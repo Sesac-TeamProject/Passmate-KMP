@@ -22,6 +22,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -31,6 +32,8 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
             implementation(projects.shared)
         }
         commonTest.dependencies {
