@@ -22,6 +22,8 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.browser)
+            implementation(libs.androidx.navigation.compose)
             implementation(libs.koin.android)
         }
         commonMain.dependencies {
