@@ -1,6 +1,6 @@
 # Passmate 코드 패턴 규칙
 
-이 문서는 Passmate-KMP(학생 앱) 구현 시 작성하는 코드의 고정 규칙이다. ConCafe 코드 패턴 규칙을 Passmate 도메인에 맞게 이식했다.
+이 문서는 Passmate-KMP(학생 앱) 구현 시 작성하는 코드의 고정 규칙이다.
 범위: `shared`, `composeApp`(Android + Desktop/jvm), `iosApp`(SwiftUI 미러)
 계약 문서: REST·WebSocket DTO/이벤트의 단일 진실은 `specs/001-passmate-mvp/contracts/`(rest-api.md·websocket-events.md)이다. 구현이 계약과 다르면 계약을 먼저 갱신한다.
 
@@ -126,7 +126,7 @@
 
 ## 10. 오류 처리 규칙
 
-- 에러 타입은 ConCafe 기본 6종에 Passmate 확장을 더해 사용한다:
+- 에러 타입은 아래와 같다:
   - 기본: `Unauthorized`, `PermissionDenied`, `ValidationFailed`, `NetworkError`, `NotFound`, `Unknown`
   - 확장: `LoginRequired`(유료 방 게스트), `PaymentRequired`(미결제), `Conflict`(닉네임 중복·중복 제출·재평가), `Gone`(종료 방·마감 문항·파기된 기록)
 - 서버 오류 응답 `{code, message}`의 `code`(예: `NICKNAME_TAKEN`, `ALREADY_RATED`, `RECORD_PURGED`)를 `AppError`에 보존해 화면 문구 분기에 사용한다.
