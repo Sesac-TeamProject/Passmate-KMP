@@ -18,9 +18,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun App() {
-    val viewModel = viewModel { GreetingViewModel() }
-    val uiState by viewModel.uiState.collectAsState()
-
     MaterialTheme {
         Column(
             modifier = Modifier
@@ -29,17 +26,7 @@ fun App() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(onClick = viewModel::toggleContent) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(uiState.showContent) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text("Compose: ${uiState.greeting}")
-                }
-            }
+
         }
     }
 }

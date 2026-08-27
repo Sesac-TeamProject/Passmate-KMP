@@ -9,20 +9,104 @@
 /* Begin PBXBuildFile section */
 		A1010001AABBCCDDEEFF0001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001AABBCCDDEEFF0001 /* ContentView.swift */; };
 		A1010002AABBCCDDEEFF0002 /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002AABBCCDDEEFF0002 /* iOSApp.swift */; };
-		A1010003AABBCCDDEEFF0003 /* GreetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011003AABBCCDDEEFF0003 /* GreetingViewModel.swift */; };
 		A1010004AABBCCDDEEFF0004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1011004AABBCCDDEEFF0004 /* Assets.xcassets */; };
 		A1010005AABBCCDDEEFF0005 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1011005AABBCCDDEEFF0005 /* Preview Assets.xcassets */; };
+		A1010022AABBCCDDEEFF0022 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011022AABBCCDDEEFF0022 /* HomeView.swift */; };
+		A1010023AABBCCDDEEFF0023 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011023AABBCCDDEEFF0023 /* HomeViewModel.swift */; };
+		A1010024AABBCCDDEEFF0024 /* HomeUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011024AABBCCDDEEFF0024 /* HomeUiState.swift */; };
+		A1010025AABBCCDDEEFF0025 /* HomeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011025AABBCCDDEEFF0025 /* HomeAction.swift */; };
+		A1010026AABBCCDDEEFF0026 /* HomeEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011026AABBCCDDEEFF0026 /* HomeEvent.swift */; };
+		A1010027AABBCCDDEEFF0027 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011027AABBCCDDEEFF0027 /* SignInView.swift */; };
+		A1010028AABBCCDDEEFF0028 /* SignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011028AABBCCDDEEFF0028 /* SignInViewModel.swift */; };
+		A1010029AABBCCDDEEFF0029 /* SignInUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011029AABBCCDDEEFF0029 /* SignInUiState.swift */; };
+		A1010030AABBCCDDEEFF0030 /* SignInAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011030AABBCCDDEEFF0030 /* SignInAction.swift */; };
+		A1010031AABBCCDDEEFF0031 /* SignInEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011031AABBCCDDEEFF0031 /* SignInEvent.swift */; };
+		A1010032AABBCCDDEEFF0032 /* JoinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011032AABBCCDDEEFF0032 /* JoinView.swift */; };
+		A1010033AABBCCDDEEFF0033 /* JoinViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011033AABBCCDDEEFF0033 /* JoinViewModel.swift */; };
+		A1010034AABBCCDDEEFF0034 /* JoinUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011034AABBCCDDEEFF0034 /* JoinUiState.swift */; };
+		A1010035AABBCCDDEEFF0035 /* JoinAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011035AABBCCDDEEFF0035 /* JoinAction.swift */; };
+		A1010036AABBCCDDEEFF0036 /* JoinEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011036AABBCCDDEEFF0036 /* JoinEvent.swift */; };
+		A1010037AABBCCDDEEFF0037 /* WaitingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011037AABBCCDDEEFF0037 /* WaitingView.swift */; };
+		A1010038AABBCCDDEEFF0038 /* WaitingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011038AABBCCDDEEFF0038 /* WaitingViewModel.swift */; };
+		A1010039AABBCCDDEEFF0039 /* WaitingUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011039AABBCCDDEEFF0039 /* WaitingUiState.swift */; };
+		A1010040AABBCCDDEEFF0040 /* WaitingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011040AABBCCDDEEFF0040 /* WaitingAction.swift */; };
+		A1010041AABBCCDDEEFF0041 /* WaitingEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011041AABBCCDDEEFF0041 /* WaitingEvent.swift */; };
+		A1010042AABBCCDDEEFF0042 /* PlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011042AABBCCDDEEFF0042 /* PlayView.swift */; };
+		A1010043AABBCCDDEEFF0043 /* PlayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011043AABBCCDDEEFF0043 /* PlayViewModel.swift */; };
+		A1010044AABBCCDDEEFF0044 /* PlayUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011044AABBCCDDEEFF0044 /* PlayUiState.swift */; };
+		A1010045AABBCCDDEEFF0045 /* PlayAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011045AABBCCDDEEFF0045 /* PlayAction.swift */; };
+		A1010046AABBCCDDEEFF0046 /* PlayEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011046AABBCCDDEEFF0046 /* PlayEvent.swift */; };
+		A1010047AABBCCDDEEFF0047 /* ResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011047AABBCCDDEEFF0047 /* ResultView.swift */; };
+		A1010048AABBCCDDEEFF0048 /* ResultViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011048AABBCCDDEEFF0048 /* ResultViewModel.swift */; };
+		A1010049AABBCCDDEEFF0049 /* ResultUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011049AABBCCDDEEFF0049 /* ResultUiState.swift */; };
+		A1010050AABBCCDDEEFF0050 /* ResultAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011050AABBCCDDEEFF0050 /* ResultAction.swift */; };
+		A1010051AABBCCDDEEFF0051 /* ResultEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011051AABBCCDDEEFF0051 /* ResultEvent.swift */; };
+		A1010052AABBCCDDEEFF0052 /* MyInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011052AABBCCDDEEFF0052 /* MyInfoView.swift */; };
+		A1010053AABBCCDDEEFF0053 /* MyInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011053AABBCCDDEEFF0053 /* MyInfoViewModel.swift */; };
+		A1010054AABBCCDDEEFF0054 /* MyInfoUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011054AABBCCDDEEFF0054 /* MyInfoUiState.swift */; };
+		A1010055AABBCCDDEEFF0055 /* MyInfoAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011055AABBCCDDEEFF0055 /* MyInfoAction.swift */; };
+		A1010056AABBCCDDEEFF0056 /* MyInfoEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011056AABBCCDDEEFF0056 /* MyInfoEvent.swift */; };
+		A1010057AABBCCDDEEFF0057 /* PaymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011057AABBCCDDEEFF0057 /* PaymentView.swift */; };
+		A1010058AABBCCDDEEFF0058 /* PaymentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011058AABBCCDDEEFF0058 /* PaymentViewModel.swift */; };
+		A1010059AABBCCDDEEFF0059 /* PaymentUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011059AABBCCDDEEFF0059 /* PaymentUiState.swift */; };
+		A1010060AABBCCDDEEFF0060 /* PaymentAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011060AABBCCDDEEFF0060 /* PaymentAction.swift */; };
+		A1010061AABBCCDDEEFF0061 /* PaymentEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011061AABBCCDDEEFF0061 /* PaymentEvent.swift */; };
+		A1010062AABBCCDDEEFF0062 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011062AABBCCDDEEFF0062 /* Route.swift */; };
+		A1010063AABBCCDDEEFF0063 /* PassmateColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011063AABBCCDDEEFF0063 /* PassmateColors.swift */; };
+		A1010064AABBCCDDEEFF0064 /* PassmateCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A1011000AABBCCDDEEFF0000 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		A1011001AABBCCDDEEFF0001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1011002AABBCCDDEEFF0002 /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
-		A1011003AABBCCDDEEFF0003 /* GreetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreetingViewModel.swift; sourceTree = "<group>"; };
 		A1011004AABBCCDDEEFF0004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1011005AABBCCDDEEFF0005 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A1011006AABBCCDDEEFF0006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FEA9D4AD37B8EF9BE110840A /* Passmate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Passmate.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1011022AABBCCDDEEFF0022 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		A1011023AABBCCDDEEFF0023 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		A1011024AABBCCDDEEFF0024 /* HomeUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeUiState.swift; sourceTree = "<group>"; };
+		A1011025AABBCCDDEEFF0025 /* HomeAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeAction.swift; sourceTree = "<group>"; };
+		A1011026AABBCCDDEEFF0026 /* HomeEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeEvent.swift; sourceTree = "<group>"; };
+		A1011027AABBCCDDEEFF0027 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		A1011028AABBCCDDEEFF0028 /* SignInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewModel.swift; sourceTree = "<group>"; };
+		A1011029AABBCCDDEEFF0029 /* SignInUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInUiState.swift; sourceTree = "<group>"; };
+		A1011030AABBCCDDEEFF0030 /* SignInAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInAction.swift; sourceTree = "<group>"; };
+		A1011031AABBCCDDEEFF0031 /* SignInEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInEvent.swift; sourceTree = "<group>"; };
+		A1011032AABBCCDDEEFF0032 /* JoinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinView.swift; sourceTree = "<group>"; };
+		A1011033AABBCCDDEEFF0033 /* JoinViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinViewModel.swift; sourceTree = "<group>"; };
+		A1011034AABBCCDDEEFF0034 /* JoinUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinUiState.swift; sourceTree = "<group>"; };
+		A1011035AABBCCDDEEFF0035 /* JoinAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinAction.swift; sourceTree = "<group>"; };
+		A1011036AABBCCDDEEFF0036 /* JoinEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinEvent.swift; sourceTree = "<group>"; };
+		A1011037AABBCCDDEEFF0037 /* WaitingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingView.swift; sourceTree = "<group>"; };
+		A1011038AABBCCDDEEFF0038 /* WaitingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingViewModel.swift; sourceTree = "<group>"; };
+		A1011039AABBCCDDEEFF0039 /* WaitingUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingUiState.swift; sourceTree = "<group>"; };
+		A1011040AABBCCDDEEFF0040 /* WaitingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingAction.swift; sourceTree = "<group>"; };
+		A1011041AABBCCDDEEFF0041 /* WaitingEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingEvent.swift; sourceTree = "<group>"; };
+		A1011042AABBCCDDEEFF0042 /* PlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayView.swift; sourceTree = "<group>"; };
+		A1011043AABBCCDDEEFF0043 /* PlayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayViewModel.swift; sourceTree = "<group>"; };
+		A1011044AABBCCDDEEFF0044 /* PlayUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayUiState.swift; sourceTree = "<group>"; };
+		A1011045AABBCCDDEEFF0045 /* PlayAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayAction.swift; sourceTree = "<group>"; };
+		A1011046AABBCCDDEEFF0046 /* PlayEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayEvent.swift; sourceTree = "<group>"; };
+		A1011047AABBCCDDEEFF0047 /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
+		A1011048AABBCCDDEEFF0048 /* ResultViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultViewModel.swift; sourceTree = "<group>"; };
+		A1011049AABBCCDDEEFF0049 /* ResultUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultUiState.swift; sourceTree = "<group>"; };
+		A1011050AABBCCDDEEFF0050 /* ResultAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultAction.swift; sourceTree = "<group>"; };
+		A1011051AABBCCDDEEFF0051 /* ResultEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultEvent.swift; sourceTree = "<group>"; };
+		A1011052AABBCCDDEEFF0052 /* MyInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoView.swift; sourceTree = "<group>"; };
+		A1011053AABBCCDDEEFF0053 /* MyInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoViewModel.swift; sourceTree = "<group>"; };
+		A1011054AABBCCDDEEFF0054 /* MyInfoUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoUiState.swift; sourceTree = "<group>"; };
+		A1011055AABBCCDDEEFF0055 /* MyInfoAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoAction.swift; sourceTree = "<group>"; };
+		A1011056AABBCCDDEEFF0056 /* MyInfoEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoEvent.swift; sourceTree = "<group>"; };
+		A1011057AABBCCDDEEFF0057 /* PaymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentView.swift; sourceTree = "<group>"; };
+		A1011058AABBCCDDEEFF0058 /* PaymentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentViewModel.swift; sourceTree = "<group>"; };
+		A1011059AABBCCDDEEFF0059 /* PaymentUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentUiState.swift; sourceTree = "<group>"; };
+		A1011060AABBCCDDEEFF0060 /* PaymentAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentAction.swift; sourceTree = "<group>"; };
+		A1011061AABBCCDDEEFF0061 /* PaymentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentEvent.swift; sourceTree = "<group>"; };
+		A1011062AABBCCDDEEFF0062 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
+		A1011063AABBCCDDEEFF0063 /* PassmateColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateColors.swift; sourceTree = "<group>"; };
+		A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateCard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,7 +125,10 @@
 			children = (
 				A1011001AABBCCDDEEFF0001 /* ContentView.swift */,
 				A1011002AABBCCDDEEFF0002 /* iOSApp.swift */,
-				A1011003AABBCCDDEEFF0003 /* GreetingViewModel.swift */,
+				A1012010AABBCCDDEEFF0010 /* ui */,
+				A1012019AABBCCDDEEFF0019 /* navigation */,
+				A1012020AABBCCDDEEFF0020 /* theme */,
+				A1012021AABBCCDDEEFF0021 /* component */,
 				A1011004AABBCCDDEEFF0004 /* Assets.xcassets */,
 				A1011006AABBCCDDEEFF0006 /* Info.plist */,
 				A1012000AABBCCDDEEFF0000 /* Preview Content */,
@@ -80,6 +167,141 @@
 				1030E2EB8EFBD5F27A20D64D /* iosApp */,
 				7332ACCB08708982CBFABD2D /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		A1012010AABBCCDDEEFF0010 /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				A1012011AABBCCDDEEFF0011 /* home */,
+				A1012012AABBCCDDEEFF0012 /* auth */,
+				A1012013AABBCCDDEEFF0013 /* join */,
+				A1012014AABBCCDDEEFF0014 /* waiting */,
+				A1012015AABBCCDDEEFF0015 /* play */,
+				A1012016AABBCCDDEEFF0016 /* result */,
+				A1012017AABBCCDDEEFF0017 /* mypage */,
+				A1012018AABBCCDDEEFF0018 /* payment */,
+			);
+			path = ui;
+			sourceTree = "<group>";
+		};
+		A1012011AABBCCDDEEFF0011 /* home */ = {
+			isa = PBXGroup;
+			children = (
+				A1011022AABBCCDDEEFF0022 /* HomeView.swift */,
+				A1011023AABBCCDDEEFF0023 /* HomeViewModel.swift */,
+				A1011024AABBCCDDEEFF0024 /* HomeUiState.swift */,
+				A1011025AABBCCDDEEFF0025 /* HomeAction.swift */,
+				A1011026AABBCCDDEEFF0026 /* HomeEvent.swift */,
+			);
+			path = home;
+			sourceTree = "<group>";
+		};
+		A1012012AABBCCDDEEFF0012 /* auth */ = {
+			isa = PBXGroup;
+			children = (
+				A1011027AABBCCDDEEFF0027 /* SignInView.swift */,
+				A1011028AABBCCDDEEFF0028 /* SignInViewModel.swift */,
+				A1011029AABBCCDDEEFF0029 /* SignInUiState.swift */,
+				A1011030AABBCCDDEEFF0030 /* SignInAction.swift */,
+				A1011031AABBCCDDEEFF0031 /* SignInEvent.swift */,
+			);
+			path = auth;
+			sourceTree = "<group>";
+		};
+		A1012013AABBCCDDEEFF0013 /* join */ = {
+			isa = PBXGroup;
+			children = (
+				A1011032AABBCCDDEEFF0032 /* JoinView.swift */,
+				A1011033AABBCCDDEEFF0033 /* JoinViewModel.swift */,
+				A1011034AABBCCDDEEFF0034 /* JoinUiState.swift */,
+				A1011035AABBCCDDEEFF0035 /* JoinAction.swift */,
+				A1011036AABBCCDDEEFF0036 /* JoinEvent.swift */,
+			);
+			path = join;
+			sourceTree = "<group>";
+		};
+		A1012014AABBCCDDEEFF0014 /* waiting */ = {
+			isa = PBXGroup;
+			children = (
+				A1011037AABBCCDDEEFF0037 /* WaitingView.swift */,
+				A1011038AABBCCDDEEFF0038 /* WaitingViewModel.swift */,
+				A1011039AABBCCDDEEFF0039 /* WaitingUiState.swift */,
+				A1011040AABBCCDDEEFF0040 /* WaitingAction.swift */,
+				A1011041AABBCCDDEEFF0041 /* WaitingEvent.swift */,
+			);
+			path = waiting;
+			sourceTree = "<group>";
+		};
+		A1012015AABBCCDDEEFF0015 /* play */ = {
+			isa = PBXGroup;
+			children = (
+				A1011042AABBCCDDEEFF0042 /* PlayView.swift */,
+				A1011043AABBCCDDEEFF0043 /* PlayViewModel.swift */,
+				A1011044AABBCCDDEEFF0044 /* PlayUiState.swift */,
+				A1011045AABBCCDDEEFF0045 /* PlayAction.swift */,
+				A1011046AABBCCDDEEFF0046 /* PlayEvent.swift */,
+			);
+			path = play;
+			sourceTree = "<group>";
+		};
+		A1012016AABBCCDDEEFF0016 /* result */ = {
+			isa = PBXGroup;
+			children = (
+				A1011047AABBCCDDEEFF0047 /* ResultView.swift */,
+				A1011048AABBCCDDEEFF0048 /* ResultViewModel.swift */,
+				A1011049AABBCCDDEEFF0049 /* ResultUiState.swift */,
+				A1011050AABBCCDDEEFF0050 /* ResultAction.swift */,
+				A1011051AABBCCDDEEFF0051 /* ResultEvent.swift */,
+			);
+			path = result;
+			sourceTree = "<group>";
+		};
+		A1012017AABBCCDDEEFF0017 /* mypage */ = {
+			isa = PBXGroup;
+			children = (
+				A1011052AABBCCDDEEFF0052 /* MyInfoView.swift */,
+				A1011053AABBCCDDEEFF0053 /* MyInfoViewModel.swift */,
+				A1011054AABBCCDDEEFF0054 /* MyInfoUiState.swift */,
+				A1011055AABBCCDDEEFF0055 /* MyInfoAction.swift */,
+				A1011056AABBCCDDEEFF0056 /* MyInfoEvent.swift */,
+			);
+			path = mypage;
+			sourceTree = "<group>";
+		};
+		A1012018AABBCCDDEEFF0018 /* payment */ = {
+			isa = PBXGroup;
+			children = (
+				A1011057AABBCCDDEEFF0057 /* PaymentView.swift */,
+				A1011058AABBCCDDEEFF0058 /* PaymentViewModel.swift */,
+				A1011059AABBCCDDEEFF0059 /* PaymentUiState.swift */,
+				A1011060AABBCCDDEEFF0060 /* PaymentAction.swift */,
+				A1011061AABBCCDDEEFF0061 /* PaymentEvent.swift */,
+			);
+			path = payment;
+			sourceTree = "<group>";
+		};
+		A1012019AABBCCDDEEFF0019 /* navigation */ = {
+			isa = PBXGroup;
+			children = (
+				A1011062AABBCCDDEEFF0062 /* Route.swift */,
+			);
+			path = navigation;
+			sourceTree = "<group>";
+		};
+		A1012020AABBCCDDEEFF0020 /* theme */ = {
+			isa = PBXGroup;
+			children = (
+				A1011063AABBCCDDEEFF0063 /* PassmateColors.swift */,
+			);
+			path = theme;
+			sourceTree = "<group>";
+		};
+		A1012021AABBCCDDEEFF0021 /* component */ = {
+			isa = PBXGroup;
+			children = (
+				A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */,
+			);
+			path = component;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -179,7 +401,49 @@
 			files = (
 				A1010001AABBCCDDEEFF0001 /* ContentView.swift in Sources */,
 				A1010002AABBCCDDEEFF0002 /* iOSApp.swift in Sources */,
-				A1010003AABBCCDDEEFF0003 /* GreetingViewModel.swift in Sources */,
+				A1010022AABBCCDDEEFF0022 /* HomeView.swift in Sources */,
+				A1010023AABBCCDDEEFF0023 /* HomeViewModel.swift in Sources */,
+				A1010024AABBCCDDEEFF0024 /* HomeUiState.swift in Sources */,
+				A1010025AABBCCDDEEFF0025 /* HomeAction.swift in Sources */,
+				A1010026AABBCCDDEEFF0026 /* HomeEvent.swift in Sources */,
+				A1010027AABBCCDDEEFF0027 /* SignInView.swift in Sources */,
+				A1010028AABBCCDDEEFF0028 /* SignInViewModel.swift in Sources */,
+				A1010029AABBCCDDEEFF0029 /* SignInUiState.swift in Sources */,
+				A1010030AABBCCDDEEFF0030 /* SignInAction.swift in Sources */,
+				A1010031AABBCCDDEEFF0031 /* SignInEvent.swift in Sources */,
+				A1010032AABBCCDDEEFF0032 /* JoinView.swift in Sources */,
+				A1010033AABBCCDDEEFF0033 /* JoinViewModel.swift in Sources */,
+				A1010034AABBCCDDEEFF0034 /* JoinUiState.swift in Sources */,
+				A1010035AABBCCDDEEFF0035 /* JoinAction.swift in Sources */,
+				A1010036AABBCCDDEEFF0036 /* JoinEvent.swift in Sources */,
+				A1010037AABBCCDDEEFF0037 /* WaitingView.swift in Sources */,
+				A1010038AABBCCDDEEFF0038 /* WaitingViewModel.swift in Sources */,
+				A1010039AABBCCDDEEFF0039 /* WaitingUiState.swift in Sources */,
+				A1010040AABBCCDDEEFF0040 /* WaitingAction.swift in Sources */,
+				A1010041AABBCCDDEEFF0041 /* WaitingEvent.swift in Sources */,
+				A1010042AABBCCDDEEFF0042 /* PlayView.swift in Sources */,
+				A1010043AABBCCDDEEFF0043 /* PlayViewModel.swift in Sources */,
+				A1010044AABBCCDDEEFF0044 /* PlayUiState.swift in Sources */,
+				A1010045AABBCCDDEEFF0045 /* PlayAction.swift in Sources */,
+				A1010046AABBCCDDEEFF0046 /* PlayEvent.swift in Sources */,
+				A1010047AABBCCDDEEFF0047 /* ResultView.swift in Sources */,
+				A1010048AABBCCDDEEFF0048 /* ResultViewModel.swift in Sources */,
+				A1010049AABBCCDDEEFF0049 /* ResultUiState.swift in Sources */,
+				A1010050AABBCCDDEEFF0050 /* ResultAction.swift in Sources */,
+				A1010051AABBCCDDEEFF0051 /* ResultEvent.swift in Sources */,
+				A1010052AABBCCDDEEFF0052 /* MyInfoView.swift in Sources */,
+				A1010053AABBCCDDEEFF0053 /* MyInfoViewModel.swift in Sources */,
+				A1010054AABBCCDDEEFF0054 /* MyInfoUiState.swift in Sources */,
+				A1010055AABBCCDDEEFF0055 /* MyInfoAction.swift in Sources */,
+				A1010056AABBCCDDEEFF0056 /* MyInfoEvent.swift in Sources */,
+				A1010057AABBCCDDEEFF0057 /* PaymentView.swift in Sources */,
+				A1010058AABBCCDDEEFF0058 /* PaymentViewModel.swift in Sources */,
+				A1010059AABBCCDDEEFF0059 /* PaymentUiState.swift in Sources */,
+				A1010060AABBCCDDEEFF0060 /* PaymentAction.swift in Sources */,
+				A1010061AABBCCDDEEFF0061 /* PaymentEvent.swift in Sources */,
+				A1010062AABBCCDDEEFF0062 /* Route.swift in Sources */,
+				A1010063AABBCCDDEEFF0063 /* PassmateColors.swift in Sources */,
+				A1010064AABBCCDDEEFF0064 /* PassmateCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
