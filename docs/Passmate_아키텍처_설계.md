@@ -1,7 +1,7 @@
 # Passmate 아키텍처 설계 — 클린아키텍처 + Koin + MVI
 
 **작성**: 2026-08-26 · **상태**: 확정 (구현 착수 전 설계)
-**담당 범위**: 이 문서와 구현은 **KMP 학생 앱(Passmate-KMP, 담당 홍희표)만** 대상이다. 백엔드(Passmate-Backend)는 전혜림, 웹(Passmate-Frontend)은 서승혁 담당 — 서버는 계약 문서(contracts/)를 통해서만 연동하고, 이 리포에서 백엔드 코드를 작성하지 않는다.
+**담당 범위**: 이 문서와 구현은 **KMP 학생 앱(Passmate-KMP, 담당 홍희표, 서승혁)만** 대상이다. 백엔드(Passmate-Backend)는 전혜림, 웹(Passmate-Frontend)은 서승혁, 이한결 담당 — 서버는 계약 문서(contracts/)를 통해서만 연동하고, 이 리포에서 백엔드 코드를 작성하지 않는다.
 **관계 문서**: 코드 레벨 규범은 [Passmate_코드_패턴_규칙.md](Passmate_코드_패턴_규칙.md)(이하 "규칙 문서")가 담당하고, 이 문서는 **구조·의존 방향·DI 배선**을 담당한다. 두 문서가 충돌하면 이 문서를 갱신하기 전까지 규칙 문서가 우선한다.
 **계약**: REST·WebSocket DTO/이벤트의 단일 진실은 `../specs/001-passmate-mvp/contracts/` — 구현이 계약과 다르면 계약을 먼저 갱신한다.
 
@@ -231,11 +231,9 @@ let viewModel = WaitingRoomViewModel(
 // composeApp: mvi/MviViewModel.kt
 abstract class MviViewModel<S : Any, A : Any, E : Any>(initialState: S) : ViewModel() {
     protected val _uiState = MutableStateFlow(initialState)
-
-    protected val _event = MutableSharedFlow<E>(replay = 0, extraBufferCapacity = 1)
-
     val uiState: StateFlow<S> = _uiState.asStateFlow()
 
+    protected val _event = MutableSharedFlow<E>(replay = 0, extraBufferCapacity = 1)
     val event: SharedFlow<E> = _event.asSharedFlow()
 
     abstract fun onAction(action: A)
