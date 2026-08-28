@@ -11,6 +11,7 @@ import org.sesacteamproject.passmate.core.network.SessionEventStream
 import org.sesacteamproject.passmate.core.network.event.ServerEvent
 import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.room.domain.model.Participant
+import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.room.domain.usecase.GetMyParticipationUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetParticipantsUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetRoomInfoUseCase
@@ -46,7 +47,12 @@ class WaitingViewModel(
                 .onSuccess { room ->
                     roomId = room.roomId
                     _uiState.update { it.copy(isLoading = false, roomTitle = room.title) }
-                    observeRoomEvents(room.roomId)
+                    // 늦은 입장(FR-024) — 이미 진행 중이면 바로 풀이 화면으로 전환한다
+                    if (room.status == RoomStatus.RUNNING) {
+                        _event.emit(WaitingEvent.SessionStarted(pin))
+                    } else {
+                        observeRoomEvents(room.roomId)
+                    }
                 }
                 .onFailure { error ->
                     _uiState.update { it.copy(isLoading = false) }

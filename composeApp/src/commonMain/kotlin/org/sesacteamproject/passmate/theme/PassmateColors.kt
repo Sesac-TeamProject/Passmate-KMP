@@ -24,6 +24,29 @@ object PassmateColors {
 
     val Border = Color(0xFFE5E7EB)
 
+    // 진행 타이머·프로그레스 (v6 M-03 타이머 링·문항 세그먼트)
+    val TimerAmber = Color(0xFFF3B440)
+
+    // 짙은 잉크 그린 — 민트 배경 위 라벨 (v6 M-05 최종 결과)
+    val InkGreen = Color(0xFF0F3D2E)
+
+    // 순위·선지 칩 파스텔 4색 + 대응 텍스트 (v6 M-03 선지·M-05 포디움/랭킹)
+    val ChipBlue = Color(0xFFAAC6F6)
+
+    val ChipBlueText = Color(0xFF173872)
+
+    val ChipGold = Color(0xFFF7DBA1)
+
+    val ChipGoldText = Color(0xFF6E4C06)
+
+    val ChipGreen = Color(0xFFA9DEC3)
+
+    val ChipGreenText = Color(0xFF14523B)
+
+    val ChipOrange = Color(0xFFF8C6A4)
+
+    val ChipOrangeText = Color(0xFF7A3A11)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     val BrandGoogleBlue = Color(0xFF4285F4)
 
