@@ -18,6 +18,7 @@ import org.sesacteamproject.passmate.session.domain.policy.SnapshotPolicy
 import org.sesacteamproject.passmate.session.domain.usecase.GetSessionSnapshotUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.GetVoiceHintsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SubmitAnswerUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyPageUseCase
 
 // Swift는 reified 제네릭을 못 쓰므로 화면(Swift VM)별 의존성을 명시 getter로 노출한다 (아키텍처 설계 §4-5)
 object KoinHelper {
@@ -57,6 +58,8 @@ object KoinHelper {
     fun getLearningReportUseCase(): GetLearningReportUseCase = KoinPlatform.getKoin().get()
 
     fun buildReportSummaryUseCase(): BuildReportSummaryUseCase = KoinPlatform.getKoin().get()
+
+    fun getMyPageUseCase(): GetMyPageUseCase = KoinPlatform.getKoin().get()
 
     fun sessionEventStreamWatcher(): SessionEventStreamWatcher = SessionEventStreamWatcher(KoinPlatform.getKoin().get())
 }

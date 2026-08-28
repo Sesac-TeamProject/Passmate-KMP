@@ -8,7 +8,8 @@ struct ContentView: View {
         NavigationStack(path: $path) {
             HomeView(
                 onJoinTapped: { path.append(.join(pin: nil)) },
-                onSignInTapped: { path.append(.signIn) }
+                onSignInTapped: { path.append(.signIn) },
+                onMyInfoTapped: { path.append(.myInfo) }
             )
             .navigationDestination(for: Route.self) { route in
                 destinationView(for: route)
@@ -51,8 +52,15 @@ struct ContentView: View {
                 roomId: roomId,
                 onClickHome: { path = [] }
             )
+        case .myInfo:
+            MyInfoView(
+                onRequireSignIn: { path.append(.signIn) },
+                onOpenReport: { roomId in path.append(.result(roomId: roomId)) },
+                onRejoin: { pin in path.append(.waiting(pin: pin)) },
+                onBack: { popOnce() }
+            )
         default:
-            // MyInfo·Payment·Settings 라우트는 담당 스토리(파트2)에서 연결된다
+            // Payment·Settings 라우트는 담당 스토리(파트2)에서 연결된다
             HomeView(
                 onJoinTapped: { path.append(.join(pin: nil)) },
                 onSignInTapped: { path.append(.signIn) }

@@ -59,12 +59,22 @@ fun HomeScreen(onNavigate: (NavigationAction) -> Unit) {
             )
         }
         Text(
-            text = "로그인",
+            text = "내 학습 기록",
             color = PassmateColors.PrimaryDeep,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier
                 .padding(top = 12.dp)
+                .clickable { onNavigate(NavigationAction.NavigateToMyInfo) }
+                .padding(4.dp)
+        )
+        Text(
+            text = "로그인",
+            color = PassmateColors.PrimaryDeep,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier
+                .padding(top = 4.dp)
                 .clickable { onNavigate(NavigationAction.NavigateToSignIn) }
                 .padding(4.dp)
         )
