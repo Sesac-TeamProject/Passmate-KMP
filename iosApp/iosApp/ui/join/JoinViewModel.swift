@@ -20,6 +20,33 @@ final class JoinViewModel: ObservableObject {
         let digits = String(pin.filter { $0.isNumber }.prefix(maxLength))
 
         uiState.pin = digits
+        // PIN이 완성되면 방 정보(호스트 등급·별점)를 미리 불러온다, 바뀌면 초기화 (T081)
+        if joinInputPolicy.isValidPin(pin: digits) {
+            prefetchRoomInfo(pin: digits)
+        } else {
+            uiState.roomInfo = nil
+            uiState.isLoadingRoomInfo = false
+        }
+    }
+
+    private func prefetchRoomInfo(pin: String) {
+        if uiState.roomInfo?.pin == pin {
+            return
+        }
+        uiState.isLoadingRoomInfo = true
+        getRoomInfoUseCase.invoke(pin: pin) { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let success = result as? AppResultSuccess<AnyObject>
+
+                self.uiState.isLoadingRoomInfo = false
+                if error == nil, let room = success?.value as? RoomInfo {
+                    self.uiState.roomInfo = room
+                } else {
+                    self.uiState.roomInfo = nil
+                }
+            }
+        }
     }
 
     private func onChangeNickname(nickname: String) {

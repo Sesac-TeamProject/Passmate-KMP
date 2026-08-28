@@ -196,6 +196,12 @@ private fun JoinCardContent(
         if (isQrScanAvailable) {
             QrScanButton(onClick = { onAction(JoinAction.ClickScanQr) })
         }
+        // 입장 전 방 정보 슬롯 (T081) — PIN 완성 시 프리페치된 호스트 등급·별점
+        val roomInfo = uiState.roomInfo
+
+        if (roomInfo != null) {
+            RoomInfoCard(room = roomInfo)
+        }
         NicknameField(
             nickname = uiState.nickname,
             onNicknameChange = { onAction(JoinAction.ChangeNickname(it)) }

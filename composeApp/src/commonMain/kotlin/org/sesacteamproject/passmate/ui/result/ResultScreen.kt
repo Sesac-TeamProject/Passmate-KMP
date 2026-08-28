@@ -20,9 +20,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,7 +46,8 @@ import org.sesacteamproject.passmate.report.domain.model.QuestionResult
 import org.sesacteamproject.passmate.report.domain.model.SessionResult
 import org.sesacteamproject.passmate.theme.PassmateColors
 
-// Figma "UI 디자인 v6" M-06(349:9395) — 정답 링·보완 주제·문항 리스트·AI 분석 카드 + 내보내기 (T062·T056)
+// Figma "UI 디자인 v6" M-06(349:9395) — 정답 링·보완 주제·문항 리스트·AI 분석 카드 + 내보내기·평가 (T062·T056·T080)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultScreen(
     viewModel: ResultViewModel = koinScreenViewModel(),
@@ -53,6 +57,7 @@ fun ResultScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val shareReport = rememberReportSharer()
+    val ratingSheetState = rememberModalBottomSheetState()
 
     LaunchedEffect(roomId) {
         viewModel.onAction(ResultAction.Enter(roomId))
@@ -62,6 +67,7 @@ fun ResultScreen(
             when (event) {
                 is ResultEvent.ShareReport -> shareReport(event.summary)
                 is ResultEvent.NavigateToSignup -> onNavigate(NavigationAction.NavigateToSignIn)
+                is ResultEvent.RatingSubmitted -> snackbarHostState.showSnackbar(event.message)
                 is ResultEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -76,6 +82,19 @@ fun ResultScreen(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
+    }
+    // 평가 시트는 컨테이너가 소유 (규칙 §11-1) — 오버레이/모달은 콘텐츠 뷰에 두지 않는다
+    if (uiState.isRatingSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.onAction(ResultAction.DismissRatingSheet) },
+            sheetState = ratingSheetState,
+            containerColor = PassmateColors.Surface
+        ) {
+            RatingSection(
+                uiState = uiState,
+                onAction = viewModel::onAction
+            )
+        }
     }
 }
 
@@ -167,6 +186,10 @@ private fun ColumnScope.LoadedResult(
 
         if (selected != null && (selected.aiFeedback != null || selected.hostReview != null)) {
             FeedbackSection(question = selected)
+        }
+        // 선생님 평가 진입 (T080) — 평가 자격이 있고 아직 안 했을 때만
+        if (result.canRate && !uiState.hasRated) {
+            RateEntryButton(onClick = { onAction(ResultAction.OpenRatingSheet) })
         }
         // 게스트 가입 유도 (T075) — 회원에게는 표시하지 않는다
         if (result.isGuest) {
@@ -378,6 +401,28 @@ private fun verdictStyle(verdict: AnswerVerdict): Triple<Color, Color, String> {
         AnswerVerdict.AI_ANALYZED -> Triple(PassmateColors.ChipGold, PassmateColors.ChipGoldText, "AI 분석")
         AnswerVerdict.AI_PENDING -> Triple(PassmateColors.ChipGold, PassmateColors.ChipGoldText, "분석 중")
         AnswerVerdict.UNGRADED -> Triple(PassmateColors.FieldGray, PassmateColors.TextSecondary, "미채점")
+    }
+}
+
+@Composable
+private fun RateEntryButton(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .background(PassmateColors.BackgroundMint, RoundedCornerShape(16.dp))
+            .border(1.dp, PassmateColors.Primary, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "★ 선생님 평가하기",
+            color = PassmateColors.PrimaryDeep,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.28).sp
+        )
     }
 }
 

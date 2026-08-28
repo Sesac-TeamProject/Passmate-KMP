@@ -4,12 +4,16 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.getOrNull
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.core.network.SessionEventStream
 import org.sesacteamproject.passmate.core.network.event.ServerEvent
 import org.sesacteamproject.passmate.mvi.MviViewModel
+import org.sesacteamproject.passmate.rating.domain.model.RatingDraft
+import org.sesacteamproject.passmate.rating.domain.model.RatingTag
+import org.sesacteamproject.passmate.rating.domain.usecase.SubmitRatingUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.BuildReportSummaryUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetLearningReportUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetSessionResultUseCase
@@ -22,6 +26,7 @@ class ResultViewModel(
     private val buildReportSummaryUseCase: BuildReportSummaryUseCase,
     private val getMyParticipationUseCase: GetMyParticipationUseCase,
     private val requestGuestClaimUseCase: RequestGuestClaimUseCase,
+    private val submitRatingUseCase: SubmitRatingUseCase,
     private val sessionEventStream: SessionEventStream
 ) : MviViewModel<ResultUiState, ResultAction, ResultEvent>(ResultUiState()) {
 
@@ -145,6 +150,81 @@ class ResultViewModel(
         }
     }
 
+    // ─── 평가 시트 (T080) ───
+
+    private fun onOpenRatingSheet() {
+        _uiState.update { it.copy(isRatingSheetVisible = true) }
+    }
+
+    private fun onDismissRatingSheet() {
+        _uiState.update { it.copy(isRatingSheetVisible = false) }
+    }
+
+    private fun onSelectRatingStars(stars: Int) {
+        _uiState.update { it.copy(ratingStars = stars) }
+    }
+
+    private fun onToggleRatingTag(tag: RatingTag) {
+        _uiState.update { state ->
+            val tags = if (tag in state.ratingTags) state.ratingTags - tag else state.ratingTags + tag
+
+            state.copy(ratingTags = tags)
+        }
+    }
+
+    private fun onChangeRatingComment(comment: String) {
+        _uiState.update { it.copy(ratingComment = comment.take(RATING_COMMENT_MAX)) }
+    }
+
+    private fun onSkipRating() {
+        _uiState.update { it.copy(isRatingSheetVisible = false) }
+    }
+
+    // 최종 중복 차단은 서버(409 ALREADY_RATED) — 클라 in-flight 가드는 UX용 (규칙 §9)
+    private fun onSubmitRating() {
+        val state = _uiState.value
+        val currentRoomId = roomId
+
+        if (currentRoomId == null || state.isSubmittingRating) {
+            return
+        }
+        viewModelScope.launch {
+            if (state.ratingStars < 1) {
+                _event.emit(ResultEvent.ShowNotice("별점을 선택해 주세요"))
+            } else {
+                _uiState.update { it.copy(isSubmittingRating = true) }
+                submitRating(currentRoomId, RatingDraft(state.ratingStars, state.ratingTags, state.ratingComment))
+            }
+        }
+    }
+
+    private suspend fun submitRating(roomId: Long, draft: RatingDraft) {
+        submitRatingUseCase.invoke(roomId, draft)
+            .onSuccess {
+                _uiState.update { it.copy(isSubmittingRating = false, isRatingSheetVisible = false, hasRated = true) }
+                _event.emit(ResultEvent.RatingSubmitted("평가를 보냈어요. 고마워요!"))
+            }
+            .onFailure { error ->
+                _uiState.update { it.copy(isSubmittingRating = false) }
+                handleRatingFailure(error)
+            }
+    }
+
+    private suspend fun handleRatingFailure(error: AppError) {
+        when (error) {
+            is AppError.Conflict -> {
+                _uiState.update { it.copy(isRatingSheetVisible = false, hasRated = true) }
+                _event.emit(ResultEvent.ShowNotice("이미 평가한 세션이에요"))
+            }
+            is AppError.Gone -> {
+                _uiState.update { it.copy(isRatingSheetVisible = false) }
+                _event.emit(ResultEvent.ShowNotice("평가 기간(24시간)이 지났어요"))
+            }
+            is AppError.NetworkError -> _event.emit(ResultEvent.ShowNotice("네트워크 연결을 확인해 주세요"))
+            else -> _event.emit(ResultEvent.ShowNotice("평가를 보내지 못했어요. 다시 시도해 주세요"))
+        }
+    }
+
     override fun onAction(action: ResultAction) {
         when (action) {
             is ResultAction.Enter -> onEnter(action.roomId)
@@ -152,6 +232,17 @@ class ResultViewModel(
             is ResultAction.ClickExport -> onClickExport()
             is ResultAction.ClickSignup -> onClickSignup()
             is ResultAction.Retry -> onRetry()
+            is ResultAction.OpenRatingSheet -> onOpenRatingSheet()
+            is ResultAction.DismissRatingSheet -> onDismissRatingSheet()
+            is ResultAction.SelectRatingStars -> onSelectRatingStars(action.stars)
+            is ResultAction.ToggleRatingTag -> onToggleRatingTag(action.tag)
+            is ResultAction.ChangeRatingComment -> onChangeRatingComment(action.comment)
+            is ResultAction.SubmitRating -> onSubmitRating()
+            is ResultAction.SkipRating -> onSkipRating()
         }
+    }
+
+    companion object {
+        private const val RATING_COMMENT_MAX = 100
     }
 }

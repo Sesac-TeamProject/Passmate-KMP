@@ -15,6 +15,7 @@ struct ResultView: View {
         buildReportSummaryUseCase: KoinHelper.shared.buildReportSummaryUseCase(),
         getMyParticipationUseCase: KoinHelper.shared.getMyParticipationUseCase(),
         requestGuestClaimUseCase: KoinHelper.shared.requestGuestClaimUseCase(),
+        submitRatingUseCase: KoinHelper.shared.submitRatingUseCase(),
         eventWatcher: KoinHelper.shared.sessionEventStreamWatcher()
     )
 
@@ -37,9 +38,22 @@ struct ResultView: View {
                 shareText = summary
             case .navigateToSignup:
                 onNavigateToSignup()
+            case .ratingSubmitted:
+                break
             case .showNotice:
                 break
             }
+        }
+        // 평가 시트는 컨테이너가 소유 (규칙 §11-1)
+        .sheet(isPresented: Binding(
+            get: { viewModel.uiState.isRatingSheetVisible },
+            set: { if !$0 { viewModel.action(.dismissRatingSheet) } }
+        )) {
+            RatingSectionView(
+                uiState: viewModel.uiState,
+                onAction: { viewModel.action($0) }
+            )
+            .presentationDetents([.large])
         }
         .sheet(isPresented: Binding(get: { shareText != nil }, set: { if !$0 { shareText = nil } })) {
             if let shareText {
@@ -102,6 +116,21 @@ private struct ResultContentView: View {
                     if let selected = result.questions.first(where: { Int($0.questionNo) == uiState.selectedQuestionNo }),
                        selected.aiFeedback != nil || selected.hostReview != nil {
                         FeedbackSectionView(question: selected)
+                    }
+                    if result.canRate, !uiState.hasRated {
+                        Button {
+                            onAction(.openRatingSheet)
+                        } label: {
+                            Text("★ 선생님 평가하기")
+                                .font(.system(size: 14, weight: .medium))
+                                .kerning(-0.28)
+                                .foregroundColor(PassmateColors.primaryDeep)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(PassmateColors.backgroundMint)
+                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.primary, lineWidth: 1))
+                                .cornerRadius(16)
+                        }
                     }
                     if result.isGuest {
                         SignupPromptSectionView(onClickSignup: { onAction(.clickSignup) })
