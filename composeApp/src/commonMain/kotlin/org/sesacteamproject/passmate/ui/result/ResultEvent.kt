@@ -8,4 +8,7 @@ sealed interface ResultEvent {
     data object NavigateToSignup : ResultEvent
 
     data class ShowNotice(val message: String) : ResultEvent
+
+    // 평가 완료 안내 (T080)
+    data class RatingSubmitted(val message: String) : ResultEvent
 }

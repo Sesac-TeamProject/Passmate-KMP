@@ -13,6 +13,6 @@ val viewModelModule = module {
     factory { JoinViewModel(get(), get(), get(), get()) }
     factory { WaitingViewModel(get(), get(), get(), get(), get()) }
     factory { PlayViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory { ResultViewModel(get(), get(), get(), get(), get(), get()) }
+    factory { ResultViewModel(get(), get(), get(), get(), get(), get(), get()) }
     factory { MyInfoViewModel(get(), get()) }
 }

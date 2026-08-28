@@ -1,5 +1,7 @@
 package org.sesacteamproject.passmate.ui.result
 
+import org.sesacteamproject.passmate.rating.domain.model.RatingTag
+
 sealed interface ResultAction {
 
     data class Enter(val roomId: Long) : ResultAction
@@ -11,4 +13,19 @@ sealed interface ResultAction {
     data object ClickSignup : ResultAction
 
     data object Retry : ResultAction
+
+    // 평가 시트 (T080)
+    data object OpenRatingSheet : ResultAction
+
+    data object DismissRatingSheet : ResultAction
+
+    data class SelectRatingStars(val stars: Int) : ResultAction
+
+    data class ToggleRatingTag(val tag: RatingTag) : ResultAction
+
+    data class ChangeRatingComment(val comment: String) : ResultAction
+
+    data object SubmitRating : ResultAction
+
+    data object SkipRating : ResultAction
 }

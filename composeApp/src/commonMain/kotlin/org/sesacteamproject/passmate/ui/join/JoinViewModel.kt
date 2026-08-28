@@ -1,6 +1,7 @@
 package org.sesacteamproject.passmate.ui.join
 
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
@@ -21,10 +22,32 @@ class JoinViewModel(
     private val joinInputPolicy: JoinInputPolicy
 ) : MviViewModel<JoinUiState, JoinAction, JoinEvent>(JoinUiState()) {
 
+    private var roomInfoJob: Job? = null
+
     private fun onChangePin(pin: String) {
         val digits = pin.filter { it.isDigit() }.take(JoinInputPolicy.PIN_LENGTH)
 
         _uiState.update { it.copy(pin = digits) }
+        // PIN이 완성되면 방 정보(호스트 등급·별점)를 미리 불러온다, 바뀌면 초기화 (T081)
+        if (joinInputPolicy.isValidPin(digits)) {
+            prefetchRoomInfo(digits)
+        } else {
+            roomInfoJob?.cancel()
+            _uiState.update { it.copy(roomInfo = null, isLoadingRoomInfo = false) }
+        }
+    }
+
+    private fun prefetchRoomInfo(pin: String) {
+        if (_uiState.value.roomInfo?.pin == pin) {
+            return
+        }
+        roomInfoJob?.cancel()
+        _uiState.update { it.copy(isLoadingRoomInfo = true) }
+        roomInfoJob = viewModelScope.launch {
+            getRoomInfoUseCase.invoke(pin)
+                .onSuccess { room -> _uiState.update { it.copy(roomInfo = room, isLoadingRoomInfo = false) } }
+                .onFailure { _uiState.update { it.copy(roomInfo = null, isLoadingRoomInfo = false) } }
+        }
     }
 
     private fun onChangeNickname(nickname: String) {

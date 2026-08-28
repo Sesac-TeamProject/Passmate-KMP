@@ -56,6 +56,18 @@ object PassmateColors {
 
     val WeakTopicText = Color(0xFFBF3F0C)
 
+    // 별점 전용 골드 (디자인 시스템 §StarRating — 별점에만 허용)
+    val StarGold = Color(0xFFF2C94C)
+
+    // 명성 뱃지·평가 태그 선택 (v6 M-06 v2 별점 시트·M-10 프로필)
+    val ReputationBadgeBg = Color(0xFFC4EEDB)
+
+    val ReputationBadgeText = Color(0xFF0B6B4C)
+
+    val RatingTagSelectedBg = Color(0xFFD6F3E6)
+
+    val RatingTagSelectedText = Color(0xFF0B6B4C)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     val BrandGoogleBlue = Color(0xFF4285F4)
 
