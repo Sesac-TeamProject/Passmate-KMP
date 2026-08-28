@@ -13,11 +13,15 @@ import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.report.domain.usecase.BuildReportSummaryUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetLearningReportUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetSessionResultUseCase
+import org.sesacteamproject.passmate.room.domain.usecase.GetMyParticipationUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.RequestGuestClaimUseCase
 
 class ResultViewModel(
     private val getSessionResultUseCase: GetSessionResultUseCase,
     private val getLearningReportUseCase: GetLearningReportUseCase,
     private val buildReportSummaryUseCase: BuildReportSummaryUseCase,
+    private val getMyParticipationUseCase: GetMyParticipationUseCase,
+    private val requestGuestClaimUseCase: RequestGuestClaimUseCase,
     private val sessionEventStream: SessionEventStream
 ) : MviViewModel<ResultUiState, ResultAction, ResultEvent>(ResultUiState()) {
 
@@ -127,11 +131,26 @@ class ResultViewModel(
         }
     }
 
+    // 게스트 가입 유도 — participantId를 대기 큐에 넣고 로그인 화면으로 (로그인 완료 후 claim, FR-036)
+    private fun onClickSignup() {
+        val participation = getMyParticipationUseCase.invoke()
+
+        viewModelScope.launch {
+            if (participation != null) {
+                requestGuestClaimUseCase.invoke(participation.participantId)
+                _event.emit(ResultEvent.NavigateToSignup)
+            } else {
+                _event.emit(ResultEvent.NavigateToSignup)
+            }
+        }
+    }
+
     override fun onAction(action: ResultAction) {
         when (action) {
             is ResultAction.Enter -> onEnter(action.roomId)
             is ResultAction.SelectQuestion -> onSelectQuestion(action.questionNo)
             is ResultAction.ClickExport -> onClickExport()
+            is ResultAction.ClickSignup -> onClickSignup()
             is ResultAction.Retry -> onRetry()
         }
     }

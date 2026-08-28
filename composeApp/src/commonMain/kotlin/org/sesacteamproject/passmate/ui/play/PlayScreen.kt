@@ -80,6 +80,7 @@ fun PlayScreen(
                     }
                 }
                 is PlayEvent.OpenResult -> onNavigate(NavigationAction.NavigateToResult(event.roomId))
+                is PlayEvent.OpenSignup -> onNavigate(NavigationAction.NavigateToSignIn)
                 is PlayEvent.RoomClosed -> {
                     snackbarHostState.showSnackbar(event.message)
                     onNavigate(NavigationAction.NavigateToHome)
@@ -702,7 +703,7 @@ private fun ColumnScope.FinalResultContent(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, bottom = 24.dp)
+            .padding(start = 20.dp, end = 20.dp, bottom = if (uiState.isGuest) 10.dp else 24.dp)
             .height(54.dp)
             .background(PassmateColors.Primary, RoundedCornerShape(16.dp))
             .clickable { onAction(PlayAction.ClickViewReport) },
@@ -716,6 +717,28 @@ private fun ColumnScope.FinalResultContent(
             fontWeight = FontWeight.Medium,
             letterSpacing = (-0.32).sp
         )
+    }
+    // 게스트 가입 유도 (T075) — 세션 종료 화면에서 기록 저장 (M-05 하단 버튼)
+    if (uiState.isGuest) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp, bottom = 24.dp)
+                .height(50.dp)
+                .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
+                .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
+                .clickable { onAction(PlayAction.ClickSignup) },
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "가입하고 이 기록 저장하기",
+                color = PassmateColors.PrimaryDeep,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = (-0.28).sp
+            )
+        }
     }
 }
 

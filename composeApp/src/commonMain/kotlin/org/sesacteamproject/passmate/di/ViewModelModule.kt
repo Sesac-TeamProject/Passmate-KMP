@@ -9,10 +9,10 @@ import org.sesacteamproject.passmate.ui.result.ResultViewModel
 import org.sesacteamproject.passmate.ui.waiting.WaitingViewModel
 
 val viewModelModule = module {
-    factory { SignInViewModel(get(), get()) }
+    factory { SignInViewModel(get(), get(), get()) }
     factory { JoinViewModel(get(), get(), get(), get()) }
     factory { WaitingViewModel(get(), get(), get(), get(), get()) }
-    factory { PlayViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory { ResultViewModel(get(), get(), get(), get()) }
+    factory { PlayViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory { ResultViewModel(get(), get(), get(), get(), get(), get()) }
     factory { MyInfoViewModel(get(), get()) }
 }

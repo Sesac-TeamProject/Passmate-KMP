@@ -25,6 +25,7 @@ data class PlayUiState(
     val correctCount: Int = 0,
     val myParticipantId: Long? = null,
     val myNickname: String? = null,
+    val isGuest: Boolean = false,
     val isLocked: Boolean = false,
     val activeVoiceHint: VoiceHint? = null
 ) {
