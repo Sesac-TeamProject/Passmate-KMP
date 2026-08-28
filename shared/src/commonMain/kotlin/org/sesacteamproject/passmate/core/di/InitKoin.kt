@@ -3,6 +3,7 @@ package org.sesacteamproject.passmate.core.di
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.sesacteamproject.passmate.auth.di.authModule
+import org.sesacteamproject.passmate.payment.di.paymentModule
 import org.sesacteamproject.passmate.rating.di.ratingModule
 import org.sesacteamproject.passmate.report.di.reportModule
 import org.sesacteamproject.passmate.room.di.roomModule
@@ -22,7 +23,8 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) {
             sessionModule,
             reportModule,
             userModule,
-            ratingModule
+            ratingModule,
+            paymentModule
         )
     }
 }

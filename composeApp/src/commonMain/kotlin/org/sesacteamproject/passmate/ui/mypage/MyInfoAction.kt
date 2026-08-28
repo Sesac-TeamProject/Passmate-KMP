@@ -11,4 +11,6 @@ sealed interface MyInfoAction {
     data class ClickRoomReport(val roomId: Long) : MyInfoAction
 
     data class ClickRejoin(val pin: String) : MyInfoAction
+
+    data object ClickCoinHistory : MyInfoAction
 }

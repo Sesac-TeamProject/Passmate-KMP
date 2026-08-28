@@ -5,6 +5,9 @@ sealed class Route(val route: String) {
 
     data object Home : Route("home")
 
+    // 공개 방 목록·탐색 (M-11) — 홈에서 진입하는 방 찾기 화면
+    data object RoomList : Route("roomList")
+
     data object SignIn : Route("signIn")
 
     data object Join : Route("join?pin={pin}")
@@ -20,6 +23,9 @@ sealed class Route(val route: String) {
     data object MyInfo : Route("myInfo")
 
     data object Payment : Route("payment/{pin}")
+
+    // 코인·결제 내역 (M-12) — 마이페이지에서 진입
+    data object CoinHistory : Route("coinHistory")
 
     data object Settings : Route("settings")
 }

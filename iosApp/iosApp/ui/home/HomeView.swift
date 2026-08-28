@@ -8,6 +8,8 @@ struct HomeView: View {
 
     var onMyInfoTapped: () -> Void = {}
 
+    var onRoomListTapped: () -> Void = {}
+
     var body: some View {
         VStack(spacing: 0) {
             PassyMascotView()
@@ -30,13 +32,20 @@ struct HomeView: View {
                     .cornerRadius(14)
             }
             .padding(.top, 24)
+            Button(action: onRoomListTapped) {
+                Text("방 찾기")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(PassmateColors.primaryDeep)
+                    .padding(4)
+            }
+            .padding(.top, 12)
             Button(action: onMyInfoTapped) {
                 Text("내 학습 기록")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(PassmateColors.primaryDeep)
                     .padding(4)
             }
-            .padding(.top, 12)
+            .padding(.top, 4)
             Button(action: onSignInTapped) {
                 Text("로그인")
                     .font(.system(size: 14, weight: .medium))

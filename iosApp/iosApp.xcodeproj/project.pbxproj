@@ -58,6 +58,17 @@
 		A1010063AABBCCDDEEFF0063 /* PassmateColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011063AABBCCDDEEFF0063 /* PassmateColors.swift */; };
 		A1010064AABBCCDDEEFF0064 /* PassmateCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */; };
 		A101000070AABBCCDDEEFF0070 /* StarRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100070AABBCCDDEEFF0070 /* StarRatingView.swift */; };
+		A101000073AABBCCDDEEFF0073 /* PortOnePaymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100073AABBCCDDEEFF0073 /* PortOnePaymentView.swift */; };
+		A101000074AABBCCDDEEFF0074 /* RoomListUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100074AABBCCDDEEFF0074 /* RoomListUiState.swift */; };
+		A101000075AABBCCDDEEFF0075 /* RoomListAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100075AABBCCDDEEFF0075 /* RoomListAction.swift */; };
+		A101000076AABBCCDDEEFF0076 /* RoomListEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100076AABBCCDDEEFF0076 /* RoomListEvent.swift */; };
+		A101000077AABBCCDDEEFF0077 /* RoomListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100077AABBCCDDEEFF0077 /* RoomListViewModel.swift */; };
+		A101000078AABBCCDDEEFF0078 /* RoomListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100078AABBCCDDEEFF0078 /* RoomListView.swift */; };
+		A101000079AABBCCDDEEFF0079 /* CoinHistoryUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100079AABBCCDDEEFF0079 /* CoinHistoryUiState.swift */; };
+		A101000080AABBCCDDEEFF0080 /* CoinHistoryAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100080AABBCCDDEEFF0080 /* CoinHistoryAction.swift */; };
+		A101000081AABBCCDDEEFF0081 /* CoinHistoryEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100081AABBCCDDEEFF0081 /* CoinHistoryEvent.swift */; };
+		A101000082AABBCCDDEEFF0082 /* CoinHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100082AABBCCDDEEFF0082 /* CoinHistoryViewModel.swift */; };
+		A101000083AABBCCDDEEFF0083 /* CoinHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100083AABBCCDDEEFF0083 /* CoinHistoryView.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
@@ -119,6 +130,17 @@
 		A1011063AABBCCDDEEFF0063 /* PassmateColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateColors.swift; sourceTree = "<group>"; };
 		A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateCard.swift; sourceTree = "<group>"; };
 		A101100070AABBCCDDEEFF0070 /* StarRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarRatingView.swift; sourceTree = "<group>"; };
+		A101100073AABBCCDDEEFF0073 /* PortOnePaymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortOnePaymentView.swift; sourceTree = "<group>"; };
+		A101100074AABBCCDDEEFF0074 /* RoomListUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListUiState.swift; sourceTree = "<group>"; };
+		A101100075AABBCCDDEEFF0075 /* RoomListAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListAction.swift; sourceTree = "<group>"; };
+		A101100076AABBCCDDEEFF0076 /* RoomListEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListEvent.swift; sourceTree = "<group>"; };
+		A101100077AABBCCDDEEFF0077 /* RoomListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListViewModel.swift; sourceTree = "<group>"; };
+		A101100078AABBCCDDEEFF0078 /* RoomListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListView.swift; sourceTree = "<group>"; };
+		A101100079AABBCCDDEEFF0079 /* CoinHistoryUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinHistoryUiState.swift; sourceTree = "<group>"; };
+		A101100080AABBCCDDEEFF0080 /* CoinHistoryAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinHistoryAction.swift; sourceTree = "<group>"; };
+		A101100081AABBCCDDEEFF0081 /* CoinHistoryEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinHistoryEvent.swift; sourceTree = "<group>"; };
+		A101100082AABBCCDDEEFF0082 /* CoinHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinHistoryViewModel.swift; sourceTree = "<group>"; };
+		A101100083AABBCCDDEEFF0083 /* CoinHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinHistoryView.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
@@ -204,6 +226,11 @@
 			isa = PBXGroup;
 			children = (
 				A1011022AABBCCDDEEFF0022 /* HomeView.swift */,
+				A101100074AABBCCDDEEFF0074 /* RoomListUiState.swift */,
+				A101100075AABBCCDDEEFF0075 /* RoomListAction.swift */,
+				A101100076AABBCCDDEEFF0076 /* RoomListEvent.swift */,
+				A101100077AABBCCDDEEFF0077 /* RoomListViewModel.swift */,
+				A101100078AABBCCDDEEFF0078 /* RoomListView.swift */,
 				A1011023AABBCCDDEEFF0023 /* HomeViewModel.swift */,
 				A1011024AABBCCDDEEFF0024 /* HomeUiState.swift */,
 				A1011025AABBCCDDEEFF0025 /* HomeAction.swift */,
@@ -293,6 +320,11 @@
 			isa = PBXGroup;
 			children = (
 				A1011057AABBCCDDEEFF0057 /* PaymentView.swift */,
+				A101100079AABBCCDDEEFF0079 /* CoinHistoryUiState.swift */,
+				A101100080AABBCCDDEEFF0080 /* CoinHistoryAction.swift */,
+				A101100081AABBCCDDEEFF0081 /* CoinHistoryEvent.swift */,
+				A101100082AABBCCDDEEFF0082 /* CoinHistoryViewModel.swift */,
+				A101100083AABBCCDDEEFF0083 /* CoinHistoryView.swift */,
 				A1011058AABBCCDDEEFF0058 /* PaymentViewModel.swift */,
 				A1011059AABBCCDDEEFF0059 /* PaymentUiState.swift */,
 				A1011060AABBCCDDEEFF0060 /* PaymentAction.swift */,
@@ -323,6 +355,7 @@
 				A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */,
 				A101100070AABBCCDDEEFF0070 /* StarRatingView.swift */,
 				A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */,
+				A101100073AABBCCDDEEFF0073 /* PortOnePaymentView.swift */,
 				A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */,
 			);
 			path = component;
@@ -475,6 +508,17 @@
 				A1010064AABBCCDDEEFF0064 /* PassmateCard.swift in Sources */,
 				A101000070AABBCCDDEEFF0070 /* StarRatingView.swift in Sources */,
 				A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */,
+				A101000073AABBCCDDEEFF0073 /* PortOnePaymentView.swift in Sources */,
+				A101000074AABBCCDDEEFF0074 /* RoomListUiState.swift in Sources */,
+				A101000075AABBCCDDEEFF0075 /* RoomListAction.swift in Sources */,
+				A101000076AABBCCDDEEFF0076 /* RoomListEvent.swift in Sources */,
+				A101000077AABBCCDDEEFF0077 /* RoomListViewModel.swift in Sources */,
+				A101000078AABBCCDDEEFF0078 /* RoomListView.swift in Sources */,
+				A101000079AABBCCDDEEFF0079 /* CoinHistoryUiState.swift in Sources */,
+				A101000080AABBCCDDEEFF0080 /* CoinHistoryAction.swift in Sources */,
+				A101000081AABBCCDDEEFF0081 /* CoinHistoryEvent.swift in Sources */,
+				A101000082AABBCCDDEEFF0082 /* CoinHistoryViewModel.swift in Sources */,
+				A101000083AABBCCDDEEFF0083 /* CoinHistoryView.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

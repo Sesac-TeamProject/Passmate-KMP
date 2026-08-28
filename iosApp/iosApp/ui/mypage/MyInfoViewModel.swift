@@ -81,6 +81,8 @@ final class MyInfoViewModel: ObservableObject {
             event.send(.openReport(roomId: roomId))
         case let .clickRejoin(pin):
             event.send(.rejoin(pin: pin))
+        case .clickCoinHistory:
+            event.send(.openCoinHistory)
         }
     }
 

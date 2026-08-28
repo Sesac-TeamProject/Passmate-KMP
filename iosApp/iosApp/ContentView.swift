@@ -9,7 +9,8 @@ struct ContentView: View {
             HomeView(
                 onJoinTapped: { path.append(.join(pin: nil)) },
                 onSignInTapped: { path.append(.signIn) },
-                onMyInfoTapped: { path.append(.myInfo) }
+                onMyInfoTapped: { path.append(.myInfo) },
+                onRoomListTapped: { path.append(.roomList) }
             )
             .navigationDestination(for: Route.self) { route in
                 destinationView(for: route)
@@ -21,6 +22,11 @@ struct ContentView: View {
     @ViewBuilder
     private func destinationView(for route: Route) -> some View {
         switch route {
+        case .roomList:
+            RoomListView(
+                onOpenRoom: { pin in path.append(.join(pin: pin)) },
+                onOpenPinEntry: { path.append(.join(pin: nil)) }
+            )
         case .signIn:
             SignInView(
                 onSignedIn: { path = [] },
@@ -30,9 +36,19 @@ struct ContentView: View {
             JoinView(
                 initialPin: pin,
                 onJoined: { pin in path.append(.waiting(pin: pin)) },
+                onPaymentRequired: { pin in path.append(.payment(pin: pin)) },
                 onSignInRequested: { path.append(.signIn) },
                 onBack: { popOnce() }
             )
+        case let .payment(pin):
+            PaymentView(
+                pin: pin,
+                onEnterRoom: { pin in path.append(.waiting(pin: pin)) },
+                onSignInRequired: { path.append(.signIn) },
+                onBack: { popOnce() }
+            )
+        case .coinHistory:
+            CoinHistoryView(onBack: { popOnce() })
         case let .waiting(pin):
             WaitingView(
                 pin: pin,
@@ -59,6 +75,7 @@ struct ContentView: View {
                 onRequireSignIn: { path.append(.signIn) },
                 onOpenReport: { roomId in path.append(.result(roomId: roomId)) },
                 onRejoin: { pin in path.append(.waiting(pin: pin)) },
+                onOpenCoinHistory: { path.append(.coinHistory) },
                 onBack: { popOnce() }
             )
         default:

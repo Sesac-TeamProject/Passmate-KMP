@@ -8,6 +8,8 @@ struct JoinView: View {
 
     var onJoined: (String) -> Void = { _ in }
 
+    var onPaymentRequired: (String) -> Void = { _ in }
+
     var onSignInRequested: () -> Void = {}
 
     var onBack: () -> Void = {}
@@ -39,6 +41,8 @@ struct JoinView: View {
                 isScannerPresented = true
             case let .joinCompleted(pin):
                 onJoined(pin)
+            case let .paymentRequired(pin):
+                onPaymentRequired(pin)
             case .signInRequested:
                 onSignInRequested()
             case let .showNotice(message):

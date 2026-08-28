@@ -5,8 +5,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import org.sesacteamproject.passmate.ui.auth.SignInScreen
 import org.sesacteamproject.passmate.ui.home.HomeScreen
+import org.sesacteamproject.passmate.ui.home.RoomListScreen
 import org.sesacteamproject.passmate.ui.join.JoinScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
+import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
+import org.sesacteamproject.passmate.ui.payment.PaymentScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
 import org.sesacteamproject.passmate.ui.result.ResultScreen
 import org.sesacteamproject.passmate.ui.waiting.WaitingScreen
@@ -16,9 +19,15 @@ private sealed interface JvmDestination {
 
     data object Home : JvmDestination
 
+    data object RoomList : JvmDestination
+
     data object SignIn : JvmDestination
 
     data class Join(val pin: String?) : JvmDestination
+
+    data class Payment(val pin: String) : JvmDestination
+
+    data object CoinHistory : JvmDestination
 
     data class Waiting(val pin: String) : JvmDestination
 
@@ -39,8 +48,10 @@ actual fun AppNavHost() {
                 routeStack.clear()
                 routeStack.add(JvmDestination.Home)
             }
+            is NavigationAction.NavigateToRoomList -> routeStack.add(JvmDestination.RoomList)
             is NavigationAction.NavigateToSignIn -> routeStack.add(JvmDestination.SignIn)
             is NavigationAction.NavigateToJoin -> routeStack.add(JvmDestination.Join(action.pin))
+            is NavigationAction.NavigateToPayment -> routeStack.add(JvmDestination.Payment(action.pin))
             is NavigationAction.NavigateToWaiting -> routeStack.add(JvmDestination.Waiting(action.pin))
             is NavigationAction.NavigateToPlay -> routeStack.add(JvmDestination.Play(action.pin))
             is NavigationAction.NavigateToResult -> {
@@ -49,6 +60,7 @@ actual fun AppNavHost() {
                 routeStack.add(JvmDestination.Result(action.roomId))
             }
             is NavigationAction.NavigateToMyInfo -> routeStack.add(JvmDestination.MyInfo)
+            is NavigationAction.NavigateToCoinHistory -> routeStack.add(JvmDestination.CoinHistory)
             is NavigationAction.NavigateBack -> {
                 if (routeStack.size > 1) {
                     routeStack.removeAt(routeStack.lastIndex)
@@ -58,11 +70,17 @@ actual fun AppNavHost() {
     }
 
     when (currentDestination) {
+        is JvmDestination.RoomList -> RoomListScreen(onNavigate = onNavigate)
         is JvmDestination.SignIn -> SignInScreen(onNavigate = onNavigate)
         is JvmDestination.Join -> JoinScreen(
             initialPin = currentDestination.pin,
             onNavigate = onNavigate
         )
+        is JvmDestination.Payment -> PaymentScreen(
+            pin = currentDestination.pin,
+            onNavigate = onNavigate
+        )
+        is JvmDestination.CoinHistory -> CoinHistoryScreen(onNavigate = onNavigate)
         is JvmDestination.Waiting -> WaitingScreen(
             pin = currentDestination.pin,
             onNavigate = onNavigate

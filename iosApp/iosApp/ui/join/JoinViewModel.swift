@@ -125,6 +125,10 @@ final class JoinViewModel: ObservableObject {
             uiState.isJoining = false
             event.send(.showNotice(message: "유료 방은 로그인 후 입장할 수 있어요"))
             event.send(.signInRequested)
+        } else if room.isPaid {
+            // 회원의 유료 방 입장은 참가비 결제 화면으로 위임한다 (US14)
+            uiState.isJoining = false
+            event.send(.paymentRequired(pin: room.pin))
         } else {
             joinRoomUseCase.invoke(
                 room: room,
@@ -151,7 +155,7 @@ final class JoinViewModel: ObservableObject {
             event.send(.showNotice(message: "유료 방은 로그인 후 입장할 수 있어요"))
             event.send(.signInRequested)
         } else if error is AppErrorPaymentRequired {
-            event.send(.showNotice(message: "참가비 결제가 필요한 방이에요. 결제 기능은 준비 중이에요"))
+            event.send(.paymentRequired(pin: uiState.pin))
         } else {
             event.send(.showNotice(message: roomErrorMessage(error)))
         }
