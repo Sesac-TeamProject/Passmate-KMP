@@ -121,6 +121,10 @@ class JoinViewModel(
             _uiState.update { it.copy(isJoining = false) }
             _event.emit(JoinEvent.ShowNotice("유료 방은 로그인 후 입장할 수 있어요"))
             _event.emit(JoinEvent.SignInRequested)
+        } else if (room.isPaid) {
+            // 회원의 유료 방 입장은 참가비 결제 화면으로 위임한다 (US14)
+            _uiState.update { it.copy(isJoining = false) }
+            _event.emit(JoinEvent.PaymentRequired(room.pin))
         } else {
             joinRoomUseCase.invoke(room, nickname, avatarId)
                 .onSuccess {
@@ -141,7 +145,7 @@ class JoinViewModel(
                 _event.emit(JoinEvent.ShowNotice("유료 방은 로그인 후 입장할 수 있어요"))
                 _event.emit(JoinEvent.SignInRequested)
             }
-            is AppError.PaymentRequired -> _event.emit(JoinEvent.ShowNotice("참가비 결제가 필요한 방이에요. 결제 기능은 준비 중이에요"))
+            is AppError.PaymentRequired -> _event.emit(JoinEvent.PaymentRequired(_uiState.value.pin))
             else -> _event.emit(JoinEvent.ShowNotice(roomErrorMessage(error)))
         }
     }

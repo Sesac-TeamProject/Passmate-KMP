@@ -5,9 +5,16 @@ sealed interface NavigationAction {
 
     data object NavigateToHome : NavigationAction
 
+    data object NavigateToRoomList : NavigationAction
+
     data object NavigateToSignIn : NavigationAction
 
     data class NavigateToJoin(val pin: String? = null) : NavigationAction
+
+    // 유료 방 결제 입장 (M-01 v2) — pin으로 방 정보·코인을 로드한다
+    data class NavigateToPayment(val pin: String) : NavigationAction
+
+    data object NavigateToCoinHistory : NavigationAction
 
     data class NavigateToWaiting(val pin: String) : NavigationAction
 

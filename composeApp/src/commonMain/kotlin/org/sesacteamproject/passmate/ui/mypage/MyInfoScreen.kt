@@ -59,6 +59,7 @@ fun MyInfoScreen(
                 is MyInfoEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
                 is MyInfoEvent.OpenReport -> onNavigate(NavigationAction.NavigateToResult(event.roomId))
                 is MyInfoEvent.Rejoin -> onNavigate(NavigationAction.NavigateToWaiting(event.pin))
+                is MyInfoEvent.OpenCoinHistory -> onNavigate(NavigationAction.NavigateToCoinHistory)
                 is MyInfoEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -149,6 +150,7 @@ private fun ColumnScope.LoadedMyInfo(
             SummaryCard(summary = summary)
             WeakTopicsRow(topics = summary.weakTopics)
         }
+        CoinHistoryRow(onClick = { onAction(MyInfoAction.ClickCoinHistory) })
         if (uiState.rooms.isEmpty() && ongoing == null) {
             EmptyRooms()
         } else {
@@ -165,6 +167,27 @@ private fun ColumnScope.LoadedMyInfo(
                 onClick = { onAction(MyInfoAction.LoadMore) }
             )
         }
+    }
+}
+
+@Composable
+private fun CoinHistoryRow(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "코인·결제 내역",
+            color = PassmateColors.TextPrimary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.weight(1f)
+        )
+        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
     }
 }
 

@@ -16,8 +16,11 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import org.sesacteamproject.passmate.ui.auth.SignInScreen
 import org.sesacteamproject.passmate.ui.home.HomeScreen
+import org.sesacteamproject.passmate.ui.home.RoomListScreen
 import org.sesacteamproject.passmate.ui.join.JoinScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
+import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
+import org.sesacteamproject.passmate.ui.payment.PaymentScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
 import org.sesacteamproject.passmate.ui.result.ResultScreen
 import org.sesacteamproject.passmate.ui.waiting.WaitingScreen
@@ -44,6 +47,7 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
             popUpTo(Route.Home.route) { inclusive = true }
             launchSingleTop = true
         }
+        is NavigationAction.NavigateToRoomList -> navigate(Route.RoomList.route)
         is NavigationAction.NavigateToSignIn -> navigate(Route.SignIn.route)
         is NavigationAction.NavigateToJoin -> {
             if (action.pin != null) {
@@ -58,7 +62,9 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
             // 세션 플로우 백스택(Join/Waiting/Play)을 클리어한다 (규칙 §2-1-2)
             popUpTo(Route.Home.route)
         }
+        is NavigationAction.NavigateToPayment -> navigate("payment/${action.pin}")
         is NavigationAction.NavigateToMyInfo -> navigate(Route.MyInfo.route)
+        is NavigationAction.NavigateToCoinHistory -> navigate(Route.CoinHistory.route)
         is NavigationAction.NavigateBack -> popBackStack()
     }
 }
@@ -80,6 +86,9 @@ actual fun AppNavHost() {
     ) {
         composable(Route.Home.route) {
             HomeScreen(onNavigate = navController::handleNavigationAction)
+        }
+        composable(Route.RoomList.route) {
+            RoomListScreen(onNavigate = navController::handleNavigationAction)
         }
         composable(
             route = "${Route.SignIn.route}?accessToken={accessToken}&refreshToken={refreshToken}",
@@ -133,8 +142,17 @@ actual fun AppNavHost() {
                 onNavigate = navController::handleNavigationAction
             )
         }
+        composable(Route.Payment.route) { backStackEntry ->
+            PaymentScreen(
+                pin = backStackEntry.arguments?.getString("pin").orEmpty(),
+                onNavigate = navController::handleNavigationAction
+            )
+        }
         composable(Route.MyInfo.route) {
             MyInfoScreen(onNavigate = navController::handleNavigationAction)
+        }
+        composable(Route.CoinHistory.route) {
+            CoinHistoryScreen(onNavigate = navController::handleNavigationAction)
         }
     }
 }

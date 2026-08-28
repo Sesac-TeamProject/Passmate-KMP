@@ -9,5 +9,8 @@ sealed interface MyInfoEvent {
 
     data class Rejoin(val pin: String) : MyInfoEvent
 
+    // 코인·결제 내역 화면으로 이동 (US14, M-12)
+    data object OpenCoinHistory : MyInfoEvent
+
     data class ShowNotice(val message: String) : MyInfoEvent
 }
