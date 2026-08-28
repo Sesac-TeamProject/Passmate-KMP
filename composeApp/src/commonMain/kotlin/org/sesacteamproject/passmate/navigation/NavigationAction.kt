@@ -7,5 +7,11 @@ sealed interface NavigationAction {
 
     data object NavigateToSignIn : NavigationAction
 
+    data class NavigateToJoin(val pin: String? = null) : NavigationAction
+
+    data class NavigateToWaiting(val pin: String) : NavigationAction
+
+    data class NavigateToPlay(val pin: String) : NavigationAction
+
     data object NavigateBack : NavigationAction
 }

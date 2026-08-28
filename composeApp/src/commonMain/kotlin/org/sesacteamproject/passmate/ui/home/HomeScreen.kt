@@ -48,15 +48,25 @@ fun HomeScreen(onNavigate: (NavigationAction) -> Unit) {
             modifier = Modifier
                 .padding(top = 24.dp)
                 .background(PassmateColors.Primary, RoundedCornerShape(14.dp))
-                .clickable { onNavigate(NavigationAction.NavigateToSignIn) }
+                .clickable { onNavigate(NavigationAction.NavigateToJoin()) }
                 .padding(horizontal = 32.dp, vertical = 14.dp)
         ) {
             Text(
-                text = "로그인",
+                text = "PIN으로 입장하기",
                 color = PassmateColors.Surface,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
         }
+        Text(
+            text = "로그인",
+            color = PassmateColors.PrimaryDeep,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .clickable { onNavigate(NavigationAction.NavigateToSignIn) }
+                .padding(4.dp)
+        )
     }
 }
