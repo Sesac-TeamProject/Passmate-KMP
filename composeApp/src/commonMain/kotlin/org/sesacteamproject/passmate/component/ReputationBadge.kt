@@ -2,7 +2,6 @@ package org.sesacteamproject.passmate.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,8 +16,7 @@ import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.room.domain.model.HostLevel
 import org.sesacteamproject.passmate.theme.PassmateColors
 
-// 명성 레벨 뱃지 (디자인 시스템 §ReputationBadge) — "Lv.N {등급명}", 파스텔 배경+진한 잉크.
-// 엠블럼 그래픽(방패/별/왕관)은 후속 — 여기선 레벨 숫자 원형 엠블럼으로 대체
+// 명성 레벨 뱃지 (디자인 시스템 §ReputationBadge) — 등급별 엠블럼 + "Lv.N {등급명}" (T086)
 @Composable
 fun ReputationBadge(
     level: HostLevel,
@@ -31,19 +29,10 @@ fun ReputationBadge(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .size(14.dp)
-                .background(PassmateColors.Primary, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = level.level.toString(),
-                color = PassmateColors.Surface,
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        LevelEmblem(
+            level = level,
+            modifier = Modifier.size(14.dp)
+        )
         Text(
             text = "Lv.${level.level} ${level.label}",
             color = PassmateColors.ReputationBadgeText,
