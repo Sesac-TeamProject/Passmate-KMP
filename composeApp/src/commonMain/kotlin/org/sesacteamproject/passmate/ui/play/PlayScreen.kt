@@ -63,6 +63,7 @@ fun PlayScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val voiceHintPlayer = rememberVoiceHintPlayer()
     var isLeaveDialogVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(pin) {
@@ -71,6 +72,13 @@ fun PlayScreen(
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
+                is PlayEvent.PlayVoiceHint -> {
+                    if (voiceHintPlayer != null) {
+                        voiceHintPlayer.play(event.hint.clipUrl)
+                    } else {
+                        snackbarHostState.showSnackbar("선생님이 음성 힌트를 보냈어요")
+                    }
+                }
                 is PlayEvent.RoomClosed -> {
                     snackbarHostState.showSnackbar(event.message)
                     onNavigate(NavigationAction.NavigateToHome)
@@ -80,12 +88,31 @@ fun PlayScreen(
             }
         }
     }
+    // 문항 전환·세션 종료로 배너가 사라지면 재생도 함께 멈춘다
+    LaunchedEffect(uiState.activeVoiceHint) {
+        if (uiState.activeVoiceHint == null) {
+            voiceHintPlayer?.stop()
+        }
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         PlayContentScreen(
             uiState = uiState,
             onAction = viewModel::onAction,
             onClickLeave = { isLeaveDialogVisible = true }
         )
+        // 음성 힌트 배너 — 오버레이 소유는 컨테이너 (규칙 §11-1)
+        val activeVoiceHint = uiState.activeVoiceHint
+
+        if (activeVoiceHint != null && uiState.phase != PlayUiState.Phase.FINISHED) {
+            VoiceHintBanner(
+                hint = activeVoiceHint,
+                controller = voiceHintPlayer,
+                onClickReplay = { viewModel.onAction(PlayAction.ClickReplayHint) },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(start = 20.dp, end = 20.dp, bottom = 92.dp)
+            )
+        }
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)

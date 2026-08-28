@@ -3,6 +3,7 @@ package org.sesacteamproject.passmate.ui.play
 import org.sesacteamproject.passmate.session.domain.model.AnswerResult
 import org.sesacteamproject.passmate.session.domain.model.RankEntry
 import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
+import org.sesacteamproject.passmate.session.domain.model.VoiceHint
 
 data class PlayUiState(
     val isLoading: Boolean = true,
@@ -24,7 +25,8 @@ data class PlayUiState(
     val correctCount: Int = 0,
     val myParticipantId: Long? = null,
     val myNickname: String? = null,
-    val isLocked: Boolean = false
+    val isLocked: Boolean = false,
+    val activeVoiceHint: VoiceHint? = null
 ) {
 
     // 화면 단계 — 전환은 전부 서버 이벤트·스냅샷으로만 일어난다 (규칙 §2-1-2)

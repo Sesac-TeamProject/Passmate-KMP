@@ -10,6 +10,7 @@ import org.sesacteamproject.passmate.core.network.ApiClient
 import org.sesacteamproject.passmate.session.data.dto.SessionSnapshotResponse
 import org.sesacteamproject.passmate.session.data.dto.SubmitAnswerRequest
 import org.sesacteamproject.passmate.session.data.dto.SubmitAnswerResponse
+import org.sesacteamproject.passmate.session.data.dto.VoiceHintsResponse
 
 // 전송만 담당 — AppResult 변환·매핑은 Repository가 한다 (규칙 §6)
 class SessionRemoteDataSource(
@@ -26,5 +27,9 @@ class SessionRemoteDataSource(
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()
+    }
+
+    suspend fun fetchVoiceHints(roomId: Long): VoiceHintsResponse {
+        return apiClient.http.get("${apiClient.baseUrl}/rooms/$roomId/session/hints").body()
     }
 }

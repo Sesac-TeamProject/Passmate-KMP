@@ -26,6 +26,7 @@ kotlin {
             implementation(libs.androidx.navigation.compose)
             implementation(libs.koin.android)
             implementation(libs.zxing.android.embedded)
+            implementation(libs.androidx.media3.exoplayer)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

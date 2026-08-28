@@ -8,6 +8,7 @@ import org.sesacteamproject.passmate.session.data.mapper.toDomain
 import org.sesacteamproject.passmate.session.data.remote.SessionRemoteDataSource
 import org.sesacteamproject.passmate.session.domain.model.AnswerResult
 import org.sesacteamproject.passmate.session.domain.model.SessionSnapshot
+import org.sesacteamproject.passmate.session.domain.model.VoiceHint
 import org.sesacteamproject.passmate.session.domain.repository.SessionRepository
 
 class SessionRepositoryImpl(
@@ -22,5 +23,10 @@ class SessionRepositoryImpl(
         val request = SubmitAnswerRequest(content = content)
 
         return apiCall { remoteDataSource.submitAnswer(roomId, questionId, request) }.map { it.toDomain() }
+    }
+
+    override suspend fun getVoiceHints(roomId: Long): AppResult<List<VoiceHint>> {
+        return apiCall { remoteDataSource.fetchVoiceHints(roomId) }
+            .map { response -> response.hints.map { it.toDomain() } }
     }
 }

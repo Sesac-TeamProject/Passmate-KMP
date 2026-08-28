@@ -23,14 +23,17 @@ import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.session.domain.model.RankEntry
 import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
 import org.sesacteamproject.passmate.session.domain.model.SessionSnapshot
+import org.sesacteamproject.passmate.session.domain.model.VoiceHint
 import org.sesacteamproject.passmate.session.domain.policy.SnapshotPolicy
 import org.sesacteamproject.passmate.session.domain.usecase.GetSessionSnapshotUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.GetVoiceHintsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SubmitAnswerUseCase
 
 class PlayViewModel(
     private val getRoomInfoUseCase: GetRoomInfoUseCase,
     private val getSessionSnapshotUseCase: GetSessionSnapshotUseCase,
     private val submitAnswerUseCase: SubmitAnswerUseCase,
+    private val getVoiceHintsUseCase: GetVoiceHintsUseCase,
     private val leaveRoomUseCase: LeaveRoomUseCase,
     private val getMyParticipationUseCase: GetMyParticipationUseCase,
     private val snapshotPolicy: SnapshotPolicy,
@@ -91,10 +94,22 @@ class PlayViewModel(
             .onSuccess { snapshot ->
                 snapshotTs = snapshot.ts
                 applySnapshot(snapshot)
+                restoreVoiceHint(roomId, snapshot.currentQuestion?.questionNo)
             }
             .onFailure {
                 _uiState.update { state -> state.copy(isLoading = false) }
             }
+    }
+
+    // 재접속 시 현재 문항의 마지막 힌트를 복구한다 — 자동 재생 없이 다시 듣기만 (FR-041)
+    private suspend fun restoreVoiceHint(roomId: Long, currentQuestionNo: Int?) {
+        if (currentQuestionNo != null) {
+            getVoiceHintsUseCase.invoke(roomId).onSuccess { hints ->
+                val latest = hints.lastOrNull { it.questionNo == currentQuestionNo }
+
+                _uiState.update { it.copy(activeVoiceHint = latest) }
+            }
+        }
     }
 
     private fun applySnapshot(snapshot: SessionSnapshot) {
@@ -147,10 +162,24 @@ class PlayViewModel(
             is ServerEvent.ScreenLocked -> _uiState.update { it.copy(isLocked = event.locked) }
             is ServerEvent.SessionStarted -> _uiState.update { it.copy(isLoading = false, questionCount = event.questionCount) }
             is ServerEvent.SessionEnded -> onSessionEnded(event)
+            is ServerEvent.HintPublished -> onHintPublished(event)
             is ServerEvent.RoomCancelled -> _event.emit(PlayEvent.RoomClosed("방이 취소됐어요"))
             is ServerEvent.ParticipantLeft -> onParticipantLeft(event)
             else -> Unit
         }
+    }
+
+    // 수신 즉시 자동 재생(FR-040, 3초 SLA) — 재생 실패 시 배너의 수동 재생으로 폴백된다
+    private suspend fun onHintPublished(event: ServerEvent.HintPublished) {
+        val hint = VoiceHint(
+            hintId = event.hintId,
+            questionNo = event.questionNo,
+            clipUrl = event.clipUrl,
+            durationMs = event.durationMs
+        )
+
+        _uiState.update { it.copy(activeVoiceHint = hint) }
+        _event.emit(PlayEvent.PlayVoiceHint(hint))
     }
 
     private fun onQuestionStarted(event: ServerEvent.QuestionStarted, serverTs: String) {
@@ -178,7 +207,8 @@ class PlayViewModel(
                 isSubmitting = false,
                 hasSubmitted = false,
                 myAnswerResult = null,
-                reveal = null
+                reveal = null,
+                activeVoiceHint = null
             )
         }
         restartTicker()
@@ -333,6 +363,16 @@ class PlayViewModel(
         }
     }
 
+    private fun onClickReplayHint() {
+        val hint = _uiState.value.activeVoiceHint
+
+        if (hint != null) {
+            viewModelScope.launch {
+                _event.emit(PlayEvent.PlayVoiceHint(hint))
+            }
+        }
+    }
+
     private fun onClickViewReport() {
         viewModelScope.launch {
             _event.emit(PlayEvent.ShowNotice("리포트 화면은 준비 중이에요"))
@@ -364,6 +404,7 @@ class PlayViewModel(
             is PlayAction.SelectChoice -> onSelectChoice(action.index)
             is PlayAction.ChangeEssayAnswer -> onChangeEssayAnswer(action.text)
             is PlayAction.ClickSubmit -> onClickSubmit()
+            is PlayAction.ClickReplayHint -> onClickReplayHint()
             is PlayAction.ConfirmLeave -> onConfirmLeave()
             is PlayAction.ClickViewReport -> onClickViewReport()
         }

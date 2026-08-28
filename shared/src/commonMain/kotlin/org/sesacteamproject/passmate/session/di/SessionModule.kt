@@ -6,6 +6,7 @@ import org.sesacteamproject.passmate.session.data.repository.SessionRepositoryIm
 import org.sesacteamproject.passmate.session.domain.policy.SnapshotPolicy
 import org.sesacteamproject.passmate.session.domain.repository.SessionRepository
 import org.sesacteamproject.passmate.session.domain.usecase.GetSessionSnapshotUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.GetVoiceHintsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SubmitAnswerUseCase
 
 val sessionModule = module {
@@ -14,4 +15,5 @@ val sessionModule = module {
     factory { SnapshotPolicy() }
     factory { GetSessionSnapshotUseCase(get()) }
     factory { SubmitAnswerUseCase(get()) }
+    factory { GetVoiceHintsUseCase(get()) }
 }

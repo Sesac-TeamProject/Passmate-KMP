@@ -10,5 +10,5 @@ val viewModelModule = module {
     factory { SignInViewModel(get(), get()) }
     factory { JoinViewModel(get(), get(), get(), get()) }
     factory { WaitingViewModel(get(), get(), get(), get(), get()) }
-    factory { PlayViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    factory { PlayViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
 }

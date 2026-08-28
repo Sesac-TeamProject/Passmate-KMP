@@ -10,6 +10,8 @@ sealed interface PlayAction {
 
     data object ClickSubmit : PlayAction
 
+    data object ClickReplayHint : PlayAction
+
     data object ConfirmLeave : PlayAction
 
     data object ClickViewReport : PlayAction

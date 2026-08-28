@@ -3,12 +3,14 @@ package org.sesacteamproject.passmate.session.data.mapper
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.session.data.dto.SessionSnapshotResponse
 import org.sesacteamproject.passmate.session.data.dto.SubmitAnswerResponse
+import org.sesacteamproject.passmate.session.data.dto.VoiceHintsResponse
 import org.sesacteamproject.passmate.session.domain.model.AnswerResult
 import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.session.domain.model.RankEntry
 import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
 import org.sesacteamproject.passmate.session.domain.model.SessionSnapshot
 import org.sesacteamproject.passmate.session.domain.model.SubmittedAnswer
+import org.sesacteamproject.passmate.session.domain.model.VoiceHint
 
 fun SessionSnapshotResponse.toDomain(): SessionSnapshot {
     return SessionSnapshot(
@@ -54,6 +56,15 @@ fun SessionSnapshotResponse.RankingEntryDto.toDomain(): RankEntry {
         nickname = nickname,
         avatarId = avatarId,
         total = total
+    )
+}
+
+fun VoiceHintsResponse.Entry.toDomain(): VoiceHint {
+    return VoiceHint(
+        hintId = hintId,
+        questionNo = questionNo,
+        clipUrl = clipUrl,
+        durationMs = durationMs
     )
 }
 
