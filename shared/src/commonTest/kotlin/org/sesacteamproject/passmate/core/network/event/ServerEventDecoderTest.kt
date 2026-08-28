@@ -57,7 +57,7 @@ class ServerEventDecoderTest {
     fun decodeQuestionStartedWithoutAnswerField() {
         val text = """
             {"type":"QUESTION_STARTED","ts":"2026-08-27T10:01:00Z",
-             "data":{"questionNo":2,"type":"MULTIPLE_CHOICE","body":"1+1은?",
+             "data":{"questionId":21,"questionNo":2,"type":"MULTIPLE_CHOICE","body":"1+1은?",
                      "choices":["1","2","3","4"],"points":10,"timeLimitSec":30,
                      "endsAt":"2026-08-27T10:01:30Z"}}
         """.trimIndent()
@@ -65,6 +65,7 @@ class ServerEventDecoderTest {
         val frame = ServerEventDecoder.decode(text)
         val event = assertIs<ServerEvent.QuestionStarted>(frame?.event)
 
+        assertEquals(21L, event.questionId)
         assertEquals(2, event.questionNo)
         assertEquals(listOf("1", "2", "3", "4"), event.choices)
         assertEquals("2026-08-27T10:01:30Z", event.endsAt)

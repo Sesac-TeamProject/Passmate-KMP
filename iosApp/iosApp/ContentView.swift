@@ -40,7 +40,11 @@ struct ContentView: View {
                 onLeft: { popOnce() }
             )
         case let .play(pin):
-            PlayView(pin: pin)
+            PlayView(
+                pin: pin,
+                onLeft: { path = [] },
+                onRoomClosed: { path = [] }
+            )
         default:
             // Result·MyInfo·Payment·Settings 라우트는 담당 스토리에서 연결된다
             HomeView(

@@ -11,6 +11,10 @@ import org.sesacteamproject.passmate.room.domain.usecase.GetParticipantsUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetRoomInfoUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.JoinRoomUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.LeaveRoomUseCase
+import org.sesacteamproject.passmate.session.domain.policy.SnapshotPolicy
+import org.sesacteamproject.passmate.session.domain.usecase.GetSessionSnapshotUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.GetVoiceHintsUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.SubmitAnswerUseCase
 
 // Swift는 reified 제네릭을 못 쓰므로 화면(Swift VM)별 의존성을 명시 getter로 노출한다 (아키텍처 설계 §4-5)
 object KoinHelper {
@@ -36,6 +40,14 @@ object KoinHelper {
     fun leaveRoomUseCase(): LeaveRoomUseCase = KoinPlatform.getKoin().get()
 
     fun getMyParticipationUseCase(): GetMyParticipationUseCase = KoinPlatform.getKoin().get()
+
+    fun getSessionSnapshotUseCase(): GetSessionSnapshotUseCase = KoinPlatform.getKoin().get()
+
+    fun submitAnswerUseCase(): SubmitAnswerUseCase = KoinPlatform.getKoin().get()
+
+    fun getVoiceHintsUseCase(): GetVoiceHintsUseCase = KoinPlatform.getKoin().get()
+
+    fun snapshotPolicy(): SnapshotPolicy = KoinPlatform.getKoin().get()
 
     fun sessionEventStreamWatcher(): SessionEventStreamWatcher = SessionEventStreamWatcher(KoinPlatform.getKoin().get())
 }
