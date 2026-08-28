@@ -5,6 +5,9 @@ import org.sesacteamproject.passmate.auth.domain.usecase.BuildGoogleSignInUrlUse
 import org.sesacteamproject.passmate.auth.domain.usecase.CompleteSignInUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
 import org.sesacteamproject.passmate.core.network.SessionEventStreamWatcher
+import org.sesacteamproject.passmate.report.domain.usecase.BuildReportSummaryUseCase
+import org.sesacteamproject.passmate.report.domain.usecase.GetLearningReportUseCase
+import org.sesacteamproject.passmate.report.domain.usecase.GetSessionResultUseCase
 import org.sesacteamproject.passmate.room.domain.policy.JoinInputPolicy
 import org.sesacteamproject.passmate.room.domain.usecase.GetMyParticipationUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetParticipantsUseCase
@@ -48,6 +51,12 @@ object KoinHelper {
     fun getVoiceHintsUseCase(): GetVoiceHintsUseCase = KoinPlatform.getKoin().get()
 
     fun snapshotPolicy(): SnapshotPolicy = KoinPlatform.getKoin().get()
+
+    fun getSessionResultUseCase(): GetSessionResultUseCase = KoinPlatform.getKoin().get()
+
+    fun getLearningReportUseCase(): GetLearningReportUseCase = KoinPlatform.getKoin().get()
+
+    fun buildReportSummaryUseCase(): BuildReportSummaryUseCase = KoinPlatform.getKoin().get()
 
     fun sessionEventStreamWatcher(): SessionEventStreamWatcher = SessionEventStreamWatcher(KoinPlatform.getKoin().get())
 }

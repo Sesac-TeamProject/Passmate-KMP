@@ -43,10 +43,16 @@ struct ContentView: View {
             PlayView(
                 pin: pin,
                 onLeft: { path = [] },
-                onRoomClosed: { path = [] }
+                onRoomClosed: { path = [] },
+                onOpenResult: { roomId in path.append(.result(roomId: roomId)) }
+            )
+        case let .result(roomId):
+            ResultView(
+                roomId: roomId,
+                onClickHome: { path = [] }
             )
         default:
-            // Result·MyInfo·Payment·Settings 라우트는 담당 스토리에서 연결된다
+            // MyInfo·Payment·Settings 라우트는 담당 스토리(파트2)에서 연결된다
             HomeView(
                 onJoinTapped: { path.append(.join(pin: nil)) },
                 onSignInTapped: { path.append(.signIn) }
