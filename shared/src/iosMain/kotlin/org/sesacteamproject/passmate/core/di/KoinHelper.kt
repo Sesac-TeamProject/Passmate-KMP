@@ -5,6 +5,13 @@ import org.sesacteamproject.passmate.auth.domain.usecase.BuildGoogleSignInUrlUse
 import org.sesacteamproject.passmate.auth.domain.usecase.CompleteSignInUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
 import org.sesacteamproject.passmate.core.network.SessionEventStreamWatcher
+import org.sesacteamproject.passmate.payment.domain.policy.CoinPolicy
+import org.sesacteamproject.passmate.payment.domain.usecase.ConfirmChargeUseCase
+import org.sesacteamproject.passmate.payment.domain.usecase.GetCoinTransactionsUseCase
+import org.sesacteamproject.passmate.payment.domain.usecase.GetMyCoinsUseCase
+import org.sesacteamproject.passmate.payment.domain.usecase.GetPublicRoomsUseCase
+import org.sesacteamproject.passmate.payment.domain.usecase.PayEntryFeeUseCase
+import org.sesacteamproject.passmate.payment.domain.usecase.RequestChargeUseCase
 import org.sesacteamproject.passmate.rating.domain.usecase.SubmitRatingUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.BuildReportSummaryUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetLearningReportUseCase
@@ -69,6 +76,20 @@ object KoinHelper {
     fun completeGuestClaimUseCase(): CompleteGuestClaimUseCase = KoinPlatform.getKoin().get()
 
     fun submitRatingUseCase(): SubmitRatingUseCase = KoinPlatform.getKoin().get()
+
+    fun getMyCoinsUseCase(): GetMyCoinsUseCase = KoinPlatform.getKoin().get()
+
+    fun getCoinTransactionsUseCase(): GetCoinTransactionsUseCase = KoinPlatform.getKoin().get()
+
+    fun requestChargeUseCase(): RequestChargeUseCase = KoinPlatform.getKoin().get()
+
+    fun confirmChargeUseCase(): ConfirmChargeUseCase = KoinPlatform.getKoin().get()
+
+    fun payEntryFeeUseCase(): PayEntryFeeUseCase = KoinPlatform.getKoin().get()
+
+    fun getPublicRoomsUseCase(): GetPublicRoomsUseCase = KoinPlatform.getKoin().get()
+
+    fun coinPolicy(): CoinPolicy = KoinPlatform.getKoin().get()
 
     fun sessionEventStreamWatcher(): SessionEventStreamWatcher = SessionEventStreamWatcher(KoinPlatform.getKoin().get())
 }
