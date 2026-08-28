@@ -15,6 +15,8 @@ final class PlayViewModel: ObservableObject {
 
     private let getMyParticipationUseCase: GetMyParticipationUseCase
 
+    private let requestGuestClaimUseCase: RequestGuestClaimUseCase
+
     private let snapshotPolicy: SnapshotPolicy
 
     private let eventWatcher: SessionEventStreamWatcher
@@ -39,6 +41,7 @@ final class PlayViewModel: ObservableObject {
 
         uiState.myParticipantId = my?.participantId
         uiState.myNickname = my?.nickname
+        uiState.isGuest = my?.isGuest ?? false
         getRoomInfoUseCase.invoke(pin: pin) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
@@ -376,6 +379,14 @@ final class PlayViewModel: ObservableObject {
         }
     }
 
+    // 게스트 가입 유도 (T075) — participantId를 대기 큐에 넣고 로그인 화면으로
+    private func onClickSignup() {
+        if let participantId = uiState.myParticipantId {
+            requestGuestClaimUseCase.invoke(participantId: participantId)
+        }
+        event.send(.openSignup)
+    }
+
     private func onClickViewReport() {
         if let roomId {
             event.send(.openResult(roomId: roomId))
@@ -416,6 +427,8 @@ final class PlayViewModel: ObservableObject {
             onClickSubmit()
         case .clickReplayHint:
             onClickReplayHint()
+        case .clickSignup:
+            onClickSignup()
         case .confirmLeave:
             onConfirmLeave()
         case .clickViewReport:
@@ -435,6 +448,7 @@ final class PlayViewModel: ObservableObject {
         getVoiceHintsUseCase: GetVoiceHintsUseCase,
         leaveRoomUseCase: LeaveRoomUseCase,
         getMyParticipationUseCase: GetMyParticipationUseCase,
+        requestGuestClaimUseCase: RequestGuestClaimUseCase,
         snapshotPolicy: SnapshotPolicy,
         eventWatcher: SessionEventStreamWatcher
     ) {
@@ -444,6 +458,7 @@ final class PlayViewModel: ObservableObject {
         self.getVoiceHintsUseCase = getVoiceHintsUseCase
         self.leaveRoomUseCase = leaveRoomUseCase
         self.getMyParticipationUseCase = getMyParticipationUseCase
+        self.requestGuestClaimUseCase = requestGuestClaimUseCase
         self.snapshotPolicy = snapshotPolicy
         self.eventWatcher = eventWatcher
         self.uiState = PlayUiState()

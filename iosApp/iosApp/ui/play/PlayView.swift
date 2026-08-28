@@ -12,6 +12,8 @@ struct PlayView: View {
 
     var onOpenResult: (Int64) -> Void = { _ in }
 
+    var onOpenSignup: () -> Void = {}
+
     @StateObject private var viewModel = PlayViewModel(
         getRoomInfoUseCase: KoinHelper.shared.getRoomInfoUseCase(),
         getSessionSnapshotUseCase: KoinHelper.shared.getSessionSnapshotUseCase(),
@@ -19,6 +21,7 @@ struct PlayView: View {
         getVoiceHintsUseCase: KoinHelper.shared.getVoiceHintsUseCase(),
         leaveRoomUseCase: KoinHelper.shared.leaveRoomUseCase(),
         getMyParticipationUseCase: KoinHelper.shared.getMyParticipationUseCase(),
+        requestGuestClaimUseCase: KoinHelper.shared.requestGuestClaimUseCase(),
         snapshotPolicy: KoinHelper.shared.snapshotPolicy(),
         eventWatcher: KoinHelper.shared.sessionEventStreamWatcher()
     )
@@ -66,6 +69,8 @@ struct PlayView: View {
                 voiceHintPlayer.play(url: hint.clipUrl)
             case let .openResult(roomId):
                 onOpenResult(roomId)
+            case .openSignup:
+                onOpenSignup()
             case let .roomClosed(message):
                 noticeMessage = message
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
@@ -518,7 +523,25 @@ private struct FinalResultContent: View {
                     .cornerRadius(16)
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 16)
+            .padding(.bottom, uiState.isGuest ? 10 : 16)
+            // 게스트 가입 유도 (T075) — 세션 종료 화면에서 기록 저장 (M-05 하단 버튼)
+            if uiState.isGuest {
+                Button {
+                    onAction(.clickSignup)
+                } label: {
+                    Text("가입하고 이 기록 저장하기")
+                        .font(.system(size: 14, weight: .medium))
+                        .kerning(-0.28)
+                        .foregroundColor(PassmateColors.primaryDeep)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(PassmateColors.surface)
+                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
+                        .cornerRadius(16)
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 16)
+            }
         }
     }
 

@@ -45,12 +45,14 @@ struct ContentView: View {
                 pin: pin,
                 onLeft: { path = [] },
                 onRoomClosed: { path = [] },
-                onOpenResult: { roomId in path.append(.result(roomId: roomId)) }
+                onOpenResult: { roomId in path.append(.result(roomId: roomId)) },
+                onOpenSignup: { path.append(.signIn) }
             )
         case let .result(roomId):
             ResultView(
                 roomId: roomId,
-                onClickHome: { path = [] }
+                onClickHome: { path = [] },
+                onNavigateToSignup: { path.append(.signIn) }
             )
         case .myInfo:
             MyInfoView(

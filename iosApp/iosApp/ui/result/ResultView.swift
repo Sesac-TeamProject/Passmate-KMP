@@ -7,10 +7,14 @@ struct ResultView: View {
 
     var onClickHome: () -> Void = {}
 
+    var onNavigateToSignup: () -> Void = {}
+
     @StateObject private var viewModel = ResultViewModel(
         getSessionResultUseCase: KoinHelper.shared.getSessionResultUseCase(),
         getLearningReportUseCase: KoinHelper.shared.getLearningReportUseCase(),
         buildReportSummaryUseCase: KoinHelper.shared.buildReportSummaryUseCase(),
+        getMyParticipationUseCase: KoinHelper.shared.getMyParticipationUseCase(),
+        requestGuestClaimUseCase: KoinHelper.shared.requestGuestClaimUseCase(),
         eventWatcher: KoinHelper.shared.sessionEventStreamWatcher()
     )
 
@@ -31,6 +35,8 @@ struct ResultView: View {
             switch event {
             case let .shareReport(summary):
                 shareText = summary
+            case .navigateToSignup:
+                onNavigateToSignup()
             case .showNotice:
                 break
             }
@@ -96,6 +102,9 @@ private struct ResultContentView: View {
                     if let selected = result.questions.first(where: { Int($0.questionNo) == uiState.selectedQuestionNo }),
                        selected.aiFeedback != nil || selected.hostReview != nil {
                         FeedbackSectionView(question: selected)
+                    }
+                    if result.isGuest {
+                        SignupPromptSectionView(onClickSignup: { onAction(.clickSignup) })
                     }
                 }
                 .padding(.horizontal, 20)

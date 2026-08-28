@@ -9,6 +9,10 @@ final class ResultViewModel: ObservableObject {
 
     private let buildReportSummaryUseCase: BuildReportSummaryUseCase
 
+    private let getMyParticipationUseCase: GetMyParticipationUseCase
+
+    private let requestGuestClaimUseCase: RequestGuestClaimUseCase
+
     private let eventWatcher: SessionEventStreamWatcher
 
     @Published private(set) var uiState: ResultUiState
@@ -122,6 +126,14 @@ final class ResultViewModel: ObservableObject {
         }
     }
 
+    // 게스트 가입 유도 — participantId를 대기 큐에 넣고 로그인 화면으로 (FR-036)
+    private func onClickSignup() {
+        if let participation = getMyParticipationUseCase.invoke() {
+            requestGuestClaimUseCase.invoke(participantId: participation.participantId)
+        }
+        event.send(.navigateToSignup)
+    }
+
     func action(_ action: ResultAction) {
         switch action {
         case let .enter(roomId):
@@ -130,6 +142,8 @@ final class ResultViewModel: ObservableObject {
             onSelectQuestion(questionNo: questionNo)
         case .clickExport:
             onClickExport()
+        case .clickSignup:
+            onClickSignup()
         case .retry:
             onRetry()
         }
@@ -143,11 +157,15 @@ final class ResultViewModel: ObservableObject {
         getSessionResultUseCase: GetSessionResultUseCase,
         getLearningReportUseCase: GetLearningReportUseCase,
         buildReportSummaryUseCase: BuildReportSummaryUseCase,
+        getMyParticipationUseCase: GetMyParticipationUseCase,
+        requestGuestClaimUseCase: RequestGuestClaimUseCase,
         eventWatcher: SessionEventStreamWatcher
     ) {
         self.getSessionResultUseCase = getSessionResultUseCase
         self.getLearningReportUseCase = getLearningReportUseCase
         self.buildReportSummaryUseCase = buildReportSummaryUseCase
+        self.getMyParticipationUseCase = getMyParticipationUseCase
+        self.requestGuestClaimUseCase = requestGuestClaimUseCase
         self.eventWatcher = eventWatcher
         self.uiState = ResultUiState()
     }

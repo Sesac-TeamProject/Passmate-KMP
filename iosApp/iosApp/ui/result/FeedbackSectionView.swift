@@ -105,9 +105,10 @@ struct FeedbackSectionView: View {
     @ViewBuilder
     private var hostReviewRow: some View {
         if let review = question.hostReview {
+            // T072(US8): 선생님 첨삭을 AI와 구분 표시, 최종 점수는 보정 우선 (FR-034~035)
             VStack(alignment: .leading, spacing: 4) {
-                Text("선생님 코멘트")
-                    .font(.system(size: 12, weight: .medium))
+                Text("선생님 첨삭")
+                    .font(.system(size: 12, weight: .bold))
                     .kerning(-0.24)
                     .foregroundColor(PassmateColors.primaryDeep)
                 Text(review.comment)
@@ -120,7 +121,17 @@ struct FeedbackSectionView: View {
                         .kerning(-0.26)
                         .foregroundColor(PassmateColors.textSecondary)
                 }
+                if let adjustedScore = review.adjustedScore {
+                    Text("최종 점수 \(Int(truncating: adjustedScore))점 · 선생님 보정 반영")
+                        .font(.system(size: 13, weight: .medium))
+                        .kerning(-0.26)
+                        .foregroundColor(PassmateColors.primaryDeep)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(PassmateColors.backgroundMint)
+            .cornerRadius(12)
         } else {
             Text("선생님 코멘트가 도착하면 여기에 표시돼요")
                 .font(.system(size: 12))
