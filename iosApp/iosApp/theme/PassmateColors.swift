@@ -10,6 +10,9 @@ enum PassmateColors {
 
     static let surface = Color(hex: 0xFFFFFF)
 
+    // 입력 필드·비활성 칩 배경 (v6 M-01 PIN 박스·닉네임 필드)
+    static let fieldGray = Color(hex: 0xF3F4F6)
+
     static let textPrimary = Color(hex: 0x1B1F24)
 
     static let textSecondary = Color(hex: 0x6B7280)
