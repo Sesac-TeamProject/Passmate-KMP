@@ -57,6 +57,9 @@
 		A1010062AABBCCDDEEFF0062 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011062AABBCCDDEEFF0062 /* Route.swift */; };
 		A1010063AABBCCDDEEFF0063 /* PassmateColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011063AABBCCDDEEFF0063 /* PassmateColors.swift */; };
 		A1010064AABBCCDDEEFF0064 /* PassmateCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */; };
+		A101000070AABBCCDDEEFF0070 /* StarRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100070AABBCCDDEEFF0070 /* StarRatingView.swift */; };
+		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
+		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
 		A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */; };
 /* End PBXBuildFile section */
@@ -115,6 +118,9 @@
 		A1011062AABBCCDDEEFF0062 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		A1011063AABBCCDDEEFF0063 /* PassmateColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateColors.swift; sourceTree = "<group>"; };
 		A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateCard.swift; sourceTree = "<group>"; };
+		A101100070AABBCCDDEEFF0070 /* StarRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarRatingView.swift; sourceTree = "<group>"; };
+		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
+		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
 		A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassyMascot.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -222,6 +228,7 @@
 			isa = PBXGroup;
 			children = (
 				A1011032AABBCCDDEEFF0032 /* JoinView.swift */,
+				A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */,
 				A1011033AABBCCDDEEFF0033 /* JoinViewModel.swift */,
 				A1011034AABBCCDDEEFF0034 /* JoinUiState.swift */,
 				A1011035AABBCCDDEEFF0035 /* JoinAction.swift */,
@@ -261,6 +268,7 @@
 				A1011047AABBCCDDEEFF0047 /* ResultView.swift */,
 				A1011068AABBCCDDEEFF0068 /* FeedbackSectionView.swift */,
 				A1011069AABBCCDDEEFF0069 /* SignupPromptSectionView.swift */,
+				A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */,
 				A1011048AABBCCDDEEFF0048 /* ResultViewModel.swift */,
 				A1011049AABBCCDDEEFF0049 /* ResultUiState.swift */,
 				A1011050AABBCCDDEEFF0050 /* ResultAction.swift */,
@@ -313,6 +321,7 @@
 			isa = PBXGroup;
 			children = (
 				A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */,
+				A101100070AABBCCDDEEFF0070 /* StarRatingView.swift */,
 				A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */,
 				A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */,
 			);
@@ -427,6 +436,7 @@
 				A1010030AABBCCDDEEFF0030 /* SignInAction.swift in Sources */,
 				A1010031AABBCCDDEEFF0031 /* SignInEvent.swift in Sources */,
 				A1010032AABBCCDDEEFF0032 /* JoinView.swift in Sources */,
+				A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */,
 				A1010033AABBCCDDEEFF0033 /* JoinViewModel.swift in Sources */,
 				A1010034AABBCCDDEEFF0034 /* JoinUiState.swift in Sources */,
 				A1010035AABBCCDDEEFF0035 /* JoinAction.swift in Sources */,
@@ -445,6 +455,7 @@
 				A1010047AABBCCDDEEFF0047 /* ResultView.swift in Sources */,
 				A1010068AABBCCDDEEFF0068 /* FeedbackSectionView.swift in Sources */,
 				A1010069AABBCCDDEEFF0069 /* SignupPromptSectionView.swift in Sources */,
+				A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */,
 				A1010048AABBCCDDEEFF0048 /* ResultViewModel.swift in Sources */,
 				A1010049AABBCCDDEEFF0049 /* ResultUiState.swift in Sources */,
 				A1010050AABBCCDDEEFF0050 /* ResultAction.swift in Sources */,
@@ -462,6 +473,7 @@
 				A1010062AABBCCDDEEFF0062 /* Route.swift in Sources */,
 				A1010063AABBCCDDEEFF0063 /* PassmateColors.swift in Sources */,
 				A1010064AABBCCDDEEFF0064 /* PassmateCard.swift in Sources */,
+				A101000070AABBCCDDEEFF0070 /* StarRatingView.swift in Sources */,
 				A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);

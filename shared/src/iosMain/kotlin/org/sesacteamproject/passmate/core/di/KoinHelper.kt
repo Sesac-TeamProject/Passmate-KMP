@@ -5,6 +5,7 @@ import org.sesacteamproject.passmate.auth.domain.usecase.BuildGoogleSignInUrlUse
 import org.sesacteamproject.passmate.auth.domain.usecase.CompleteSignInUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
 import org.sesacteamproject.passmate.core.network.SessionEventStreamWatcher
+import org.sesacteamproject.passmate.rating.domain.usecase.SubmitRatingUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.BuildReportSummaryUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetLearningReportUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetSessionResultUseCase
@@ -66,6 +67,8 @@ object KoinHelper {
     fun requestGuestClaimUseCase(): RequestGuestClaimUseCase = KoinPlatform.getKoin().get()
 
     fun completeGuestClaimUseCase(): CompleteGuestClaimUseCase = KoinPlatform.getKoin().get()
+
+    fun submitRatingUseCase(): SubmitRatingUseCase = KoinPlatform.getKoin().get()
 
     fun sessionEventStreamWatcher(): SessionEventStreamWatcher = SessionEventStreamWatcher(KoinPlatform.getKoin().get())
 }

@@ -13,6 +13,8 @@ final class ResultViewModel: ObservableObject {
 
     private let requestGuestClaimUseCase: RequestGuestClaimUseCase
 
+    private let submitRatingUseCase: SubmitRatingUseCase
+
     private let eventWatcher: SessionEventStreamWatcher
 
     @Published private(set) var uiState: ResultUiState
@@ -134,6 +136,60 @@ final class ResultViewModel: ObservableObject {
         event.send(.navigateToSignup)
     }
 
+    // ─── 평가 시트 (T080) ───
+
+    private func onToggleRatingTag(_ tag: RatingTag) {
+        if uiState.ratingTags.contains(tag) {
+            uiState.ratingTags.remove(tag)
+        } else {
+            uiState.ratingTags.insert(tag)
+        }
+    }
+
+    // 최종 중복 차단은 서버(409 ALREADY_RATED) — 클라 in-flight 가드는 UX용 (규칙 §9)
+    private func onSubmitRating() {
+        guard let roomId, !uiState.isSubmittingRating else { return }
+        if uiState.ratingStars < 1 {
+            event.send(.showNotice(message: "별점을 선택해 주세요"))
+            return
+        }
+        uiState.isSubmittingRating = true
+        let draft = RatingDraft(
+            stars: Int32(uiState.ratingStars),
+            tags: Set(uiState.ratingTags),
+            comment: uiState.ratingComment
+        )
+
+        submitRatingUseCase.invoke(roomId: roomId, draft: draft) { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.uiState.isSubmittingRating = false
+                if error == nil, result is AppResultSuccess<AnyObject> {
+                    self.uiState.isRatingSheetVisible = false
+                    self.uiState.hasRated = true
+                    self.event.send(.ratingSubmitted(message: "평가를 보냈어요. 고마워요!"))
+                } else {
+                    self.handleRatingFailure((result as? AppResultFailure)?.error)
+                }
+            }
+        }
+    }
+
+    private func handleRatingFailure(_ error: AppError?) {
+        if error is AppErrorConflict {
+            uiState.isRatingSheetVisible = false
+            uiState.hasRated = true
+            event.send(.showNotice(message: "이미 평가한 세션이에요"))
+        } else if error is AppErrorGone {
+            uiState.isRatingSheetVisible = false
+            event.send(.showNotice(message: "평가 기간(24시간)이 지났어요"))
+        } else if error is AppErrorNetworkError {
+            event.send(.showNotice(message: "네트워크 연결을 확인해 주세요"))
+        } else {
+            event.send(.showNotice(message: "평가를 보내지 못했어요. 다시 시도해 주세요"))
+        }
+    }
+
     func action(_ action: ResultAction) {
         switch action {
         case let .enter(roomId):
@@ -146,6 +202,20 @@ final class ResultViewModel: ObservableObject {
             onClickSignup()
         case .retry:
             onRetry()
+        case .openRatingSheet:
+            uiState.isRatingSheetVisible = true
+        case .dismissRatingSheet:
+            uiState.isRatingSheetVisible = false
+        case let .selectRatingStars(stars):
+            uiState.ratingStars = stars
+        case let .toggleRatingTag(tag):
+            onToggleRatingTag(tag)
+        case let .changeRatingComment(comment):
+            uiState.ratingComment = String(comment.prefix(100))
+        case .submitRating:
+            onSubmitRating()
+        case .skipRating:
+            uiState.isRatingSheetVisible = false
         }
     }
 
@@ -159,6 +229,7 @@ final class ResultViewModel: ObservableObject {
         buildReportSummaryUseCase: BuildReportSummaryUseCase,
         getMyParticipationUseCase: GetMyParticipationUseCase,
         requestGuestClaimUseCase: RequestGuestClaimUseCase,
+        submitRatingUseCase: SubmitRatingUseCase,
         eventWatcher: SessionEventStreamWatcher
     ) {
         self.getSessionResultUseCase = getSessionResultUseCase
@@ -166,6 +237,7 @@ final class ResultViewModel: ObservableObject {
         self.buildReportSummaryUseCase = buildReportSummaryUseCase
         self.getMyParticipationUseCase = getMyParticipationUseCase
         self.requestGuestClaimUseCase = requestGuestClaimUseCase
+        self.submitRatingUseCase = submitRatingUseCase
         self.eventWatcher = eventWatcher
         self.uiState = ResultUiState()
     }

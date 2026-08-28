@@ -44,6 +44,27 @@ enum PassmateColors {
 
     static let chipOrangeText = Color(hex: 0x7A3A11)
 
+    // 오답 칩·보완 주제 (v6 M-06 리포트) — US4/US5 미러 참조 토큰
+    static let wrongPink = Color(hex: 0xF7ADB1)
+
+    static let wrongPinkText = Color(hex: 0x7C1F26)
+
+    static let weakTopicBg = Color(hex: 0xFDEFDE)
+
+    static let weakTopicText = Color(hex: 0xBF3F0C)
+
+    // 별점 전용 골드 (디자인 시스템 §StarRating)
+    static let starGold = Color(hex: 0xF2C94C)
+
+    // 명성 뱃지·평가 태그 선택 (v6 M-06 v2 별점 시트·M-10 프로필)
+    static let reputationBadgeBg = Color(hex: 0xC4EEDB)
+
+    static let reputationBadgeText = Color(hex: 0x0B6B4C)
+
+    static let ratingTagSelectedBg = Color(hex: 0xD6F3E6)
+
+    static let ratingTagSelectedText = Color(hex: 0x0B6B4C)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     static let brandGoogleBlue = Color(hex: 0x4285F4)
 

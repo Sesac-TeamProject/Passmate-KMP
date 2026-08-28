@@ -123,6 +123,10 @@ private struct JoinContentView: View {
                     onPinChange: { onAction(.changePin(pin: $0)) }
                 )
                 qrScanButton
+                // 입장 전 방 정보 슬롯 (T081)
+                if let room = uiState.roomInfo {
+                    RoomInfoCardView(room: room)
+                }
                 nicknameField
                 avatarField
                 joinButton
