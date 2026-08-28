@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import org.sesacteamproject.passmate.ui.auth.SignInScreen
 import org.sesacteamproject.passmate.ui.home.HomeScreen
 import org.sesacteamproject.passmate.ui.join.JoinScreen
+import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
 import org.sesacteamproject.passmate.ui.result.ResultScreen
 import org.sesacteamproject.passmate.ui.waiting.WaitingScreen
@@ -24,6 +25,8 @@ private sealed interface JvmDestination {
     data class Play(val pin: String) : JvmDestination
 
     data class Result(val roomId: Long) : JvmDestination
+
+    data object MyInfo : JvmDestination
 }
 
 @Composable
@@ -45,6 +48,7 @@ actual fun AppNavHost() {
                 routeStack.removeAll { it is JvmDestination.Waiting || it is JvmDestination.Play }
                 routeStack.add(JvmDestination.Result(action.roomId))
             }
+            is NavigationAction.NavigateToMyInfo -> routeStack.add(JvmDestination.MyInfo)
             is NavigationAction.NavigateBack -> {
                 if (routeStack.size > 1) {
                     routeStack.removeAt(routeStack.lastIndex)
@@ -71,6 +75,7 @@ actual fun AppNavHost() {
             roomId = currentDestination.roomId,
             onNavigate = onNavigate
         )
+        is JvmDestination.MyInfo -> MyInfoScreen(onNavigate = onNavigate)
         else -> HomeScreen(onNavigate = onNavigate)
     }
 }
