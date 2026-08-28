@@ -13,7 +13,9 @@ sealed class Route(val route: String) {
 
     data object Play : Route("play/{pin}")
 
-    data object Result : Route("result/{participationId}")
+    // 결과·리포트 화면 — 백엔드 /rooms/{roomId}/results/me 기준으로 roomId를 인자로 받는다
+    // (2026-08-28 백엔드 명세서 정합. 마이페이지(파트2 US6)도 roomId로 진입한다)
+    data object Result : Route("result/{roomId}")
 
     data object MyInfo : Route("myInfo")
 

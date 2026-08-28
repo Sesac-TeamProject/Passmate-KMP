@@ -47,6 +47,15 @@ object PassmateColors {
 
     val ChipOrangeText = Color(0xFF7A3A11)
 
+    // 오답 칩·보완 주제 (v6 M-06 리포트)
+    val WrongPink = Color(0xFFF7ADB1)
+
+    val WrongPinkText = Color(0xFF7C1F26)
+
+    val WeakTopicBg = Color(0xFFFDEFDE)
+
+    val WeakTopicText = Color(0xFFBF3F0C)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     val BrandGoogleBlue = Color(0xFF4285F4)
 

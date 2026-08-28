@@ -13,5 +13,7 @@ sealed interface NavigationAction {
 
     data class NavigateToPlay(val pin: String) : NavigationAction
 
+    data class NavigateToResult(val roomId: Long) : NavigationAction
+
     data object NavigateBack : NavigationAction
 }
