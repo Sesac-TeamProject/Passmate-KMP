@@ -13,6 +13,9 @@ object PassmateColors {
 
     val Surface = Color(0xFFFFFFFF)
 
+    // 입력 필드·비활성 칩 배경 (v6 M-01 PIN 박스·닉네임 필드)
+    val FieldGray = Color(0xFFF3F4F6)
+
     val TextPrimary = Color(0xFF1B1F24)
 
     val TextSecondary = Color(0xFF6B7280)

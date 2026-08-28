@@ -54,6 +54,8 @@
 		A1010062AABBCCDDEEFF0062 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011062AABBCCDDEEFF0062 /* Route.swift */; };
 		A1010063AABBCCDDEEFF0063 /* PassmateColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011063AABBCCDDEEFF0063 /* PassmateColors.swift */; };
 		A1010064AABBCCDDEEFF0064 /* PassmateCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */; };
+		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
+		A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -107,6 +109,8 @@
 		A1011062AABBCCDDEEFF0062 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		A1011063AABBCCDDEEFF0063 /* PassmateColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateColors.swift; sourceTree = "<group>"; };
 		A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateCard.swift; sourceTree = "<group>"; };
+		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
+		A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassyMascot.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -300,6 +304,8 @@
 			isa = PBXGroup;
 			children = (
 				A1011064AABBCCDDEEFF0064 /* PassmateCard.swift */,
+				A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */,
+				A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */,
 			);
 			path = component;
 			sourceTree = "<group>";
@@ -444,6 +450,8 @@
 				A1010062AABBCCDDEEFF0062 /* Route.swift in Sources */,
 				A1010063AABBCCDDEEFF0063 /* PassmateColors.swift in Sources */,
 				A1010064AABBCCDDEEFF0064 /* PassmateCard.swift in Sources */,
+				A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */,
+				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

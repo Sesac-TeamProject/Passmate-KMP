@@ -57,7 +57,7 @@ fun SignInScreen(
             when (event) {
                 is SignInEvent.OpenSignInPage -> openSignInPage(event.url)
                 is SignInEvent.SignInCompleted -> onNavigate(NavigationAction.NavigateToHome)
-                is SignInEvent.GuestEnterRequested -> onNavigate(NavigationAction.NavigateToHome)
+                is SignInEvent.GuestEnterRequested -> onNavigate(NavigationAction.NavigateToJoin())
                 is SignInEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }

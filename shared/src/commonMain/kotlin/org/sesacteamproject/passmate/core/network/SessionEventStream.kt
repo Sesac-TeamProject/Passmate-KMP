@@ -26,7 +26,7 @@ class SessionEventStream(
         data class Received(val frame: ServerEventFrame) : StreamEvent
     }
 
-    fun events(pin: String): Flow<StreamEvent> {
+    fun events(roomId: Long): Flow<StreamEvent> {
         return channelFlow {
             var attempt = 0
 
@@ -38,7 +38,7 @@ class SessionEventStream(
                     attempt = 0
                     send(StreamEvent.Connected)
                     coroutineScope {
-                        launch { collectDestination(session, "/topic/rooms/$pin") }
+                        launch { collectDestination(session, "/topic/rooms/$roomId") }
                         launch { collectDestination(session, "/user/queue/feedback") }
                         launch { collectDestination(session, "/user/queue/errors") }
                     }

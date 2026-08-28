@@ -11,17 +11,46 @@ class ServerEventDecoderTest {
     fun decodeParticipantJoined() {
         val text = """
             {"type":"PARTICIPANT_JOINED","ts":"2026-08-27T10:00:00Z",
-             "data":{"participationId":11,"nickname":"영희","isGuest":true,"count":3}}
+             "data":{"participantId":11,"nickname":"영희","isGuest":true,"avatarId":5,"count":3}}
         """.trimIndent()
 
         val frame = ServerEventDecoder.decode(text)
         val event = assertIs<ServerEvent.ParticipantJoined>(frame?.event)
 
         assertEquals("2026-08-27T10:00:00Z", frame?.ts)
-        assertEquals(11L, event.participationId)
+        assertEquals(11L, event.participantId)
         assertEquals("영희", event.nickname)
         assertEquals(true, event.isGuest)
+        assertEquals(5, event.avatarId)
         assertEquals(3, event.count)
+    }
+
+    @Test
+    fun decodeParticipantLeftWithReason() {
+        val text = """
+            {"type":"PARTICIPANT_LEFT","ts":"2026-08-27T10:00:30Z",
+             "data":{"participantId":11,"count":2,"reason":"KICKED"}}
+        """.trimIndent()
+
+        val frame = ServerEventDecoder.decode(text)
+        val event = assertIs<ServerEvent.ParticipantLeft>(frame?.event)
+
+        assertEquals(11L, event.participantId)
+        assertEquals(ServerEvent.ParticipantLeft.REASON_KICKED, event.reason)
+    }
+
+    @Test
+    fun decodeSessionStarted() {
+        val text = """
+            {"type":"SESSION_STARTED","ts":"2026-08-27T10:00:40Z",
+             "data":{"sessionId":3,"questionCount":10}}
+        """.trimIndent()
+
+        val frame = ServerEventDecoder.decode(text)
+        val event = assertIs<ServerEvent.SessionStarted>(frame?.event)
+
+        assertEquals(3L, event.sessionId)
+        assertEquals(10, event.questionCount)
     }
 
     @Test
@@ -45,7 +74,7 @@ class ServerEventDecoderTest {
     fun decodeRankingUpdated() {
         val text = """
             {"type":"RANKING_UPDATED","ts":"2026-08-27T10:02:00Z",
-             "data":{"ranking":[{"rank":1,"participationId":11,"nickname":"영희","total":150.0}]}}
+             "data":{"ranking":[{"rank":1,"participantId":11,"nickname":"영희","total":150.0}]}}
         """.trimIndent()
 
         val frame = ServerEventDecoder.decode(text)
@@ -70,16 +99,26 @@ class ServerEventDecoderTest {
     }
 
     @Test
-    fun decodeVoiceHint() {
+    fun decodeHintPublished() {
         val text = """
-            {"type":"VOICE_HINT","ts":"2026-08-27T10:04:00Z",
+            {"type":"HINT_PUBLISHED","ts":"2026-08-27T10:04:00Z",
              "data":{"hintId":7,"questionNo":2,"clipUrl":"https://storage/clip.webm","durationMs":4200}}
         """.trimIndent()
 
         val frame = ServerEventDecoder.decode(text)
-        val event = assertIs<ServerEvent.VoiceHint>(frame?.event)
+        val event = assertIs<ServerEvent.HintPublished>(frame?.event)
 
         assertEquals(4200L, event.durationMs)
+    }
+
+    @Test
+    fun decodeScreenLocked() {
+        val text = """{"type":"SCREEN_LOCKED","ts":"2026-08-27T10:04:30Z","data":{"locked":true}}"""
+
+        val frame = ServerEventDecoder.decode(text)
+        val event = assertIs<ServerEvent.ScreenLocked>(frame?.event)
+
+        assertEquals(true, event.locked)
     }
 
     @Test

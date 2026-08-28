@@ -25,6 +25,7 @@ kotlin {
             implementation(libs.androidx.browser)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.koin.android)
+            implementation(libs.zxing.android.embedded)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
