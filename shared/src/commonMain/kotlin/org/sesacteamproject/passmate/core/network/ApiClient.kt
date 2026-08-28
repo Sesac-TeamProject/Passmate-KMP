@@ -29,7 +29,7 @@ import org.sesacteamproject.passmate.core.storage.TokenStorage
 private data class TokenRefreshRequest(val refreshToken: String)
 
 @Serializable
-private data class TokenRefreshResponse(val accessToken: String, val refreshToken: String)
+private data class TokenRefreshResponse(val accessToken: String, val refreshToken: String? = null)
 
 class ApiClient(
     private val tokenStorage: TokenStorage,
@@ -79,7 +79,7 @@ class ApiClient(
                         setBody(TokenRefreshRequest(refreshToken))
                     }.body()
 
-                    tokenStorage.saveMemberTokens(response.accessToken, response.refreshToken)
+                    tokenStorage.saveMemberTokens(response.accessToken, response.refreshToken ?: refreshToken)
                     true
                 } catch (e: ClientRequestException) {
                     tokenStorage.clearMemberTokens()
@@ -122,6 +122,7 @@ class ApiClient(
     }
 
     companion object {
-        private const val REFRESH_PATH = "/auth/token/refresh"
+        // 2026-08-28 백엔드 API 명세서 확정 경로 — 응답의 refreshToken은 미회전 시 생략될 수 있다
+        private const val REFRESH_PATH = "/auth/refresh"
     }
 }
