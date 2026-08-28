@@ -18,6 +18,7 @@ import org.sesacteamproject.passmate.ui.auth.SignInScreen
 import org.sesacteamproject.passmate.ui.home.HomeScreen
 import org.sesacteamproject.passmate.ui.join.JoinScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
+import org.sesacteamproject.passmate.ui.result.ResultScreen
 import org.sesacteamproject.passmate.ui.waiting.WaitingScreen
 
 // OAuth 콜백 딥링크 — 백엔드가 ?client=mobile 인가 완료 시 이 URI로 리다이렉트한다 (contracts §Auth)
@@ -52,6 +53,10 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
         }
         is NavigationAction.NavigateToWaiting -> navigate("waiting/${action.pin}")
         is NavigationAction.NavigateToPlay -> navigate("play/${action.pin}")
+        is NavigationAction.NavigateToResult -> navigate("result/${action.roomId}") {
+            // 세션 플로우 백스택(Join/Waiting/Play)을 클리어한다 (규칙 §2-1-2)
+            popUpTo(Route.Home.route)
+        }
         is NavigationAction.NavigateBack -> popBackStack()
     }
 }
@@ -117,6 +122,12 @@ actual fun AppNavHost() {
         composable(Route.Play.route) { backStackEntry ->
             PlayScreen(
                 pin = backStackEntry.arguments?.getString("pin").orEmpty(),
+                onNavigate = navController::handleNavigationAction
+            )
+        }
+        composable(Route.Result.route) { backStackEntry ->
+            ResultScreen(
+                roomId = backStackEntry.arguments?.getString("roomId")?.toLongOrNull() ?: -1L,
                 onNavigate = navController::handleNavigationAction
             )
         }

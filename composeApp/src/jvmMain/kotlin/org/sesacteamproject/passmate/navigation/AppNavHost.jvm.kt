@@ -7,6 +7,7 @@ import org.sesacteamproject.passmate.ui.auth.SignInScreen
 import org.sesacteamproject.passmate.ui.home.HomeScreen
 import org.sesacteamproject.passmate.ui.join.JoinScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
+import org.sesacteamproject.passmate.ui.result.ResultScreen
 import org.sesacteamproject.passmate.ui.waiting.WaitingScreen
 
 // Desktop은 상태 기반 라우트 상태머신 (규칙 §2-1). 라우트 인자는 목적지 엔트리로 보관한다
@@ -21,6 +22,8 @@ private sealed interface JvmDestination {
     data class Waiting(val pin: String) : JvmDestination
 
     data class Play(val pin: String) : JvmDestination
+
+    data class Result(val roomId: Long) : JvmDestination
 }
 
 @Composable
@@ -37,6 +40,11 @@ actual fun AppNavHost() {
             is NavigationAction.NavigateToJoin -> routeStack.add(JvmDestination.Join(action.pin))
             is NavigationAction.NavigateToWaiting -> routeStack.add(JvmDestination.Waiting(action.pin))
             is NavigationAction.NavigateToPlay -> routeStack.add(JvmDestination.Play(action.pin))
+            is NavigationAction.NavigateToResult -> {
+                // 세션 플로우 백스택 클리어 후 결과 진입 (규칙 §2-1-2)
+                routeStack.removeAll { it is JvmDestination.Waiting || it is JvmDestination.Play }
+                routeStack.add(JvmDestination.Result(action.roomId))
+            }
             is NavigationAction.NavigateBack -> {
                 if (routeStack.size > 1) {
                     routeStack.removeAt(routeStack.lastIndex)
@@ -57,6 +65,10 @@ actual fun AppNavHost() {
         )
         is JvmDestination.Play -> PlayScreen(
             pin = currentDestination.pin,
+            onNavigate = onNavigate
+        )
+        is JvmDestination.Result -> ResultScreen(
+            roomId = currentDestination.roomId,
             onNavigate = onNavigate
         )
         else -> HomeScreen(onNavigate = onNavigate)

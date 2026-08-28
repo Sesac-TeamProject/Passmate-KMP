@@ -10,6 +10,8 @@ struct PlayView: View {
 
     var onRoomClosed: () -> Void = {}
 
+    var onOpenResult: (Int64) -> Void = { _ in }
+
     @StateObject private var viewModel = PlayViewModel(
         getRoomInfoUseCase: KoinHelper.shared.getRoomInfoUseCase(),
         getSessionSnapshotUseCase: KoinHelper.shared.getSessionSnapshotUseCase(),
@@ -62,6 +64,8 @@ struct PlayView: View {
             switch event {
             case let .playVoiceHint(hint):
                 voiceHintPlayer.play(url: hint.clipUrl)
+            case let .openResult(roomId):
+                onOpenResult(roomId)
             case let .roomClosed(message):
                 noticeMessage = message
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {

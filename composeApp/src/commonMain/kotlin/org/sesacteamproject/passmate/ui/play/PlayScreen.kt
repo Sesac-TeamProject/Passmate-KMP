@@ -79,6 +79,7 @@ fun PlayScreen(
                         snackbarHostState.showSnackbar("선생님이 음성 힌트를 보냈어요")
                     }
                 }
+                is PlayEvent.OpenResult -> onNavigate(NavigationAction.NavigateToResult(event.roomId))
                 is PlayEvent.RoomClosed -> {
                     snackbarHostState.showSnackbar(event.message)
                     onNavigate(NavigationAction.NavigateToHome)

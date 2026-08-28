@@ -5,7 +5,7 @@ enum Route: Hashable {
     case join(pin: String?)
     case waiting(pin: String)
     case play(pin: String)
-    case result(participationId: Int64)
+    case result(roomId: Int64)
     case myInfo
     case payment(pin: String)
     case settings

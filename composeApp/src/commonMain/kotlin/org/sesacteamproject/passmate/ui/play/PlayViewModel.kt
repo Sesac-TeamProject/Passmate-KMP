@@ -374,8 +374,12 @@ class PlayViewModel(
     }
 
     private fun onClickViewReport() {
-        viewModelScope.launch {
-            _event.emit(PlayEvent.ShowNotice("리포트 화면은 준비 중이에요"))
+        val currentRoomId = roomId
+
+        if (currentRoomId != null) {
+            viewModelScope.launch {
+                _event.emit(PlayEvent.OpenResult(currentRoomId))
+            }
         }
     }
 

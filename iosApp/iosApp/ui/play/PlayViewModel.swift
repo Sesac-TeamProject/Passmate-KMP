@@ -377,7 +377,9 @@ final class PlayViewModel: ObservableObject {
     }
 
     private func onClickViewReport() {
-        event.send(.showNotice(message: "리포트 화면은 준비 중이에요"))
+        if let roomId {
+            event.send(.openResult(roomId: roomId))
+        }
     }
 
     private func toRankEntry(_ entry: ServerEventRankingEntry) -> RankEntry {
