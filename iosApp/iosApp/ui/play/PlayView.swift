@@ -14,11 +14,14 @@ struct PlayView: View {
         getRoomInfoUseCase: KoinHelper.shared.getRoomInfoUseCase(),
         getSessionSnapshotUseCase: KoinHelper.shared.getSessionSnapshotUseCase(),
         submitAnswerUseCase: KoinHelper.shared.submitAnswerUseCase(),
+        getVoiceHintsUseCase: KoinHelper.shared.getVoiceHintsUseCase(),
         leaveRoomUseCase: KoinHelper.shared.leaveRoomUseCase(),
         getMyParticipationUseCase: KoinHelper.shared.getMyParticipationUseCase(),
         snapshotPolicy: KoinHelper.shared.snapshotPolicy(),
         eventWatcher: KoinHelper.shared.sessionEventStreamWatcher()
     )
+
+    @StateObject private var voiceHintPlayer = VoiceHintAudioPlayer()
 
     @State private var isLeaveDialogVisible = false
 
@@ -30,14 +33,35 @@ struct PlayView: View {
             onAction: { viewModel.action($0) },
             onClickLeave: { isLeaveDialogVisible = true }
         )
+        // 음성 힌트 배너 — 오버레이 소유는 컨테이너 (규칙 §11-1)
+        .overlay(alignment: .bottom) {
+            if let hint = viewModel.uiState.activeVoiceHint, viewModel.uiState.phase != .finished {
+                VoiceHintBannerView(
+                    hint: hint,
+                    player: voiceHintPlayer,
+                    onReplay: { viewModel.action(.clickReplayHint) }
+                )
+                .padding(.horizontal, 20)
+                .padding(.bottom, 84)
+            }
+        }
         .onAppear {
             viewModel.action(.enter(pin: pin))
         }
         .onDisappear {
             viewModel.stopWatching()
+            voiceHintPlayer.stop()
+        }
+        .onChange(of: viewModel.uiState.activeVoiceHint?.hintId) { hintId in
+            // 문항 전환·세션 종료로 배너가 사라지면 재생도 함께 멈춘다
+            if hintId == nil {
+                voiceHintPlayer.stop()
+            }
         }
         .onReceive(viewModel.event) { event in
             switch event {
+            case let .playVoiceHint(hint):
+                voiceHintPlayer.play(url: hint.clipUrl)
             case let .roomClosed(message):
                 noticeMessage = message
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {

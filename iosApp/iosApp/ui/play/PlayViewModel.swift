@@ -9,6 +9,8 @@ final class PlayViewModel: ObservableObject {
 
     private let submitAnswerUseCase: SubmitAnswerUseCase
 
+    private let getVoiceHintsUseCase: GetVoiceHintsUseCase
+
     private let leaveRoomUseCase: LeaveRoomUseCase
 
     private let getMyParticipationUseCase: GetMyParticipationUseCase
@@ -74,8 +76,25 @@ final class PlayViewModel: ObservableObject {
                 if error == nil, let snapshot = success?.value as? SessionSnapshot {
                     self.snapshotTs = snapshot.ts
                     self.applySnapshot(snapshot)
+                    self.restoreVoiceHint(roomId: roomId, currentQuestionNo: snapshot.currentQuestion?.questionNo)
                 } else {
                     self.uiState.isLoading = false
+                }
+            }
+        }
+    }
+
+    // 재접속 시 현재 문항의 마지막 힌트를 복구한다 — 자동 재생 없이 다시 듣기만 (FR-041)
+    private func restoreVoiceHint(roomId: Int64, currentQuestionNo: Int32?) {
+        if let currentQuestionNo {
+            getVoiceHintsUseCase.invoke(roomId: roomId) { [weak self] result, error in
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    let success = result as? AppResultSuccess<AnyObject>
+
+                    if error == nil, let hints = success?.value as? [VoiceHint] {
+                        self.uiState.activeVoiceHint = hints.last { $0.questionNo == currentQuestionNo }
+                    }
                 }
             }
         }
@@ -135,6 +154,8 @@ final class PlayViewModel: ObservableObject {
             uiState.questionCount = Int(sessionStarted.questionCount)
         } else if let sessionEnded = serverEvent as? ServerEventSessionEnded {
             onSessionEnded(sessionEnded)
+        } else if let hintPublished = serverEvent as? ServerEventHintPublished {
+            onHintPublished(hintPublished)
         } else if serverEvent is ServerEventRoomCancelled {
             event.send(.roomClosed(message: "방이 취소됐어요"))
         } else if let left = serverEvent as? ServerEventParticipantLeft {
@@ -166,6 +187,7 @@ final class PlayViewModel: ObservableObject {
         uiState.hasSubmitted = false
         uiState.myAnswerResult = nil
         uiState.reveal = nil
+        uiState.activeVoiceHint = nil
         restartTicker()
     }
 
@@ -194,6 +216,19 @@ final class PlayViewModel: ObservableObject {
             uiState.rank = Int(myEntry.rank)
             uiState.totalScore = myEntry.total
         }
+    }
+
+    // 수신 즉시 자동 재생(FR-040, 3초 SLA) — 재생 실패 시 배너의 수동 재생으로 폴백된다
+    private func onHintPublished(_ published: ServerEventHintPublished) {
+        let hint = VoiceHint(
+            hintId: published.hintId,
+            questionNo: published.questionNo,
+            clipUrl: published.clipUrl,
+            durationMs: published.durationMs
+        )
+
+        uiState.activeVoiceHint = hint
+        event.send(.playVoiceHint(hint: hint))
     }
 
     private func onParticipantLeft(_ left: ServerEventParticipantLeft) {
@@ -335,6 +370,12 @@ final class PlayViewModel: ObservableObject {
         }
     }
 
+    private func onClickReplayHint() {
+        if let hint = uiState.activeVoiceHint {
+            event.send(.playVoiceHint(hint: hint))
+        }
+    }
+
     private func onClickViewReport() {
         event.send(.showNotice(message: "리포트 화면은 준비 중이에요"))
     }
@@ -371,6 +412,8 @@ final class PlayViewModel: ObservableObject {
             onChangeEssayAnswer(text: text)
         case .clickSubmit:
             onClickSubmit()
+        case .clickReplayHint:
+            onClickReplayHint()
         case .confirmLeave:
             onConfirmLeave()
         case .clickViewReport:
@@ -387,6 +430,7 @@ final class PlayViewModel: ObservableObject {
         getRoomInfoUseCase: GetRoomInfoUseCase,
         getSessionSnapshotUseCase: GetSessionSnapshotUseCase,
         submitAnswerUseCase: SubmitAnswerUseCase,
+        getVoiceHintsUseCase: GetVoiceHintsUseCase,
         leaveRoomUseCase: LeaveRoomUseCase,
         getMyParticipationUseCase: GetMyParticipationUseCase,
         snapshotPolicy: SnapshotPolicy,
@@ -395,6 +439,7 @@ final class PlayViewModel: ObservableObject {
         self.getRoomInfoUseCase = getRoomInfoUseCase
         self.getSessionSnapshotUseCase = getSessionSnapshotUseCase
         self.submitAnswerUseCase = submitAnswerUseCase
+        self.getVoiceHintsUseCase = getVoiceHintsUseCase
         self.leaveRoomUseCase = leaveRoomUseCase
         self.getMyParticipationUseCase = getMyParticipationUseCase
         self.snapshotPolicy = snapshotPolicy

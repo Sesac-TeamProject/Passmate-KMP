@@ -32,6 +32,7 @@
 		A1010040AABBCCDDEEFF0040 /* WaitingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011040AABBCCDDEEFF0040 /* WaitingAction.swift */; };
 		A1010041AABBCCDDEEFF0041 /* WaitingEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011041AABBCCDDEEFF0041 /* WaitingEvent.swift */; };
 		A1010042AABBCCDDEEFF0042 /* PlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011042AABBCCDDEEFF0042 /* PlayView.swift */; };
+		A1010067AABBCCDDEEFF0067 /* VoiceHintPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011067AABBCCDDEEFF0067 /* VoiceHintPlayerView.swift */; };
 		A1010043AABBCCDDEEFF0043 /* PlayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011043AABBCCDDEEFF0043 /* PlayViewModel.swift */; };
 		A1010044AABBCCDDEEFF0044 /* PlayUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011044AABBCCDDEEFF0044 /* PlayUiState.swift */; };
 		A1010045AABBCCDDEEFF0045 /* PlayAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011045AABBCCDDEEFF0045 /* PlayAction.swift */; };
@@ -87,6 +88,7 @@
 		A1011040AABBCCDDEEFF0040 /* WaitingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingAction.swift; sourceTree = "<group>"; };
 		A1011041AABBCCDDEEFF0041 /* WaitingEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingEvent.swift; sourceTree = "<group>"; };
 		A1011042AABBCCDDEEFF0042 /* PlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayView.swift; sourceTree = "<group>"; };
+		A1011067AABBCCDDEEFF0067 /* VoiceHintPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceHintPlayerView.swift; sourceTree = "<group>"; };
 		A1011043AABBCCDDEEFF0043 /* PlayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayViewModel.swift; sourceTree = "<group>"; };
 		A1011044AABBCCDDEEFF0044 /* PlayUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayUiState.swift; sourceTree = "<group>"; };
 		A1011045AABBCCDDEEFF0045 /* PlayAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayAction.swift; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 			isa = PBXGroup;
 			children = (
 				A1011042AABBCCDDEEFF0042 /* PlayView.swift */,
+				A1011067AABBCCDDEEFF0067 /* VoiceHintPlayerView.swift */,
 				A1011043AABBCCDDEEFF0043 /* PlayViewModel.swift */,
 				A1011044AABBCCDDEEFF0044 /* PlayUiState.swift */,
 				A1011045AABBCCDDEEFF0045 /* PlayAction.swift */,
@@ -428,6 +431,7 @@
 				A1010040AABBCCDDEEFF0040 /* WaitingAction.swift in Sources */,
 				A1010041AABBCCDDEEFF0041 /* WaitingEvent.swift in Sources */,
 				A1010042AABBCCDDEEFF0042 /* PlayView.swift in Sources */,
+				A1010067AABBCCDDEEFF0067 /* VoiceHintPlayerView.swift in Sources */,
 				A1010043AABBCCDDEEFF0043 /* PlayViewModel.swift in Sources */,
 				A1010044AABBCCDDEEFF0044 /* PlayUiState.swift in Sources */,
 				A1010045AABBCCDDEEFF0045 /* PlayAction.swift in Sources */,

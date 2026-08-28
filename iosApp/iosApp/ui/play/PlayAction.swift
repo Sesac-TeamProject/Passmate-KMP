@@ -3,6 +3,7 @@ enum PlayAction {
     case selectChoice(index: Int)
     case changeEssayAnswer(text: String)
     case clickSubmit
+    case clickReplayHint
     case confirmLeave
     case clickViewReport
 }
