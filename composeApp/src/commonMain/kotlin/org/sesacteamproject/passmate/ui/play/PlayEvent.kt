@@ -9,6 +9,8 @@ sealed interface PlayEvent {
 
     data class OpenResult(val roomId: Long) : PlayEvent
 
+    data object OpenSignup : PlayEvent
+
     data class RoomClosed(val message: String) : PlayEvent
 
     data object Left : PlayEvent

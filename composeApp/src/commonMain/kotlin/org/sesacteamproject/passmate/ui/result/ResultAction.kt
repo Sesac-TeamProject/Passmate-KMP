@@ -8,5 +8,7 @@ sealed interface ResultAction {
 
     data object ClickExport : ResultAction
 
+    data object ClickSignup : ResultAction
+
     data object Retry : ResultAction
 }

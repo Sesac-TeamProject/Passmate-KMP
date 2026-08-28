@@ -10,7 +10,8 @@ struct SignInView: View {
 
     @StateObject private var viewModel = SignInViewModel(
         buildGoogleSignInUrlUseCase: KoinHelper.shared.buildGoogleSignInUrlUseCase(),
-        completeSignInUseCase: KoinHelper.shared.completeSignInUseCase()
+        completeSignInUseCase: KoinHelper.shared.completeSignInUseCase(),
+        completeGuestClaimUseCase: KoinHelper.shared.completeGuestClaimUseCase()
     )
 
     @State private var authSession: ASWebAuthenticationSession?

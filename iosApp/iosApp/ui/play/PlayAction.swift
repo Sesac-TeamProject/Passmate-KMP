@@ -4,6 +4,7 @@ enum PlayAction {
     case changeEssayAnswer(text: String)
     case clickSubmit
     case clickReplayHint
+    case clickSignup
     case confirmLeave
     case clickViewReport
 }

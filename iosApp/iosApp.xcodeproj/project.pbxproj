@@ -39,6 +39,7 @@
 		A1010046AABBCCDDEEFF0046 /* PlayEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011046AABBCCDDEEFF0046 /* PlayEvent.swift */; };
 		A1010047AABBCCDDEEFF0047 /* ResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011047AABBCCDDEEFF0047 /* ResultView.swift */; };
 		A1010068AABBCCDDEEFF0068 /* FeedbackSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011068AABBCCDDEEFF0068 /* FeedbackSectionView.swift */; };
+		A1010069AABBCCDDEEFF0069 /* SignupPromptSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011069AABBCCDDEEFF0069 /* SignupPromptSectionView.swift */; };
 		A1010048AABBCCDDEEFF0048 /* ResultViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011048AABBCCDDEEFF0048 /* ResultViewModel.swift */; };
 		A1010049AABBCCDDEEFF0049 /* ResultUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011049AABBCCDDEEFF0049 /* ResultUiState.swift */; };
 		A1010050AABBCCDDEEFF0050 /* ResultAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011050AABBCCDDEEFF0050 /* ResultAction.swift */; };
@@ -96,6 +97,7 @@
 		A1011046AABBCCDDEEFF0046 /* PlayEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayEvent.swift; sourceTree = "<group>"; };
 		A1011047AABBCCDDEEFF0047 /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
 		A1011068AABBCCDDEEFF0068 /* FeedbackSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackSectionView.swift; sourceTree = "<group>"; };
+		A1011069AABBCCDDEEFF0069 /* SignupPromptSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupPromptSectionView.swift; sourceTree = "<group>"; };
 		A1011048AABBCCDDEEFF0048 /* ResultViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultViewModel.swift; sourceTree = "<group>"; };
 		A1011049AABBCCDDEEFF0049 /* ResultUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultUiState.swift; sourceTree = "<group>"; };
 		A1011050AABBCCDDEEFF0050 /* ResultAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultAction.swift; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 			children = (
 				A1011047AABBCCDDEEFF0047 /* ResultView.swift */,
 				A1011068AABBCCDDEEFF0068 /* FeedbackSectionView.swift */,
+				A1011069AABBCCDDEEFF0069 /* SignupPromptSectionView.swift */,
 				A1011048AABBCCDDEEFF0048 /* ResultViewModel.swift */,
 				A1011049AABBCCDDEEFF0049 /* ResultUiState.swift */,
 				A1011050AABBCCDDEEFF0050 /* ResultAction.swift */,
@@ -441,6 +444,7 @@
 				A1010046AABBCCDDEEFF0046 /* PlayEvent.swift in Sources */,
 				A1010047AABBCCDDEEFF0047 /* ResultView.swift in Sources */,
 				A1010068AABBCCDDEEFF0068 /* FeedbackSectionView.swift in Sources */,
+				A1010069AABBCCDDEEFF0069 /* SignupPromptSectionView.swift in Sources */,
 				A1010048AABBCCDDEEFF0048 /* ResultViewModel.swift in Sources */,
 				A1010049AABBCCDDEEFF0049 /* ResultUiState.swift in Sources */,
 				A1010050AABBCCDDEEFF0050 /* ResultAction.swift in Sources */,

@@ -28,6 +28,7 @@ import org.sesacteamproject.passmate.session.domain.policy.SnapshotPolicy
 import org.sesacteamproject.passmate.session.domain.usecase.GetSessionSnapshotUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.GetVoiceHintsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SubmitAnswerUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.RequestGuestClaimUseCase
 
 class PlayViewModel(
     private val getRoomInfoUseCase: GetRoomInfoUseCase,
@@ -36,6 +37,7 @@ class PlayViewModel(
     private val getVoiceHintsUseCase: GetVoiceHintsUseCase,
     private val leaveRoomUseCase: LeaveRoomUseCase,
     private val getMyParticipationUseCase: GetMyParticipationUseCase,
+    private val requestGuestClaimUseCase: RequestGuestClaimUseCase,
     private val snapshotPolicy: SnapshotPolicy,
     private val sessionEventStream: SessionEventStream
 ) : MviViewModel<PlayUiState, PlayAction, PlayEvent>(PlayUiState()) {
@@ -59,7 +61,8 @@ class PlayViewModel(
         _uiState.update {
             it.copy(
                 myParticipantId = my?.participantId,
-                myNickname = my?.nickname
+                myNickname = my?.nickname,
+                isGuest = my?.isGuest ?: false
             )
         }
         viewModelScope.launch {
@@ -383,6 +386,18 @@ class PlayViewModel(
         }
     }
 
+    // 게스트 가입 유도 (T075) — participantId를 대기 큐에 넣고 로그인 화면으로
+    private fun onClickSignup() {
+        val participantId = _uiState.value.myParticipantId
+
+        viewModelScope.launch {
+            if (participantId != null) {
+                requestGuestClaimUseCase.invoke(participantId)
+            }
+            _event.emit(PlayEvent.OpenSignup)
+        }
+    }
+
     private fun toRankEntry(entry: ServerEvent.RankingEntry): RankEntry {
         return RankEntry(
             rank = entry.rank,
@@ -409,6 +424,7 @@ class PlayViewModel(
             is PlayAction.ChangeEssayAnswer -> onChangeEssayAnswer(action.text)
             is PlayAction.ClickSubmit -> onClickSubmit()
             is PlayAction.ClickReplayHint -> onClickReplayHint()
+            is PlayAction.ClickSignup -> onClickSignup()
             is PlayAction.ConfirmLeave -> onConfirmLeave()
             is PlayAction.ClickViewReport -> onClickViewReport()
         }

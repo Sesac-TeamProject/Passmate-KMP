@@ -147,7 +147,8 @@ private fun StatusMessage(message: String) {
     )
 }
 
-// 첨삭 입력은 파트2 T072 — 여기선 도착 시 표시만, 미도착이면 안내 문구 (M-06 하단)
+// T072(US8): AI 분석과 선생님 첨삭을 구분 표시하고, 최종 점수는 첨삭 보정을 우선한다 (FR-034~035).
+// 첨삭 입력은 파트2/웹 몫 — 여기선 도착 시 표시만, 미도착이면 안내 문구 (M-06 하단)
 @Composable
 private fun HostReviewRow(review: HostReview?) {
     if (review == null) {
@@ -158,12 +159,18 @@ private fun HostReviewRow(review: HostReview?) {
             letterSpacing = (-0.24).sp
         )
     } else {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(PassmateColors.BackgroundMint, RoundedCornerShape(12.dp))
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Text(
-                text = "선생님 코멘트",
+                text = "선생님 첨삭",
                 color = PassmateColors.PrimaryDeep,
                 fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.24).sp
             )
             Text(
@@ -178,6 +185,17 @@ private fun HostReviewRow(review: HostReview?) {
                     text = "개선 — ${review.improvement}",
                     color = PassmateColors.TextSecondary,
                     fontSize = 13.sp,
+                    letterSpacing = (-0.26).sp
+                )
+            }
+            val adjustedScore = review.adjustedScore
+
+            if (adjustedScore != null) {
+                Text(
+                    text = "최종 점수 ${adjustedScore.toInt()}점 · 선생님 보정 반영",
+                    color = PassmateColors.PrimaryDeep,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
                     letterSpacing = (-0.26).sp
                 )
             }

@@ -7,6 +7,8 @@ final class SignInViewModel: ObservableObject {
 
     private let completeSignInUseCase: CompleteSignInUseCase
 
+    private let completeGuestClaimUseCase: CompleteGuestClaimUseCase
+
     @Published private(set) var uiState: SignInUiState
 
     let event = PassthroughSubject<SignInEvent, Never>()
@@ -35,9 +37,26 @@ final class SignInViewModel: ObservableObject {
                 guard let self else { return }
                 self.uiState.isSigningIn = false
                 if error == nil, result != nil, !(result is AppResultFailure) {
+                    self.claimPendingGuestRecord()
                     self.event.send(.signInCompleted)
                 } else {
                     self.event.send(.showNotice(message: "로그인에 실패했어요. 다시 시도해 주세요"))
+                }
+            }
+        }
+    }
+
+    // 가입 유도로 진입했다면 대기 중인 게스트 기록을 연동한다 (FR-036)
+    private func claimPendingGuestRecord() {
+        completeGuestClaimUseCase.invoke { [weak self] result, _ in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if let failure = result as? AppResultFailure {
+                    if failure.error is AppErrorGone {
+                        self.event.send(.showNotice(message: "기록 보관 기간(7일)이 지나 저장하지 못했어요"))
+                    } else {
+                        self.event.send(.showNotice(message: "기록을 계정에 저장하지 못했어요"))
+                    }
                 }
             }
         }
@@ -58,10 +77,12 @@ final class SignInViewModel: ObservableObject {
 
     init(
         buildGoogleSignInUrlUseCase: BuildGoogleSignInUrlUseCase,
-        completeSignInUseCase: CompleteSignInUseCase
+        completeSignInUseCase: CompleteSignInUseCase,
+        completeGuestClaimUseCase: CompleteGuestClaimUseCase
     ) {
         self.buildGoogleSignInUrlUseCase = buildGoogleSignInUrlUseCase
         self.completeSignInUseCase = completeSignInUseCase
+        self.completeGuestClaimUseCase = completeGuestClaimUseCase
         self.uiState = SignInUiState()
     }
 }

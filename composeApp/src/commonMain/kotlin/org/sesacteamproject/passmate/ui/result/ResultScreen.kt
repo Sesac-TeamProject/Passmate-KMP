@@ -61,6 +61,7 @@ fun ResultScreen(
         viewModel.event.collect { event ->
             when (event) {
                 is ResultEvent.ShareReport -> shareReport(event.summary)
+                is ResultEvent.NavigateToSignup -> onNavigate(NavigationAction.NavigateToSignIn)
                 is ResultEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -166,6 +167,10 @@ private fun ColumnScope.LoadedResult(
 
         if (selected != null && (selected.aiFeedback != null || selected.hostReview != null)) {
             FeedbackSection(question = selected)
+        }
+        // 게스트 가입 유도 (T075) — 회원에게는 표시하지 않는다
+        if (result.isGuest) {
+            SignupPromptSection(onClickSignup = { onAction(ResultAction.ClickSignup) })
         }
     }
     ExportButton(onClick = { onAction(ResultAction.ClickExport) })

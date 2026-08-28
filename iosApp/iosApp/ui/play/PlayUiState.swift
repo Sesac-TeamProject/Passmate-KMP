@@ -37,6 +37,8 @@ struct PlayUiState {
 
     var myNickname: String?
 
+    var isGuest: Bool = false
+
     var isLocked: Bool = false
 
     var activeVoiceHint: VoiceHint?
