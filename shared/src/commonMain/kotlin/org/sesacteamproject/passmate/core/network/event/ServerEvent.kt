@@ -36,6 +36,7 @@ sealed interface ServerEvent {
 
     @Serializable
     data class QuestionStarted(
+        val questionId: Long,
         val questionNo: Int,
         val type: String,
         val body: String,

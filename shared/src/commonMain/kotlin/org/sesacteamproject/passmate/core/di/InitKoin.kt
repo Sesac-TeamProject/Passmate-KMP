@@ -4,6 +4,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.sesacteamproject.passmate.auth.di.authModule
 import org.sesacteamproject.passmate.room.di.roomModule
+import org.sesacteamproject.passmate.session.di.sessionModule
 
 // 플랫폼 시작점 3곳(PassmateApplication·jvm main·iOS KoinHelper)에서만 호출한다.
 // 기능(스토리) 모듈은 구현되는 스토리 증분마다 여기에 추가한다 (아키텍처 설계 §4-2).
@@ -14,7 +15,8 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) {
             coreModule,
             platformCoreModule,
             authModule,
-            roomModule
+            roomModule,
+            sessionModule
         )
     }
 }
