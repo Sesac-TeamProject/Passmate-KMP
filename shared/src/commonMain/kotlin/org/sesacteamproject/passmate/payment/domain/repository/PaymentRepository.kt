@@ -42,4 +42,7 @@ interface PaymentRepository {
     suspend fun getSettlementAccount(): AppResult<SettlementAccount>
 
     suspend fun saveSettlementAccount(account: SettlementAccount): AppResult<Unit>
+
+    // 기본 결제 수단 설정 (M-12-8, PUT /users/me/payment-method)
+    suspend fun setDefaultPaymentMethod(method: PaymentMethod): AppResult<Unit>
 }

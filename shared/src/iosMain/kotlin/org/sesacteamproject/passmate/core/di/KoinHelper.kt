@@ -4,6 +4,7 @@ import org.koin.mp.KoinPlatform
 import org.sesacteamproject.passmate.auth.domain.usecase.BuildGoogleSignInUrlUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.CompleteSignInUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
+import org.sesacteamproject.passmate.auth.domain.usecase.SignOutUseCase
 import org.sesacteamproject.passmate.core.network.SessionEventStreamWatcher
 import org.sesacteamproject.passmate.payment.domain.policy.CoinPolicy
 import org.sesacteamproject.passmate.payment.domain.usecase.ConfirmChargeUseCase
@@ -13,6 +14,7 @@ import org.sesacteamproject.passmate.payment.domain.usecase.GetMyCoinsUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.GetPublicRoomsUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.GetSettlementAccountUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.SaveSettlementAccountUseCase
+import org.sesacteamproject.passmate.payment.domain.usecase.SetPaymentMethodUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.PayEntryFeeUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.RequestChargeUseCase
 import org.sesacteamproject.passmate.rating.domain.usecase.SubmitRatingUseCase
@@ -43,6 +45,11 @@ import org.sesacteamproject.passmate.session.domain.usecase.StartSessionUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SubmitAnswerUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.BlockHostUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.CompleteGuestClaimUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.DeleteAccountUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetNotificationSettingsUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.UpdateMyProfileUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.UpdateNotificationSettingsUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetHostProfileUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyBadgesUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyGradeUseCase
@@ -120,6 +127,20 @@ object KoinHelper {
     fun blockHostUseCase(): BlockHostUseCase = KoinPlatform.getKoin().get()
 
     fun reportHostUseCase(): ReportHostUseCase = KoinPlatform.getKoin().get()
+
+    fun signOutUseCase(): SignOutUseCase = KoinPlatform.getKoin().get()
+
+    fun getMyProfileUseCase(): GetMyProfileUseCase = KoinPlatform.getKoin().get()
+
+    fun updateMyProfileUseCase(): UpdateMyProfileUseCase = KoinPlatform.getKoin().get()
+
+    fun deleteAccountUseCase(): DeleteAccountUseCase = KoinPlatform.getKoin().get()
+
+    fun getNotificationSettingsUseCase(): GetNotificationSettingsUseCase = KoinPlatform.getKoin().get()
+
+    fun updateNotificationSettingsUseCase(): UpdateNotificationSettingsUseCase = KoinPlatform.getKoin().get()
+
+    fun setPaymentMethodUseCase(): SetPaymentMethodUseCase = KoinPlatform.getKoin().get()
 
     fun getHostedRoomsUseCase(): GetHostedRoomsUseCase = KoinPlatform.getKoin().get()
 

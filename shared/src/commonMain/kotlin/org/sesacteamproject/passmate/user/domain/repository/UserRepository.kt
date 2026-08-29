@@ -5,7 +5,9 @@ import org.sesacteamproject.passmate.user.domain.model.Badge
 import org.sesacteamproject.passmate.user.domain.model.HostProfile
 import org.sesacteamproject.passmate.user.domain.model.MyGrade
 import org.sesacteamproject.passmate.user.domain.model.MyPage
+import org.sesacteamproject.passmate.user.domain.model.NotificationSettings
 import org.sesacteamproject.passmate.user.domain.model.ReportReason
+import org.sesacteamproject.passmate.user.domain.model.UserProfile
 
 interface UserRepository {
 
@@ -29,4 +31,18 @@ interface UserRepository {
 
     // 신고 접수 — 게스트 익명 신고 가능 (M-10)
     suspend fun reportUser(userId: Long, reason: ReportReason, detail: String?): AppResult<Unit>
+
+    // ── 내 정보 관리 (M-12 설정 허브) ──
+
+    suspend fun getMyProfile(): AppResult<UserProfile>
+
+    // 닉네임·기본 캐릭터 수정 (M-12-1·M-12-7)
+    suspend fun updateMyProfile(nickname: String?, avatarId: Int?): AppResult<Unit>
+
+    // 회원 탈퇴 — 정산 미지급분·진행 중 방 있으면 409 (M-12-12)
+    suspend fun deleteAccount(): AppResult<Unit>
+
+    suspend fun getNotificationSettings(): AppResult<NotificationSettings>
+
+    suspend fun updateNotificationSettings(settings: NotificationSettings): AppResult<Unit>
 }

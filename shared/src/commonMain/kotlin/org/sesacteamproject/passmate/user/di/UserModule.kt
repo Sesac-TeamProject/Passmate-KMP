@@ -7,6 +7,11 @@ import org.sesacteamproject.passmate.user.domain.model.PendingGuestClaim
 import org.sesacteamproject.passmate.user.domain.repository.UserRepository
 import org.sesacteamproject.passmate.user.domain.usecase.BlockHostUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.CompleteGuestClaimUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.DeleteAccountUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetNotificationSettingsUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.UpdateMyProfileUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.UpdateNotificationSettingsUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetHostProfileUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyBadgesUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyGradeUseCase
@@ -26,4 +31,9 @@ val userModule = module {
     factory { GetHostProfileUseCase(get()) }
     factory { BlockHostUseCase(get()) }
     factory { ReportHostUseCase(get()) }
+    factory { GetMyProfileUseCase(get()) }
+    factory { UpdateMyProfileUseCase(get()) }
+    factory { DeleteAccountUseCase(get(), get()) }
+    factory { GetNotificationSettingsUseCase(get()) }
+    factory { UpdateNotificationSettingsUseCase(get()) }
 }

@@ -5,7 +5,9 @@ import org.sesacteamproject.passmate.room.domain.model.HostLevel
 import org.sesacteamproject.passmate.user.data.dto.BadgesResponse
 import org.sesacteamproject.passmate.user.data.dto.GradeResponse
 import org.sesacteamproject.passmate.user.data.dto.HostProfileResponse
+import org.sesacteamproject.passmate.user.data.dto.UserProfileResponse
 import org.sesacteamproject.passmate.user.data.dto.MyPageResponse
+import org.sesacteamproject.passmate.user.data.dto.NotificationSettingsDto
 import org.sesacteamproject.passmate.user.domain.model.Badge
 import org.sesacteamproject.passmate.user.domain.model.BadgeType
 import org.sesacteamproject.passmate.user.domain.model.GradeCriterion
@@ -15,8 +17,10 @@ import org.sesacteamproject.passmate.user.domain.model.JoinedRoom
 import org.sesacteamproject.passmate.user.domain.model.MyGrade
 import org.sesacteamproject.passmate.user.domain.model.MyPage
 import org.sesacteamproject.passmate.user.domain.model.MyPageSummary
+import org.sesacteamproject.passmate.user.domain.model.NotificationSettings
 import org.sesacteamproject.passmate.user.domain.model.NextGrade
 import org.sesacteamproject.passmate.user.domain.model.OngoingRoom
+import org.sesacteamproject.passmate.user.domain.model.UserProfile
 
 fun MyPageResponse.toDomain(): MyPage {
     return MyPage(
@@ -123,5 +127,26 @@ fun HostProfileResponse.toDomain(): HostProfile {
         totalStudents = totalStudents,
         badges = badges.mapNotNull { BadgeType.from(it) },
         rooms = rooms.map { it.toDomain() }
+    )
+}
+
+fun UserProfileResponse.toDomain(): UserProfile {
+    return UserProfile(
+        nickname = nickname,
+        email = email,
+        joinedAt = joinedAt,
+        avatarId = avatarId,
+        level = HostLevel.from(level),
+        coins = coins,
+        joinedRoomCount = joinedRoomCount,
+        hostedRoomCount = hostedRoomCount
+    )
+}
+
+fun NotificationSettingsDto.toDomain(): NotificationSettings {
+    return NotificationSettings(
+        sessionStart = sessionStart,
+        ratingRequest = ratingRequest,
+        settlementDone = settlementDone
     )
 }
