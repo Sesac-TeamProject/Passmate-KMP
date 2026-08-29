@@ -3,6 +3,7 @@ package org.sesacteamproject.passmate.ui.hostroom
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,10 +31,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,8 +50,7 @@ import org.sesacteamproject.passmate.session.domain.model.SubmissionStatus
 import org.sesacteamproject.passmate.theme.PassmateColors
 
 // Figma "UI 디자인 v6" M-T2(349:10123) — 진행 리모컨: 프로젝터는 벽, 폰은 조작.
-// 문항·제출 현황은 서버 이벤트·재조회로만 갱신되고, 화면 전환(SESSION_ENDED→리포트)도 서버 이벤트로만 일어난다 (규칙 §2-1-2).
-// PTT 힌트 송출은 후속 태스크(T121)
+// 문항·제출 현황은 서버 이벤트·재조회로만 갱신되고, 화면 전환(SESSION_ENDED→리포트)도 서버 이벤트로만 일어난다 (규칙 §2-1-2)
 @Composable
 fun SessionControlScreen(
     roomId: Long,
@@ -199,6 +201,10 @@ private fun LoadedControl(
             )
         } else {
             QuestionCard(uiState = uiState)
+            PttButton(
+                uiState = uiState,
+                onAction = onAction
+            )
             ControlButtons(
                 uiState = uiState,
                 onAction = onAction
@@ -498,6 +504,96 @@ private fun ChoiceBar(
             fontSize = 13.sp,
             letterSpacing = (-0.26).sp
         )
+    }
+}
+
+// "길게 눌러 힌트 말하기" (M-T2, T121) — 누르는 동안 녹음, 놓으면 업로드. Desktop은 미지원 안내 칩
+@Composable
+private fun PttButton(
+    uiState: SessionControlUiState,
+    onAction: (SessionControlAction) -> Unit
+) {
+    val recorder = rememberVoiceHintRecorder()
+
+    if (recorder == null) {
+        Text(
+            text = "🎙 힌트 말하기(PTT)는 모바일 앱에서 지원돼요",
+            color = PassmateColors.TextTertiary,
+            fontSize = 13.sp,
+            letterSpacing = (-0.26).sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(PassmateColors.FieldGray, RoundedCornerShape(16.dp))
+                .padding(vertical = 14.dp)
+        )
+    } else {
+        var isRecording by remember { mutableStateOf(false) }
+        val currentOnAction = rememberUpdatedState(onAction)
+        val currentIsSending = rememberUpdatedState(uiState.isSendingHint)
+        val background = if (isRecording) PassmateColors.Primary else PassmateColors.Surface
+        val textColor = if (isRecording) PassmateColors.Surface else PassmateColors.PrimaryDeep
+        val label = when {
+            uiState.isSendingHint -> "힌트 보내는 중…"
+            isRecording -> "녹음 중… 놓으면 전송돼요"
+            else -> "🎙 길게 눌러 힌트 말하기 (PTT)"
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .border(1.dp, PassmateColors.Primary, RoundedCornerShape(16.dp))
+                .background(background, RoundedCornerShape(16.dp))
+                .pointerInput(recorder) {
+                    detectTapGestures(
+                        onPress = {
+                            if (!currentIsSending.value) {
+                                if (recorder.start()) {
+                                    isRecording = true
+                                    val released = tryAwaitRelease()
+
+                                    isRecording = false
+                                    if (released) {
+                                        val hint = recorder.stop()
+
+                                        if (hint != null) {
+                                            currentOnAction.value(SessionControlAction.SendVoiceHint(hint))
+                                        } else {
+                                            currentOnAction.value(
+                                                SessionControlAction.Notice("녹음이 너무 짧아요 · 길게 눌러 말해 주세요")
+                                            )
+                                        }
+                                    } else {
+                                        recorder.cancel()
+                                    }
+                                } else {
+                                    currentOnAction.value(
+                                        SessionControlAction.Notice("마이크 권한을 허용한 뒤 다시 길게 눌러 주세요")
+                                    )
+                                }
+                            }
+                        }
+                    )
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            if (uiState.isSendingHint) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(18.dp),
+                    color = PassmateColors.PrimaryDeep,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = label,
+                    color = textColor,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = (-0.28).sp
+                )
+            }
+        }
     }
 }
 

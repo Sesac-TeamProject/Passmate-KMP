@@ -23,6 +23,7 @@ import org.sesacteamproject.passmate.session.domain.usecase.EndSessionUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.GetSessionSnapshotUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.GetSubmissionsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.NextQuestionUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.PublishVoiceHintUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SetScreenLockUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.StartSessionUseCase
 
@@ -35,6 +36,7 @@ class SessionControlViewModel(
     private val endCurrentQuestionUseCase: EndCurrentQuestionUseCase,
     private val endSessionUseCase: EndSessionUseCase,
     private val setScreenLockUseCase: SetScreenLockUseCase,
+    private val publishVoiceHintUseCase: PublishVoiceHintUseCase,
     private val sessionEventStream: SessionEventStream,
     private val isSignedInUseCase: IsSignedInUseCase
 ) : MviViewModel<SessionControlUiState, SessionControlAction, SessionControlEvent>(SessionControlUiState()) {
@@ -239,6 +241,40 @@ class SessionControlViewModel(
         }
     }
 
+    // PTT 클립 업로드 — 진행 중 문항이 있을 때만, 브로드캐스트·수신은 서버 몫 (FR-039)
+    private fun onSendVoiceHint(hint: RecordedVoiceHint) {
+        val state = _uiState.value
+
+        if (state.isSendingHint || state.status != RoomStatus.RUNNING || state.question == null) {
+            emitControlNotice("문항 진행 중에만 힌트를 보낼 수 있어요")
+            return
+        }
+        _uiState.update { it.copy(isSendingHint = true) }
+        viewModelScope.launch {
+            publishVoiceHintUseCase.invoke(
+                roomId = roomId,
+                audioBytes = hint.audioBytes,
+                mimeType = hint.mimeType,
+                fileName = hint.fileName,
+                durationMs = hint.durationMs
+            )
+                .onSuccess {
+                    _uiState.update { it.copy(isSendingHint = false) }
+                    _event.emit(SessionControlEvent.ShowNotice("힌트를 보냈어요"))
+                }
+                .onFailure {
+                    _uiState.update { it.copy(isSendingHint = false) }
+                    _event.emit(SessionControlEvent.ShowNotice("힌트를 보내지 못했어요. 다시 시도해 주세요"))
+                }
+        }
+    }
+
+    private fun emitControlNotice(message: String) {
+        viewModelScope.launch {
+            _event.emit(SessionControlEvent.ShowNotice(message))
+        }
+    }
+
     // 제어 요청 공통 처리 — 상태 전이는 서버 브로드캐스트로만 반영한다 (규칙 §2-1-2)
     private fun runControl(block: suspend () -> AppResult<*>) {
         if (_uiState.value.isControlling) {
@@ -276,6 +312,8 @@ class SessionControlViewModel(
             is SessionControlAction.ClickEndQuestion -> onClickEndQuestion()
             is SessionControlAction.ConfirmEndSession -> onConfirmEndSession()
             is SessionControlAction.ToggleLock -> onToggleLock()
+            is SessionControlAction.SendVoiceHint -> onSendVoiceHint(action.hint)
+            is SessionControlAction.Notice -> emitControlNotice(action.message)
         }
     }
 }

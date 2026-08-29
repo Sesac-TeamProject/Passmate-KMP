@@ -35,7 +35,7 @@ val viewModelModule = module {
     factory { CreateRoomViewModel(get(), get()) }
     factory { RoomReportViewModel(get(), get(), get()) }
     factory {
-        SessionControlViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
+        SessionControlViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
     }
     factory { EarningsViewModel(get(), get()) }
     factory { SettlementAccountViewModel(get(), get()) }
