@@ -79,6 +79,7 @@ struct ContentView: View {
                 onOpenCoinHistory: { path.append(.coinHistory) },
                 onOpenReputation: { path.append(.reputation) },
                 onOpenHostedRooms: { path.append(.hostedRooms) },
+                onOpenEarnings: { path.append(.earnings) },
                 onBack: { popOnce() }
             )
         case .reputation:
@@ -92,6 +93,11 @@ struct ContentView: View {
                 onOpenReputation: { path.append(.reputation) },
                 onOpenRoomReport: { roomId in path.append(.roomReport(roomId: roomId)) },
                 onOpenSessionControl: { roomId, pin in path.append(.sessionControl(roomId: roomId, pin: pin)) },
+                onBack: { popOnce() }
+            )
+        case .earnings:
+            EarningsView(
+                onRequireSignIn: { path.append(.signIn) },
                 onBack: { popOnce() }
             )
         case let .sessionControl(roomId, pin):
