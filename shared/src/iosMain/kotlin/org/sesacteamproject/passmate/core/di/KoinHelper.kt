@@ -16,7 +16,10 @@ import org.sesacteamproject.passmate.rating.domain.usecase.SubmitRatingUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.BuildReportSummaryUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetLearningReportUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetSessionResultUseCase
+import org.sesacteamproject.passmate.question.domain.usecase.GetMyQuestionSetsUseCase
 import org.sesacteamproject.passmate.room.domain.policy.JoinInputPolicy
+import org.sesacteamproject.passmate.room.domain.usecase.CreateRoomUseCase
+import org.sesacteamproject.passmate.room.domain.usecase.GetHostedRoomsUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetMyParticipationUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetParticipantsUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetRoomInfoUseCase
@@ -105,6 +108,12 @@ object KoinHelper {
     fun blockHostUseCase(): BlockHostUseCase = KoinPlatform.getKoin().get()
 
     fun reportHostUseCase(): ReportHostUseCase = KoinPlatform.getKoin().get()
+
+    fun getHostedRoomsUseCase(): GetHostedRoomsUseCase = KoinPlatform.getKoin().get()
+
+    fun createRoomUseCase(): CreateRoomUseCase = KoinPlatform.getKoin().get()
+
+    fun getMyQuestionSetsUseCase(): GetMyQuestionSetsUseCase = KoinPlatform.getKoin().get()
 
     fun sessionEventStreamWatcher(): SessionEventStreamWatcher = SessionEventStreamWatcher(KoinPlatform.getKoin().get())
 }
