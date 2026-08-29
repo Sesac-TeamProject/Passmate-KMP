@@ -89,6 +89,8 @@ final class MyInfoViewModel: ObservableObject {
             event.send(.openHostedRooms)
         case .clickEarnings:
             event.send(.openEarnings)
+        case .clickSettings:
+            event.send(.openSettings)
         }
     }
 

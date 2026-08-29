@@ -8,4 +8,5 @@ enum MyInfoAction {
     case clickReputation
     case clickHostedRooms
     case clickEarnings
+    case clickSettings
 }

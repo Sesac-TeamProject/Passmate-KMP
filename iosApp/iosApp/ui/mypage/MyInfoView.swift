@@ -17,6 +17,8 @@ struct MyInfoView: View {
 
     var onOpenEarnings: () -> Void = {}
 
+    var onOpenSettings: () -> Void = {}
+
     var onBack: () -> Void = {}
 
     @StateObject private var viewModel = MyInfoViewModel(
@@ -51,6 +53,8 @@ struct MyInfoView: View {
                 onOpenHostedRooms()
             case .openEarnings:
                 onOpenEarnings()
+            case .openSettings:
+                onOpenSettings()
             case let .showNotice(message):
                 noticeMessage = message
             }
@@ -118,6 +122,12 @@ private struct MyInfoContentView: View {
                         .kerning(-0.48)
                         .foregroundColor(PassmateColors.textPrimary)
                     Spacer()
+                    Button(action: { onAction(.clickSettings) }) {
+                        Text("설정")
+                            .font(.system(size: 14, weight: .medium))
+                            .kerning(-0.28)
+                            .foregroundColor(PassmateColors.primaryDeep)
+                    }
                     Button(action: onClickBack) {
                         Text("닫기")
                             .font(.system(size: 14, weight: .medium))

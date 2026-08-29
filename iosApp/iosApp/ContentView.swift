@@ -80,6 +80,7 @@ struct ContentView: View {
                 onOpenReputation: { path.append(.reputation) },
                 onOpenHostedRooms: { path.append(.hostedRooms) },
                 onOpenEarnings: { path.append(.earnings) },
+                onOpenSettings: { path.append(.settings) },
                 onBack: { popOnce() }
             )
         case .reputation:
@@ -114,8 +115,14 @@ struct ContentView: View {
                 onRequireSignIn: { path.append(.signIn) },
                 onBack: { popOnce() }
             )
+        case .settings:
+            SettingsView(
+                onRequireSignIn: { path.append(.signIn) },
+                onOpenCoinHistory: { path.append(.coinHistory) },
+                onSignedOut: { path = [] },
+                onBack: { popOnce() }
+            )
         default:
-            // Payment·Settings 라우트는 담당 스토리(파트2)에서 연결된다
             HomeView(
                 onJoinTapped: { path.append(.join(pin: nil)) },
                 onSignInTapped: { path.append(.signIn) }
