@@ -163,6 +163,8 @@ struct LevelEmblemView: View {
 
 // 호스트 등급 Lv.1~5 (shared HostLevel 미러) — Kotlin enum 인터롭 대신 Swift 자체 정의로 라벨 안정화
 enum HostLevel: Int {
+    var level: Int { rawValue }
+
     case seedling = 1
     case growing = 2
     case verified = 3

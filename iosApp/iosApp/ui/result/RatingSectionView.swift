@@ -30,7 +30,7 @@ struct RatingSectionView: View {
             }
             .frame(maxWidth: .infinity)
             FlowLayout(spacing: 8) {
-                ForEach(RatingTag.all, id: \.self) { tag in
+                ForEach(RatingTag.companion.all, id: \.self) { tag in
                     tagChip(tag)
                 }
             }

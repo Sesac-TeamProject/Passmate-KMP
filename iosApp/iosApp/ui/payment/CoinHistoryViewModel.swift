@@ -27,7 +27,7 @@ final class CoinHistoryViewModel: ObservableObject {
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.uiState.isLoading = false
-                if let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult {
+                if let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult<AnyObject> {
                     self.uiState.hasError = false
                     self.uiState.items = self.transactions(page)
                     self.uiState.hasNext = page.hasNext
@@ -48,7 +48,7 @@ final class CoinHistoryViewModel: ObservableObject {
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.uiState.isLoadingMore = false
-                if let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult {
+                if let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult<AnyObject> {
                     self.uiState.items += self.transactions(page)
                     self.uiState.hasNext = page.hasNext
                     self.uiState.nextCursor = page.nextCursor
@@ -59,7 +59,7 @@ final class CoinHistoryViewModel: ObservableObject {
         }
     }
 
-    private func transactions(_ page: PagedResult) -> [CoinTransaction] {
+    private func transactions(_ page: PagedResult<AnyObject>) -> [CoinTransaction] {
         page.items.compactMap { $0 as? CoinTransaction }
     }
 

@@ -36,7 +36,7 @@ final class RoomListViewModel: ObservableObject {
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.uiState.isLoading = false
-                if let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult {
+                if let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult<AnyObject> {
                     self.uiState.hasError = false
                     self.uiState.rooms = self.publicRooms(page)
                     self.uiState.hasNext = page.hasNext
@@ -62,7 +62,7 @@ final class RoomListViewModel: ObservableObject {
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.uiState.isLoadingMore = false
-                if let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult {
+                if let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult<AnyObject> {
                     self.uiState.rooms += self.publicRooms(page)
                     self.uiState.hasNext = page.hasNext
                     self.uiState.nextCursor = page.nextCursor
@@ -73,7 +73,7 @@ final class RoomListViewModel: ObservableObject {
         }
     }
 
-    private func publicRooms(_ page: PagedResult) -> [PublicRoom] {
+    private func publicRooms(_ page: PagedResult<AnyObject>) -> [PublicRoom] {
         page.items.compactMap { $0 as? PublicRoom }
     }
 

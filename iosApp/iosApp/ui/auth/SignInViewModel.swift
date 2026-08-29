@@ -52,7 +52,7 @@ final class SignInViewModel: ObservableObject {
             DispatchQueue.main.async {
                 guard let self else { return }
                 if let failure = result as? AppResultFailure {
-                    if failure.error is AppErrorGone {
+                    if failure.error is AppError.Gone {
                         self.event.send(.showNotice(message: "기록 보관 기간(7일)이 지나 저장하지 못했어요"))
                     } else {
                         self.event.send(.showNotice(message: "기록을 계정에 저장하지 못했어요"))

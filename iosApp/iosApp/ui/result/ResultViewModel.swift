@@ -176,14 +176,14 @@ final class ResultViewModel: ObservableObject {
     }
 
     private func handleRatingFailure(_ error: AppError?) {
-        if error is AppErrorConflict {
+        if error is AppError.Conflict {
             uiState.isRatingSheetVisible = false
             uiState.hasRated = true
             event.send(.showNotice(message: "이미 평가한 세션이에요"))
-        } else if error is AppErrorGone {
+        } else if error is AppError.Gone {
             uiState.isRatingSheetVisible = false
             event.send(.showNotice(message: "평가 기간(24시간)이 지났어요"))
-        } else if error is AppErrorNetworkError {
+        } else if error is AppError.NetworkError {
             event.send(.showNotice(message: "네트워크 연결을 확인해 주세요"))
         } else {
             event.send(.showNotice(message: "평가를 보내지 못했어요. 다시 시도해 주세요"))
