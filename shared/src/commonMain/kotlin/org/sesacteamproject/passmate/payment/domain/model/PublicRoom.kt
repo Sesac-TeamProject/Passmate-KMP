@@ -8,6 +8,8 @@ data class PublicRoom(
     val pin: String,
     val title: String,
     val topic: String?,
+    // 호스트 userId — 선생님 프로필 시트(M-10) 진입용 (contracts 2026-08-29 추가)
+    val hostId: Long?,
     val hostName: String,
     val hostLevel: Int?,
     val hostRating: Double?,

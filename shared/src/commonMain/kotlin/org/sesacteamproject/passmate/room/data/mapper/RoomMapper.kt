@@ -27,6 +27,7 @@ fun RoomInfoResponse.toDomain(): RoomInfo {
 
 fun RoomInfoResponse.Host.toDomain(): RoomHost {
     return RoomHost(
+        userId = userId,
         nickname = nickname,
         level = level,
         avgStars = avgStars,

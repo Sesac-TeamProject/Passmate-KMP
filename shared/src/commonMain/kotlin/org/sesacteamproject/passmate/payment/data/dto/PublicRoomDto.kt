@@ -9,6 +9,7 @@ data class PublicRoomDto(
     val pin: String = "",
     val title: String = "",
     val topic: String? = null,
+    val hostId: Long? = null,
     val hostName: String = "",
     val hostLevel: Int? = null,
     val hostRating: Double? = null,

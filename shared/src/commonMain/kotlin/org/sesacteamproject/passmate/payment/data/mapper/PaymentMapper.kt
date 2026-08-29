@@ -81,6 +81,7 @@ fun PublicRoomDto.toDomain(): PublicRoom {
         pin = pin,
         title = title,
         topic = topic,
+        hostId = hostId,
         hostName = hostName,
         hostLevel = hostLevel,
         hostRating = hostRating,

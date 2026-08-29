@@ -22,6 +22,7 @@ data class RoomInfoResponse(
 
     @Serializable
     data class Host(
+        val userId: Long? = null,
         val nickname: String,
         val level: Int? = null,
         val avgStars: Double? = null,
