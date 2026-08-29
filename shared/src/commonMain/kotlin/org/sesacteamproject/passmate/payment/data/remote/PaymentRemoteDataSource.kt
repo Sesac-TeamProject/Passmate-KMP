@@ -17,6 +17,7 @@ import org.sesacteamproject.passmate.payment.data.dto.ConfirmChargeResponse
 import org.sesacteamproject.passmate.payment.data.dto.CreateChargeRequest
 import org.sesacteamproject.passmate.payment.data.dto.CreateEntryPaymentRequest
 import org.sesacteamproject.passmate.payment.data.dto.EarningsResponse
+import org.sesacteamproject.passmate.payment.data.dto.PaymentMethodRequest
 import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
 import org.sesacteamproject.passmate.payment.data.dto.EntryPaymentResponse
 import org.sesacteamproject.passmate.payment.data.dto.PublicRoomPageResponse
@@ -86,6 +87,13 @@ class PaymentRemoteDataSource(
 
     suspend fun fetchSettlementAccount(): SettlementAccountDto {
         return apiClient.http.get("${apiClient.baseUrl}/users/me/settlement-account").body()
+    }
+
+    suspend fun putPaymentMethod(request: PaymentMethodRequest) {
+        apiClient.http.put("${apiClient.baseUrl}/users/me/payment-method") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
     }
 
     suspend fun putSettlementAccount(request: SettlementAccountDto) {

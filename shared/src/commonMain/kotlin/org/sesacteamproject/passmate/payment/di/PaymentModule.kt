@@ -12,6 +12,7 @@ import org.sesacteamproject.passmate.payment.domain.usecase.GetMyCoinsUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.GetPublicRoomsUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.GetSettlementAccountUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.SaveSettlementAccountUseCase
+import org.sesacteamproject.passmate.payment.domain.usecase.SetPaymentMethodUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.PayEntryFeeUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.RequestChargeUseCase
 
@@ -28,4 +29,5 @@ val paymentModule = module {
     factory { GetEarningsUseCase(get()) }
     factory { GetSettlementAccountUseCase(get()) }
     factory { SaveSettlementAccountUseCase(get()) }
+    factory { SetPaymentMethodUseCase(get()) }
 }

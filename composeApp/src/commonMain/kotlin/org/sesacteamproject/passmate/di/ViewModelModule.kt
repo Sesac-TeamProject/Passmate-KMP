@@ -11,9 +11,13 @@ import org.sesacteamproject.passmate.ui.join.JoinViewModel
 import org.sesacteamproject.passmate.ui.mypage.MyInfoViewModel
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryViewModel
 import org.sesacteamproject.passmate.ui.payment.EarningsViewModel
+import org.sesacteamproject.passmate.ui.payment.PaymentMethodViewModel
 import org.sesacteamproject.passmate.ui.payment.PaymentViewModel
 import org.sesacteamproject.passmate.ui.payment.SettlementAccountViewModel
+import org.sesacteamproject.passmate.ui.mypage.EditProfileViewModel
+import org.sesacteamproject.passmate.ui.mypage.NotificationSettingsViewModel
 import org.sesacteamproject.passmate.ui.mypage.ReputationViewModel
+import org.sesacteamproject.passmate.ui.mypage.SettingsViewModel
 import org.sesacteamproject.passmate.ui.play.PlayViewModel
 import org.sesacteamproject.passmate.ui.profile.HostProfileViewModel
 import org.sesacteamproject.passmate.ui.result.ResultViewModel
@@ -39,4 +43,8 @@ val viewModelModule = module {
     }
     factory { EarningsViewModel(get(), get()) }
     factory { SettlementAccountViewModel(get(), get()) }
+    factory { SettingsViewModel(get(), get(), get(), get()) }
+    factory { EditProfileViewModel(get()) }
+    factory { NotificationSettingsViewModel(get(), get()) }
+    factory { PaymentMethodViewModel(get(), get()) }
 }

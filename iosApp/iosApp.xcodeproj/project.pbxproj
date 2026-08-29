@@ -110,6 +110,26 @@
 		A1010001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */; };
 		A1010001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */; };
 		A1010001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift */; };
+		A1010001125AABBCCDDEEFF0125 /* SettingsUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001125AABBCCDDEEFF0125 /* SettingsUiState.swift */; };
+		A1010001126AABBCCDDEEFF0126 /* SettingsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001126AABBCCDDEEFF0126 /* SettingsAction.swift */; };
+		A1010001127AABBCCDDEEFF0127 /* SettingsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001127AABBCCDDEEFF0127 /* SettingsEvent.swift */; };
+		A1010001128AABBCCDDEEFF0128 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001128AABBCCDDEEFF0128 /* SettingsViewModel.swift */; };
+		A1010001129AABBCCDDEEFF0129 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001129AABBCCDDEEFF0129 /* SettingsView.swift */; };
+		A1010001130AABBCCDDEEFF0130 /* EditProfileUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001130AABBCCDDEEFF0130 /* EditProfileUiState.swift */; };
+		A1010001131AABBCCDDEEFF0131 /* EditProfileAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001131AABBCCDDEEFF0131 /* EditProfileAction.swift */; };
+		A1010001132AABBCCDDEEFF0132 /* EditProfileEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001132AABBCCDDEEFF0132 /* EditProfileEvent.swift */; };
+		A1010001133AABBCCDDEEFF0133 /* EditProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001133AABBCCDDEEFF0133 /* EditProfileViewModel.swift */; };
+		A1010001134AABBCCDDEEFF0134 /* EditProfileSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001134AABBCCDDEEFF0134 /* EditProfileSheetView.swift */; };
+		A1010001135AABBCCDDEEFF0135 /* NotificationSettingsUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001135AABBCCDDEEFF0135 /* NotificationSettingsUiState.swift */; };
+		A1010001136AABBCCDDEEFF0136 /* NotificationSettingsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001136AABBCCDDEEFF0136 /* NotificationSettingsAction.swift */; };
+		A1010001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift */; };
+		A1010001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift */; };
+		A1010001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift */; };
+		A1010001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift */; };
+		A1010001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift */; };
+		A1010001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */; };
+		A1010001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */; };
+		A1010001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
@@ -223,6 +243,26 @@
 		A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountViewModel.swift; sourceTree = "<group>"; };
 		A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountSheetView.swift; sourceTree = "<group>"; };
 		A1011001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceHintRecorder.swift; sourceTree = "<group>"; };
+		A1011001125AABBCCDDEEFF0125 /* SettingsUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsUiState.swift; sourceTree = "<group>"; };
+		A1011001126AABBCCDDEEFF0126 /* SettingsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAction.swift; sourceTree = "<group>"; };
+		A1011001127AABBCCDDEEFF0127 /* SettingsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsEvent.swift; sourceTree = "<group>"; };
+		A1011001128AABBCCDDEEFF0128 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		A1011001129AABBCCDDEEFF0129 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A1011001130AABBCCDDEEFF0130 /* EditProfileUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileUiState.swift; sourceTree = "<group>"; };
+		A1011001131AABBCCDDEEFF0131 /* EditProfileAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileAction.swift; sourceTree = "<group>"; };
+		A1011001132AABBCCDDEEFF0132 /* EditProfileEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileEvent.swift; sourceTree = "<group>"; };
+		A1011001133AABBCCDDEEFF0133 /* EditProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewModel.swift; sourceTree = "<group>"; };
+		A1011001134AABBCCDDEEFF0134 /* EditProfileSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileSheetView.swift; sourceTree = "<group>"; };
+		A1011001135AABBCCDDEEFF0135 /* NotificationSettingsUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsUiState.swift; sourceTree = "<group>"; };
+		A1011001136AABBCCDDEEFF0136 /* NotificationSettingsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsAction.swift; sourceTree = "<group>"; };
+		A1011001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsEvent.swift; sourceTree = "<group>"; };
+		A1011001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsViewModel.swift; sourceTree = "<group>"; };
+		A1011001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsSheetView.swift; sourceTree = "<group>"; };
+		A1011001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodUiState.swift; sourceTree = "<group>"; };
+		A1011001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodAction.swift; sourceTree = "<group>"; };
+		A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodEvent.swift; sourceTree = "<group>"; };
+		A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodViewModel.swift; sourceTree = "<group>"; };
+		A1011001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodSheetView.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
@@ -401,6 +441,21 @@
 				A101100086AABBCCDDEEFF0086 /* ReputationEvent.swift */,
 				A101100087AABBCCDDEEFF0087 /* ReputationViewModel.swift */,
 				A101100088AABBCCDDEEFF0088 /* ReputationView.swift */,
+				A1011001125AABBCCDDEEFF0125 /* SettingsUiState.swift */,
+				A1011001126AABBCCDDEEFF0126 /* SettingsAction.swift */,
+				A1011001127AABBCCDDEEFF0127 /* SettingsEvent.swift */,
+				A1011001128AABBCCDDEEFF0128 /* SettingsViewModel.swift */,
+				A1011001129AABBCCDDEEFF0129 /* SettingsView.swift */,
+				A1011001130AABBCCDDEEFF0130 /* EditProfileUiState.swift */,
+				A1011001131AABBCCDDEEFF0131 /* EditProfileAction.swift */,
+				A1011001132AABBCCDDEEFF0132 /* EditProfileEvent.swift */,
+				A1011001133AABBCCDDEEFF0133 /* EditProfileViewModel.swift */,
+				A1011001134AABBCCDDEEFF0134 /* EditProfileSheetView.swift */,
+				A1011001135AABBCCDDEEFF0135 /* NotificationSettingsUiState.swift */,
+				A1011001136AABBCCDDEEFF0136 /* NotificationSettingsAction.swift */,
+				A1011001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift */,
+				A1011001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift */,
+				A1011001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift */,
 			);
 			path = mypage;
 			sourceTree = "<group>";
@@ -428,6 +483,11 @@
 				A1011001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift */,
 				A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */,
 				A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */,
+				A1011001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift */,
+				A1011001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift */,
+				A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */,
+				A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */,
+				A1011001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift */,
 			);
 			path = payment;
 			sourceTree = "<group>";
@@ -699,6 +759,26 @@
 				A1010001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift in Sources */,
 				A1010001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift in Sources */,
 				A1010001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift in Sources */,
+				A1010001125AABBCCDDEEFF0125 /* SettingsUiState.swift in Sources */,
+				A1010001126AABBCCDDEEFF0126 /* SettingsAction.swift in Sources */,
+				A1010001127AABBCCDDEEFF0127 /* SettingsEvent.swift in Sources */,
+				A1010001128AABBCCDDEEFF0128 /* SettingsViewModel.swift in Sources */,
+				A1010001129AABBCCDDEEFF0129 /* SettingsView.swift in Sources */,
+				A1010001130AABBCCDDEEFF0130 /* EditProfileUiState.swift in Sources */,
+				A1010001131AABBCCDDEEFF0131 /* EditProfileAction.swift in Sources */,
+				A1010001132AABBCCDDEEFF0132 /* EditProfileEvent.swift in Sources */,
+				A1010001133AABBCCDDEEFF0133 /* EditProfileViewModel.swift in Sources */,
+				A1010001134AABBCCDDEEFF0134 /* EditProfileSheetView.swift in Sources */,
+				A1010001135AABBCCDDEEFF0135 /* NotificationSettingsUiState.swift in Sources */,
+				A1010001136AABBCCDDEEFF0136 /* NotificationSettingsAction.swift in Sources */,
+				A1010001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift in Sources */,
+				A1010001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift in Sources */,
+				A1010001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift in Sources */,
+				A1010001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift in Sources */,
+				A1010001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift in Sources */,
+				A1010001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift in Sources */,
+				A1010001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift in Sources */,
+				A1010001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

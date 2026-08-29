@@ -4,14 +4,18 @@ import org.sesacteamproject.passmate.core.model.AppResult
 import org.sesacteamproject.passmate.core.model.map
 import org.sesacteamproject.passmate.core.network.apiCall
 import org.sesacteamproject.passmate.user.data.dto.ClaimGuestRecordRequest
+import org.sesacteamproject.passmate.user.data.dto.NotificationSettingsDto
 import org.sesacteamproject.passmate.user.data.dto.ReportRequest
+import org.sesacteamproject.passmate.user.data.dto.UpdateProfileRequest
 import org.sesacteamproject.passmate.user.data.mapper.toDomain
 import org.sesacteamproject.passmate.user.data.remote.UserRemoteDataSource
 import org.sesacteamproject.passmate.user.domain.model.Badge
 import org.sesacteamproject.passmate.user.domain.model.HostProfile
 import org.sesacteamproject.passmate.user.domain.model.MyGrade
 import org.sesacteamproject.passmate.user.domain.model.MyPage
+import org.sesacteamproject.passmate.user.domain.model.NotificationSettings
 import org.sesacteamproject.passmate.user.domain.model.ReportReason
+import org.sesacteamproject.passmate.user.domain.model.UserProfile
 import org.sesacteamproject.passmate.user.domain.repository.UserRepository
 
 class UserRepositoryImpl(
@@ -51,5 +55,36 @@ class UserRepositoryImpl(
         )
 
         return apiCall { remoteDataSource.submitReport(request) }
+    }
+
+    override suspend fun getMyProfile(): AppResult<UserProfile> {
+        return apiCall { remoteDataSource.fetchMyProfile() }.map { it.toDomain() }
+    }
+
+    override suspend fun updateMyProfile(nickname: String?, avatarId: Int?): AppResult<Unit> {
+        val request = UpdateProfileRequest(
+            nickname = nickname?.trim()?.ifEmpty { null },
+            avatarId = avatarId
+        )
+
+        return apiCall { remoteDataSource.updateMyProfile(request) }
+    }
+
+    override suspend fun deleteAccount(): AppResult<Unit> {
+        return apiCall { remoteDataSource.deleteAccount() }
+    }
+
+    override suspend fun getNotificationSettings(): AppResult<NotificationSettings> {
+        return apiCall { remoteDataSource.fetchNotificationSettings() }.map { it.toDomain() }
+    }
+
+    override suspend fun updateNotificationSettings(settings: NotificationSettings): AppResult<Unit> {
+        val request = NotificationSettingsDto(
+            sessionStart = settings.sessionStart,
+            ratingRequest = settings.ratingRequest,
+            settlementDone = settings.settlementDone
+        )
+
+        return apiCall { remoteDataSource.updateNotificationSettings(request) }
     }
 }

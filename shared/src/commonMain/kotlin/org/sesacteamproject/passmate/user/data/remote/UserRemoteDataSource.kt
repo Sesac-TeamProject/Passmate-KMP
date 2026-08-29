@@ -5,6 +5,7 @@ import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -14,7 +15,10 @@ import org.sesacteamproject.passmate.user.data.dto.ClaimGuestRecordRequest
 import org.sesacteamproject.passmate.user.data.dto.GradeResponse
 import org.sesacteamproject.passmate.user.data.dto.HostProfileResponse
 import org.sesacteamproject.passmate.user.data.dto.MyPageResponse
+import org.sesacteamproject.passmate.user.data.dto.NotificationSettingsDto
 import org.sesacteamproject.passmate.user.data.dto.ReportRequest
+import org.sesacteamproject.passmate.user.data.dto.UpdateProfileRequest
+import org.sesacteamproject.passmate.user.data.dto.UserProfileResponse
 
 // 전송만 담당 — AppResult 변환·매핑은 Repository가 한다 (규칙 §6)
 class UserRemoteDataSource(
@@ -57,6 +61,32 @@ class UserRemoteDataSource(
 
     suspend fun submitReport(request: ReportRequest) {
         apiClient.http.post("${apiClient.baseUrl}/reports") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    suspend fun fetchMyProfile(): UserProfileResponse {
+        return apiClient.http.get("${apiClient.baseUrl}/users/me").body()
+    }
+
+    suspend fun updateMyProfile(request: UpdateProfileRequest) {
+        apiClient.http.put("${apiClient.baseUrl}/users/me") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    suspend fun deleteAccount() {
+        apiClient.http.delete("${apiClient.baseUrl}/users/me")
+    }
+
+    suspend fun fetchNotificationSettings(): NotificationSettingsDto {
+        return apiClient.http.get("${apiClient.baseUrl}/users/me/notification-settings").body()
+    }
+
+    suspend fun updateNotificationSettings(request: NotificationSettingsDto) {
+        apiClient.http.put("${apiClient.baseUrl}/users/me/notification-settings") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }

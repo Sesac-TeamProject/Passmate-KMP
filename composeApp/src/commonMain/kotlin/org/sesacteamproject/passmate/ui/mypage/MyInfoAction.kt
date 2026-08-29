@@ -22,4 +22,7 @@ sealed interface MyInfoAction {
 
     // 정산(M-T4)으로 이동
     data object ClickEarnings : MyInfoAction
+
+    // 설정(내 정보 관리, M-12)으로 이동
+    data object ClickSettings : MyInfoAction
 }

@@ -6,5 +6,6 @@ enum MyInfoEvent {
     case openReputation
     case openHostedRooms
     case openEarnings
+    case openSettings
     case showNotice(message: String)
 }

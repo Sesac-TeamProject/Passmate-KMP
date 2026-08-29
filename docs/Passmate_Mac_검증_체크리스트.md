@@ -86,3 +86,16 @@
 - [ ] 방 생성: POST /rooms(세트 연결) → PIN 발급 스낵바 · 유료 선택 Lv.3 미만 403 문구
 - [ ] 리모컨: 세션 시작→QUESTION_STARTED 반영·SUBMISSION_UPDATED 재조회·바로 마감·화면 잠금(SCREEN_LOCKED 학생 측 확인)·세션 종료→방 리포트 자동 전환
 - [ ] 정산: earnings 요약·페이징 · 계좌 저장 PUT → 요약 행 갱신
+
+## 8. 파트1 마감 2건 — PTT 송출(T121, PR #14)·설정 허브(T122, PR #15)
+
+> T121: `VoiceHintRecorder.swift`(pbxproj idx 124) + Info.plist `NSMicrophoneUsageDescription`. T122: 설정 20파일(idx 125~144, mypage 15·payment 5). **다음 가용 idx = 145.**
+
+- [ ] **PTT(iOS)**: 리모컨에서 길게 눌러 녹음 — 최초 마이크 권한 프롬프트 → 허용 후 다시 길게 → 녹음 중 표시 → 놓으면 업로드 `[백엔드]` · 500ms 미만 "너무 짧아요" · AVAudioSession playAndRecord 전환 후 힌트 재생(AVPlayer)과 충돌 없는지
+- [ ] **PTT(Android 실기기)**: RECORD_AUDIO 런타임 권한 플로우 동일 확인 · m4a 업로드 → 학생 기기 자동 재생 3초 SLA `[백엔드]`
+- [ ] **설정 허브(M-12)**: 마이 → "설정" → 프로필 카드(아바타·레벨 칩·코인) + 행 6종 렌더
+- [ ] 계정 정보 시트: 닉네임 12자 제한·아바타 12종 선택 링 → 저장 → 카드 갱신 `[백엔드]`
+- [ ] 결제 수단 시트: 기본값 로드(coins.defaultMethod)·라디오 5종 → 저장 `[백엔드]`
+- [ ] 알림 설정 시트: 토글 즉시 저장·실패 시 원복 `[백엔드]`
+- [ ] 로그아웃: 확인 → 홈 복귀·게스트 전환(isSignedIn=false) — 네트워크 꺼도 로컬 로그아웃 성공
+- [ ] 회원 탈퇴: 확인 경고 문구 → 409(정산 대기·진행 중 방) 시 서버 메시지 표시 `[백엔드]`

@@ -49,3 +49,9 @@ data class SettlementAccountDto(
     val accountNumber: String = "",
     val holderName: String = ""
 )
+
+// PUT /users/me/payment-method — 기본 결제 수단 (M-12-8)
+@Serializable
+data class PaymentMethodRequest(
+    val method: String
+)

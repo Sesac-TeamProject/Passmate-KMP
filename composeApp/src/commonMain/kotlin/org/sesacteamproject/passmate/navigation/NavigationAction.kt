@@ -39,5 +39,8 @@ sealed interface NavigationAction {
     // 정산 (M-T4) — 마이페이지에서 진입
     data object NavigateToEarnings : NavigationAction
 
+    // 설정(내 정보 관리, M-12) — 마이페이지에서 진입 (규칙 §2-1-1: Settings는 MyInfo의 상세 push)
+    data object NavigateToSettings : NavigationAction
+
     data object NavigateBack : NavigationAction
 }

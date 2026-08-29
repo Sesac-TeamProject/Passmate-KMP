@@ -7,6 +7,7 @@ import org.sesacteamproject.passmate.core.network.apiCall
 import org.sesacteamproject.passmate.payment.data.dto.ConfirmChargeRequest
 import org.sesacteamproject.passmate.payment.data.dto.CreateChargeRequest
 import org.sesacteamproject.passmate.payment.data.dto.CreateEntryPaymentRequest
+import org.sesacteamproject.passmate.payment.data.dto.PaymentMethodRequest
 import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
 import org.sesacteamproject.passmate.payment.data.mapper.toDomain
 import org.sesacteamproject.passmate.payment.data.remote.PaymentRemoteDataSource
@@ -80,5 +81,9 @@ class PaymentRepositoryImpl(
         )
 
         return apiCall { remoteDataSource.putSettlementAccount(request) }
+    }
+
+    override suspend fun setDefaultPaymentMethod(method: PaymentMethod): AppResult<Unit> {
+        return apiCall { remoteDataSource.putPaymentMethod(PaymentMethodRequest(method.wireValue)) }
     }
 }

@@ -63,6 +63,7 @@ fun MyInfoScreen(
                 is MyInfoEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
                 is MyInfoEvent.OpenHostedRooms -> onNavigate(NavigationAction.NavigateToHostedRooms)
                 is MyInfoEvent.OpenEarnings -> onNavigate(NavigationAction.NavigateToEarnings)
+                is MyInfoEvent.OpenSettings -> onNavigate(NavigationAction.NavigateToSettings)
                 is MyInfoEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -129,16 +130,28 @@ private fun ColumnScope.LoadedMyInfo(
                 fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.48).sp
             )
-            Text(
-                text = "닫기",
-                color = PassmateColors.TextSecondary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp,
-                modifier = Modifier
-                    .clickable(onClick = onClickBack)
-                    .padding(4.dp)
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "설정",
+                    color = PassmateColors.PrimaryDeep,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = (-0.28).sp,
+                    modifier = Modifier
+                        .clickable { onAction(MyInfoAction.ClickSettings) }
+                        .padding(4.dp)
+                )
+                Text(
+                    text = "닫기",
+                    color = PassmateColors.TextSecondary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = (-0.28).sp,
+                    modifier = Modifier
+                        .clickable(onClick = onClickBack)
+                        .padding(4.dp)
+                )
+            }
         }
         val ongoing = uiState.ongoing
         val summary = uiState.summary
