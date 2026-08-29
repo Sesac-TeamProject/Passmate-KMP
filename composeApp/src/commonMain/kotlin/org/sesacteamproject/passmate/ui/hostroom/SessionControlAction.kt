@@ -16,4 +16,9 @@ sealed interface SessionControlAction {
     data object ConfirmEndSession : SessionControlAction
 
     data object ToggleLock : SessionControlAction
+
+    // PTT 녹음 종료 → 클립 업로드 (M-T2 "길게 눌러 힌트 말하기", T121)
+    data class SendVoiceHint(val hint: RecordedVoiceHint) : SessionControlAction
+
+    data class Notice(val message: String) : SessionControlAction
 }

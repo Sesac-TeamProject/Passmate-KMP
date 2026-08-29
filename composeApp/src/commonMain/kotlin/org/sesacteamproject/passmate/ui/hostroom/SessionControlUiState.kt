@@ -20,5 +20,7 @@ data class SessionControlUiState(
     val isLocked: Boolean = false,
     val isProjectorConnected: Boolean = false,
     // 제어 요청 in-flight — 중복 호출 방지 (규칙 §9)
-    val isControlling: Boolean = false
+    val isControlling: Boolean = false,
+    // PTT 클립 업로드 in-flight
+    val isSendingHint: Boolean = false
 )

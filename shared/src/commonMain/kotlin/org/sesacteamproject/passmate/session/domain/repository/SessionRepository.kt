@@ -30,4 +30,13 @@ interface SessionRepository {
 
     // 현재 문항 제출 현황 — SUBMISSION_UPDATED 수신 시 재조회한다
     suspend fun getSubmissions(roomId: Long): AppResult<SubmissionStatus>
+
+    // PTT 클립 업로드 (M-T2) — 저장 후 전 학생에게 HINT_PUBLISHED 브로드캐스트 (FR-039)
+    suspend fun publishVoiceHint(
+        roomId: Long,
+        audioBytes: ByteArray,
+        mimeType: String,
+        fileName: String,
+        durationMs: Long
+    ): AppResult<VoiceHint>
 }

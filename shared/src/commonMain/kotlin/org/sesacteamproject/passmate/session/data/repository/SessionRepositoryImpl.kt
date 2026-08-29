@@ -57,4 +57,16 @@ class SessionRepositoryImpl(
     override suspend fun getSubmissions(roomId: Long): AppResult<SubmissionStatus> {
         return apiCall { remoteDataSource.fetchSubmissions(roomId) }.map { it.toDomain() }
     }
+
+    override suspend fun publishVoiceHint(
+        roomId: Long,
+        audioBytes: ByteArray,
+        mimeType: String,
+        fileName: String,
+        durationMs: Long
+    ): AppResult<VoiceHint> {
+        return apiCall {
+            remoteDataSource.publishHint(roomId, audioBytes, mimeType, fileName, durationMs)
+        }.map { it.toDomain() }
+    }
 }
