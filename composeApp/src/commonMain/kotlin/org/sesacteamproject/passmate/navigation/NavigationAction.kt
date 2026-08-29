@@ -24,5 +24,8 @@ sealed interface NavigationAction {
 
     data object NavigateToMyInfo : NavigationAction
 
+    // 내 명성·뱃지 상세 (M-09) — 마이페이지에서 진입
+    data object NavigateToReputation : NavigationAction
+
     data object NavigateBack : NavigationAction
 }

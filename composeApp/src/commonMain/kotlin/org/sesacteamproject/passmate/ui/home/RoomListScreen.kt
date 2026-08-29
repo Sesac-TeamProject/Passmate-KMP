@@ -19,14 +19,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -41,26 +49,68 @@ import org.sesacteamproject.passmate.payment.domain.model.PublicRoom
 import org.sesacteamproject.passmate.payment.domain.model.RoomTypeFilter
 import org.sesacteamproject.passmate.room.domain.model.HostLevel
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.ui.profile.HostProfileSheet
 
 // 공개 방 목록·탐색 (M-11) — 검색 + 유형 필터 + 인기 방 카드. 방 선택 시 입장 화면으로 이동한다.
+// 선생님 이름 탭 시 프로필 시트(M-10)를 연다 — 시트 표시 여부는 이 화면이 소유한다 (규칙 §11-1)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoomListScreen(onNavigate: (NavigationAction) -> Unit) {
     val viewModel: RoomListViewModel = koinScreenViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val profileSheetState = rememberModalBottomSheetState()
+    var profileHostId by remember { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
                 is RoomListEvent.OpenRoom -> onNavigate(NavigationAction.NavigateToJoin(event.pin))
                 is RoomListEvent.OpenPinEntry -> onNavigate(NavigationAction.NavigateToJoin())
-                is RoomListEvent.ShowNotice -> {}
+                is RoomListEvent.OpenHostProfile -> profileHostId = event.hostId
+                is RoomListEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
-    RoomListContentScreen(
-        uiState = uiState,
-        onAction = viewModel::onAction
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        RoomListContentScreen(
+            uiState = uiState,
+            onAction = viewModel::onAction
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
+    val hostId = profileHostId
+
+    if (hostId != null) {
+        ModalBottomSheet(
+            onDismissRequest = { profileHostId = null },
+            sheetState = profileSheetState,
+            containerColor = PassmateColors.Surface
+        ) {
+            HostProfileSheet(
+                hostId = hostId,
+                onJoinRoom = { pin ->
+                    profileHostId = null
+                    onNavigate(NavigationAction.NavigateToJoin(pin))
+                },
+                onRequireSignIn = {
+                    profileHostId = null
+                    onNavigate(NavigationAction.NavigateToSignIn)
+                },
+                onBlocked = {
+                    profileHostId = null
+                    // 차단 호스트의 방은 공개 목록에서 숨겨진다 — 목록 새로고침 (M-10)
+                    viewModel.onAction(RoomListAction.Retry)
+                },
+                onNotice = { message ->
+                    viewModel.onAction(RoomListAction.Notice(message))
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -117,6 +167,7 @@ private fun RoomListContentScreen(
                 else -> RoomList(
                     uiState = uiState,
                     onClickRoom = { onAction(RoomListAction.ClickRoom(it)) },
+                    onClickHost = { onAction(RoomListAction.ClickHost(it)) },
                     onLoadMore = { onAction(RoomListAction.LoadMore) }
                 )
             }
@@ -176,10 +227,19 @@ private fun TypeFilterRow(selected: RoomTypeFilter, onSelect: (RoomTypeFilter) -
 }
 
 @Composable
-private fun RoomList(uiState: RoomListUiState, onClickRoom: (String) -> Unit, onLoadMore: () -> Unit) {
+private fun RoomList(
+    uiState: RoomListUiState,
+    onClickRoom: (String) -> Unit,
+    onClickHost: (Long) -> Unit,
+    onLoadMore: () -> Unit
+) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         items(uiState.rooms, key = { it.roomId }) { room ->
-            RoomCard(room = room, onClick = { onClickRoom(room.pin) })
+            RoomCard(
+                room = room,
+                onClick = { onClickRoom(room.pin) },
+                onClickHost = onClickHost
+            )
         }
         if (uiState.hasNext) {
             item(key = "load-more") {
@@ -194,7 +254,11 @@ private fun RoomList(uiState: RoomListUiState, onClickRoom: (String) -> Unit, on
 }
 
 @Composable
-private fun RoomCard(room: PublicRoom, onClick: () -> Unit) {
+private fun RoomCard(
+    room: PublicRoom,
+    onClick: () -> Unit,
+    onClickHost: (Long) -> Unit
+) {
     PassmateCard(modifier = Modifier.clickable { onClick() }) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -212,7 +276,19 @@ private fun RoomCard(room: PublicRoom, onClick: () -> Unit) {
                 Text(it, color = PassmateColors.TextSecondary, fontSize = 13.sp)
             }
             Spacer(Modifier.height(10.dp))
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            val hostId = room.hostId
+            // 선생님 이름을 누르면 레벨·별점·뱃지 프로필 시트 (M-10, M-11 노트)
+            val hostRowModifier = if (hostId != null) {
+                Modifier.clickable { onClickHost(hostId) }
+            } else {
+                Modifier
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = hostRowModifier
+            ) {
                 Text(room.hostName, color = PassmateColors.TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
                 HostLevel.from(room.hostLevel)?.let { level ->
                     ReputationBadge(level = level)

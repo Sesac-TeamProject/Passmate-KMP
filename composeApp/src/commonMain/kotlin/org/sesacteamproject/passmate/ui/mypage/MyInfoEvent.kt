@@ -12,5 +12,8 @@ sealed interface MyInfoEvent {
     // 코인·결제 내역 화면으로 이동 (US14, M-12)
     data object OpenCoinHistory : MyInfoEvent
 
+    // 내 명성·뱃지 상세 화면으로 이동 (M-09)
+    data object OpenReputation : MyInfoEvent
+
     data class ShowNotice(val message: String) : MyInfoEvent
 }
