@@ -11,6 +11,7 @@ enum Route: Hashable {
     case reputation
     case hostedRooms
     case roomReport(roomId: Int64)
+    case sessionControl(roomId: Int64, pin: String)
     case payment(pin: String)
     case coinHistory
     case settings

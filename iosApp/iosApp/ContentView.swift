@@ -91,6 +91,15 @@ struct ContentView: View {
                 onRequireSignIn: { path.append(.signIn) },
                 onOpenReputation: { path.append(.reputation) },
                 onOpenRoomReport: { roomId in path.append(.roomReport(roomId: roomId)) },
+                onOpenSessionControl: { roomId, pin in path.append(.sessionControl(roomId: roomId, pin: pin)) },
+                onBack: { popOnce() }
+            )
+        case let .sessionControl(roomId, pin):
+            SessionControlView(
+                roomId: roomId,
+                pin: pin,
+                onRequireSignIn: { path.append(.signIn) },
+                onSessionEnded: { roomId in path.append(.roomReport(roomId: roomId)) },
                 onBack: { popOnce() }
             )
         case let .roomReport(roomId):

@@ -5,5 +5,7 @@ enum HostedRoomsEvent {
     case openReputation
     // 종료된 방 상세 → 방 리포트 (M-14)
     case openRoomReport(roomId: Int64)
+    // 진행 중 방 → 진행 리모컨 (M-T2)
+    case openSessionControl(roomId: Int64, pin: String)
     case showNotice(message: String)
 }
