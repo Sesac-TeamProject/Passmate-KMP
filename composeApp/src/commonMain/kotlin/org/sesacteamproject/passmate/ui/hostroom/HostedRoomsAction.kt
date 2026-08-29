@@ -13,7 +13,7 @@ sealed interface HostedRoomsAction {
 
     data object ClickReputation : HostedRoomsAction
 
-    data class ClickOngoingRoom(val pin: String) : HostedRoomsAction
+    data class ClickOngoingRoom(val roomId: Long, val pin: String) : HostedRoomsAction
 
     data class ClickEndedRoom(val roomId: Long) : HostedRoomsAction
 

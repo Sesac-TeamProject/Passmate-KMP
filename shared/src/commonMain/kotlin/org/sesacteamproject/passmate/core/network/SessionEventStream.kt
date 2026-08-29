@@ -26,7 +26,8 @@ class SessionEventStream(
         data class Received(val frame: ServerEventFrame) : StreamEvent
     }
 
-    fun events(roomId: Long): Flow<StreamEvent> {
+    // isHost=true면 호스트 전용 토픽(/topic/rooms/{roomId}/host)도 함께 구독한다 (M-T2 리모컨)
+    fun events(roomId: Long, isHost: Boolean = false): Flow<StreamEvent> {
         return channelFlow {
             var attempt = 0
 
@@ -39,6 +40,9 @@ class SessionEventStream(
                     send(StreamEvent.Connected)
                     coroutineScope {
                         launch { collectDestination(session, "/topic/rooms/$roomId") }
+                        if (isHost) {
+                            launch { collectDestination(session, "/topic/rooms/$roomId/host") }
+                        }
                         launch { collectDestination(session, "/user/queue/feedback") }
                         launch { collectDestination(session, "/user/queue/errors") }
                     }

@@ -31,6 +31,9 @@ sealed class Route(val route: String) {
     // 방 리포트 (M-14) — 내가 만든 방 › 종료 › 상세
     data object RoomReport : Route("roomReport/{roomId}")
 
+    // 진행 리모컨 (M-T2) — 내가 만든 방 › 진행 중 › 진행
+    data object SessionControl : Route("sessionControl/{roomId}/{pin}")
+
     data object Payment : Route("payment/{pin}")
 
     // 코인·결제 내역 (M-12) — 마이페이지에서 진입

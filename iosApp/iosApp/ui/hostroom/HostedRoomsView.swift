@@ -10,6 +10,8 @@ struct HostedRoomsView: View {
 
     var onOpenRoomReport: (Int64) -> Void = { _ in }
 
+    var onOpenSessionControl: (Int64, String) -> Void = { _, _ in }
+
     var onBack: () -> Void = {}
 
     @StateObject private var viewModel = HostedRoomsViewModel(
@@ -44,6 +46,8 @@ struct HostedRoomsView: View {
                 onOpenReputation()
             case let .openRoomReport(roomId):
                 onOpenRoomReport(roomId)
+            case let .openSessionControl(roomId, pin):
+                onOpenSessionControl(roomId, pin)
             case let .showNotice(message):
                 noticeMessage = message
             }
@@ -171,7 +175,7 @@ private struct HostedRoomsContentView: View {
                         chipLabel: "진행 중",
                         isOngoing: true,
                         rooms: uiState.ongoing,
-                        onClickRoom: { room in onAction(.clickOngoingRoom(pin: room.pin)) }
+                        onClickRoom: { room in onAction(.clickOngoingRoom(roomId: room.roomId, pin: room.pin)) }
                     )
                 }
                 if !uiState.ended.isEmpty {

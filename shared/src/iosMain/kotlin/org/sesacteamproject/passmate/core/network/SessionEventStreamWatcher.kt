@@ -23,6 +23,16 @@ class SessionEventStreamWatcher(
         }
     }
 
+    // 호스트 리모컨(M-T2) 전용 — 호스트 토픽 포함 구독. ObjC는 Kotlin 기본인자를 못 쓰므로 별도 메소드로 노출
+    fun startAsHost(roomId: Long, onEvent: (SessionEventStream.StreamEvent) -> Unit) {
+        stop()
+        job = scope.launch {
+            stream.events(roomId, isHost = true).collect { event ->
+                onEvent(event)
+            }
+        }
+    }
+
     fun stop() {
         job?.cancel()
         job = null

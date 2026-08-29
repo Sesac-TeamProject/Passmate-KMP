@@ -94,6 +94,11 @@
 		A101000106AABBCCDDEEFF0106 /* RoomReportEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100106AABBCCDDEEFF0106 /* RoomReportEvent.swift */; };
 		A101000107AABBCCDDEEFF0107 /* RoomReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100107AABBCCDDEEFF0107 /* RoomReportViewModel.swift */; };
 		A101000108AABBCCDDEEFF0108 /* RoomReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100108AABBCCDDEEFF0108 /* RoomReportView.swift */; };
+		A101000109AABBCCDDEEFF0109 /* SessionControlUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100109AABBCCDDEEFF0109 /* SessionControlUiState.swift */; };
+		A101000110AABBCCDDEEFF0110 /* SessionControlAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100110AABBCCDDEEFF0110 /* SessionControlAction.swift */; };
+		A101000111AABBCCDDEEFF0111 /* SessionControlEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100111AABBCCDDEEFF0111 /* SessionControlEvent.swift */; };
+		A101000112AABBCCDDEEFF0112 /* SessionControlViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100112AABBCCDDEEFF0112 /* SessionControlViewModel.swift */; };
+		A101000113AABBCCDDEEFF0113 /* SessionControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100113AABBCCDDEEFF0113 /* SessionControlView.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
@@ -191,6 +196,11 @@
 		A101100106AABBCCDDEEFF0106 /* RoomReportEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomReportEvent.swift; sourceTree = "<group>"; };
 		A101100107AABBCCDDEEFF0107 /* RoomReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomReportViewModel.swift; sourceTree = "<group>"; };
 		A101100108AABBCCDDEEFF0108 /* RoomReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomReportView.swift; sourceTree = "<group>"; };
+		A101100109AABBCCDDEEFF0109 /* SessionControlUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlUiState.swift; sourceTree = "<group>"; };
+		A101100110AABBCCDDEEFF0110 /* SessionControlAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlAction.swift; sourceTree = "<group>"; };
+		A101100111AABBCCDDEEFF0111 /* SessionControlEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlEvent.swift; sourceTree = "<group>"; };
+		A101100112AABBCCDDEEFF0112 /* SessionControlViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlViewModel.swift; sourceTree = "<group>"; };
+		A101100113AABBCCDDEEFF0113 /* SessionControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlView.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
@@ -420,6 +430,11 @@
 				A101100106AABBCCDDEEFF0106 /* RoomReportEvent.swift */,
 				A101100107AABBCCDDEEFF0107 /* RoomReportViewModel.swift */,
 				A101100108AABBCCDDEEFF0108 /* RoomReportView.swift */,
+				A101100109AABBCCDDEEFF0109 /* SessionControlUiState.swift */,
+				A101100110AABBCCDDEEFF0110 /* SessionControlAction.swift */,
+				A101100111AABBCCDDEEFF0111 /* SessionControlEvent.swift */,
+				A101100112AABBCCDDEEFF0112 /* SessionControlViewModel.swift */,
+				A101100113AABBCCDDEEFF0113 /* SessionControlView.swift */,
 			);
 			path = hostroom;
 			sourceTree = "<group>";
@@ -635,6 +650,11 @@
 				A101000106AABBCCDDEEFF0106 /* RoomReportEvent.swift in Sources */,
 				A101000107AABBCCDDEEFF0107 /* RoomReportViewModel.swift in Sources */,
 				A101000108AABBCCDDEEFF0108 /* RoomReportView.swift in Sources */,
+				A101000109AABBCCDDEEFF0109 /* SessionControlUiState.swift in Sources */,
+				A101000110AABBCCDDEEFF0110 /* SessionControlAction.swift in Sources */,
+				A101000111AABBCCDDEEFF0111 /* SessionControlEvent.swift in Sources */,
+				A101000112AABBCCDDEEFF0112 /* SessionControlViewModel.swift in Sources */,
+				A101000113AABBCCDDEEFF0113 /* SessionControlView.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

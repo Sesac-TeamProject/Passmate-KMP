@@ -37,6 +37,9 @@ object ServerEventDecoder {
             "FEEDBACK_READY" -> decodeData<ServerEvent.FeedbackReady>(data)
             "FEEDBACK_FAILED" -> decodeData<ServerEvent.FeedbackFailed>(data)
             "REVIEW_RECEIVED" -> decodeData<ServerEvent.ReviewReceived>(data)
+            "SUBMISSION_UPDATED" -> decodeData<ServerEvent.SubmissionUpdated>(data)
+            "PROJECTOR_CONNECTED" -> ServerEvent.ProjectorConnected
+            "PROJECTOR_DISCONNECTED" -> ServerEvent.ProjectorDisconnected
             else -> null
         }
     }
