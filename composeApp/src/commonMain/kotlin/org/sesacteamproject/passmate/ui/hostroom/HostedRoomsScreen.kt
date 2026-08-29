@@ -64,6 +64,9 @@ fun HostedRoomsScreen(onNavigate: (NavigationAction) -> Unit) {
                 is HostedRoomsEvent.OpenCreateSheet -> isCreateSheetVisible = true
                 is HostedRoomsEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
                 is HostedRoomsEvent.OpenRoomReport -> onNavigate(NavigationAction.NavigateToRoomReport(event.roomId))
+                is HostedRoomsEvent.OpenSessionControl -> onNavigate(
+                    NavigationAction.NavigateToSessionControl(event.roomId, event.pin)
+                )
                 is HostedRoomsEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -180,7 +183,7 @@ private fun LoadedHostedRooms(
                 chipLabel = "진행 중",
                 isOngoing = true,
                 rooms = uiState.ongoing,
-                onClickRoom = { room -> onAction(HostedRoomsAction.ClickOngoingRoom(room.pin)) }
+                onClickRoom = { room -> onAction(HostedRoomsAction.ClickOngoingRoom(room.roomId, room.pin)) }
             )
         }
         if (uiState.ended.isNotEmpty()) {

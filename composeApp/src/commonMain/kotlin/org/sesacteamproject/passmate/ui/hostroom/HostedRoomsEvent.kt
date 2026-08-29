@@ -12,5 +12,8 @@ sealed interface HostedRoomsEvent {
     // 종료된 방 상세 → 방 리포트 (M-14)
     data class OpenRoomReport(val roomId: Long) : HostedRoomsEvent
 
+    // 진행 중 방 → 진행 리모컨 (M-T2)
+    data class OpenSessionControl(val roomId: Long, val pin: String) : HostedRoomsEvent
+
     data class ShowNotice(val message: String) : HostedRoomsEvent
 }

@@ -20,6 +20,7 @@ import org.sesacteamproject.passmate.ui.home.RoomListScreen
 import org.sesacteamproject.passmate.ui.join.JoinScreen
 import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsScreen
 import org.sesacteamproject.passmate.ui.hostroom.RoomReportScreen
+import org.sesacteamproject.passmate.ui.hostroom.SessionControlScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
@@ -70,6 +71,7 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
         is NavigationAction.NavigateToReputation -> navigate(Route.Reputation.route)
         is NavigationAction.NavigateToHostedRooms -> navigate(Route.HostedRooms.route)
         is NavigationAction.NavigateToRoomReport -> navigate("roomReport/${action.roomId}")
+        is NavigationAction.NavigateToSessionControl -> navigate("sessionControl/${action.roomId}/${action.pin}")
         is NavigationAction.NavigateToCoinHistory -> navigate(Route.CoinHistory.route)
         is NavigationAction.NavigateBack -> popBackStack()
     }
@@ -166,6 +168,13 @@ actual fun AppNavHost() {
         composable(Route.RoomReport.route) { backStackEntry ->
             RoomReportScreen(
                 roomId = backStackEntry.arguments?.getString("roomId")?.toLongOrNull() ?: -1L,
+                onNavigate = navController::handleNavigationAction
+            )
+        }
+        composable(Route.SessionControl.route) { backStackEntry ->
+            SessionControlScreen(
+                roomId = backStackEntry.arguments?.getString("roomId")?.toLongOrNull() ?: -1L,
+                pin = backStackEntry.arguments?.getString("pin").orEmpty(),
                 onNavigate = navController::handleNavigationAction
             )
         }
