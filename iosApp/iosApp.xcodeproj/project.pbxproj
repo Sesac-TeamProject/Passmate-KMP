@@ -69,6 +69,16 @@
 		A101000081AABBCCDDEEFF0081 /* CoinHistoryEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100081AABBCCDDEEFF0081 /* CoinHistoryEvent.swift */; };
 		A101000082AABBCCDDEEFF0082 /* CoinHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100082AABBCCDDEEFF0082 /* CoinHistoryViewModel.swift */; };
 		A101000083AABBCCDDEEFF0083 /* CoinHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100083AABBCCDDEEFF0083 /* CoinHistoryView.swift */; };
+		A101000084AABBCCDDEEFF0084 /* ReputationUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100084AABBCCDDEEFF0084 /* ReputationUiState.swift */; };
+		A101000085AABBCCDDEEFF0085 /* ReputationAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100085AABBCCDDEEFF0085 /* ReputationAction.swift */; };
+		A101000086AABBCCDDEEFF0086 /* ReputationEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100086AABBCCDDEEFF0086 /* ReputationEvent.swift */; };
+		A101000087AABBCCDDEEFF0087 /* ReputationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100087AABBCCDDEEFF0087 /* ReputationViewModel.swift */; };
+		A101000088AABBCCDDEEFF0088 /* ReputationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100088AABBCCDDEEFF0088 /* ReputationView.swift */; };
+		A101000089AABBCCDDEEFF0089 /* HostProfileUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100089AABBCCDDEEFF0089 /* HostProfileUiState.swift */; };
+		A101000090AABBCCDDEEFF0090 /* HostProfileAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100090AABBCCDDEEFF0090 /* HostProfileAction.swift */; };
+		A101000091AABBCCDDEEFF0091 /* HostProfileEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100091AABBCCDDEEFF0091 /* HostProfileEvent.swift */; };
+		A101000092AABBCCDDEEFF0092 /* HostProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100092AABBCCDDEEFF0092 /* HostProfileViewModel.swift */; };
+		A101000093AABBCCDDEEFF0093 /* HostProfileSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100093AABBCCDDEEFF0093 /* HostProfileSheetView.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
@@ -141,6 +151,16 @@
 		A101100081AABBCCDDEEFF0081 /* CoinHistoryEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinHistoryEvent.swift; sourceTree = "<group>"; };
 		A101100082AABBCCDDEEFF0082 /* CoinHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinHistoryViewModel.swift; sourceTree = "<group>"; };
 		A101100083AABBCCDDEEFF0083 /* CoinHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinHistoryView.swift; sourceTree = "<group>"; };
+		A101100084AABBCCDDEEFF0084 /* ReputationUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReputationUiState.swift; sourceTree = "<group>"; };
+		A101100085AABBCCDDEEFF0085 /* ReputationAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReputationAction.swift; sourceTree = "<group>"; };
+		A101100086AABBCCDDEEFF0086 /* ReputationEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReputationEvent.swift; sourceTree = "<group>"; };
+		A101100087AABBCCDDEEFF0087 /* ReputationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReputationViewModel.swift; sourceTree = "<group>"; };
+		A101100088AABBCCDDEEFF0088 /* ReputationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReputationView.swift; sourceTree = "<group>"; };
+		A101100089AABBCCDDEEFF0089 /* HostProfileUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostProfileUiState.swift; sourceTree = "<group>"; };
+		A101100090AABBCCDDEEFF0090 /* HostProfileAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostProfileAction.swift; sourceTree = "<group>"; };
+		A101100091AABBCCDDEEFF0091 /* HostProfileEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostProfileEvent.swift; sourceTree = "<group>"; };
+		A101100092AABBCCDDEEFF0092 /* HostProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostProfileViewModel.swift; sourceTree = "<group>"; };
+		A101100093AABBCCDDEEFF0093 /* HostProfileSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostProfileSheetView.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
@@ -218,6 +238,7 @@
 				A1012016AABBCCDDEEFF0016 /* result */,
 				A1012017AABBCCDDEEFF0017 /* mypage */,
 				A1012018AABBCCDDEEFF0018 /* payment */,
+				A1012019AABBCCDDEEFF0019 /* profile */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -312,6 +333,11 @@
 				A1011054AABBCCDDEEFF0054 /* MyInfoUiState.swift */,
 				A1011055AABBCCDDEEFF0055 /* MyInfoAction.swift */,
 				A1011056AABBCCDDEEFF0056 /* MyInfoEvent.swift */,
+				A101100084AABBCCDDEEFF0084 /* ReputationUiState.swift */,
+				A101100085AABBCCDDEEFF0085 /* ReputationAction.swift */,
+				A101100086AABBCCDDEEFF0086 /* ReputationEvent.swift */,
+				A101100087AABBCCDDEEFF0087 /* ReputationViewModel.swift */,
+				A101100088AABBCCDDEEFF0088 /* ReputationView.swift */,
 			);
 			path = mypage;
 			sourceTree = "<group>";
@@ -331,6 +357,18 @@
 				A1011061AABBCCDDEEFF0061 /* PaymentEvent.swift */,
 			);
 			path = payment;
+			sourceTree = "<group>";
+		};
+		A1012019AABBCCDDEEFF0019 /* profile */ = {
+			isa = PBXGroup;
+			children = (
+				A101100089AABBCCDDEEFF0089 /* HostProfileUiState.swift */,
+				A101100090AABBCCDDEEFF0090 /* HostProfileAction.swift */,
+				A101100091AABBCCDDEEFF0091 /* HostProfileEvent.swift */,
+				A101100092AABBCCDDEEFF0092 /* HostProfileViewModel.swift */,
+				A101100093AABBCCDDEEFF0093 /* HostProfileSheetView.swift */,
+			);
+			path = profile;
 			sourceTree = "<group>";
 		};
 		A1012019AABBCCDDEEFF0019 /* navigation */ = {
@@ -519,6 +557,16 @@
 				A101000081AABBCCDDEEFF0081 /* CoinHistoryEvent.swift in Sources */,
 				A101000082AABBCCDDEEFF0082 /* CoinHistoryViewModel.swift in Sources */,
 				A101000083AABBCCDDEEFF0083 /* CoinHistoryView.swift in Sources */,
+				A101000084AABBCCDDEEFF0084 /* ReputationUiState.swift in Sources */,
+				A101000085AABBCCDDEEFF0085 /* ReputationAction.swift in Sources */,
+				A101000086AABBCCDDEEFF0086 /* ReputationEvent.swift in Sources */,
+				A101000087AABBCCDDEEFF0087 /* ReputationViewModel.swift in Sources */,
+				A101000088AABBCCDDEEFF0088 /* ReputationView.swift in Sources */,
+				A101000089AABBCCDDEEFF0089 /* HostProfileUiState.swift in Sources */,
+				A101000090AABBCCDDEEFF0090 /* HostProfileAction.swift in Sources */,
+				A101000091AABBCCDDEEFF0091 /* HostProfileEvent.swift in Sources */,
+				A101000092AABBCCDDEEFF0092 /* HostProfileViewModel.swift in Sources */,
+				A101000093AABBCCDDEEFF0093 /* HostProfileSheetView.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

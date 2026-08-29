@@ -1,7 +1,13 @@
 import SwiftUI
 import Shared
 
-// 공개 방 목록·탐색 (M-11) — Compose RoomListScreen.kt 미러
+// 프로필 시트 표시용 Identifiable 래퍼 — 시트 표시 여부는 이 화면이 소유한다 (규칙 §11-1)
+private struct ProfileHost: Identifiable {
+    let id: Int64
+}
+
+// 공개 방 목록·탐색 (M-11) — Compose RoomListScreen.kt 미러.
+// 선생님 이름 탭 시 프로필 시트(M-10)를 연다
 struct RoomListView: View {
     @StateObject private var viewModel = RoomListViewModel(
         getPublicRoomsUseCase: KoinHelper.shared.getPublicRoomsUseCase()
@@ -10,6 +16,12 @@ struct RoomListView: View {
     var onOpenRoom: (String) -> Void = { _ in }
 
     var onOpenPinEntry: () -> Void = {}
+
+    var onRequireSignIn: () -> Void = {}
+
+    @State private var profileHost: ProfileHost?
+
+    @State private var noticeMessage: String?
 
     var body: some View {
         RoomListContentView(
@@ -22,10 +34,59 @@ struct RoomListView: View {
                 onOpenRoom(pin)
             case .openPinEntry:
                 onOpenPinEntry()
-            case .showNotice:
-                break
+            case let .openHostProfile(hostId):
+                profileHost = ProfileHost(id: hostId)
+            case let .showNotice(message):
+                noticeMessage = message
             }
         }
+        .sheet(item: $profileHost) { host in
+            HostProfileSheetView(
+                hostId: host.id,
+                onJoinRoom: { pin in
+                    profileHost = nil
+                    onOpenRoom(pin)
+                },
+                onRequireSignIn: {
+                    profileHost = nil
+                    onRequireSignIn()
+                },
+                onBlocked: {
+                    profileHost = nil
+                    // 차단 호스트의 방은 공개 목록에서 숨겨진다 — 목록 새로고침 (M-10)
+                    viewModel.action(.retry)
+                },
+                onNotice: { message in
+                    viewModel.action(.notice(message: message))
+                }
+            )
+            .presentationDetents([.medium, .large])
+        }
+        .overlay(alignment: .bottom) {
+            if let noticeMessage {
+                RoomListNoticeToast(message: noticeMessage)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                            self.noticeMessage = nil
+                        }
+                    }
+            }
+        }
+    }
+}
+
+private struct RoomListNoticeToast: View {
+    let message: String
+
+    var body: some View {
+        Text(message)
+            .font(.system(size: 13))
+            .foregroundColor(PassmateColors.surface)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(PassmateColors.textPrimary.opacity(0.9))
+            .cornerRadius(10)
+            .padding(.bottom, 16)
     }
 }
 
@@ -116,8 +177,11 @@ private struct RoomListContentView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 ForEach(uiState.rooms, id: \.roomId) { room in
-                    RoomCardView(room: room)
-                        .onTapGesture { onAction(.clickRoom(pin: room.pin)) }
+                    RoomCardView(
+                        room: room,
+                        onClickHost: { hostId in onAction(.clickHost(hostId: hostId)) }
+                    )
+                    .onTapGesture { onAction(.clickRoom(pin: room.pin)) }
                 }
                 if uiState.hasNext {
                     ProgressView()
@@ -172,6 +236,8 @@ private struct RoomListContentView: View {
 private struct RoomCardView: View {
     let room: PublicRoom
 
+    var onClickHost: (Int64) -> Void = { _ in }
+
     var body: some View {
         PassmateCard {
             VStack(alignment: .leading, spacing: 0) {
@@ -188,6 +254,7 @@ private struct RoomCardView: View {
                         .foregroundColor(PassmateColors.textSecondary)
                         .padding(.top, 4)
                 }
+                // 선생님 이름을 누르면 레벨·별점·뱃지 프로필 시트 (M-10, M-11 노트)
                 HStack(spacing: 8) {
                     Text(room.hostName)
                         .font(.system(size: 13, weight: .medium))
@@ -202,6 +269,11 @@ private struct RoomCardView: View {
                     }
                 }
                 .padding(.top, 10)
+                .onTapGesture {
+                    if let hostId = room.hostId?.int64Value {
+                        onClickHost(hostId)
+                    }
+                }
                 Text(participantsText)
                     .font(.system(size: 12))
                     .foregroundColor(PassmateColors.textTertiary)

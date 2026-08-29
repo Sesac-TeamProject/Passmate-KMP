@@ -8,6 +8,7 @@ enum Route: Hashable {
     case play(pin: String)
     case result(roomId: Int64)
     case myInfo
+    case reputation
     case payment(pin: String)
     case coinHistory
     case settings

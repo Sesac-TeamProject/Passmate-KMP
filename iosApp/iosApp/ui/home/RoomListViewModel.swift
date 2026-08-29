@@ -93,12 +93,16 @@ final class RoomListViewModel: ObservableObject {
             onSelectType(type: type)
         case let .clickRoom(pin):
             event.send(.openRoom(pin: pin))
+        case let .clickHost(hostId):
+            event.send(.openHostProfile(hostId: hostId))
         case .loadMore:
             onLoadMore()
         case .retry:
             reload()
         case .clickPinEntry:
             event.send(.openPinEntry)
+        case let .notice(message):
+            event.send(.showNotice(message: message))
         }
     }
 

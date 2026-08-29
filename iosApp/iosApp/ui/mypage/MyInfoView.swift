@@ -11,6 +11,8 @@ struct MyInfoView: View {
 
     var onOpenCoinHistory: () -> Void = {}
 
+    var onOpenReputation: () -> Void = {}
+
     var onBack: () -> Void = {}
 
     @StateObject private var viewModel = MyInfoViewModel(
@@ -39,6 +41,8 @@ struct MyInfoView: View {
                 onRejoin(pin)
             case .openCoinHistory:
                 onOpenCoinHistory()
+            case .openReputation:
+                onOpenReputation()
             case let .showNotice(message):
                 noticeMessage = message
             }
@@ -120,6 +124,7 @@ private struct MyInfoContentView: View {
                     SummaryCard(summary: summary)
                     WeakTopicsRow(topics: summary.weakTopics)
                 }
+                ReputationEntryRow(onClick: { onAction(.clickReputation) })
                 CoinHistoryEntryRow(onClick: { onAction(.clickCoinHistory) })
                 if uiState.rooms.isEmpty, uiState.ongoing == nil {
                     Text("아직 참여한 방이 없어요")
@@ -216,6 +221,26 @@ private struct OngoingCard: View {
         parts.append("PIN \(formatPin(ongoing.pin))")
 
         return parts.joined(separator: " · ")
+    }
+}
+
+private struct ReputationEntryRow: View {
+    let onClick: () -> Void
+
+    var body: some View {
+        Button(action: onClick) {
+            HStack {
+                Text("내 명성·뱃지")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(PassmateColors.textPrimary)
+                Spacer()
+                Text("›").font(.system(size: 18)).foregroundColor(PassmateColors.textTertiary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
+            .background(PassmateColors.surface)
+            .cornerRadius(16)
+        }
     }
 }
 
