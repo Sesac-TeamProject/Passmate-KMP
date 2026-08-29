@@ -142,4 +142,20 @@ sealed interface ServerEvent {
         val avatarId: Int? = null,
         val total: Double
     )
+
+    // ── 호스트 전용 (/topic/rooms/{roomId}/host — M-T2 리모컨·프로젝터 웹) ──
+
+    @Serializable
+    data class SubmissionUpdated(
+        val questionNo: Int,
+        val submittedCount: Int,
+        val totalCount: Int
+    ) : ServerEvent
+
+    // 프로젝터 웹 화면 접속/해제 — 리모컨 상단 동기화 상태 표시
+    @Serializable
+    data object ProjectorConnected : ServerEvent
+
+    @Serializable
+    data object ProjectorDisconnected : ServerEvent
 }

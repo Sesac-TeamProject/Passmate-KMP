@@ -2,13 +2,17 @@ package org.sesacteamproject.passmate.session.data.mapper
 
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.session.data.dto.SessionSnapshotResponse
+import org.sesacteamproject.passmate.session.data.dto.SubmissionsResponse
 import org.sesacteamproject.passmate.session.data.dto.SubmitAnswerResponse
 import org.sesacteamproject.passmate.session.data.dto.VoiceHintsResponse
 import org.sesacteamproject.passmate.session.domain.model.AnswerResult
+import org.sesacteamproject.passmate.session.domain.model.ChoiceCount
 import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.session.domain.model.RankEntry
 import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
 import org.sesacteamproject.passmate.session.domain.model.SessionSnapshot
+import org.sesacteamproject.passmate.session.domain.model.SubmissionParticipant
+import org.sesacteamproject.passmate.session.domain.model.SubmissionStatus
 import org.sesacteamproject.passmate.session.domain.model.SubmittedAnswer
 import org.sesacteamproject.passmate.session.domain.model.VoiceHint
 
@@ -65,6 +69,24 @@ fun VoiceHintsResponse.Entry.toDomain(): VoiceHint {
         questionNo = questionNo,
         clipUrl = clipUrl,
         durationMs = durationMs
+    )
+}
+
+fun SubmissionsResponse.toDomain(): SubmissionStatus {
+    return SubmissionStatus(
+        questionNo = questionNo,
+        submittedCount = submittedCount,
+        totalCount = totalCount,
+        accuracyPercent = accuracyPercent,
+        choices = choices.orEmpty().map { ChoiceCount(label = it.label, count = it.count) },
+        participants = participants.map {
+            SubmissionParticipant(
+                participantId = it.participantId,
+                nickname = it.nickname,
+                avatarId = it.avatarId,
+                submitted = it.submitted
+            )
+        }
     )
 }
 

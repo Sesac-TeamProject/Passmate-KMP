@@ -28,8 +28,14 @@ import org.sesacteamproject.passmate.room.domain.usecase.GetRoomInfoUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.JoinRoomUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.LeaveRoomUseCase
 import org.sesacteamproject.passmate.session.domain.policy.SnapshotPolicy
+import org.sesacteamproject.passmate.session.domain.usecase.EndCurrentQuestionUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.EndSessionUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.GetSessionSnapshotUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.GetSubmissionsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.GetVoiceHintsUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.NextQuestionUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.SetScreenLockUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.StartSessionUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SubmitAnswerUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.BlockHostUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.CompleteGuestClaimUseCase
@@ -120,6 +126,18 @@ object KoinHelper {
     fun getRoomReportUseCase(): GetRoomReportUseCase = KoinPlatform.getKoin().get()
 
     fun buildRoomReportSummaryUseCase(): BuildRoomReportSummaryUseCase = KoinPlatform.getKoin().get()
+
+    fun startSessionUseCase(): StartSessionUseCase = KoinPlatform.getKoin().get()
+
+    fun nextQuestionUseCase(): NextQuestionUseCase = KoinPlatform.getKoin().get()
+
+    fun endCurrentQuestionUseCase(): EndCurrentQuestionUseCase = KoinPlatform.getKoin().get()
+
+    fun endSessionUseCase(): EndSessionUseCase = KoinPlatform.getKoin().get()
+
+    fun setScreenLockUseCase(): SetScreenLockUseCase = KoinPlatform.getKoin().get()
+
+    fun getSubmissionsUseCase(): GetSubmissionsUseCase = KoinPlatform.getKoin().get()
 
     fun sessionEventStreamWatcher(): SessionEventStreamWatcher = SessionEventStreamWatcher(KoinPlatform.getKoin().get())
 }
