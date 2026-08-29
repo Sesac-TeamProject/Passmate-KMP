@@ -26,8 +26,13 @@ import org.sesacteamproject.passmate.session.domain.policy.SnapshotPolicy
 import org.sesacteamproject.passmate.session.domain.usecase.GetSessionSnapshotUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.GetVoiceHintsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SubmitAnswerUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.BlockHostUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.CompleteGuestClaimUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetHostProfileUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyBadgesUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyGradeUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyPageUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.ReportHostUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.RequestGuestClaimUseCase
 
 // Swift는 reified 제네릭을 못 쓰므로 화면(Swift VM)별 의존성을 명시 getter로 노출한다 (아키텍처 설계 §4-5)
@@ -90,6 +95,16 @@ object KoinHelper {
     fun getPublicRoomsUseCase(): GetPublicRoomsUseCase = KoinPlatform.getKoin().get()
 
     fun coinPolicy(): CoinPolicy = KoinPlatform.getKoin().get()
+
+    fun getMyGradeUseCase(): GetMyGradeUseCase = KoinPlatform.getKoin().get()
+
+    fun getMyBadgesUseCase(): GetMyBadgesUseCase = KoinPlatform.getKoin().get()
+
+    fun getHostProfileUseCase(): GetHostProfileUseCase = KoinPlatform.getKoin().get()
+
+    fun blockHostUseCase(): BlockHostUseCase = KoinPlatform.getKoin().get()
+
+    fun reportHostUseCase(): ReportHostUseCase = KoinPlatform.getKoin().get()
 
     fun sessionEventStreamWatcher(): SessionEventStreamWatcher = SessionEventStreamWatcher(KoinPlatform.getKoin().get())
 }

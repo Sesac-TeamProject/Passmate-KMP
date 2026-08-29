@@ -1,6 +1,7 @@
 package org.sesacteamproject.passmate.user.data.remote
 
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
@@ -8,8 +9,12 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import org.sesacteamproject.passmate.core.network.ApiClient
+import org.sesacteamproject.passmate.user.data.dto.BadgesResponse
 import org.sesacteamproject.passmate.user.data.dto.ClaimGuestRecordRequest
+import org.sesacteamproject.passmate.user.data.dto.GradeResponse
+import org.sesacteamproject.passmate.user.data.dto.HostProfileResponse
 import org.sesacteamproject.passmate.user.data.dto.MyPageResponse
+import org.sesacteamproject.passmate.user.data.dto.ReportRequest
 
 // 전송만 담당 — AppResult 변환·매핑은 Repository가 한다 (규칙 §6)
 class UserRemoteDataSource(
@@ -25,6 +30,33 @@ class UserRemoteDataSource(
 
     suspend fun claimGuestRecord(request: ClaimGuestRecordRequest) {
         apiClient.http.post("${apiClient.baseUrl}/guest-records/claim") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    suspend fun fetchGrade(): GradeResponse {
+        return apiClient.http.get("${apiClient.baseUrl}/users/me/grade").body()
+    }
+
+    suspend fun fetchBadges(): BadgesResponse {
+        return apiClient.http.get("${apiClient.baseUrl}/users/me/badges").body()
+    }
+
+    suspend fun fetchHostProfile(userId: Long): HostProfileResponse {
+        return apiClient.http.get("${apiClient.baseUrl}/users/$userId/profile").body()
+    }
+
+    suspend fun blockUser(userId: Long) {
+        apiClient.http.post("${apiClient.baseUrl}/users/$userId/block")
+    }
+
+    suspend fun unblockUser(userId: Long) {
+        apiClient.http.delete("${apiClient.baseUrl}/users/$userId/block")
+    }
+
+    suspend fun submitReport(request: ReportRequest) {
+        apiClient.http.post("${apiClient.baseUrl}/reports") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }

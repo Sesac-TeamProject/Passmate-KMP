@@ -97,6 +97,12 @@ class MyInfoViewModel(
         }
     }
 
+    private fun onClickReputation() {
+        viewModelScope.launch {
+            _event.emit(MyInfoEvent.OpenReputation)
+        }
+    }
+
     override fun onAction(action: MyInfoAction) {
         when (action) {
             is MyInfoAction.Enter -> onEnter()
@@ -105,6 +111,7 @@ class MyInfoViewModel(
             is MyInfoAction.ClickRoomReport -> onClickRoomReport(action.roomId)
             is MyInfoAction.ClickRejoin -> onClickRejoin(action.pin)
             is MyInfoAction.ClickCoinHistory -> onClickCoinHistory()
+            is MyInfoAction.ClickReputation -> onClickReputation()
         }
     }
 }

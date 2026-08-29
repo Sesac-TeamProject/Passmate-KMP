@@ -25,7 +25,8 @@ struct ContentView: View {
         case .roomList:
             RoomListView(
                 onOpenRoom: { pin in path.append(.join(pin: pin)) },
-                onOpenPinEntry: { path.append(.join(pin: nil)) }
+                onOpenPinEntry: { path.append(.join(pin: nil)) },
+                onRequireSignIn: { path.append(.signIn) }
             )
         case .signIn:
             SignInView(
@@ -76,6 +77,12 @@ struct ContentView: View {
                 onOpenReport: { roomId in path.append(.result(roomId: roomId)) },
                 onRejoin: { pin in path.append(.waiting(pin: pin)) },
                 onOpenCoinHistory: { path.append(.coinHistory) },
+                onOpenReputation: { path.append(.reputation) },
+                onBack: { popOnce() }
+            )
+        case .reputation:
+            ReputationView(
+                onRequireSignIn: { path.append(.signIn) },
                 onBack: { popOnce() }
             )
         default:

@@ -104,15 +104,29 @@ class RoomListViewModel(
         }
     }
 
+    private fun onClickHost(hostId: Long) {
+        viewModelScope.launch {
+            _event.emit(RoomListEvent.OpenHostProfile(hostId))
+        }
+    }
+
+    private fun onNotice(message: String) {
+        viewModelScope.launch {
+            _event.emit(RoomListEvent.ShowNotice(message))
+        }
+    }
+
     override fun onAction(action: RoomListAction) {
         when (action) {
             is RoomListAction.ChangeQuery -> onChangeQuery(action.query)
             is RoomListAction.SubmitSearch -> onSubmitSearch()
             is RoomListAction.SelectType -> onSelectType(action.type)
             is RoomListAction.ClickRoom -> onClickRoom(action.pin)
+            is RoomListAction.ClickHost -> onClickHost(action.hostId)
             is RoomListAction.LoadMore -> onLoadMore()
             is RoomListAction.Retry -> reload()
             is RoomListAction.ClickPinEntry -> onClickPinEntry()
+            is RoomListAction.Notice -> onNotice(action.message)
         }
     }
 

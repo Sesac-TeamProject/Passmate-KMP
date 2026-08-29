@@ -83,6 +83,8 @@ final class MyInfoViewModel: ObservableObject {
             event.send(.rejoin(pin: pin))
         case .clickCoinHistory:
             event.send(.openCoinHistory)
+        case .clickReputation:
+            event.send(.openReputation)
         }
     }
 

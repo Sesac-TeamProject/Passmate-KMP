@@ -55,7 +55,7 @@ private fun roomInfo(): RoomInfo {
         maxParticipants = 20,
         isPaid = false,
         entryFee = null,
-        host = RoomHost("김선생", 3, 4.7, 28)
+        host = RoomHost(7L, "김선생", 3, 4.7, 28)
     )
 }
 
