@@ -56,3 +56,33 @@
 - `ANSWER_SUBMITTED`(학생 화면 제출 현황) 존폐 — 백엔드 명세서엔 호스트 토픽 `SUBMISSION_UPDATED`만 존재
 - 답 제출 `content` 규약(객관식=보기 원문·OX="O"/"X"·서술형=텍스트) — 백엔드 채점 비교 방식과 합의 필요
 - M-05 "내 리포트 보기"=준비 중 안내(T062 파트2) · 가입 유도 버튼 미구현(T075 파트2)
+
+## 7. v6 앱 확장 (T116~T120, 2026-08-29 — PR #9~#13)
+
+> 신규 Swift 30개 + pbxproj idx **84~123** 등록(그룹 profile=0019·hostroom=0020 신설). **다음 가용 idx = 124.**
+
+### 7-1. 빌드·인터롭 1순위 의심 지점
+
+- [ ] pbxproj 로드: ui/profile(5) · ui/hostroom(15) · ui/mypage Reputation*(5) · ui/payment Earnings/SettlementAccount*(10) 전부 Navigator에 표시
+- [ ] Kotlin enum 신규 노출: `BadgeType.firstRoom` 등 8종 · `ReportReason.nickname` 등 6종 · `SettlementStatus.scheduled/paid/held` · `QuestionType.multipleChoice`(리모컨·리포트 첫 사용)
+- [ ] `Shared.HostLevel.verified` 모듈 한정 비교(ReputationView — 로컬 Swift HostLevel과 이름 충돌 지점)
+- [ ] `SessionEventStreamWatcher.startAsHost(roomId:onEvent:)` 신규 메소드 + `ServerEventSubmissionUpdated`·`ServerEventProjectorConnected/Disconnected` 클래스명
+- [ ] `PagedResult.items` 캐스트: `[HostedRoom]`·`[QuestionSetSummary]`·`[SettlementItem]` · `NextGrade.criteria`→`[GradeCriterion]`
+- [ ] `CreateRoomUseCase.invoke(title:questionSetId:isPaid:entryFee:)` — `KotlinLong?`/`KotlinInt?` 래핑 전달부(CreateRoomViewModel.swift)
+
+### 7-2. 시뮬레이터 스모크 (백엔드 불필요)
+
+- [ ] 마이(MyInfoView) → "내가 만든 방"·"정산"·"내 명성·뱃지" 행 3개 push 진입
+- [ ] ReputationView: 등급 카드(엠블럼·진행 바·조건 행 ✓/현재·목표)·뱃지 그리드 렌더(로딩 실패 화면이라도 크래시 없음)
+- [ ] RoomListView 호스트 이름 탭 → HostProfileSheetView 시트(medium/large) · 신고 confirmationDialog 6종 · 차단 alert
+- [ ] HostedRoomsView: + FAB → CreateRoomSheetView(세트 Menu·무료/유료 토글·유료 시 참가비 필드)
+- [ ] RoomReportView: 개요/문항별/학생별 탭 전환 · 내보내기 → UIActivityViewController
+- [ ] SessionControlView: 대기 패널→(백엔드 없으면 오류 토스트) · 타이머 링·제어 버튼 렌더
+- [ ] EarningsView: 요약 카드·상태 칩 3종 · "계좌 관리" → SettlementAccountSheetView(숫자 키패드)
+
+### 7-3. 백엔드 연동 E2E `[백엔드]`
+
+- [ ] 명성: GET /users/me/grade·badges → 승급 조건 12/20·✓4.7 표기 · 프로필: 차단 후 목록에서 방 숨김 확인
+- [ ] 방 생성: POST /rooms(세트 연결) → PIN 발급 스낵바 · 유료 선택 Lv.3 미만 403 문구
+- [ ] 리모컨: 세션 시작→QUESTION_STARTED 반영·SUBMISSION_UPDATED 재조회·바로 마감·화면 잠금(SCREEN_LOCKED 학생 측 확인)·세션 종료→방 리포트 자동 전환
+- [ ] 정산: earnings 요약·페이징 · 계좌 저장 PUT → 요약 행 갱신
