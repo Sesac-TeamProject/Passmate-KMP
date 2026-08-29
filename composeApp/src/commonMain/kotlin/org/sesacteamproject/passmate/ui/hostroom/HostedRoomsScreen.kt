@@ -63,6 +63,7 @@ fun HostedRoomsScreen(onNavigate: (NavigationAction) -> Unit) {
                 is HostedRoomsEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
                 is HostedRoomsEvent.OpenCreateSheet -> isCreateSheetVisible = true
                 is HostedRoomsEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
+                is HostedRoomsEvent.OpenRoomReport -> onNavigate(NavigationAction.NavigateToRoomReport(event.roomId))
                 is HostedRoomsEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }

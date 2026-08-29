@@ -5,6 +5,7 @@ import org.sesacteamproject.passmate.ui.auth.SignInViewModel
 import org.sesacteamproject.passmate.ui.home.RoomListViewModel
 import org.sesacteamproject.passmate.ui.hostroom.CreateRoomViewModel
 import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsViewModel
+import org.sesacteamproject.passmate.ui.hostroom.RoomReportViewModel
 import org.sesacteamproject.passmate.ui.join.JoinViewModel
 import org.sesacteamproject.passmate.ui.mypage.MyInfoViewModel
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryViewModel
@@ -29,4 +30,5 @@ val viewModelModule = module {
     factory { HostProfileViewModel(get(), get(), get(), get()) }
     factory { HostedRoomsViewModel(get(), get(), get()) }
     factory { CreateRoomViewModel(get(), get()) }
+    factory { RoomReportViewModel(get(), get(), get()) }
 }

@@ -8,6 +8,8 @@ struct HostedRoomsView: View {
 
     var onOpenReputation: () -> Void = {}
 
+    var onOpenRoomReport: (Int64) -> Void = { _ in }
+
     var onBack: () -> Void = {}
 
     @StateObject private var viewModel = HostedRoomsViewModel(
@@ -40,6 +42,8 @@ struct HostedRoomsView: View {
                 isCreateSheetVisible = true
             case .openReputation:
                 onOpenReputation()
+            case let .openRoomReport(roomId):
+                onOpenRoomReport(roomId)
             case let .showNotice(message):
                 noticeMessage = message
             }

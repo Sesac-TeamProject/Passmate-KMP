@@ -9,5 +9,8 @@ sealed interface HostedRoomsEvent {
 
     data object OpenReputation : HostedRoomsEvent
 
+    // 종료된 방 상세 → 방 리포트 (M-14)
+    data class OpenRoomReport(val roomId: Long) : HostedRoomsEvent
+
     data class ShowNotice(val message: String) : HostedRoomsEvent
 }

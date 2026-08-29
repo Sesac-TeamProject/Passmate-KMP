@@ -90,6 +90,13 @@ struct ContentView: View {
             HostedRoomsView(
                 onRequireSignIn: { path.append(.signIn) },
                 onOpenReputation: { path.append(.reputation) },
+                onOpenRoomReport: { roomId in path.append(.roomReport(roomId: roomId)) },
+                onBack: { popOnce() }
+            )
+        case let .roomReport(roomId):
+            RoomReportView(
+                roomId: roomId,
+                onRequireSignIn: { path.append(.signIn) },
                 onBack: { popOnce() }
             )
         default:

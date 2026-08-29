@@ -30,5 +30,8 @@ sealed interface NavigationAction {
     // 내가 만든 방 (M-13) — 마이페이지에서 진입
     data object NavigateToHostedRooms : NavigationAction
 
+    // 방 리포트 (M-14) — 내가 만든 방 › 종료 › 상세
+    data class NavigateToRoomReport(val roomId: Long) : NavigationAction
+
     data object NavigateBack : NavigationAction
 }

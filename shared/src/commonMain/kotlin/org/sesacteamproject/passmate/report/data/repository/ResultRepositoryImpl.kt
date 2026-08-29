@@ -6,6 +6,7 @@ import org.sesacteamproject.passmate.core.network.apiCall
 import org.sesacteamproject.passmate.report.data.mapper.toDomain
 import org.sesacteamproject.passmate.report.data.remote.ResultRemoteDataSource
 import org.sesacteamproject.passmate.report.domain.model.LearningReport
+import org.sesacteamproject.passmate.report.domain.model.RoomReport
 import org.sesacteamproject.passmate.report.domain.model.SessionResult
 import org.sesacteamproject.passmate.report.domain.repository.ResultRepository
 
@@ -19,5 +20,9 @@ class ResultRepositoryImpl(
 
     override suspend fun getLearningReport(roomId: Long): AppResult<LearningReport> {
         return apiCall { remoteDataSource.fetchLearningReport(roomId) }.map { it.toDomain() }
+    }
+
+    override suspend fun getRoomReport(roomId: Long): AppResult<RoomReport> {
+        return apiCall { remoteDataSource.fetchRoomReport(roomId) }.map { it.toDomain() }
     }
 }

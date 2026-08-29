@@ -3,5 +3,7 @@ enum HostedRoomsEvent {
     case requireSignIn
     case openCreateSheet
     case openReputation
+    // 종료된 방 상세 → 방 리포트 (M-14)
+    case openRoomReport(roomId: Int64)
     case showNotice(message: String)
 }

@@ -4,6 +4,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import org.sesacteamproject.passmate.core.network.ApiClient
 import org.sesacteamproject.passmate.report.data.dto.LearningReportResponse
+import org.sesacteamproject.passmate.report.data.dto.RoomReportResponse
 import org.sesacteamproject.passmate.report.data.dto.SessionResultResponse
 
 // 전송만 담당 — AppResult 변환·매핑은 Repository가 한다 (규칙 §6)
@@ -16,5 +17,9 @@ class ResultRemoteDataSource(
 
     suspend fun fetchLearningReport(roomId: Long): LearningReportResponse {
         return apiClient.http.get("${apiClient.baseUrl}/rooms/$roomId/reports/me").body()
+    }
+
+    suspend fun fetchRoomReport(roomId: Long): RoomReportResponse {
+        return apiClient.http.get("${apiClient.baseUrl}/rooms/$roomId/results").body()
     }
 }
