@@ -6,4 +6,5 @@ enum MyInfoAction {
     case clickRejoin(pin: String)
     case clickCoinHistory
     case clickReputation
+    case clickHostedRooms
 }

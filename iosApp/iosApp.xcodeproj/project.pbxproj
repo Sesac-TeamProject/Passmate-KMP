@@ -79,6 +79,16 @@
 		A101000091AABBCCDDEEFF0091 /* HostProfileEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100091AABBCCDDEEFF0091 /* HostProfileEvent.swift */; };
 		A101000092AABBCCDDEEFF0092 /* HostProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100092AABBCCDDEEFF0092 /* HostProfileViewModel.swift */; };
 		A101000093AABBCCDDEEFF0093 /* HostProfileSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100093AABBCCDDEEFF0093 /* HostProfileSheetView.swift */; };
+		A101000094AABBCCDDEEFF0094 /* HostedRoomsUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100094AABBCCDDEEFF0094 /* HostedRoomsUiState.swift */; };
+		A101000095AABBCCDDEEFF0095 /* HostedRoomsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100095AABBCCDDEEFF0095 /* HostedRoomsAction.swift */; };
+		A101000096AABBCCDDEEFF0096 /* HostedRoomsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100096AABBCCDDEEFF0096 /* HostedRoomsEvent.swift */; };
+		A101000097AABBCCDDEEFF0097 /* HostedRoomsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100097AABBCCDDEEFF0097 /* HostedRoomsViewModel.swift */; };
+		A101000098AABBCCDDEEFF0098 /* HostedRoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100098AABBCCDDEEFF0098 /* HostedRoomsView.swift */; };
+		A101000099AABBCCDDEEFF0099 /* CreateRoomUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100099AABBCCDDEEFF0099 /* CreateRoomUiState.swift */; };
+		A101000100AABBCCDDEEFF0100 /* CreateRoomAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100100AABBCCDDEEFF0100 /* CreateRoomAction.swift */; };
+		A101000101AABBCCDDEEFF0101 /* CreateRoomEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100101AABBCCDDEEFF0101 /* CreateRoomEvent.swift */; };
+		A101000102AABBCCDDEEFF0102 /* CreateRoomViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100102AABBCCDDEEFF0102 /* CreateRoomViewModel.swift */; };
+		A101000103AABBCCDDEEFF0103 /* CreateRoomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100103AABBCCDDEEFF0103 /* CreateRoomSheetView.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
@@ -161,6 +171,16 @@
 		A101100091AABBCCDDEEFF0091 /* HostProfileEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostProfileEvent.swift; sourceTree = "<group>"; };
 		A101100092AABBCCDDEEFF0092 /* HostProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostProfileViewModel.swift; sourceTree = "<group>"; };
 		A101100093AABBCCDDEEFF0093 /* HostProfileSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostProfileSheetView.swift; sourceTree = "<group>"; };
+		A101100094AABBCCDDEEFF0094 /* HostedRoomsUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedRoomsUiState.swift; sourceTree = "<group>"; };
+		A101100095AABBCCDDEEFF0095 /* HostedRoomsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedRoomsAction.swift; sourceTree = "<group>"; };
+		A101100096AABBCCDDEEFF0096 /* HostedRoomsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedRoomsEvent.swift; sourceTree = "<group>"; };
+		A101100097AABBCCDDEEFF0097 /* HostedRoomsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedRoomsViewModel.swift; sourceTree = "<group>"; };
+		A101100098AABBCCDDEEFF0098 /* HostedRoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedRoomsView.swift; sourceTree = "<group>"; };
+		A101100099AABBCCDDEEFF0099 /* CreateRoomUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRoomUiState.swift; sourceTree = "<group>"; };
+		A101100100AABBCCDDEEFF0100 /* CreateRoomAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRoomAction.swift; sourceTree = "<group>"; };
+		A101100101AABBCCDDEEFF0101 /* CreateRoomEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRoomEvent.swift; sourceTree = "<group>"; };
+		A101100102AABBCCDDEEFF0102 /* CreateRoomViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRoomViewModel.swift; sourceTree = "<group>"; };
+		A101100103AABBCCDDEEFF0103 /* CreateRoomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRoomSheetView.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
@@ -239,6 +259,7 @@
 				A1012017AABBCCDDEEFF0017 /* mypage */,
 				A1012018AABBCCDDEEFF0018 /* payment */,
 				A1012019AABBCCDDEEFF0019 /* profile */,
+				A1012020AABBCCDDEEFF0020 /* hostroom */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -369,6 +390,23 @@
 				A101100093AABBCCDDEEFF0093 /* HostProfileSheetView.swift */,
 			);
 			path = profile;
+			sourceTree = "<group>";
+		};
+		A1012020AABBCCDDEEFF0020 /* hostroom */ = {
+			isa = PBXGroup;
+			children = (
+				A101100094AABBCCDDEEFF0094 /* HostedRoomsUiState.swift */,
+				A101100095AABBCCDDEEFF0095 /* HostedRoomsAction.swift */,
+				A101100096AABBCCDDEEFF0096 /* HostedRoomsEvent.swift */,
+				A101100097AABBCCDDEEFF0097 /* HostedRoomsViewModel.swift */,
+				A101100098AABBCCDDEEFF0098 /* HostedRoomsView.swift */,
+				A101100099AABBCCDDEEFF0099 /* CreateRoomUiState.swift */,
+				A101100100AABBCCDDEEFF0100 /* CreateRoomAction.swift */,
+				A101100101AABBCCDDEEFF0101 /* CreateRoomEvent.swift */,
+				A101100102AABBCCDDEEFF0102 /* CreateRoomViewModel.swift */,
+				A101100103AABBCCDDEEFF0103 /* CreateRoomSheetView.swift */,
+			);
+			path = hostroom;
 			sourceTree = "<group>";
 		};
 		A1012019AABBCCDDEEFF0019 /* navigation */ = {
@@ -567,6 +605,16 @@
 				A101000091AABBCCDDEEFF0091 /* HostProfileEvent.swift in Sources */,
 				A101000092AABBCCDDEEFF0092 /* HostProfileViewModel.swift in Sources */,
 				A101000093AABBCCDDEEFF0093 /* HostProfileSheetView.swift in Sources */,
+				A101000094AABBCCDDEEFF0094 /* HostedRoomsUiState.swift in Sources */,
+				A101000095AABBCCDDEEFF0095 /* HostedRoomsAction.swift in Sources */,
+				A101000096AABBCCDDEEFF0096 /* HostedRoomsEvent.swift in Sources */,
+				A101000097AABBCCDDEEFF0097 /* HostedRoomsViewModel.swift in Sources */,
+				A101000098AABBCCDDEEFF0098 /* HostedRoomsView.swift in Sources */,
+				A101000099AABBCCDDEEFF0099 /* CreateRoomUiState.swift in Sources */,
+				A101000100AABBCCDDEEFF0100 /* CreateRoomAction.swift in Sources */,
+				A101000101AABBCCDDEEFF0101 /* CreateRoomEvent.swift in Sources */,
+				A101000102AABBCCDDEEFF0102 /* CreateRoomViewModel.swift in Sources */,
+				A101000103AABBCCDDEEFF0103 /* CreateRoomSheetView.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
