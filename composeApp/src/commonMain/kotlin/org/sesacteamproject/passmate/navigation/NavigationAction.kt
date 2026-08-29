@@ -36,5 +36,8 @@ sealed interface NavigationAction {
     // 진행 리모컨 (M-T2) — 내가 만든 방 › 진행 중 › 진행
     data class NavigateToSessionControl(val roomId: Long, val pin: String) : NavigationAction
 
+    // 정산 (M-T4) — 마이페이지에서 진입
+    data object NavigateToEarnings : NavigationAction
+
     data object NavigateBack : NavigationAction
 }

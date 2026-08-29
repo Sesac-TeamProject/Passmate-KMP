@@ -19,4 +19,7 @@ sealed interface MyInfoAction {
 
     // 내가 만든 방(M-13)으로 이동
     data object ClickHostedRooms : MyInfoAction
+
+    // 정산(M-T4)으로 이동
+    data object ClickEarnings : MyInfoAction
 }

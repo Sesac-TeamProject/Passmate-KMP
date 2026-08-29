@@ -18,5 +18,8 @@ sealed interface MyInfoEvent {
     // 내가 만든 방 화면으로 이동 (M-13)
     data object OpenHostedRooms : MyInfoEvent
 
+    // 정산 화면으로 이동 (M-T4)
+    data object OpenEarnings : MyInfoEvent
+
     data class ShowNotice(val message: String) : MyInfoEvent
 }
