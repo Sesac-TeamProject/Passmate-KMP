@@ -27,5 +27,8 @@ sealed interface NavigationAction {
     // 내 명성·뱃지 상세 (M-09) — 마이페이지에서 진입
     data object NavigateToReputation : NavigationAction
 
+    // 내가 만든 방 (M-13) — 마이페이지에서 진입
+    data object NavigateToHostedRooms : NavigationAction
+
     data object NavigateBack : NavigationAction
 }
