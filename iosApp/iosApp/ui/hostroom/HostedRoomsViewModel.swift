@@ -115,11 +115,11 @@ final class HostedRoomsViewModel: ObservableObject {
             event.send(.openCreateSheet)
         case .clickReputation:
             event.send(.openReputation)
-        // 진행 리모컨(M-T2)·방 리포트(M-14)는 후속 태스크에서 연결한다 (tasks.md T118·T119)
+        // 진행 리모컨(M-T2)은 후속 태스크에서 연결한다 (tasks.md T119)
         case .clickOngoingRoom:
             event.send(.showNotice(message: "진행 리모컨은 곧 제공돼요 · 프로젝터 화면은 웹에서 진행해 주세요"))
-        case .clickEndedRoom:
-            event.send(.showNotice(message: "방 리포트는 곧 제공돼요 · 웹에서 확인해 주세요"))
+        case let .clickEndedRoom(roomId):
+            event.send(.openRoomReport(roomId: roomId))
         case let .roomCreated(pin):
             onRoomCreated(pin: pin)
         case let .notice(message):
