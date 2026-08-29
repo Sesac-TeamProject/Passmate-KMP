@@ -15,5 +15,8 @@ sealed interface MyInfoEvent {
     // 내 명성·뱃지 상세 화면으로 이동 (M-09)
     data object OpenReputation : MyInfoEvent
 
+    // 내가 만든 방 화면으로 이동 (M-13)
+    data object OpenHostedRooms : MyInfoEvent
+
     data class ShowNotice(val message: String) : MyInfoEvent
 }

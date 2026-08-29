@@ -3,11 +3,15 @@ package org.sesacteamproject.passmate.room.data.remote
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import org.sesacteamproject.passmate.core.network.ApiClient
+import org.sesacteamproject.passmate.room.data.dto.CreateRoomRequest
+import org.sesacteamproject.passmate.room.data.dto.CreateRoomResponse
+import org.sesacteamproject.passmate.room.data.dto.HostedRoomsResponse
 import org.sesacteamproject.passmate.room.data.dto.JoinRoomRequest
 import org.sesacteamproject.passmate.room.data.dto.JoinRoomResponse
 import org.sesacteamproject.passmate.room.data.dto.ParticipantsResponse
@@ -34,5 +38,20 @@ class RoomRemoteDataSource(
 
     suspend fun leave(roomId: Long) {
         apiClient.http.delete("${apiClient.baseUrl}/rooms/$roomId/participants/me")
+    }
+
+    suspend fun fetchHostedRooms(cursor: String?): HostedRoomsResponse {
+        return apiClient.http.get("${apiClient.baseUrl}/users/me/rooms/hosted") {
+            if (cursor != null) {
+                parameter("cursor", cursor)
+            }
+        }.body()
+    }
+
+    suspend fun createRoom(request: CreateRoomRequest): CreateRoomResponse {
+        return apiClient.http.post("${apiClient.baseUrl}/rooms") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
     }
 }

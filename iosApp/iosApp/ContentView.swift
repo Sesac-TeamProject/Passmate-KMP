@@ -78,11 +78,18 @@ struct ContentView: View {
                 onRejoin: { pin in path.append(.waiting(pin: pin)) },
                 onOpenCoinHistory: { path.append(.coinHistory) },
                 onOpenReputation: { path.append(.reputation) },
+                onOpenHostedRooms: { path.append(.hostedRooms) },
                 onBack: { popOnce() }
             )
         case .reputation:
             ReputationView(
                 onRequireSignIn: { path.append(.signIn) },
+                onBack: { popOnce() }
+            )
+        case .hostedRooms:
+            HostedRoomsView(
+                onRequireSignIn: { path.append(.signIn) },
+                onOpenReputation: { path.append(.reputation) },
                 onBack: { popOnce() }
             )
         default:

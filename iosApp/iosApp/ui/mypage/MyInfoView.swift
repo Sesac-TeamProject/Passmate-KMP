@@ -13,6 +13,8 @@ struct MyInfoView: View {
 
     var onOpenReputation: () -> Void = {}
 
+    var onOpenHostedRooms: () -> Void = {}
+
     var onBack: () -> Void = {}
 
     @StateObject private var viewModel = MyInfoViewModel(
@@ -43,6 +45,8 @@ struct MyInfoView: View {
                 onOpenCoinHistory()
             case .openReputation:
                 onOpenReputation()
+            case .openHostedRooms:
+                onOpenHostedRooms()
             case let .showNotice(message):
                 noticeMessage = message
             }
@@ -124,6 +128,7 @@ private struct MyInfoContentView: View {
                     SummaryCard(summary: summary)
                     WeakTopicsRow(topics: summary.weakTopics)
                 }
+                HostedRoomsEntryRow(onClick: { onAction(.clickHostedRooms) })
                 ReputationEntryRow(onClick: { onAction(.clickReputation) })
                 CoinHistoryEntryRow(onClick: { onAction(.clickCoinHistory) })
                 if uiState.rooms.isEmpty, uiState.ongoing == nil {
@@ -221,6 +226,26 @@ private struct OngoingCard: View {
         parts.append("PIN \(formatPin(ongoing.pin))")
 
         return parts.joined(separator: " · ")
+    }
+}
+
+private struct HostedRoomsEntryRow: View {
+    let onClick: () -> Void
+
+    var body: some View {
+        Button(action: onClick) {
+            HStack {
+                Text("내가 만든 방")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(PassmateColors.textPrimary)
+                Spacer()
+                Text("›").font(.system(size: 18)).foregroundColor(PassmateColors.textTertiary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
+            .background(PassmateColors.surface)
+            .cornerRadius(16)
+        }
     }
 }
 

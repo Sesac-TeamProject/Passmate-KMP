@@ -6,6 +6,9 @@ import kotlin.test.assertIs
 import kotlinx.coroutines.test.runTest
 import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.AppResult
+import org.sesacteamproject.passmate.core.model.PagedResult
+import org.sesacteamproject.passmate.room.domain.model.CreatedRoom
+import org.sesacteamproject.passmate.room.domain.model.HostedRoom
 import org.sesacteamproject.passmate.room.domain.model.MyParticipation
 import org.sesacteamproject.passmate.room.domain.model.Participant
 import org.sesacteamproject.passmate.room.domain.model.RoomHost
@@ -38,6 +41,19 @@ private class FakeRoomRepository(
 
     override fun myParticipation(): MyParticipation? {
         return null
+    }
+
+    override suspend fun getHostedRooms(cursor: String?): AppResult<PagedResult<HostedRoom>> {
+        return AppResult.Success(PagedResult(emptyList(), null, false))
+    }
+
+    override suspend fun createRoom(
+        title: String,
+        questionSetId: Long?,
+        isPaid: Boolean,
+        entryFee: Int?
+    ): AppResult<CreatedRoom> {
+        return AppResult.Failure(AppError.Unknown())
     }
 }
 

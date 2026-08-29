@@ -16,4 +16,7 @@ sealed interface MyInfoAction {
 
     // 내 명성·뱃지 상세(M-09)로 이동
     data object ClickReputation : MyInfoAction
+
+    // 내가 만든 방(M-13)으로 이동
+    data object ClickHostedRooms : MyInfoAction
 }

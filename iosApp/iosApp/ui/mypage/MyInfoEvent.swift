@@ -4,5 +4,6 @@ enum MyInfoEvent {
     case rejoin(pin: String)
     case openCoinHistory
     case openReputation
+    case openHostedRooms
     case showNotice(message: String)
 }

@@ -7,6 +7,7 @@ import org.sesacteamproject.passmate.ui.auth.SignInScreen
 import org.sesacteamproject.passmate.ui.home.HomeScreen
 import org.sesacteamproject.passmate.ui.home.RoomListScreen
 import org.sesacteamproject.passmate.ui.join.JoinScreen
+import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
@@ -39,6 +40,8 @@ private sealed interface JvmDestination {
     data object MyInfo : JvmDestination
 
     data object Reputation : JvmDestination
+
+    data object HostedRooms : JvmDestination
 }
 
 @Composable
@@ -64,6 +67,7 @@ actual fun AppNavHost() {
             }
             is NavigationAction.NavigateToMyInfo -> routeStack.add(JvmDestination.MyInfo)
             is NavigationAction.NavigateToReputation -> routeStack.add(JvmDestination.Reputation)
+            is NavigationAction.NavigateToHostedRooms -> routeStack.add(JvmDestination.HostedRooms)
             is NavigationAction.NavigateToCoinHistory -> routeStack.add(JvmDestination.CoinHistory)
             is NavigationAction.NavigateBack -> {
                 if (routeStack.size > 1) {
@@ -99,6 +103,7 @@ actual fun AppNavHost() {
         )
         is JvmDestination.MyInfo -> MyInfoScreen(onNavigate = onNavigate)
         is JvmDestination.Reputation -> ReputationScreen(onNavigate = onNavigate)
+        is JvmDestination.HostedRooms -> HostedRoomsScreen(onNavigate = onNavigate)
         else -> HomeScreen(onNavigate = onNavigate)
     }
 }

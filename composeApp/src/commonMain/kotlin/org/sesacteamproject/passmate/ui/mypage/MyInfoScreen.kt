@@ -61,6 +61,7 @@ fun MyInfoScreen(
                 is MyInfoEvent.Rejoin -> onNavigate(NavigationAction.NavigateToWaiting(event.pin))
                 is MyInfoEvent.OpenCoinHistory -> onNavigate(NavigationAction.NavigateToCoinHistory)
                 is MyInfoEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
+                is MyInfoEvent.OpenHostedRooms -> onNavigate(NavigationAction.NavigateToHostedRooms)
                 is MyInfoEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -151,6 +152,7 @@ private fun ColumnScope.LoadedMyInfo(
             SummaryCard(summary = summary)
             WeakTopicsRow(topics = summary.weakTopics)
         }
+        HostedRoomsRow(onClick = { onAction(MyInfoAction.ClickHostedRooms) })
         ReputationRow(onClick = { onAction(MyInfoAction.ClickReputation) })
         CoinHistoryRow(onClick = { onAction(MyInfoAction.ClickCoinHistory) })
         if (uiState.rooms.isEmpty() && ongoing == null) {
@@ -169,6 +171,27 @@ private fun ColumnScope.LoadedMyInfo(
                 onClick = { onAction(MyInfoAction.LoadMore) }
             )
         }
+    }
+}
+
+@Composable
+private fun HostedRoomsRow(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "내가 만든 방",
+            color = PassmateColors.TextPrimary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.weight(1f)
+        )
+        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
     }
 }
 

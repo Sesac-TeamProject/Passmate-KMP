@@ -1,13 +1,17 @@
 package org.sesacteamproject.passmate.room.data.repository
 
 import org.sesacteamproject.passmate.core.model.AppResult
+import org.sesacteamproject.passmate.core.model.PagedResult
 import org.sesacteamproject.passmate.core.model.map
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.core.network.apiCall
 import org.sesacteamproject.passmate.core.storage.TokenStorage
+import org.sesacteamproject.passmate.room.data.dto.CreateRoomRequest
 import org.sesacteamproject.passmate.room.data.dto.JoinRoomRequest
 import org.sesacteamproject.passmate.room.data.mapper.toDomain
 import org.sesacteamproject.passmate.room.data.remote.RoomRemoteDataSource
+import org.sesacteamproject.passmate.room.domain.model.CreatedRoom
+import org.sesacteamproject.passmate.room.domain.model.HostedRoom
 import org.sesacteamproject.passmate.room.domain.model.MyParticipation
 import org.sesacteamproject.passmate.room.domain.model.Participant
 import org.sesacteamproject.passmate.room.domain.model.RoomInfo
@@ -62,5 +66,25 @@ class RoomRepositoryImpl(
 
     override fun myParticipation(): MyParticipation? {
         return myParticipation
+    }
+
+    override suspend fun getHostedRooms(cursor: String?): AppResult<PagedResult<HostedRoom>> {
+        return apiCall { remoteDataSource.fetchHostedRooms(cursor) }.map { it.toDomain() }
+    }
+
+    override suspend fun createRoom(
+        title: String,
+        questionSetId: Long?,
+        isPaid: Boolean,
+        entryFee: Int?
+    ): AppResult<CreatedRoom> {
+        val request = CreateRoomRequest(
+            title = title,
+            questionSetId = questionSetId,
+            isPaid = isPaid,
+            entryFee = entryFee
+        )
+
+        return apiCall { remoteDataSource.createRoom(request) }.map { it.toDomain() }
     }
 }

@@ -18,6 +18,7 @@ import org.sesacteamproject.passmate.ui.auth.SignInScreen
 import org.sesacteamproject.passmate.ui.home.HomeScreen
 import org.sesacteamproject.passmate.ui.home.RoomListScreen
 import org.sesacteamproject.passmate.ui.join.JoinScreen
+import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
@@ -66,6 +67,7 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
         is NavigationAction.NavigateToPayment -> navigate("payment/${action.pin}")
         is NavigationAction.NavigateToMyInfo -> navigate(Route.MyInfo.route)
         is NavigationAction.NavigateToReputation -> navigate(Route.Reputation.route)
+        is NavigationAction.NavigateToHostedRooms -> navigate(Route.HostedRooms.route)
         is NavigationAction.NavigateToCoinHistory -> navigate(Route.CoinHistory.route)
         is NavigationAction.NavigateBack -> popBackStack()
     }
@@ -155,6 +157,9 @@ actual fun AppNavHost() {
         }
         composable(Route.Reputation.route) {
             ReputationScreen(onNavigate = navController::handleNavigationAction)
+        }
+        composable(Route.HostedRooms.route) {
+            HostedRoomsScreen(onNavigate = navController::handleNavigationAction)
         }
         composable(Route.CoinHistory.route) {
             CoinHistoryScreen(onNavigate = navController::handleNavigationAction)

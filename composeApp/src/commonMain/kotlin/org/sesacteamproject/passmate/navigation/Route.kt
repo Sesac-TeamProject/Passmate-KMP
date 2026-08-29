@@ -25,6 +25,9 @@ sealed class Route(val route: String) {
     // 내 명성·뱃지 상세 (M-09) — 마이페이지에서 진입
     data object Reputation : Route("reputation")
 
+    // 내가 만든 방 (M-13) — 마이페이지에서 진입, 새 방 만들기 시트 포함
+    data object HostedRooms : Route("hostedRooms")
+
     data object Payment : Route("payment/{pin}")
 
     // 코인·결제 내역 (M-12) — 마이페이지에서 진입
