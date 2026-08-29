@@ -115,6 +115,12 @@ class MyInfoViewModel(
         }
     }
 
+    private fun onClickSettings() {
+        viewModelScope.launch {
+            _event.emit(MyInfoEvent.OpenSettings)
+        }
+    }
+
     override fun onAction(action: MyInfoAction) {
         when (action) {
             is MyInfoAction.Enter -> onEnter()
@@ -126,6 +132,7 @@ class MyInfoViewModel(
             is MyInfoAction.ClickReputation -> onClickReputation()
             is MyInfoAction.ClickHostedRooms -> onClickHostedRooms()
             is MyInfoAction.ClickEarnings -> onClickEarnings()
+            is MyInfoAction.ClickSettings -> onClickSettings()
         }
     }
 }

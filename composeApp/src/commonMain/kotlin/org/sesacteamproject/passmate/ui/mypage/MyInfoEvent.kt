@@ -21,5 +21,8 @@ sealed interface MyInfoEvent {
     // 정산 화면으로 이동 (M-T4)
     data object OpenEarnings : MyInfoEvent
 
+    // 설정 화면으로 이동 (M-12)
+    data object OpenSettings : MyInfoEvent
+
     data class ShowNotice(val message: String) : MyInfoEvent
 }
