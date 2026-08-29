@@ -240,3 +240,36 @@ struct VoiceHintBannerView: View {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 }
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("재생 중") {
+    let player = VoiceHintAudioPlayer()
+    player.play(url: "https://cdn.passmate.app/hints/301.m4a")
+    return VoiceHintBannerView(
+        hint: VoiceHint(hintId: 301, questionNo: 3, clipUrl: "https://cdn.passmate.app/hints/301.m4a", durationMs: 42000),
+        player: player,
+        onReplay: {}
+    )
+    .padding()
+}
+
+#Preview("재생 완료 · 다시 듣기") {
+    VoiceHintBannerView(
+        hint: VoiceHint(hintId: 301, questionNo: 3, clipUrl: "https://cdn.passmate.app/hints/301.m4a", durationMs: 42000),
+        player: VoiceHintAudioPlayer(),
+        onReplay: {}
+    )
+    .padding()
+}
+
+#Preview("재생 실패") {
+    let player = VoiceHintAudioPlayer()
+    player.play(url: "")
+    return VoiceHintBannerView(
+        hint: VoiceHint(hintId: 301, questionNo: 3, clipUrl: "https://cdn.passmate.app/hints/301.m4a", durationMs: 42000),
+        player: player,
+        onReplay: {}
+    )
+    .padding()
+}

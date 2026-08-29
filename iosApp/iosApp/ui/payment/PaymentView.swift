@@ -273,3 +273,73 @@ private struct PaymentContentView: View {
         .frame(maxWidth: .infinity)
     }
 }
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("부족분 있음") {
+    PaymentContentView(
+        uiState: PaymentUiState(
+            isLoading: false,
+            room: RoomInfo(
+                roomId: 601,
+                pin: "731204",
+                title: "8월 4주차 Spring 스터디",
+                topic: "이차방정식 심화",
+                status: .waiting,
+                questionCount: KotlinInt(int: 8),
+                estimatedMinutes: KotlinInt(int: 20),
+                scheduledAt: nil,
+                participantCount: KotlinInt(int: 12),
+                maxParticipants: KotlinInt(int: 30),
+                isPaid: true,
+                entryFee: KotlinInt(int: 500),
+                host: RoomHost(nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
+            ),
+            balance: 200,
+            shortfall: 300,
+            nickname: "민지",
+            avatarId: 3,
+            selectedMethod: .kakaoPay
+        ),
+        onAction: { _ in },
+        onBack: {}
+    )
+}
+
+#Preview("결제 진행 중") {
+    PaymentContentView(
+        uiState: PaymentUiState(
+            isLoading: false,
+            room: RoomInfo(
+                roomId: 601,
+                pin: "731204",
+                title: "8월 4주차 Spring 스터디",
+                topic: "이차방정식 심화",
+                status: .waiting,
+                questionCount: KotlinInt(int: 8),
+                estimatedMinutes: KotlinInt(int: 20),
+                scheduledAt: nil,
+                participantCount: KotlinInt(int: 12),
+                maxParticipants: KotlinInt(int: 30),
+                isPaid: true,
+                entryFee: KotlinInt(int: 500),
+                host: RoomHost(nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
+            ),
+            balance: 800,
+            shortfall: 0,
+            nickname: "민지",
+            avatarId: 3,
+            isProcessing: true
+        ),
+        onAction: { _ in },
+        onBack: {}
+    )
+}
+
+#Preview("실패 재시도") {
+    PaymentContentView(
+        uiState: PaymentUiState(isLoading: false, hasLoadError: true),
+        onAction: { _ in },
+        onBack: {}
+    )
+}

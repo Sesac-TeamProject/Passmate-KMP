@@ -76,3 +76,47 @@ struct RoomInfoCardView: View {
         return "\(rounded / 10).\(rounded % 10)"
     }
 }
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("평점 있음") {
+    RoomInfoCardView(
+        room: RoomInfo(
+            roomId: 801,
+            pin: "482913",
+            title: "8월 4주차 Spring 스터디",
+            topic: "이차함수 심화",
+            status: .waiting,
+            questionCount: KotlinInt(int: 8),
+            estimatedMinutes: KotlinInt(int: 20),
+            scheduledAt: nil,
+            participantCount: KotlinInt(int: 12),
+            maxParticipants: KotlinInt(int: 30),
+            isPaid: true,
+            entryFee: KotlinInt(int: 500),
+            host: RoomHost(nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
+        )
+    )
+    .padding()
+}
+
+#Preview("평점 없음") {
+    RoomInfoCardView(
+        room: RoomInfo(
+            roomId: 802,
+            pin: "115820",
+            title: "확률과 통계 총정리",
+            topic: nil,
+            status: .waiting,
+            questionCount: KotlinInt(int: 6),
+            estimatedMinutes: KotlinInt(int: 15),
+            scheduledAt: nil,
+            participantCount: KotlinInt(int: 3),
+            maxParticipants: nil,
+            isPaid: false,
+            entryFee: nil,
+            host: RoomHost(nickname: "이선생", level: nil, avgStars: nil, ratingCount: nil)
+        )
+    )
+    .padding()
+}

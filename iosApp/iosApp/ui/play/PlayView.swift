@@ -807,3 +807,100 @@ private func formatScore(_ total: Double) -> String {
         .reversed()
     )
 }
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("문항 풀이") {
+    PlayContentView(
+        uiState: PlayUiState(
+            isLoading: false,
+            phase: .question,
+            questionCount: 8,
+            question: SessionQuestion(
+                questionId: 501,
+                questionNo: 3,
+                type: .multipleChoice,
+                body: "등차수열 2, 5, 8, 11, ...의 공차를 구하세요.",
+                choices: ["1", "2", "3", "4"],
+                points: 100,
+                timeLimitSec: 30,
+                endsAt: "2026-08-28T10:15:30Z",
+                isClosed: false
+            ),
+            selectedChoiceIndex: 2,
+            remainingSeconds: 18,
+            myParticipantId: 9001,
+            myNickname: "민지",
+            isGuest: false
+        ),
+        onAction: { _ in },
+        onClickLeave: {}
+    )
+}
+
+#Preview("채점 결과") {
+    PlayContentView(
+        uiState: PlayUiState(
+            isLoading: false,
+            phase: .question,
+            questionCount: 8,
+            question: SessionQuestion(
+                questionId: 501,
+                questionNo: 3,
+                type: .multipleChoice,
+                body: "등차수열 2, 5, 8, 11, ...의 공차를 구하세요.",
+                choices: ["1", "2", "3", "4"],
+                points: 100,
+                timeLimitSec: 30,
+                endsAt: "2026-08-28T10:15:30Z",
+                isClosed: true
+            ),
+            remainingSeconds: 0,
+            hasSubmitted: true,
+            myAnswerResult: AnswerResult(
+                correct: KotlinBoolean(bool: true),
+                baseScore: 100,
+                speedBonus: 20,
+                earnedScore: 120,
+                totalScore: 480,
+                rank: KotlinInt(int: 2),
+                rankDelta: KotlinInt(int: 1),
+                isProvisional: false
+            ),
+            reveal: PlayUiState.Reveal(
+                answer: "3",
+                explanation: "이웃한 두 항의 차 5-2=3, 8-5=3으로 공차는 3이에요.",
+                correctAnswererCount: 5
+            ),
+            totalScore: 480,
+            rank: 2,
+            myParticipantId: 9001,
+            myNickname: "민지"
+        ),
+        onAction: { _ in },
+        onClickLeave: {}
+    )
+}
+
+#Preview("최종 결과") {
+    PlayContentView(
+        uiState: PlayUiState(
+            isLoading: false,
+            phase: .finished,
+            questionCount: 8,
+            totalScore: 990,
+            myCorrectCount: 6,
+            rank: 3,
+            finalRanking: [
+                RankEntry(rank: 1, participantId: 9002, nickname: "준영", avatarId: KotlinInt(int: 2), total: 1240),
+                RankEntry(rank: 2, participantId: 9003, nickname: "혜림", avatarId: KotlinInt(int: 5), total: 1180),
+                RankEntry(rank: 3, participantId: 9001, nickname: "민지", avatarId: KotlinInt(int: 1), total: 990)
+            ],
+            myParticipantId: 9001,
+            myNickname: "민지",
+            isGuest: false
+        ),
+        onAction: { _ in },
+        onClickLeave: {}
+    )
+}
