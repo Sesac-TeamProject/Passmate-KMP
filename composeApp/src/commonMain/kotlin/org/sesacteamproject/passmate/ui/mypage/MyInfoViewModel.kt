@@ -109,6 +109,12 @@ class MyInfoViewModel(
         }
     }
 
+    private fun onClickEarnings() {
+        viewModelScope.launch {
+            _event.emit(MyInfoEvent.OpenEarnings)
+        }
+    }
+
     override fun onAction(action: MyInfoAction) {
         when (action) {
             is MyInfoAction.Enter -> onEnter()
@@ -119,6 +125,7 @@ class MyInfoViewModel(
             is MyInfoAction.ClickCoinHistory -> onClickCoinHistory()
             is MyInfoAction.ClickReputation -> onClickReputation()
             is MyInfoAction.ClickHostedRooms -> onClickHostedRooms()
+            is MyInfoAction.ClickEarnings -> onClickEarnings()
         }
     }
 }

@@ -13,6 +13,7 @@ import org.sesacteamproject.passmate.ui.hostroom.SessionControlScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
+import org.sesacteamproject.passmate.ui.payment.EarningsScreen
 import org.sesacteamproject.passmate.ui.payment.PaymentScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
 import org.sesacteamproject.passmate.ui.result.ResultScreen
@@ -48,6 +49,8 @@ private sealed interface JvmDestination {
     data class RoomReport(val roomId: Long) : JvmDestination
 
     data class SessionControl(val roomId: Long, val pin: String) : JvmDestination
+
+    data object Earnings : JvmDestination
 }
 
 @Composable
@@ -79,6 +82,7 @@ actual fun AppNavHost() {
                 JvmDestination.SessionControl(action.roomId, action.pin)
             )
             is NavigationAction.NavigateToCoinHistory -> routeStack.add(JvmDestination.CoinHistory)
+            is NavigationAction.NavigateToEarnings -> routeStack.add(JvmDestination.Earnings)
             is NavigationAction.NavigateBack -> {
                 if (routeStack.size > 1) {
                     routeStack.removeAt(routeStack.lastIndex)
@@ -99,6 +103,7 @@ actual fun AppNavHost() {
             onNavigate = onNavigate
         )
         is JvmDestination.CoinHistory -> CoinHistoryScreen(onNavigate = onNavigate)
+        is JvmDestination.Earnings -> EarningsScreen(onNavigate = onNavigate)
         is JvmDestination.Waiting -> WaitingScreen(
             pin = currentDestination.pin,
             onNavigate = onNavigate

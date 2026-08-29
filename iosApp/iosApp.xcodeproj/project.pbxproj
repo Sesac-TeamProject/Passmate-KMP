@@ -99,6 +99,16 @@
 		A101000111AABBCCDDEEFF0111 /* SessionControlEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100111AABBCCDDEEFF0111 /* SessionControlEvent.swift */; };
 		A101000112AABBCCDDEEFF0112 /* SessionControlViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100112AABBCCDDEEFF0112 /* SessionControlViewModel.swift */; };
 		A101000113AABBCCDDEEFF0113 /* SessionControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100113AABBCCDDEEFF0113 /* SessionControlView.swift */; };
+		A1010001114AABBCCDDEEFF0114 /* EarningsUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001114AABBCCDDEEFF0114 /* EarningsUiState.swift */; };
+		A1010001115AABBCCDDEEFF0115 /* EarningsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001115AABBCCDDEEFF0115 /* EarningsAction.swift */; };
+		A1010001116AABBCCDDEEFF0116 /* EarningsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001116AABBCCDDEEFF0116 /* EarningsEvent.swift */; };
+		A1010001117AABBCCDDEEFF0117 /* EarningsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001117AABBCCDDEEFF0117 /* EarningsViewModel.swift */; };
+		A1010001118AABBCCDDEEFF0118 /* EarningsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001118AABBCCDDEEFF0118 /* EarningsView.swift */; };
+		A1010001119AABBCCDDEEFF0119 /* SettlementAccountUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001119AABBCCDDEEFF0119 /* SettlementAccountUiState.swift */; };
+		A1010001120AABBCCDDEEFF0120 /* SettlementAccountAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001120AABBCCDDEEFF0120 /* SettlementAccountAction.swift */; };
+		A1010001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift */; };
+		A1010001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */; };
+		A1010001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
@@ -201,6 +211,16 @@
 		A101100111AABBCCDDEEFF0111 /* SessionControlEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlEvent.swift; sourceTree = "<group>"; };
 		A101100112AABBCCDDEEFF0112 /* SessionControlViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlViewModel.swift; sourceTree = "<group>"; };
 		A101100113AABBCCDDEEFF0113 /* SessionControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlView.swift; sourceTree = "<group>"; };
+		A1011001114AABBCCDDEEFF0114 /* EarningsUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarningsUiState.swift; sourceTree = "<group>"; };
+		A1011001115AABBCCDDEEFF0115 /* EarningsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarningsAction.swift; sourceTree = "<group>"; };
+		A1011001116AABBCCDDEEFF0116 /* EarningsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarningsEvent.swift; sourceTree = "<group>"; };
+		A1011001117AABBCCDDEEFF0117 /* EarningsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarningsViewModel.swift; sourceTree = "<group>"; };
+		A1011001118AABBCCDDEEFF0118 /* EarningsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarningsView.swift; sourceTree = "<group>"; };
+		A1011001119AABBCCDDEEFF0119 /* SettlementAccountUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountUiState.swift; sourceTree = "<group>"; };
+		A1011001120AABBCCDDEEFF0120 /* SettlementAccountAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountAction.swift; sourceTree = "<group>"; };
+		A1011001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountEvent.swift; sourceTree = "<group>"; };
+		A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountViewModel.swift; sourceTree = "<group>"; };
+		A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountSheetView.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
@@ -396,6 +416,16 @@
 				A1011059AABBCCDDEEFF0059 /* PaymentUiState.swift */,
 				A1011060AABBCCDDEEFF0060 /* PaymentAction.swift */,
 				A1011061AABBCCDDEEFF0061 /* PaymentEvent.swift */,
+				A1011001114AABBCCDDEEFF0114 /* EarningsUiState.swift */,
+				A1011001115AABBCCDDEEFF0115 /* EarningsAction.swift */,
+				A1011001116AABBCCDDEEFF0116 /* EarningsEvent.swift */,
+				A1011001117AABBCCDDEEFF0117 /* EarningsViewModel.swift */,
+				A1011001118AABBCCDDEEFF0118 /* EarningsView.swift */,
+				A1011001119AABBCCDDEEFF0119 /* SettlementAccountUiState.swift */,
+				A1011001120AABBCCDDEEFF0120 /* SettlementAccountAction.swift */,
+				A1011001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift */,
+				A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */,
+				A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */,
 			);
 			path = payment;
 			sourceTree = "<group>";
@@ -655,6 +685,16 @@
 				A101000111AABBCCDDEEFF0111 /* SessionControlEvent.swift in Sources */,
 				A101000112AABBCCDDEEFF0112 /* SessionControlViewModel.swift in Sources */,
 				A101000113AABBCCDDEEFF0113 /* SessionControlView.swift in Sources */,
+				A1010001114AABBCCDDEEFF0114 /* EarningsUiState.swift in Sources */,
+				A1010001115AABBCCDDEEFF0115 /* EarningsAction.swift in Sources */,
+				A1010001116AABBCCDDEEFF0116 /* EarningsEvent.swift in Sources */,
+				A1010001117AABBCCDDEEFF0117 /* EarningsViewModel.swift in Sources */,
+				A1010001118AABBCCDDEEFF0118 /* EarningsView.swift in Sources */,
+				A1010001119AABBCCDDEEFF0119 /* SettlementAccountUiState.swift in Sources */,
+				A1010001120AABBCCDDEEFF0120 /* SettlementAccountAction.swift in Sources */,
+				A1010001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift in Sources */,
+				A1010001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift in Sources */,
+				A1010001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

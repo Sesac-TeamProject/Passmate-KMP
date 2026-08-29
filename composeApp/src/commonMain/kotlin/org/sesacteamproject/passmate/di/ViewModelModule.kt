@@ -10,7 +10,9 @@ import org.sesacteamproject.passmate.ui.hostroom.SessionControlViewModel
 import org.sesacteamproject.passmate.ui.join.JoinViewModel
 import org.sesacteamproject.passmate.ui.mypage.MyInfoViewModel
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryViewModel
+import org.sesacteamproject.passmate.ui.payment.EarningsViewModel
 import org.sesacteamproject.passmate.ui.payment.PaymentViewModel
+import org.sesacteamproject.passmate.ui.payment.SettlementAccountViewModel
 import org.sesacteamproject.passmate.ui.mypage.ReputationViewModel
 import org.sesacteamproject.passmate.ui.play.PlayViewModel
 import org.sesacteamproject.passmate.ui.profile.HostProfileViewModel
@@ -35,4 +37,6 @@ val viewModelModule = module {
     factory {
         SessionControlViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
     }
+    factory { EarningsViewModel(get(), get()) }
+    factory { SettlementAccountViewModel(get(), get()) }
 }

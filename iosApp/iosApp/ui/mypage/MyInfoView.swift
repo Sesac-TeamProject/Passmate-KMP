@@ -15,6 +15,8 @@ struct MyInfoView: View {
 
     var onOpenHostedRooms: () -> Void = {}
 
+    var onOpenEarnings: () -> Void = {}
+
     var onBack: () -> Void = {}
 
     @StateObject private var viewModel = MyInfoViewModel(
@@ -47,6 +49,8 @@ struct MyInfoView: View {
                 onOpenReputation()
             case .openHostedRooms:
                 onOpenHostedRooms()
+            case .openEarnings:
+                onOpenEarnings()
             case let .showNotice(message):
                 noticeMessage = message
             }
@@ -129,6 +133,7 @@ private struct MyInfoContentView: View {
                     WeakTopicsRow(topics: summary.weakTopics)
                 }
                 HostedRoomsEntryRow(onClick: { onAction(.clickHostedRooms) })
+                EarningsEntryRow(onClick: { onAction(.clickEarnings) })
                 ReputationEntryRow(onClick: { onAction(.clickReputation) })
                 CoinHistoryEntryRow(onClick: { onAction(.clickCoinHistory) })
                 if uiState.rooms.isEmpty, uiState.ongoing == nil {
@@ -236,6 +241,26 @@ private struct HostedRoomsEntryRow: View {
         Button(action: onClick) {
             HStack {
                 Text("내가 만든 방")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(PassmateColors.textPrimary)
+                Spacer()
+                Text("›").font(.system(size: 18)).foregroundColor(PassmateColors.textTertiary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
+            .background(PassmateColors.surface)
+            .cornerRadius(16)
+        }
+    }
+}
+
+private struct EarningsEntryRow: View {
+    let onClick: () -> Void
+
+    var body: some View {
+        Button(action: onClick) {
+            HStack {
+                Text("정산")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(PassmateColors.textPrimary)
                 Spacer()
