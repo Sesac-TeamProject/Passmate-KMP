@@ -11,6 +11,7 @@ import org.sesacteamproject.passmate.session.domain.usecase.GetSessionSnapshotUs
 import org.sesacteamproject.passmate.session.domain.usecase.GetSubmissionsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.GetVoiceHintsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.NextQuestionUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.PublishVoiceHintUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SetScreenLockUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.StartSessionUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SubmitAnswerUseCase
@@ -28,4 +29,5 @@ val sessionModule = module {
     factory { EndSessionUseCase(get()) }
     factory { SetScreenLockUseCase(get()) }
     factory { GetSubmissionsUseCase(get()) }
+    factory { PublishVoiceHintUseCase(get()) }
 }

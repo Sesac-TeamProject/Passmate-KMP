@@ -1,11 +1,15 @@
 package org.sesacteamproject.passmate.session.data.remote
 
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import org.sesacteamproject.passmate.core.network.ApiClient
 import org.sesacteamproject.passmate.session.data.dto.ScreenLockRequest
@@ -35,6 +39,30 @@ class SessionRemoteDataSource(
 
     suspend fun fetchVoiceHints(roomId: Long): VoiceHintsResponse {
         return apiClient.http.get("${apiClient.baseUrl}/rooms/$roomId/session/hints").body()
+    }
+
+    // PTT 클립 업로드 (M-T2) — multipart: audio(클립)+durationMs. 앱 포맷=audio/mp4(m4a/AAC)
+    suspend fun publishHint(
+        roomId: Long,
+        audioBytes: ByteArray,
+        mimeType: String,
+        fileName: String,
+        durationMs: Long
+    ): VoiceHintsResponse.Entry {
+        return apiClient.http.submitFormWithBinaryData(
+            url = "${apiClient.baseUrl}/rooms/$roomId/session/hints",
+            formData = formData {
+                append(
+                    "audio",
+                    audioBytes,
+                    Headers.build {
+                        append(HttpHeaders.ContentType, mimeType)
+                        append(HttpHeaders.ContentDisposition, "filename=\"$fileName\"")
+                    }
+                )
+                append("durationMs", durationMs.toString())
+            }
+        ).body()
     }
 
     // ── 호스트 세션 제어 (M-T2 리모컨) — contracts §Session ──

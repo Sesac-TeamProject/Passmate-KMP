@@ -37,6 +37,7 @@ import org.sesacteamproject.passmate.session.domain.usecase.GetSessionSnapshotUs
 import org.sesacteamproject.passmate.session.domain.usecase.GetSubmissionsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.GetVoiceHintsUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.NextQuestionUseCase
+import org.sesacteamproject.passmate.session.domain.usecase.PublishVoiceHintUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SetScreenLockUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.StartSessionUseCase
 import org.sesacteamproject.passmate.session.domain.usecase.SubmitAnswerUseCase
@@ -141,6 +142,8 @@ object KoinHelper {
     fun setScreenLockUseCase(): SetScreenLockUseCase = KoinPlatform.getKoin().get()
 
     fun getSubmissionsUseCase(): GetSubmissionsUseCase = KoinPlatform.getKoin().get()
+
+    fun publishVoiceHintUseCase(): PublishVoiceHintUseCase = KoinPlatform.getKoin().get()
 
     fun getEarningsUseCase(): GetEarningsUseCase = KoinPlatform.getKoin().get()
 
