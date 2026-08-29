@@ -256,11 +256,18 @@ private final class AuthSessionCoordinator: NSObject, ASWebAuthenticationPresent
     }
 }
 
-struct SignInView_Previews: PreviewProvider {
-    static var previews: some View {
-        SignInContentView(
-            uiState: SignInUiState(),
-            onAction: { _ in }
-        )
-    }
+// MARK: - 프리뷰 (Figma 시안 비교용, Koin 미초기화 상태에서도 안전한 콘텐츠 뷰 기반)
+
+#Preview("기본") {
+    SignInContentView(
+        uiState: SignInUiState(),
+        onAction: { _ in }
+    )
+}
+
+#Preview("로그인 중 (isSigningIn)") {
+    SignInContentView(
+        uiState: SignInUiState(isSigningIn: true),
+        onAction: { _ in }
+    )
 }
