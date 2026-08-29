@@ -109,6 +109,7 @@
 		A1010001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift */; };
 		A1010001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */; };
 		A1010001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */; };
+		A1010001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
@@ -221,6 +222,7 @@
 		A1011001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountEvent.swift; sourceTree = "<group>"; };
 		A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountViewModel.swift; sourceTree = "<group>"; };
 		A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountSheetView.swift; sourceTree = "<group>"; };
+		A1011001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceHintRecorder.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
@@ -465,6 +467,7 @@
 				A101100111AABBCCDDEEFF0111 /* SessionControlEvent.swift */,
 				A101100112AABBCCDDEEFF0112 /* SessionControlViewModel.swift */,
 				A101100113AABBCCDDEEFF0113 /* SessionControlView.swift */,
+				A1011001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift */,
 			);
 			path = hostroom;
 			sourceTree = "<group>";
@@ -695,6 +698,7 @@
 				A1010001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift in Sources */,
 				A1010001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift in Sources */,
 				A1010001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift in Sources */,
+				A1010001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

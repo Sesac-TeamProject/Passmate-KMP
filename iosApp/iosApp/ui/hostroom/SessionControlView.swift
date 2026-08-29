@@ -2,7 +2,7 @@ import SwiftUI
 import Shared
 
 // Figma "UI 디자인 v6" M-T2(349:10123) 미러 — 진행 리모컨: 프로젝터는 벽, 폰은 조작.
-// 화면 전환(SESSION_ENDED→리포트)은 서버 이벤트로만 일어난다 (규칙 §2-1-2). PTT 힌트 송출은 후속 태스크(T121)
+// 화면 전환(SESSION_ENDED→리포트)은 서버 이벤트로만 일어난다 (규칙 §2-1-2)
 struct SessionControlView: View {
     let roomId: Int64
 
@@ -23,6 +23,7 @@ struct SessionControlView: View {
         endCurrentQuestionUseCase: KoinHelper.shared.endCurrentQuestionUseCase(),
         endSessionUseCase: KoinHelper.shared.endSessionUseCase(),
         setScreenLockUseCase: KoinHelper.shared.setScreenLockUseCase(),
+        publishVoiceHintUseCase: KoinHelper.shared.publishVoiceHintUseCase(),
         eventWatcher: KoinHelper.shared.sessionEventStreamWatcher(),
         isSignedInUseCase: KoinHelper.shared.isSignedInUseCase()
     )
@@ -96,6 +97,13 @@ private struct SessionControlContentView: View {
 
     let onClickEndSession: () -> Void
 
+    // PTT 녹음 — 순수 UI 상태(레코더·누름 상태)만 콘텐츠 뷰에 둔다 (규칙 §11-1)
+    @State private var recorder = VoiceHintRecorder()
+
+    @State private var isRecording = false
+
+    @State private var isPttPressed = false
+
     var body: some View {
         Group {
             if uiState.isLoading {
@@ -155,6 +163,7 @@ private struct SessionControlContentView: View {
                     waitingPanel
                 } else {
                     questionCard
+                    pttButton
                     controlButtons
                 }
                 bottomControls
@@ -264,6 +273,60 @@ private struct SessionControlContentView: View {
             .foregroundColor(PassmateColors.textPrimary)
             .frame(width: 48, height: 48)
             .overlay(Circle().stroke(ringColor, lineWidth: 3))
+    }
+
+    // "길게 눌러 힌트 말하기" (M-T2, T121) — 누르는 동안 녹음, 놓으면 업로드
+    private var pttButton: some View {
+        let label: String
+        if uiState.isSendingHint {
+            label = "힌트 보내는 중…"
+        } else if isRecording {
+            label = "녹음 중… 놓으면 전송돼요"
+        } else {
+            label = "🎙 길게 눌러 힌트 말하기 (PTT)"
+        }
+
+        return Group {
+            if uiState.isSendingHint {
+                ProgressView().tint(PassmateColors.primaryDeep)
+            } else {
+                Text(label)
+                    .font(.system(size: 14, weight: .medium))
+                    .kerning(-0.28)
+                    .foregroundColor(isRecording ? PassmateColors.surface : PassmateColors.primaryDeep)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 52)
+        .background(isRecording ? PassmateColors.primary : PassmateColors.surface)
+        .cornerRadius(16)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.primary, lineWidth: 1))
+        .gesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    if !isPttPressed {
+                        isPttPressed = true
+                        if !uiState.isSendingHint {
+                            if recorder.start() {
+                                isRecording = true
+                            } else {
+                                onAction(.notice(message: "마이크 권한을 허용한 뒤 다시 길게 눌러 주세요"))
+                            }
+                        }
+                    }
+                }
+                .onEnded { _ in
+                    isPttPressed = false
+                    if isRecording {
+                        isRecording = false
+                        if let hint = recorder.stop() {
+                            onAction(.sendVoiceHint(hint: hint))
+                        } else {
+                            onAction(.notice(message: "녹음이 너무 짧아요 · 길게 눌러 말해 주세요"))
+                        }
+                    }
+                }
+        )
     }
 
     private var controlButtons: some View {

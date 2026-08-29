@@ -30,4 +30,7 @@ struct SessionControlUiState {
 
     // 제어 요청 in-flight — 중복 호출 방지 (규칙 §9)
     var isControlling: Bool = false
+
+    // PTT 클립 업로드 in-flight
+    var isSendingHint: Bool = false
 }

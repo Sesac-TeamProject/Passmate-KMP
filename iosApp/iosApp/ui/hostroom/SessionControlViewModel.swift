@@ -20,6 +20,8 @@ final class SessionControlViewModel: ObservableObject {
 
     private let setScreenLockUseCase: SetScreenLockUseCase
 
+    private let publishVoiceHintUseCase: PublishVoiceHintUseCase
+
     private let eventWatcher: SessionEventStreamWatcher
 
     private let isSignedInUseCase: IsSignedInUseCase
@@ -222,6 +224,32 @@ final class SessionControlViewModel: ObservableObject {
         }
     }
 
+    // PTT 클립 업로드 — 진행 중 문항이 있을 때만, 브로드캐스트·수신은 서버 몫 (FR-039)
+    private func onSendVoiceHint(_ hint: RecordedVoiceHint) {
+        if uiState.isSendingHint || uiState.status != RoomStatus.running || uiState.question == nil {
+            event.send(.showNotice(message: "문항 진행 중에만 힌트를 보낼 수 있어요"))
+            return
+        }
+        uiState.isSendingHint = true
+        publishVoiceHintUseCase.invoke(
+            roomId: roomId,
+            audioBytes: hint.audioData.toKotlinByteArray(),
+            mimeType: hint.mimeType,
+            fileName: hint.fileName,
+            durationMs: hint.durationMs
+        ) { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.uiState.isSendingHint = false
+                if error == nil, result is AppResultSuccess<AnyObject> {
+                    self.event.send(.showNotice(message: "힌트를 보냈어요"))
+                } else {
+                    self.event.send(.showNotice(message: "힌트를 보내지 못했어요. 다시 시도해 주세요"))
+                }
+            }
+        }
+    }
+
     // 제어 요청 공통 처리 — 상태 전이는 서버 브로드캐스트로만 반영한다 (규칙 §2-1-2)
     private func runControl(_ block: @escaping (@escaping (Any?, Error?) -> Void) -> Void) {
         if uiState.isControlling {
@@ -286,6 +314,10 @@ final class SessionControlViewModel: ObservableObject {
             }
         case .toggleLock:
             onToggleLock()
+        case let .sendVoiceHint(hint):
+            onSendVoiceHint(hint)
+        case let .notice(message):
+            event.send(.showNotice(message: message))
         }
     }
 
@@ -303,6 +335,7 @@ final class SessionControlViewModel: ObservableObject {
         endCurrentQuestionUseCase: EndCurrentQuestionUseCase,
         endSessionUseCase: EndSessionUseCase,
         setScreenLockUseCase: SetScreenLockUseCase,
+        publishVoiceHintUseCase: PublishVoiceHintUseCase,
         eventWatcher: SessionEventStreamWatcher,
         isSignedInUseCase: IsSignedInUseCase
     ) {
@@ -314,7 +347,22 @@ final class SessionControlViewModel: ObservableObject {
         self.endCurrentQuestionUseCase = endCurrentQuestionUseCase
         self.endSessionUseCase = endSessionUseCase
         self.setScreenLockUseCase = setScreenLockUseCase
+        self.publishVoiceHintUseCase = publishVoiceHintUseCase
         self.eventWatcher = eventWatcher
         self.isSignedInUseCase = isSignedInUseCase
+    }
+}
+
+// Swift Data → Kotlin ByteArray 브리지 — 힌트 클립(수십 KB)에만 사용
+private extension Data {
+    func toKotlinByteArray() -> KotlinByteArray {
+        let byteArray = KotlinByteArray(size: Int32(count))
+
+        withUnsafeBytes { (buffer: UnsafeRawBufferPointer) in
+            for (index, byte) in buffer.enumerated() {
+                byteArray.set(index: Int32(index), value: Int8(bitPattern: byte))
+            }
+        }
+        return byteArray
     }
 }
