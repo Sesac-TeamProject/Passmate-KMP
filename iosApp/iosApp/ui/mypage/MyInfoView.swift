@@ -1,30 +1,43 @@
 import SwiftUI
 import Shared
 
-// Figma "UI 디자인 v6" M-08(349:9544) 미러 — 진행 중 방·누적 요약·보완 주제·참여한 방 목록(→리포트) (T064)
+// 시트 3종 중 무엇이 열려 있는지 — 표시 여부는 이 화면이 소유한다 (규칙 §11-1)
+private enum MyInfoSheet: Identifiable {
+    case editProfile(nickname: String, avatarId: Int?)
+    case paymentMethod
+    case notifications
+
+    var id: String {
+        switch self {
+        case .editProfile: return "editProfile"
+        case .paymentMethod: return "paymentMethod"
+        case .notifications: return "notifications"
+        }
+    }
+}
+
+// Figma "UI 디자인 v6" M-12(349:9683) 미러 — 마이 탭 루트: 프로필·계정·코인·정산·알림·로그아웃
 struct MyInfoView: View {
     var onRequireSignIn: () -> Void = {}
 
-    var onOpenReport: (Int64) -> Void = { _ in }
-
-    var onRejoin: (String) -> Void = { _ in }
-
     var onOpenCoinHistory: () -> Void = {}
 
-    var onOpenReputation: () -> Void = {}
-
-    var onOpenHostedRooms: () -> Void = {}
-
-    var onOpenEarnings: () -> Void = {}
-
-    var onOpenSettings: () -> Void = {}
+    var onSignedOut: () -> Void = {}
 
     var onBack: () -> Void = {}
 
     @StateObject private var viewModel = MyInfoViewModel(
-        getMyPageUseCase: KoinHelper.shared.getMyPageUseCase(),
+        getMyProfileUseCase: KoinHelper.shared.getMyProfileUseCase(),
+        signOutUseCase: KoinHelper.shared.signOutUseCase(),
+        deleteAccountUseCase: KoinHelper.shared.deleteAccountUseCase(),
         isSignedInUseCase: KoinHelper.shared.isSignedInUseCase()
     )
+
+    @State private var activeSheet: MyInfoSheet?
+
+    @State private var showSignOutConfirm = false
+
+    @State private var showDeleteConfirm = false
 
     @State private var noticeMessage: String?
 
@@ -32,7 +45,9 @@ struct MyInfoView: View {
         MyInfoContentView(
             uiState: viewModel.uiState,
             onAction: { viewModel.action($0) },
-            onClickBack: onBack
+            onClickBack: onBack,
+            onClickSignOut: { showSignOutConfirm = true },
+            onClickDelete: { showDeleteConfirm = true }
         )
         .onAppear {
             viewModel.action(.enter)
@@ -41,23 +56,39 @@ struct MyInfoView: View {
             switch event {
             case .requireSignIn:
                 onRequireSignIn()
-            case let .openReport(roomId):
-                onOpenReport(roomId)
-            case let .rejoin(pin):
-                onRejoin(pin)
+            case let .openEditProfile(nickname, avatarId):
+                activeSheet = .editProfile(nickname: nickname, avatarId: avatarId)
+            case .openPaymentMethod:
+                activeSheet = .paymentMethod
+            case .openNotifications:
+                activeSheet = .notifications
             case .openCoinHistory:
                 onOpenCoinHistory()
-            case .openReputation:
-                onOpenReputation()
-            case .openHostedRooms:
-                onOpenHostedRooms()
-            case .openEarnings:
-                onOpenEarnings()
-            case .openSettings:
-                onOpenSettings()
+            case .signedOut, .accountDeleted:
+                onSignedOut()
             case let .showNotice(message):
                 noticeMessage = message
             }
+        }
+        .sheet(item: $activeSheet) { sheet in
+            sheetContent(sheet)
+                .presentationDetents([.medium, .large])
+        }
+        .alert("로그아웃", isPresented: $showSignOutConfirm) {
+            Button("로그아웃", role: .destructive) {
+                viewModel.action(.confirmSignOut)
+            }
+            Button("취소", role: .cancel) {}
+        } message: {
+            Text("로그아웃하면 게스트로 전환돼요. 기록은 계정에 안전하게 보관돼요.")
+        }
+        .alert("회원 탈퇴", isPresented: $showDeleteConfirm) {
+            Button("탈퇴", role: .destructive) {
+                viewModel.action(.confirmDeleteAccount)
+            }
+            Button("취소", role: .cancel) {}
+        } message: {
+            Text("탈퇴하면 참여·개설 기록과 보유 코인이 모두 삭제되고 되돌릴 수 없어요. 정산 대기 금액이나 진행 중인 방이 있으면 탈퇴할 수 없어요.")
         }
         .overlay(alignment: .bottom) {
             if let noticeMessage {
@@ -70,6 +101,52 @@ struct MyInfoView: View {
             }
         }
     }
+
+    @ViewBuilder
+    private func sheetContent(_ sheet: MyInfoSheet) -> some View {
+        switch sheet {
+        case let .editProfile(nickname, avatarId):
+            EditProfileSheetView(
+                initialNickname: nickname,
+                initialAvatarId: avatarId,
+                onSaved: {
+                    activeSheet = nil
+                    viewModel.action(.profileUpdated)
+                },
+                onNotice: { viewModel.action(.notice(message: $0)) },
+                onClose: { activeSheet = nil }
+            )
+        case .paymentMethod:
+            PaymentMethodSheetView(
+                onSaved: {
+                    activeSheet = nil
+                    viewModel.action(.notice(message: "기본 결제 수단을 저장했어요"))
+                },
+                onNotice: { viewModel.action(.notice(message: $0)) },
+                onClose: { activeSheet = nil }
+            )
+        case .notifications:
+            NotificationSettingsSheetView(
+                onNotice: { viewModel.action(.notice(message: $0)) },
+                onClose: { activeSheet = nil }
+            )
+        }
+    }
+}
+
+private struct MyInfoNoticeToast: View {
+    let message: String
+
+    var body: some View {
+        Text(message)
+            .font(.system(size: 13))
+            .foregroundColor(PassmateColors.surface)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(PassmateColors.textPrimary.opacity(0.9))
+            .cornerRadius(10)
+            .padding(.bottom, 16)
+    }
 }
 
 private struct MyInfoContentView: View {
@@ -78,6 +155,10 @@ private struct MyInfoContentView: View {
     let onAction: (MyInfoAction) -> Void
 
     let onClickBack: () -> Void
+
+    let onClickSignOut: () -> Void
+
+    let onClickDelete: () -> Void
 
     var body: some View {
         Group {
@@ -97,7 +178,7 @@ private struct MyInfoContentView: View {
 
     private var errorView: some View {
         VStack(spacing: 12) {
-            Text("기록을 불러오지 못했어요")
+            Text("내 정보를 불러오지 못했어요")
                 .font(.system(size: 16, weight: .medium))
                 .kerning(-0.32)
                 .foregroundColor(PassmateColors.textPrimary)
@@ -117,17 +198,11 @@ private struct MyInfoContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    Text("참여한 방")
+                    Text("설정")
                         .font(.system(size: 24, weight: .bold))
                         .kerning(-0.48)
                         .foregroundColor(PassmateColors.textPrimary)
                     Spacer()
-                    Button(action: { onAction(.clickSettings) }) {
-                        Text("설정")
-                            .font(.system(size: 14, weight: .medium))
-                            .kerning(-0.28)
-                            .foregroundColor(PassmateColors.primaryDeep)
-                    }
                     Button(action: onClickBack) {
                         Text("닫기")
                             .font(.system(size: 14, weight: .medium))
@@ -135,31 +210,21 @@ private struct MyInfoContentView: View {
                             .foregroundColor(PassmateColors.textSecondary)
                     }
                 }
-                if let ongoing = uiState.ongoing {
-                    OngoingCard(ongoing: ongoing, onClickRejoin: { onAction(.clickRejoin(pin: ongoing.pin)) })
+                if let profile = uiState.profile {
+                    ProfileCardView(profile: profile)
                 }
-                if let summary = uiState.summary {
-                    SummaryCard(summary: summary)
-                    WeakTopicsRow(topics: summary.weakTopics)
-                }
-                HostedRoomsEntryRow(onClick: { onAction(.clickHostedRooms) })
-                EarningsEntryRow(onClick: { onAction(.clickEarnings) })
-                ReputationEntryRow(onClick: { onAction(.clickReputation) })
-                CoinHistoryEntryRow(onClick: { onAction(.clickCoinHistory) })
-                if uiState.rooms.isEmpty, uiState.ongoing == nil {
-                    Text("아직 참여한 방이 없어요")
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.textSecondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
-                } else {
-                    ForEach(uiState.rooms, id: \.roomId) { room in
-                        JoinedRoomRow(room: room, onClickReport: { onAction(.clickRoomReport(roomId: room.roomId)) })
+                settingRow(label: "계정 정보 · 내 캐릭터") { onAction(.clickEditProfile) }
+                settingRow(label: "결제 수단 관리") { onAction(.clickPaymentMethod) }
+                settingRow(label: "알림 설정") { onAction(.clickNotifications) }
+                settingRow(label: "코인·결제 내역") { onAction(.clickCoinHistory) }
+                settingRow(label: "로그아웃", labelColor: PassmateColors.textSecondary, action: onClickSignOut)
+                settingRow(label: "회원 탈퇴", labelColor: PassmateColors.weakTopicText, action: onClickDelete)
+                if uiState.isProcessing {
+                    HStack {
+                        Spacer()
+                        ProgressView().tint(PassmateColors.primary)
+                        Spacer()
                     }
-                }
-                if uiState.nextCursor != nil {
-                    loadMoreButton
                 }
             }
             .padding(.horizontal, 20)
@@ -168,432 +233,89 @@ private struct MyInfoContentView: View {
         }
     }
 
-    private var loadMoreButton: some View {
-        Button {
-            onAction(.loadMore)
-        } label: {
-            Group {
-                if uiState.isLoadingMore {
-                    ProgressView().tint(PassmateColors.primary)
-                } else {
-                    Text("더 보기")
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.primaryDeep)
-                }
+    private func settingRow(
+        label: String,
+        labelColor: Color = PassmateColors.textPrimary,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack {
+                Text(label)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(labelColor)
+                Spacer()
+                Text("›").font(.system(size: 18)).foregroundColor(PassmateColors.textTertiary)
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 48)
-            .overlay(RoundedRectangle(cornerRadius: 14).stroke(PassmateColors.border, lineWidth: 1))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
+            .background(PassmateColors.surface)
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
         }
-        .disabled(uiState.isLoadingMore)
     }
 }
 
-private struct OngoingCard: View {
-    let ongoing: OngoingRoom
-
-    let onClickRejoin: () -> Void
+private struct ProfileCardView: View {
+    let profile: UserProfile
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Text("진행 중")
-                    .font(.system(size: 12))
-                    .kerning(-0.24)
-                    .foregroundColor(PassmateColors.surface)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(PassmateColors.primary)
-                    .clipShape(Capsule())
-                Text(ongoing.title)
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.textPrimary)
+        HStack(spacing: 14) {
+            StudentAvatarView(avatarId: profile.avatarId.map { Int(truncating: $0) } ?? 0)
+                .frame(width: 52, height: 52)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Text(profile.nickname)
+                        .font(.system(size: 18, weight: .bold))
+                        .kerning(-0.36)
+                        .foregroundColor(PassmateColors.textPrimary)
+                    if let level = localLevel {
+                        ReputationBadgeView(level: level)
+                    }
+                }
+                Text(subtitle)
+                    .font(.system(size: 13))
+                    .kerning(-0.26)
+                    .foregroundColor(PassmateColors.textSecondary)
+                if let coins = profile.coins?.int64Value {
+                    Text("보유 코인 \(formatCoins(coins)) C")
+                        .font(.system(size: 13, weight: .medium))
+                        .kerning(-0.26)
+                        .foregroundColor(PassmateColors.primaryDeep)
+                }
             }
-            Text(subtitle)
-                .font(.system(size: 14))
-                .kerning(-0.28)
-                .foregroundColor(PassmateColors.textSecondary)
-            Button(action: onClickRejoin) {
-                Text("다시 들어가기")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.surface)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 44)
-                    .background(PassmateColors.primary)
-                    .cornerRadius(12)
-            }
+            Spacer()
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(PassmateColors.backgroundMint)
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.primary, lineWidth: 1))
-        .cornerRadius(16)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+        .background(PassmateColors.surface)
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(PassmateColors.border, lineWidth: 1))
+    }
+
+    private var localLevel: HostLevel? {
+        guard let level = profile.level else { return nil }
+
+        return HostLevel.from(Int(level.level))
     }
 
     private var subtitle: String {
         var parts: [String] = []
 
-        if let progress = ongoing.progressLabel { parts.append(progress) }
-        if let host = ongoing.hostNickname { parts.append("\(host) 선생님") }
-        parts.append("PIN \(formatPin(ongoing.pin))")
-
-        return parts.joined(separator: " · ")
-    }
-}
-
-private struct HostedRoomsEntryRow: View {
-    let onClick: () -> Void
-
-    var body: some View {
-        Button(action: onClick) {
-            HStack {
-                Text("내가 만든 방")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(PassmateColors.textPrimary)
-                Spacer()
-                Text("›").font(.system(size: 18)).foregroundColor(PassmateColors.textTertiary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(PassmateColors.surface)
-            .cornerRadius(16)
+        if let email = profile.email {
+            parts.append(email)
+        }
+        if let joinedAt = profile.joinedAt {
+            parts.append("\(String(joinedAt.prefix(10))) 가입")
+        }
+        if parts.isEmpty {
+            return "구글 계정으로 로그인"
+        } else {
+            return parts.joined(separator: " · ")
         }
     }
-}
 
-private struct EarningsEntryRow: View {
-    let onClick: () -> Void
+    private func formatCoins(_ coins: Int64) -> String {
+        let formatter = NumberFormatter()
 
-    var body: some View {
-        Button(action: onClick) {
-            HStack {
-                Text("정산")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(PassmateColors.textPrimary)
-                Spacer()
-                Text("›").font(.system(size: 18)).foregroundColor(PassmateColors.textTertiary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(PassmateColors.surface)
-            .cornerRadius(16)
-        }
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: coins)) ?? "\(coins)"
     }
-}
-
-private struct ReputationEntryRow: View {
-    let onClick: () -> Void
-
-    var body: some View {
-        Button(action: onClick) {
-            HStack {
-                Text("내 명성·뱃지")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(PassmateColors.textPrimary)
-                Spacer()
-                Text("›").font(.system(size: 18)).foregroundColor(PassmateColors.textTertiary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(PassmateColors.surface)
-            .cornerRadius(16)
-        }
-    }
-}
-
-private struct CoinHistoryEntryRow: View {
-    let onClick: () -> Void
-
-    var body: some View {
-        Button(action: onClick) {
-            HStack {
-                Text("코인·결제 내역")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(PassmateColors.textPrimary)
-                Spacer()
-                Text("›").font(.system(size: 18)).foregroundColor(PassmateColors.textTertiary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(PassmateColors.surface)
-            .cornerRadius(16)
-        }
-    }
-}
-
-private struct SummaryCard: View {
-    let summary: MyPageSummary
-
-    var body: some View {
-        HStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .stroke(PassmateColors.primary, lineWidth: 6)
-                VStack(spacing: 0) {
-                    Text("\(summary.accuracyPercent)%")
-                        .font(.system(size: 16, weight: .medium))
-                        .kerning(-0.32)
-                        .foregroundColor(PassmateColors.primaryDeep)
-                    Text("평균")
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.textSecondary)
-                }
-            }
-            .frame(width: 70, height: 70)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(summaryLine)
-                    .font(.system(size: 16, weight: .medium))
-                    .kerning(-0.32)
-                    .foregroundColor(PassmateColors.textPrimary)
-                if let trend = summary.trendText {
-                    Text(trend)
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.textSecondary)
-                }
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 16)
-        .overlay(RoundedRectangle(cornerRadius: 20).stroke(PassmateColors.border, lineWidth: 1))
-        .cornerRadius(20)
-    }
-
-    private var summaryLine: String {
-        let rankPart = summary.avgRank.map { " · 평균 \(formatRank(Double(truncating: $0)))위" } ?? ""
-
-        return "\(summary.participationCount)회 참여\(rankPart)"
-    }
-}
-
-private struct WeakTopicsRow: View {
-    let topics: [String]
-
-    var body: some View {
-        if !topics.isEmpty {
-            FlowLayout(spacing: 8) {
-                Text("보완할 주제")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.textSecondary)
-                    .padding(.vertical, 6)
-                ForEach(topics, id: \.self) { topic in
-                    Text(topic)
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.weakTopicText)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(PassmateColors.weakTopicBg)
-                        .clipShape(Capsule())
-                }
-            }
-        }
-    }
-}
-
-private struct JoinedRoomRow: View {
-    let room: JoinedRoom
-
-    let onClickReport: () -> Void
-
-    var body: some View {
-        HStack(spacing: 12) {
-            let style = rankStyle(room.myRank?.intValue)
-
-            Text(room.myRank.map { "\($0)" } ?? "-")
-                .font(.system(size: 14, weight: .medium))
-                .kerning(-0.28)
-                .foregroundColor(style.textColor)
-                .frame(width: 26, height: 26)
-                .background(style.background)
-                .clipShape(Circle())
-            VStack(alignment: .leading, spacing: 2) {
-                Text(room.title)
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.textPrimary)
-                Text("\(room.dateLabel) · \(room.questionCount)문항")
-                    .font(.system(size: 12))
-                    .kerning(-0.24)
-                    .foregroundColor(PassmateColors.textSecondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            if let score = room.myScore {
-                Text("\(formatScore(Double(truncating: score)))점")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.textPrimary)
-            }
-            if room.hasReport {
-                Button(action: onClickReport) {
-                    Text("리포트")
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.primaryDeep)
-                        .padding(.horizontal, 12)
-                        .frame(height: 30)
-                        .background(PassmateColors.fieldGray)
-                        .clipShape(Capsule())
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
-        .cornerRadius(16)
-    }
-}
-
-private struct MyInfoNoticeToast: View {
-    let message: String
-
-    var body: some View {
-        Text(message)
-            .font(.system(size: 13))
-            .foregroundColor(PassmateColors.surface)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(PassmateColors.textPrimary.opacity(0.9))
-            .cornerRadius(10)
-            .padding(.bottom, 16)
-    }
-}
-
-private func rankStyle(_ rank: Int?) -> (background: Color, textColor: Color) {
-    if rank == 1 {
-        return (PassmateColors.chipGold, PassmateColors.chipGoldText)
-    } else if rank == 2 {
-        return (PassmateColors.chipBlue, PassmateColors.chipBlueText)
-    } else if rank == 3 {
-        return (PassmateColors.chipOrange, PassmateColors.chipOrangeText)
-    } else {
-        return (PassmateColors.fieldGray, PassmateColors.textSecondary)
-    }
-}
-
-private func formatPin(_ pin: String) -> String {
-    stride(from: 0, to: pin.count, by: 3)
-        .map { start in
-            let s = pin.index(pin.startIndex, offsetBy: start)
-            let e = pin.index(s, offsetBy: 3, limitedBy: pin.endIndex) ?? pin.endIndex
-
-            return String(pin[s..<e])
-        }
-        .joined(separator: " ")
-}
-
-private func formatRank(_ rank: Double) -> String {
-    let rounded = Int((rank * 10).rounded())
-
-    if rounded % 10 == 0 {
-        return "\(rounded / 10)"
-    } else {
-        return "\(rounded / 10).\(rounded % 10)"
-    }
-}
-
-private func formatScore(_ score: Double) -> String {
-    let digits = String(Int(score))
-
-    return String(
-        digits.reversed().enumerated().map { index, char -> String in
-            index > 0 && index % 3 == 0 ? ",\(char)" : String(char)
-        }
-        .joined()
-        .reversed()
-    )
-}
-
-// 칩 가로 흐름 배치 (iOS 16+)
-private struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) -> CGSize {
-        let maxWidth = proposal.width ?? .infinity
-        var rowWidth: CGFloat = 0
-        var rowHeight: CGFloat = 0
-        var totalHeight: CGFloat = 0
-        var totalWidth: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-
-            if rowWidth + size.width > maxWidth, rowWidth > 0 {
-                totalHeight += rowHeight + spacing
-                totalWidth = max(totalWidth, rowWidth - spacing)
-                rowWidth = 0
-                rowHeight = 0
-            }
-            rowWidth += size.width + spacing
-            rowHeight = max(rowHeight, size.height)
-        }
-        totalHeight += rowHeight
-        totalWidth = max(totalWidth, rowWidth - spacing)
-
-        return CGSize(width: min(totalWidth, maxWidth), height: totalHeight)
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) {
-        var x = bounds.minX
-        var y = bounds.minY
-        var rowHeight: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-
-            if x + size.width > bounds.maxX, x > bounds.minX {
-                x = bounds.minX
-                y += rowHeight + spacing
-                rowHeight = 0
-            }
-            subview.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(size))
-            x += size.width + spacing
-            rowHeight = max(rowHeight, size.height)
-        }
-    }
-}
-
-// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
-
-#Preview("진행 중 방 + 참여한 방 3개") {
-    MyInfoContentView(
-        uiState: MyInfoUiState(
-            isLoading: false,
-            summary: MyPageSummary(
-                participationCount: 12,
-                accuracyPercent: 78,
-                avgRank: KotlinDouble(double: 2.4),
-                trendText: "지난주보다 +5%",
-                weakTopics: ["이차함수", "확률과 통계"]
-            ),
-            ongoing: OngoingRoom(
-                roomId: 501,
-                pin: "482913",
-                title: "8월 4주차 Spring 스터디",
-                hostNickname: "김선생",
-                progressLabel: "5 / 8 문항 진행 중"
-            ),
-            rooms: [
-                JoinedRoom(roomId: 401, title: "7월 3주차 미적분 특강", dateLabel: "2026.07.18", questionCount: 10, myScore: KotlinDouble(double: 890), myRank: KotlinInt(int: 2), hasReport: true),
-                JoinedRoom(roomId: 402, title: "확률과 통계 총정리", dateLabel: "2026.07.10", questionCount: 8, myScore: KotlinDouble(double: 720), myRank: KotlinInt(int: 5), hasReport: true),
-                JoinedRoom(roomId: 403, title: "함수의 극한 퀴즈", dateLabel: "2026.06.28", questionCount: 6, myScore: nil, myRank: nil, hasReport: false)
-            ]
-        ),
-        onAction: { _ in },
-        onClickBack: {}
-    )
-}
-
-#Preview("참여한 방 없음") {
-    MyInfoContentView(
-        uiState: MyInfoUiState(isLoading: false, rooms: []),
-        onAction: { _ in },
-        onClickBack: {}
-    )
 }

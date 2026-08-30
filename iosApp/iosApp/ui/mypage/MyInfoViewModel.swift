@@ -2,12 +2,17 @@ import Combine
 import Foundation
 import Shared
 
+// Compose MyInfoViewModel.kt 미러 — 내 정보 관리 허브 (M-12)
 final class MyInfoViewModel: ObservableObject {
-    private let getMyPageUseCase: GetMyPageUseCase
+    private let getMyProfileUseCase: GetMyProfileUseCase
+
+    private let signOutUseCase: SignOutUseCase
+
+    private let deleteAccountUseCase: DeleteAccountUseCase
 
     private let isSignedInUseCase: IsSignedInUseCase
 
-    @Published private(set) var uiState: MyInfoUiState
+    @Published private(set) var uiState = MyInfoUiState()
 
     let event = PassthroughSubject<MyInfoEvent, Never>()
 
@@ -18,29 +23,26 @@ final class MyInfoViewModel: ObservableObject {
             return
         }
         hasEntered = true
-        // 회원 전용 가드 — 서버 검증이 최종 권위지만 UX상 진입 시 먼저 로그인 유도 (규칙 §8)
+        // 회원 전용 가드 — 서버 검증이 최종 권위 (규칙 §8)
         if isSignedInUseCase.invoke() {
-            loadFirstPage()
+            load()
         } else {
             event.send(.requireSignIn)
         }
     }
 
-    private func loadFirstPage() {
+    private func load() {
         uiState.isLoading = true
         uiState.loadFailed = false
-        getMyPageUseCase.invoke(cursor: nil) { [weak self] result, error in
+        getMyProfileUseCase.invoke { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
-                let success = result as? AppResultSuccess<AnyObject>
+                let profile = (result as? AppResultSuccess<AnyObject>)?.value as? UserProfile
 
-                if error == nil, let myPage = success?.value as? MyPage {
+                if error == nil, let profile {
                     self.uiState.isLoading = false
                     self.uiState.loadFailed = false
-                    self.uiState.summary = myPage.summary
-                    self.uiState.ongoing = myPage.ongoing
-                    self.uiState.rooms = myPage.rooms
-                    self.uiState.nextCursor = myPage.nextCursor
+                    self.uiState.profile = profile
                 } else {
                     self.uiState.isLoading = false
                     self.uiState.loadFailed = true
@@ -49,23 +51,58 @@ final class MyInfoViewModel: ObservableObject {
         }
     }
 
-    private func onLoadMore() {
-        guard let cursor = uiState.nextCursor, !uiState.isLoadingMore else { return }
-        uiState.isLoadingMore = true
-        getMyPageUseCase.invoke(cursor: cursor) { [weak self] result, error in
+    private func onClickEditProfile() {
+        if let profile = uiState.profile {
+            event.send(.openEditProfile(
+                nickname: profile.nickname,
+                avatarId: profile.avatarId.map { Int(truncating: $0) }
+            ))
+        }
+    }
+
+    private func onConfirmSignOut() {
+        if uiState.isProcessing {
+            return
+        }
+        uiState.isProcessing = true
+        // 로컬 세션 정리는 shared가 항상 수행 — 실패 케이스 없음 (M-12-11)
+        signOutUseCase.invoke { [weak self] _, _ in
             DispatchQueue.main.async {
                 guard let self else { return }
-                let success = result as? AppResultSuccess<AnyObject>
+                self.uiState.isProcessing = false
+                self.event.send(.signedOut)
+            }
+        }
+    }
 
-                if error == nil, let myPage = success?.value as? MyPage {
-                    self.uiState.isLoadingMore = false
-                    self.uiState.rooms = self.uiState.rooms + myPage.rooms
-                    self.uiState.nextCursor = myPage.nextCursor
+    private func onConfirmDeleteAccount() {
+        if uiState.isProcessing {
+            return
+        }
+        uiState.isProcessing = true
+        deleteAccountUseCase.invoke { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.uiState.isProcessing = false
+                if error == nil, result is AppResultSuccess<AnyObject> {
+                    self.event.send(.accountDeleted)
                 } else {
-                    self.uiState.isLoadingMore = false
-                    self.event.send(.showNotice(message: "목록을 더 불러오지 못했어요"))
+                    let appError = (result as? AppResultFailure)?.error
+
+                    self.event.send(.showNotice(message: self.deleteFailMessage(appError)))
                 }
             }
+        }
+    }
+
+    // 서버 code 기반 문구 분기 (규칙 §10) — 409=정산 미지급분·진행 중 방 거부
+    private func deleteFailMessage(_ error: AppError?) -> String {
+        if let conflict = error as? AppError.Conflict {
+            return conflict.serverMessage ?? "정산 대기 금액이나 진행 중인 방이 있어 탈퇴할 수 없어요"
+        } else if error is AppError.NetworkError {
+            return "네트워크 연결을 확인해 주세요"
+        } else {
+            return "탈퇴를 처리하지 못했어요. 다시 시도해 주세요"
         }
     }
 
@@ -74,32 +111,36 @@ final class MyInfoViewModel: ObservableObject {
         case .enter:
             onEnter()
         case .retry:
-            loadFirstPage()
-        case .loadMore:
-            onLoadMore()
-        case let .clickRoomReport(roomId):
-            event.send(.openReport(roomId: roomId))
-        case let .clickRejoin(pin):
-            event.send(.rejoin(pin: pin))
+            load()
+        case .clickEditProfile:
+            onClickEditProfile()
+        case .clickPaymentMethod:
+            event.send(.openPaymentMethod)
+        case .clickNotifications:
+            event.send(.openNotifications)
         case .clickCoinHistory:
             event.send(.openCoinHistory)
-        case .clickReputation:
-            event.send(.openReputation)
-        case .clickHostedRooms:
-            event.send(.openHostedRooms)
-        case .clickEarnings:
-            event.send(.openEarnings)
-        case .clickSettings:
-            event.send(.openSettings)
+        case .confirmSignOut:
+            onConfirmSignOut()
+        case .confirmDeleteAccount:
+            onConfirmDeleteAccount()
+        case .profileUpdated:
+            load()
+            event.send(.showNotice(message: "내 정보를 저장했어요"))
+        case let .notice(message):
+            event.send(.showNotice(message: message))
         }
     }
 
     init(
-        getMyPageUseCase: GetMyPageUseCase,
+        getMyProfileUseCase: GetMyProfileUseCase,
+        signOutUseCase: SignOutUseCase,
+        deleteAccountUseCase: DeleteAccountUseCase,
         isSignedInUseCase: IsSignedInUseCase
     ) {
-        self.getMyPageUseCase = getMyPageUseCase
+        self.getMyProfileUseCase = getMyProfileUseCase
+        self.signOutUseCase = signOutUseCase
+        self.deleteAccountUseCase = deleteAccountUseCase
         self.isSignedInUseCase = isSignedInUseCase
-        self.uiState = MyInfoUiState()
     }
 }

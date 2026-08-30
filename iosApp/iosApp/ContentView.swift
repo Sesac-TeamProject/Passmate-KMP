@@ -74,14 +74,15 @@ struct ContentView: View {
         case .myInfo:
             MyInfoView(
                 onRequireSignIn: { path.append(.signIn) },
-                onOpenReport: { roomId in path.append(.result(roomId: roomId)) },
-                onRejoin: { pin in path.append(.waiting(pin: pin)) },
                 onOpenCoinHistory: { path.append(.coinHistory) },
-                onOpenReputation: { path.append(.reputation) },
-                onOpenHostedRooms: { path.append(.hostedRooms) },
-                onOpenEarnings: { path.append(.earnings) },
-                onOpenSettings: { path.append(.settings) },
+                onSignedOut: { path = [] },
                 onBack: { popOnce() }
+            )
+        case .joinedRooms:
+            JoinedRoomsView(
+                onRequireSignIn: { path.append(.signIn) },
+                onOpenReport: { roomId in path.append(.result(roomId: roomId)) },
+                onRejoin: { pin in path.append(.waiting(pin: pin)) }
             )
         case .reputation:
             ReputationView(
@@ -118,8 +119,7 @@ struct ContentView: View {
         case .settings:
             SettingsView(
                 onRequireSignIn: { path.append(.signIn) },
-                onOpenCoinHistory: { path.append(.coinHistory) },
-                onSignedOut: { path = [] },
+                onAccountDeleted: { path = [] },
                 onBack: { popOnce() }
             )
         default:
