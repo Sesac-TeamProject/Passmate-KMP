@@ -130,6 +130,11 @@
 		A1010001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */; };
 		A1010001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */; };
 		A1010001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift */; };
+		A1010001145AABBCCDDEEFF0145 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001145AABBCCDDEEFF0145 /* AppTab.swift */; };
+		A1010001146AABBCCDDEEFF0146 /* AppShellUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001146AABBCCDDEEFF0146 /* AppShellUiState.swift */; };
+		A1010001147AABBCCDDEEFF0147 /* AppShellAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */; };
+		A1010001148AABBCCDDEEFF0148 /* AppShellEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001148AABBCCDDEEFF0148 /* AppShellEvent.swift */; };
+		A1010001149AABBCCDDEEFF0149 /* AppShellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001149AABBCCDDEEFF0149 /* AppShellViewModel.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
@@ -263,6 +268,11 @@
 		A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodEvent.swift; sourceTree = "<group>"; };
 		A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodViewModel.swift; sourceTree = "<group>"; };
 		A1011001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodSheetView.swift; sourceTree = "<group>"; };
+		A1011001145AABBCCDDEEFF0145 /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
+		A1011001146AABBCCDDEEFF0146 /* AppShellUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellUiState.swift; sourceTree = "<group>"; };
+		A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellAction.swift; sourceTree = "<group>"; };
+		A1011001148AABBCCDDEEFF0148 /* AppShellEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellEvent.swift; sourceTree = "<group>"; };
+		A1011001149AABBCCDDEEFF0149 /* AppShellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellViewModel.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
@@ -536,6 +546,11 @@
 			isa = PBXGroup;
 			children = (
 				A1011062AABBCCDDEEFF0062 /* Route.swift */,
+				A1011001145AABBCCDDEEFF0145 /* AppTab.swift */,
+				A1011001146AABBCCDDEEFF0146 /* AppShellUiState.swift */,
+				A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */,
+				A1011001148AABBCCDDEEFF0148 /* AppShellEvent.swift */,
+				A1011001149AABBCCDDEEFF0149 /* AppShellViewModel.swift */,
 			);
 			path = navigation;
 			sourceTree = "<group>";
@@ -779,6 +794,11 @@
 				A1010001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift in Sources */,
 				A1010001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift in Sources */,
 				A1010001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift in Sources */,
+				A1010001145AABBCCDDEEFF0145 /* AppTab.swift in Sources */,
+				A1010001146AABBCCDDEEFF0146 /* AppShellUiState.swift in Sources */,
+				A1010001147AABBCCDDEEFF0147 /* AppShellAction.swift in Sources */,
+				A1010001148AABBCCDDEEFF0148 /* AppShellEvent.swift in Sources */,
+				A1010001149AABBCCDDEEFF0149 /* AppShellViewModel.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
