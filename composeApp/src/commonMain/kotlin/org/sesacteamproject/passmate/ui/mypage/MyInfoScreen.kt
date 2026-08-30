@@ -62,7 +62,6 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
     var activeSheet by remember { mutableStateOf<MyInfoSheet?>(null) }
     var editInitial by remember { mutableStateOf<Pair<String, Int?>>("" to null) }
     var showSignOutConfirm by remember { mutableStateOf(false) }
-    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.onAction(MyInfoAction.Enter)
@@ -79,8 +78,10 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
                 is MyInfoEvent.OpenNotifications -> activeSheet = MyInfoSheet.NOTIFICATIONS
                 is MyInfoEvent.OpenCoinHistory -> onNavigate(NavigationAction.NavigateToCoinHistory)
                 is MyInfoEvent.SignedOut -> onNavigate(NavigationAction.NavigateToHome)
-                is MyInfoEvent.AccountDeleted -> onNavigate(NavigationAction.NavigateToHome)
                 is MyInfoEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
+                // 새 이벤트(OpenReputation·OpenSettlementAccount·OpenEarnings·OpenSettings)는
+                // Task 5에서 화면을 다시 쓸 때 연결한다 — 지금은 임시로 무시
+                else -> Unit
             }
         }
     }
@@ -89,8 +90,7 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
             uiState = uiState,
             onAction = viewModel::onAction,
             onClickBack = { onNavigate(NavigationAction.NavigateBack) },
-            onClickSignOut = { showSignOutConfirm = true },
-            onClickDelete = { showDeleteConfirm = true }
+            onClickSignOut = { showSignOutConfirm = true }
         )
         SnackbarHost(
             hostState = snackbarHostState,
@@ -141,18 +141,6 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
             onDismiss = { showSignOutConfirm = false }
         )
     }
-    if (showDeleteConfirm) {
-        ConfirmDialog(
-            title = "회원 탈퇴",
-            message = "탈퇴하면 참여·개설 기록과 보유 코인이 모두 삭제되고 되돌릴 수 없어요. 정산 대기 금액이나 진행 중인 방이 있으면 탈퇴할 수 없어요.",
-            confirmLabel = "탈퇴",
-            onConfirm = {
-                showDeleteConfirm = false
-                viewModel.onAction(MyInfoAction.ConfirmDeleteAccount)
-            },
-            onDismiss = { showDeleteConfirm = false }
-        )
-    }
 }
 
 @Composable
@@ -200,8 +188,7 @@ private fun MyInfoContentScreen(
     uiState: MyInfoUiState,
     onAction: (MyInfoAction) -> Unit,
     onClickBack: () -> Unit,
-    onClickSignOut: () -> Unit,
-    onClickDelete: () -> Unit
+    onClickSignOut: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -215,8 +202,7 @@ private fun MyInfoContentScreen(
                 uiState = uiState,
                 onAction = onAction,
                 onClickBack = onClickBack,
-                onClickSignOut = onClickSignOut,
-                onClickDelete = onClickDelete
+                onClickSignOut = onClickSignOut
             )
         }
     }
@@ -227,8 +213,7 @@ private fun LoadedMyInfo(
     uiState: MyInfoUiState,
     onAction: (MyInfoAction) -> Unit,
     onClickBack: () -> Unit,
-    onClickSignOut: () -> Unit,
-    onClickDelete: () -> Unit
+    onClickSignOut: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -271,11 +256,6 @@ private fun LoadedMyInfo(
             label = "로그아웃",
             labelColor = PassmateColors.TextSecondary,
             onClick = onClickSignOut
-        )
-        SettingRow(
-            label = "회원 탈퇴",
-            labelColor = PassmateColors.WeakTopicText,
-            onClick = onClickDelete
         )
         if (uiState.isProcessing) {
             Box(
