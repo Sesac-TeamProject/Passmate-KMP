@@ -29,7 +29,7 @@ final class CreateRoomViewModel: ObservableObject {
         getMyQuestionSetsUseCase.invoke(confirmedOnly: true, cursor: nil) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
-                let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult
+                let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult<AnyObject>
 
                 if error == nil, let page {
                     let sets = page.items.compactMap { $0 as? QuestionSetSummary }
@@ -79,9 +79,9 @@ final class CreateRoomViewModel: ObservableObject {
     private func createFailMessage(_ error: AppError?) -> String {
         if error?.serverCode == "HOST_LEVEL_REQUIRED" {
             return "유료 방은 Lv.3(검증된 운영자)부터 열 수 있어요"
-        } else if let validation = error as? AppErrorValidationFailed {
+        } else if let validation = error as? AppError.ValidationFailed {
             return validation.serverMessage ?? "입력값을 확인해 주세요"
-        } else if error is AppErrorNetworkError {
+        } else if error is AppError.NetworkError {
             return "네트워크 연결을 확인해 주세요"
         } else {
             return "방을 만들지 못했어요. 다시 시도해 주세요"

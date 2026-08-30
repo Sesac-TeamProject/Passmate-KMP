@@ -34,7 +34,7 @@ final class SettlementAccountViewModel: ObservableObject {
                     self.uiState.bankName = account.bankName
                     self.uiState.accountNumber = account.accountNumber
                     self.uiState.holderName = account.holderName
-                } else if let appError = (result as? AppResultFailure)?.error, !(appError is AppErrorNotFound) {
+                } else if let appError = (result as? AppResultFailure)?.error, !(appError is AppError.NotFound) {
                     // 미등록(404)은 빈 폼으로 시작한다 (M-12-3)
                     self.event.send(.showNotice(message: "계좌 정보를 불러오지 못했어요"))
                 }
@@ -73,9 +73,9 @@ final class SettlementAccountViewModel: ObservableObject {
 
     // 서버 code 기반 문구 분기 (규칙 §10)
     private func saveFailMessage(_ error: AppError?) -> String {
-        if let validation = error as? AppErrorValidationFailed {
+        if let validation = error as? AppError.ValidationFailed {
             return validation.serverMessage ?? "계좌 정보를 확인해 주세요"
-        } else if error is AppErrorNetworkError {
+        } else if error is AppError.NetworkError {
             return "네트워크 연결을 확인해 주세요"
         } else {
             return "계좌를 저장하지 못했어요. 다시 시도해 주세요"
