@@ -340,8 +340,8 @@
 				A1012016AABBCCDDEEFF0016 /* result */,
 				A1012017AABBCCDDEEFF0017 /* mypage */,
 				A1012018AABBCCDDEEFF0018 /* payment */,
-				A1012019AABBCCDDEEFF0019 /* profile */,
-				A1012020AABBCCDDEEFF0020 /* hostroom */,
+				A1012022AABBCCDDEEFF0022 /* profile */,
+				A1012023AABBCCDDEEFF0023 /* hostroom */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -492,7 +492,7 @@
 			path = payment;
 			sourceTree = "<group>";
 		};
-		A1012019AABBCCDDEEFF0019 /* profile */ = {
+		A1012022AABBCCDDEEFF0022 /* profile */ = {
 			isa = PBXGroup;
 			children = (
 				A101100089AABBCCDDEEFF0089 /* HostProfileUiState.swift */,
@@ -504,7 +504,7 @@
 			path = profile;
 			sourceTree = "<group>";
 		};
-		A1012020AABBCCDDEEFF0020 /* hostroom */ = {
+		A1012023AABBCCDDEEFF0023 /* hostroom */ = {
 			isa = PBXGroup;
 			children = (
 				A101100094AABBCCDDEEFF0094 /* HostedRoomsUiState.swift */,
