@@ -2,7 +2,7 @@ import SwiftUI
 import Shared
 
 // Figma "UI 디자인 v6" M-12-1+M-12-7 미러 — 계정 정보(닉네임)·내 캐릭터 변경 통합 시트.
-// 시트 표시 여부는 호스팅 화면(SettingsView)이 소유한다 (규칙 §11-1)
+// 시트 표시 여부는 호스팅 화면(MyInfoView)이 소유한다 (규칙 §11-1)
 struct EditProfileSheetView: View {
     let initialNickname: String
 

@@ -32,6 +32,8 @@
 ### 2-1-1. 공통 라우트 규격
 
 - 루트 라우트: `Home`, `SignIn`, `Join`, `Waiting`, `Play`, `Result`, `MyInfo`, `Payment`, `Settings`
+- 하단 탭 루트(피그마 v6, 2026-08-30): `Home`(홈=입장 폼 인라인) · `HostedRooms`(내가 만든 방) · `JoinedRooms`(참여한 방) · `MyInfo`(마이). 탭 바는 이 4개 루트에서만 표시하고 push된 화면에서는 숨긴다. 게스트가 로그인 필수 탭(`HostedRooms`·`JoinedRooms`·`MyInfo`)을 누르면 화면을 열지 않고 `SignIn`으로 보낸다(판단은 셸 `AppShellViewModel`).
+- `Join`은 `join?pin=`(QR·딥링크·방 목록 참여)일 때만 push 라우트로 쓴다. pin 없는 입장은 `Home` 탭이 담당한다.
 - 라우트 인자: `join?pin=`, `waiting/{pin}`, `play/{pin}`, `result/{participationId}`, `payment/{pin}`
 - `Home` = 공개 방 목록 + PIN 입장 진입점. 앱 시작 기본 진입은 항상 `Home`(게스트 포함).
 - `Settings`는 `MyInfo`에서 진입하는 상세 push 라우트로 취급한다.
@@ -42,7 +44,7 @@
   - `GAME_STARTED` 수신 → `Waiting`에서 `Play`로 전환
   - `GAME_FINISHED` 수신 → `Play`에서 `Result`로 전환
 - `Play` 진입 후 뒤로가기는 즉시 pop 하지 않고 퇴장 확인 다이얼로그를 거친다.
-- `Result` 진입 시 세션 플로우 백스택(`Join/Waiting/Play`)을 클리어한다.
+- `Result` 진입 시 세션 플로우 엔트리(`Join/Payment/Waiting/Play`)만 백스택에서 제거하고, 그 아래의 탭 루트(`Home`·`JoinedRooms` 등)는 유지한다.
 - **재접속 복구**: 앱 재진입·네트워크 복구 시 `GET /rooms/{pin}/session/snapshot` 결과의 `status`로 라우트를 결정한다(WAITING→`Waiting`, RUNNING→`Play`, FINISHED→`Result`). 스냅샷 ts 이전의 STOMP 이벤트는 폐기한다.
 - 종료된 방(410)·잘못된 PIN(404)은 안내 후 `Home`으로 보낸다.
 

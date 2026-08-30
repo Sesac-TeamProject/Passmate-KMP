@@ -34,8 +34,8 @@
 ### 1-3. 게스트 가드 (셸 소유)
 
 - `AppShellViewModel`(composeApp `mvi/MviViewModel` 상속, iOS Swift 미러) — 의존: `IsSignedInUseCase`
-  - `uiState`: `AppShellUiState(currentTab: AppTab, isSignedIn: Boolean)`
-  - `action`: `SelectTab(tab)` · `Refresh`(탭 루트 복귀·로그인/로그아웃 후 재계산)
+  - `uiState`: `AppShellUiState(isSignedIn: Boolean)`
+  - `action`: `SelectTab(tab)` — 탭을 누를 때마다 `IsSignedInUseCase`를 동기 조회하므로 별도 Refresh가 필요 없다
   - `event`: `NavigateToTab(tab)` · `RequireSignIn`
   - 규칙: `tab.requiresSignIn && !isSignedIn` → `RequireSignIn`, 아니면 `NavigateToTab`. `Home`은 항상 통과.
 - `AppTab` enum(`HOME`·`HOSTED_ROOMS`·`JOINED_ROOMS`·`MY_INFO`, `requiresSignIn`, 라벨)은 composeApp `navigation/`에 둔다. Swift 미러 동일.
@@ -50,20 +50,19 @@
 | Desktop | `routeStack` 유지. 탭 전환 = 스택을 `[탭 루트]`로 교체(단일 스택, 탭별 보존 없음). 최상단이 탭 루트일 때만 바 표시 |
 | iOS | `TabView(selection:)` 4개, 탭마다 `NavigationStack(path)`. `ContentView.destinationView(for:)`를 탭이 공유하는 `@ViewBuilder` 함수로 추출(내용 무변경). 로그인 필수 탭 선택은 `AppShellViewModel` 판정 후 `selection` 변경 또는 `.signIn` push |
 
-- 탭 바 컴포넌트: Compose `component/PassmateBottomTabBar.kt`(commonMain — Android·Desktop 공유), Swift `component/PassmateBottomTabBar.swift`. 아이콘·라벨·선택색은 `PassmateColors` 토큰만 사용.
+- 탭 바 컴포넌트: Compose `component/PassmateBottomTabBar.kt`(Android·Desktop 공유). iOS는 네이티브 `TabView` 탭 바(SF Symbols, tint Primary)를 쓴다.
 
 ### 1-5. 세션 플로우 접점 (규칙 §2-1-2)
 
-`NavigateToResult` 시 백스택 클리어 범위를 "Home까지"에서 **"Join(pin)·Waiting·Play 엔트리만 제거"**로 바꾼다. 참여한 방 탭의 "다시 들어가기"→Waiting→Play→Result, "리포트"→Result에서 탭 루트가 유지돼야 한다.
+`NavigateToResult` 시 백스택 클리어 범위를 "Home까지"에서 **"Join(pin)·Payment·Waiting·Play 엔트리만 제거"**로 바꾼다. 참여한 방 탭의 "다시 들어가기"→Waiting→Play→Result, "리포트"→Result에서 탭 루트가 유지돼야 한다.
 
-- Android: Waiting이 스택에 있으면 `popUpTo(Waiting) { inclusive = true }`, 그 아래 Join(pin)이 있으면 함께 제거(구현 시 `navController.currentBackStack`으로 판단). 없으면 단순 push.
-- Desktop: 기존 `removeAll { Waiting || Play }`에 `Join` 추가.
-- iOS: 세션 종료 경로(`PlayView.onOpenResult`)는 `path = [.result]`가 아니라 **세션 엔트리만 제거 후 `.result` 추가**; 리포트 경로(`JoinedRooms`)는 `path.append(.result)`.
+- Android: Waiting이 스택에 있으면 `popBackStack(Route.Waiting.route, inclusive = true)`, 있었다면 이어서 Payment·Join(pin) 순으로 `popBackStack`을 호출해 함께 제거. 없으면 단순 push.
+- Desktop: `isSessionFlow()`가 걸러내는 세션 플로우 엔트리 집합을 `Join·Payment·Waiting·Play`로 확장하고, `removeAll { it.isSessionFlow() }`로 한 번에 제거.
+- iOS: 세션 종료 경로(`PlayView.onOpenResult`)는 `path = [.result]`가 아니라 **`isSessionRoute`(Join·Payment·Waiting·Play) 엔트리만 제거 후 `.result` 추가**; 리포트 경로(`JoinedRooms`)는 `path.append(.result)`.
 
 ## 2. 홈 탭 (M-01 v6)
 
-- `Route.Home`이 `JoinScreen(initialPin = null, isTabRoot = true)` / `JoinView(initialPin: nil, isTabRoot: true)`를 렌더한다.
-- `isTabRoot`가 true면 뒤로가기 버튼을 숨긴다. push(`join?pin=`)일 땐 기존과 같다. 폼·헤더·QR·닉네임·캐릭터·"기록을 남기려면 로그인" 행·`JoinViewModel`은 **무변경**.
+- `Route.Home`이 `JoinScreen()` / `JoinView(initialPin: nil)`를 렌더한다. Join에는 원래 뒤로가기 버튼이 없어 `isTabRoot` 파라미터가 불필요하다(구현 중 확인).
 - 임시 `HomeScreen.kt`, iOS `HomeView.swift`·`HomeViewModel.swift`·`HomeUiState.swift`·`HomeAction.swift` 삭제(pbxproj 참조 제거).
 - 제외: "방 찾기"·"내 학습 기록"·"로그인" 링크(각각 시안 없음·참여한 방 탭·Join 폼 로그인 행이 대체).
 - `SignInScreen`의 `SignInCompleted`·`GuestEnterRequested`는 둘 다 홈 탭으로 수렴(기존 `NavigateToHome`/`NavigateToJoin()` 의미 유지). pendingRoute는 범위 밖.
@@ -87,12 +86,12 @@
 | 헤더 | 큰 제목 "마이" + 우상단 "설정" 텍스트 버튼 → `NavigateToSettings` | — |
 | 프로필 카드 | 아바타(`StudentAvatar`)·닉네임·`Lv.N 라벨` 칩(`LevelEmblem`)·"참여한 방 N · 내가 만든 방 N". **카드 탭 → `NavigateToReputation`(M-09)** | `GetMyProfileUseCase` → `UserProfile` |
 | 계정 카드 | 닉네임 변경 › · 내 캐릭터 변경 › — 둘 다 `EditProfileSheet` 열기 | 〃 |
-| 코인 카드 | 보유 코인 "1,200 C · 유료 방 참가비에 사용" + **코인 충전** 버튼(4번 작업 전까지 `ShowNotice("코인 충전은 준비 중이에요")`) · 결제 수단 관리 ›(`PaymentMethodSheet`, 부제 = 기본 수단 라벨 + " · 포트원 안전결제") · 코인 내역 보기 ›(`NavigateToCoinHistory`, 부제 고정 "충전·사용 내역") | `UserProfile.coins`, `GetMyCoinsUseCase` → `CoinBalance.defaultMethod` |
-| 정산 카드 | 정산 계좌 변경 ›(`SettlementAccountSheet`, 부제 = "은행 마스킹번호 · 예금주", 미등록이면 "계좌를 등록해 주세요") · 이번 달 정산 예정 내역 ›(`NavigateToEarnings`, 부제 = "₩금액 · 지급일 지급", 없으면 "정산 예정 없음") | `GetEarningsUseCase` → `Earnings.account`·`nextPayout` |
+| 코인 카드 | 보유 코인 "1,200 C · 유료 방 참가비에 사용" + **코인 충전** 버튼(4번 작업 전까지 `ShowNotice("코인 충전은 준비 중이에요")`) · 결제 수단 관리 ›(`PaymentMethodSheet`, 부제 = 기본 수단 라벨 + " · 포트원 안전결제") · 코인 내역 보기 ›(`NavigateToCoinHistory`, 부제 = `CoinBalance.recent`에서 "최근 8/22 -10,000 C") | `UserProfile.coins`, `GetMyCoinsUseCase` → `CoinBalance.defaultMethod` |
+| 정산 카드 | 정산 계좌 변경 ›(`SettlementAccountSheet`, 부제 = "은행 마스킹번호", 미등록이면 "계좌를 등록해 주세요") · 이번 달 정산 예정 내역 ›(`NavigateToEarnings`, 부제 = "₩금액 · 지급일 지급", 없으면 "정산 예정 없음") | `GetEarningsUseCase` → `Earnings.account`·`nextPayout` |
 | 알림 행 | 알림 설정 ›(`NotificationSettingsSheet`), 부제 고정 "세션 시작 · 별점 요청 · 정산" | — |
-| 하단 | **로그아웃** 버튼 → 확인 다이얼로그(기존) → `ConfirmSignOut` → `SignedOut` 이벤트 → `NavigateToHome` + 셸 `Refresh` | `SignOutUseCase` |
+| 하단 | **로그아웃** 버튼 → 확인 다이얼로그(기존) → `ConfirmSignOut` → `SignedOut` 이벤트 → `NavigateToHome` | `SignOutUseCase` |
 
-시안과 다른 단순화(의도적): 코인 내역 부제와 알림 부제는 고정 문구(추가 API 호출 회피).
+시안과 다른 단순화(의도적): 알림 부제는 고정 문구(추가 API 호출 회피).
 
 ### 4-2. 상태 (`MyInfoUiState`)
 
