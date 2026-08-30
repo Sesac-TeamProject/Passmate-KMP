@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -33,7 +34,7 @@ fun PassmateBottomTabBar(
     onSelectTab: (AppTab) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.fillMaxWidth().background(PassmateColors.Surface)) {
+    Column(modifier = modifier.fillMaxWidth().background(PassmateColors.Surface).navigationBarsPadding()) {
         Divider(color = PassmateColors.Border, thickness = 1.dp)
         Row(
             modifier = Modifier

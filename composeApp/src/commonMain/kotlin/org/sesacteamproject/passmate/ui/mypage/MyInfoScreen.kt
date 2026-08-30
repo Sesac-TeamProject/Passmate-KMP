@@ -213,7 +213,7 @@ private fun LoadedMyInfo(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 96.dp),
+            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Row(

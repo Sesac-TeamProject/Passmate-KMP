@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -55,18 +56,26 @@ private fun Context.findComponentActivity(): ComponentActivity? {
     return null
 }
 
-// 표준 하단 탭 전환 — 탭별 백스택 저장/복원, 홈 탭이 항상 스택 바닥 (스펙 §1-4)
+// 하단 탭 전환 — 홈 루트 위의 화면을 걷어내고 탭 루트를 올린다. 플랫 그래프라 saveState/restoreState는 쓰지 않는다
+// (쓰면 팝된 화면(SignIn 등)이 홈 탭 복귀 시 되살아난다). 탭별 백스택 보존은 범위 밖 (스펙 §1-4·§9)
 private fun NavHostController.navigateToTab(tab: AppTab) {
     navigate(tab.route) {
-        popUpTo(Route.Home.route) { saveState = true }
+        popUpTo(Route.Home.route)
         launchSingleTop = true
-        restoreState = true
+    }
+}
+
+// 홈으로 복귀 — 홈 루트(JoinScreen)를 재생성해 로그인/로그아웃 후 세션 상태를 다시 읽게 한다 (규칙 §8)
+private fun NavHostController.navigateHome() {
+    navigate(Route.Home.route) {
+        popUpTo(Route.Home.route) { inclusive = true }
+        launchSingleTop = true
     }
 }
 
 private fun NavHostController.handleNavigationAction(action: NavigationAction) {
     when (action) {
-        is NavigationAction.NavigateToHome -> navigateToTab(AppTab.HOME)
+        is NavigationAction.NavigateToHome -> navigateHome()
         is NavigationAction.NavigateToTab -> navigateToTab(action.tab)
         is NavigationAction.NavigateToRoomList -> navigate(Route.RoomList.route)
         is NavigationAction.NavigateToSignIn -> navigate(Route.SignIn.route)
@@ -75,7 +84,7 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
             if (action.pin != null) {
                 navigate("join?pin=${action.pin}")
             } else {
-                navigateToTab(AppTab.HOME)
+                navigateHome()
             }
         }
         is NavigationAction.NavigateToWaiting -> navigate("waiting/${action.pin}")
@@ -130,6 +139,7 @@ actual fun AppNavHost() {
         }
     }
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             // 탭 루트 4개에서만 하단 바 표시 (스펙 §1-2)
             if (currentTab != null) {

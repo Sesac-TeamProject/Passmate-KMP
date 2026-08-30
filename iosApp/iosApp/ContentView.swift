@@ -18,6 +18,9 @@ struct ContentView: View {
 
     @State private var myInfoPath: [Route] = []
 
+    // 로그인·로그아웃·탈퇴 시 증가 — 탭 루트(JoinView·MyInfoView 등)를 재생성해 세션 상태를 다시 읽게 한다 (규칙 §8)
+    @State private var sessionGeneration = 0
+
     var body: some View {
         TabView(selection: tabSelection) {
             tabStack(path: $homePath) {
@@ -63,12 +66,14 @@ struct ContentView: View {
                     onSignedOut: {
                         myInfoPath = []
                         selectedTab = .home
+                        sessionGeneration += 1
                     }
                 )
             }
             .tabItem { Label(AppTab.myInfo.label, systemImage: AppTab.myInfo.systemImage) }
             .tag(AppTab.myInfo)
         }
+        .id(sessionGeneration)
         .tint(PassmateColors.primary)
         .onReceive(shellViewModel.event) { event in
             switch event {
@@ -123,7 +128,7 @@ struct ContentView: View {
             )
         case .signIn:
             SignInView(
-                onSignedIn: { path.wrappedValue = [] },
+                onSignedIn: { path.wrappedValue = []; sessionGeneration += 1 },
                 onGuestEnter: { path.wrappedValue = [] }
             )
         case let .join(pin):
@@ -198,6 +203,7 @@ struct ContentView: View {
                 onAccountDeleted: {
                     path.wrappedValue = []
                     selectedTab = .home
+                    sessionGeneration += 1
                 },
                 onBack: { popOnce(path) }
             )
