@@ -4,18 +4,25 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.util.Consumer
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import org.sesacteamproject.passmate.component.PassmateBottomTabBar
+import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.ui.auth.SignInScreen
-import org.sesacteamproject.passmate.ui.home.HomeScreen
 import org.sesacteamproject.passmate.ui.home.RoomListScreen
 import org.sesacteamproject.passmate.ui.join.JoinScreen
 import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsScreen
@@ -48,27 +55,39 @@ private fun Context.findComponentActivity(): ComponentActivity? {
     return null
 }
 
+// 표준 하단 탭 전환 — 탭별 백스택 저장/복원, 홈 탭이 항상 스택 바닥 (스펙 §1-4)
+private fun NavHostController.navigateToTab(tab: AppTab) {
+    navigate(tab.route) {
+        popUpTo(Route.Home.route) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
 private fun NavHostController.handleNavigationAction(action: NavigationAction) {
     when (action) {
-        is NavigationAction.NavigateToHome -> navigate(Route.Home.route) {
-            popUpTo(Route.Home.route) { inclusive = true }
-            launchSingleTop = true
-        }
-        is NavigationAction.NavigateToTab -> navigate(action.tab.route)
+        is NavigationAction.NavigateToHome -> navigateToTab(AppTab.HOME)
+        is NavigationAction.NavigateToTab -> navigateToTab(action.tab)
         is NavigationAction.NavigateToRoomList -> navigate(Route.RoomList.route)
         is NavigationAction.NavigateToSignIn -> navigate(Route.SignIn.route)
         is NavigationAction.NavigateToJoin -> {
+            // 홈 탭이 곧 입장 폼 — pin 없는 Join은 홈 탭으로 (스펙 §1-1)
             if (action.pin != null) {
                 navigate("join?pin=${action.pin}")
             } else {
-                navigate("join")
+                navigateToTab(AppTab.HOME)
             }
         }
         is NavigationAction.NavigateToWaiting -> navigate("waiting/${action.pin}")
         is NavigationAction.NavigateToPlay -> navigate("play/${action.pin}")
-        is NavigationAction.NavigateToResult -> navigate("result/${action.roomId}") {
-            // 세션 플로우 백스택(Join/Waiting/Play)을 클리어한다 (규칙 §2-1-2)
-            popUpTo(Route.Home.route)
+        is NavigationAction.NavigateToResult -> {
+            // 세션 플로우 엔트리(Waiting·Play·Join)만 제거하고 탭 루트는 유지한다 (규칙 §2-1-2, 스펙 §1-5)
+            val hadSession = popBackStack(Route.Waiting.route, inclusive = true)
+
+            if (hadSession) {
+                popBackStack(Route.Join.route, inclusive = true)
+            }
+            navigate("result/${action.roomId}")
         }
         is NavigationAction.NavigateToPayment -> navigate("payment/${action.pin}")
         is NavigationAction.NavigateToMyInfo -> navigate(Route.MyInfo.route)
@@ -86,6 +105,9 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
 @Composable
 actual fun AppNavHost() {
     val navController = rememberNavController()
+    val shellViewModel: AppShellViewModel = koinScreenViewModel()
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentTab = AppTab.fromRoute(backStackEntry?.destination?.route)
     val activity = LocalContext.current.findComponentActivity()
 
     DisposableEffect(activity, navController) {
@@ -94,107 +116,133 @@ actual fun AppNavHost() {
         activity?.addOnNewIntentListener(listener)
         onDispose { activity?.removeOnNewIntentListener(listener) }
     }
-    NavHost(
-        navController = navController,
-        startDestination = Route.Home.route
-    ) {
-        composable(Route.Home.route) {
-            HomeScreen(onNavigate = navController::handleNavigationAction)
+    LaunchedEffect(shellViewModel) {
+        shellViewModel.event.collect { event ->
+            when (event) {
+                is AppShellEvent.NavigateToTab -> navController.handleNavigationAction(
+                    NavigationAction.NavigateToTab(event.tab)
+                )
+                is AppShellEvent.RequireSignIn -> navController.handleNavigationAction(
+                    NavigationAction.NavigateToSignIn
+                )
+            }
         }
-        composable(Route.RoomList.route) {
-            RoomListScreen(onNavigate = navController::handleNavigationAction)
+    }
+    Scaffold(
+        bottomBar = {
+            // 탭 루트 4개에서만 하단 바 표시 (스펙 §1-2)
+            if (currentTab != null) {
+                PassmateBottomTabBar(
+                    selectedTab = currentTab,
+                    onSelectTab = { shellViewModel.onAction(AppShellAction.SelectTab(it)) }
+                )
+            }
         }
-        composable(
-            route = "${Route.SignIn.route}?accessToken={accessToken}&refreshToken={refreshToken}",
-            arguments = listOf(
-                navArgument("accessToken") {
-                    nullable = true
-                    defaultValue = null
-                },
-                navArgument("refreshToken") {
-                    nullable = true
-                    defaultValue = null
-                }
-            ),
-            deepLinks = listOf(navDeepLink { uriPattern = OAUTH_CALLBACK_DEEP_LINK })
-        ) { backStackEntry ->
-            SignInScreen(
-                oauthAccessToken = backStackEntry.arguments?.getString("accessToken"),
-                oauthRefreshToken = backStackEntry.arguments?.getString("refreshToken"),
-                onNavigate = navController::handleNavigationAction
-            )
-        }
-        composable(
-            route = Route.Join.route,
-            arguments = listOf(
-                navArgument("pin") {
-                    nullable = true
-                    defaultValue = null
-                }
-            )
-        ) { backStackEntry ->
-            JoinScreen(
-                initialPin = backStackEntry.arguments?.getString("pin"),
-                onNavigate = navController::handleNavigationAction
-            )
-        }
-        composable(Route.Waiting.route) { backStackEntry ->
-            WaitingScreen(
-                pin = backStackEntry.arguments?.getString("pin").orEmpty(),
-                onNavigate = navController::handleNavigationAction
-            )
-        }
-        composable(Route.Play.route) { backStackEntry ->
-            PlayScreen(
-                pin = backStackEntry.arguments?.getString("pin").orEmpty(),
-                onNavigate = navController::handleNavigationAction
-            )
-        }
-        composable(Route.Result.route) { backStackEntry ->
-            ResultScreen(
-                roomId = backStackEntry.arguments?.getString("roomId")?.toLongOrNull() ?: -1L,
-                onNavigate = navController::handleNavigationAction
-            )
-        }
-        composable(Route.Payment.route) { backStackEntry ->
-            PaymentScreen(
-                pin = backStackEntry.arguments?.getString("pin").orEmpty(),
-                onNavigate = navController::handleNavigationAction
-            )
-        }
-        composable(Route.MyInfo.route) {
-            MyInfoScreen(onNavigate = navController::handleNavigationAction)
-        }
-        composable(Route.JoinedRooms.route) {
-            JoinedRoomsScreen(onNavigate = navController::handleNavigationAction)
-        }
-        composable(Route.Reputation.route) {
-            ReputationScreen(onNavigate = navController::handleNavigationAction)
-        }
-        composable(Route.HostedRooms.route) {
-            HostedRoomsScreen(onNavigate = navController::handleNavigationAction)
-        }
-        composable(Route.RoomReport.route) { backStackEntry ->
-            RoomReportScreen(
-                roomId = backStackEntry.arguments?.getString("roomId")?.toLongOrNull() ?: -1L,
-                onNavigate = navController::handleNavigationAction
-            )
-        }
-        composable(Route.SessionControl.route) { backStackEntry ->
-            SessionControlScreen(
-                roomId = backStackEntry.arguments?.getString("roomId")?.toLongOrNull() ?: -1L,
-                pin = backStackEntry.arguments?.getString("pin").orEmpty(),
-                onNavigate = navController::handleNavigationAction
-            )
-        }
-        composable(Route.CoinHistory.route) {
-            CoinHistoryScreen(onNavigate = navController::handleNavigationAction)
-        }
-        composable(Route.Earnings.route) {
-            EarningsScreen(onNavigate = navController::handleNavigationAction)
-        }
-        composable(Route.Settings.route) {
-            SettingsScreen(onNavigate = navController::handleNavigationAction)
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Route.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Route.Home.route) {
+                // 홈 탭 = 입장 폼 인라인 (M-01 v6) — JoinScreen 재사용
+                JoinScreen(onNavigate = navController::handleNavigationAction)
+            }
+            composable(Route.RoomList.route) {
+                RoomListScreen(onNavigate = navController::handleNavigationAction)
+            }
+            composable(
+                route = "${Route.SignIn.route}?accessToken={accessToken}&refreshToken={refreshToken}",
+                arguments = listOf(
+                    navArgument("accessToken") {
+                        nullable = true
+                        defaultValue = null
+                    },
+                    navArgument("refreshToken") {
+                        nullable = true
+                        defaultValue = null
+                    }
+                ),
+                deepLinks = listOf(navDeepLink { uriPattern = OAUTH_CALLBACK_DEEP_LINK })
+            ) { backStackEntry ->
+                SignInScreen(
+                    oauthAccessToken = backStackEntry.arguments?.getString("accessToken"),
+                    oauthRefreshToken = backStackEntry.arguments?.getString("refreshToken"),
+                    onNavigate = navController::handleNavigationAction
+                )
+            }
+            composable(
+                route = Route.Join.route,
+                arguments = listOf(
+                    navArgument("pin") {
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { backStackEntry ->
+                JoinScreen(
+                    initialPin = backStackEntry.arguments?.getString("pin"),
+                    onNavigate = navController::handleNavigationAction
+                )
+            }
+            composable(Route.Waiting.route) { backStackEntry ->
+                WaitingScreen(
+                    pin = backStackEntry.arguments?.getString("pin").orEmpty(),
+                    onNavigate = navController::handleNavigationAction
+                )
+            }
+            composable(Route.Play.route) { backStackEntry ->
+                PlayScreen(
+                    pin = backStackEntry.arguments?.getString("pin").orEmpty(),
+                    onNavigate = navController::handleNavigationAction
+                )
+            }
+            composable(Route.Result.route) { backStackEntry ->
+                ResultScreen(
+                    roomId = backStackEntry.arguments?.getString("roomId")?.toLongOrNull() ?: -1L,
+                    onNavigate = navController::handleNavigationAction
+                )
+            }
+            composable(Route.Payment.route) { backStackEntry ->
+                PaymentScreen(
+                    pin = backStackEntry.arguments?.getString("pin").orEmpty(),
+                    onNavigate = navController::handleNavigationAction
+                )
+            }
+            composable(Route.MyInfo.route) {
+                MyInfoScreen(onNavigate = navController::handleNavigationAction)
+            }
+            composable(Route.JoinedRooms.route) {
+                JoinedRoomsScreen(onNavigate = navController::handleNavigationAction)
+            }
+            composable(Route.Reputation.route) {
+                ReputationScreen(onNavigate = navController::handleNavigationAction)
+            }
+            composable(Route.HostedRooms.route) {
+                HostedRoomsScreen(onNavigate = navController::handleNavigationAction)
+            }
+            composable(Route.RoomReport.route) { backStackEntry ->
+                RoomReportScreen(
+                    roomId = backStackEntry.arguments?.getString("roomId")?.toLongOrNull() ?: -1L,
+                    onNavigate = navController::handleNavigationAction
+                )
+            }
+            composable(Route.SessionControl.route) { backStackEntry ->
+                SessionControlScreen(
+                    roomId = backStackEntry.arguments?.getString("roomId")?.toLongOrNull() ?: -1L,
+                    pin = backStackEntry.arguments?.getString("pin").orEmpty(),
+                    onNavigate = navController::handleNavigationAction
+                )
+            }
+            composable(Route.CoinHistory.route) {
+                CoinHistoryScreen(onNavigate = navController::handleNavigationAction)
+            }
+            composable(Route.Earnings.route) {
+                EarningsScreen(onNavigate = navController::handleNavigationAction)
+            }
+            composable(Route.Settings.route) {
+                SettingsScreen(onNavigate = navController::handleNavigationAction)
+            }
         }
     }
 }
