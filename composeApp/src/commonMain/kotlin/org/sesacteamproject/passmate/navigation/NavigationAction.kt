@@ -27,10 +27,10 @@ sealed interface NavigationAction {
 
     data object NavigateToMyInfo : NavigationAction
 
-    // 내 명성·뱃지 상세 (M-09) — 마이페이지에서 진입
+    // 내 명성·뱃지 상세 (M-09) — 마이 탭 프로필 카드에서 진입
     data object NavigateToReputation : NavigationAction
 
-    // 내가 만든 방 (M-13) — 마이페이지에서 진입
+    // 내가 만든 방 (M-13) — 하단 탭 루트(탭 바 전용, 직접 push 호출처 없음)
     data object NavigateToHostedRooms : NavigationAction
 
     // 방 리포트 (M-14) — 내가 만든 방 › 종료 › 상세
@@ -39,10 +39,10 @@ sealed interface NavigationAction {
     // 진행 리모컨 (M-T2) — 내가 만든 방 › 진행 중 › 진행
     data class NavigateToSessionControl(val roomId: Long, val pin: String) : NavigationAction
 
-    // 정산 (M-T4) — 마이페이지에서 진입
+    // 정산 (M-T4) — 마이 탭에서 진입
     data object NavigateToEarnings : NavigationAction
 
-    // 설정(내 정보 관리, M-12) — 마이페이지에서 진입 (규칙 §2-1-1: Settings는 MyInfo의 상세 push)
+    // 설정(내 정보 관리, M-12) — 마이 탭 우상단 "설정"에서 진입 (규칙 §2-1-1: Settings는 MyInfo의 상세 push)
     data object NavigateToSettings : NavigationAction
 
     data object NavigateBack : NavigationAction

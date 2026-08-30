@@ -40,15 +40,15 @@
   - 규칙: `tab.requiresSignIn && !isSignedIn` → `RequireSignIn`, 아니면 `NavigateToTab`. `Home`은 항상 통과.
 - `AppTab` enum(`HOME`·`HOSTED_ROOMS`·`JOINED_ROOMS`·`MY_INFO`, `requiresSignIn`, 라벨)은 composeApp `navigation/`에 둔다. Swift 미러 동일.
 - 기존 화면 VM의 `RequireSignIn`(`HostedRooms`·`JoinedRooms`·`MyInfo`)은 딥링크 직접 진입 대비 보험으로 유지.
-- `observeCurrentUser` 스트림(규칙 §8)은 아직 shared에 없다. 이번에는 탭 탭 시·`Refresh` 시 동기 조회로 충분 — 스트림 도입은 범위 밖.
+- `observeCurrentUser` 스트림(규칙 §8)은 아직 shared에 없다. 이번에는 탭 탭 시 동기 조회 + 세션 변경 시 탭 루트 재생성으로 충분 — 스트림 도입은 범위 밖.
 
 ### 1-4. 플랫폼별 셸
 
 | 플랫폼 | 구현 |
 |---|---|
-| Android | `NavHost` 하나 유지 + `Scaffold(bottomBar = PassmateBottomTabBar)`. 현재 목적지(`currentBackStackEntryAsState`)가 탭 루트일 때만 바 표시. 탭 전환: `navigate(tab.route) { popUpTo(Home) { saveState = true }; launchSingleTop = true; restoreState = true }` |
+| Android | `NavHost` 하나 유지 + `Scaffold(bottomBar = PassmateBottomTabBar)`. 현재 목적지(`currentBackStackEntryAsState`)가 탭 루트일 때만 바 표시. 탭 전환: `navigate(tab.route) { popUpTo(Home); launchSingleTop = true }` — 플랫 그래프라 saveState/restoreState는 쓰지 않는다(팝된 SignIn이 되살아남). `NavigateToHome`·`NavigateToJoin(pin=null)`은 `popUpTo(Home){inclusive}`로 홈 루트(JoinScreen)를 재생성해 세션 상태를 다시 읽는다 |
 | Desktop | `routeStack` 유지. 탭 전환 = 스택을 `[탭 루트]`로 교체(단일 스택, 탭별 보존 없음). 최상단이 탭 루트일 때만 바 표시 |
-| iOS | `TabView(selection:)` 4개, 탭마다 `NavigationStack(path)`. `ContentView.destinationView(for:)`를 탭이 공유하는 `@ViewBuilder` 함수로 추출(내용 무변경). 로그인 필수 탭 선택은 `AppShellViewModel` 판정 후 `selection` 변경 또는 `.signIn` push |
+| iOS | `TabView(selection:)` 4개, 탭마다 `NavigationStack(path)`. `ContentView.destinationView(for:)`를 탭이 공유하는 `@ViewBuilder` 함수로 추출(내용 무변경). 로그인 필수 탭 선택은 `AppShellViewModel` 판정 후 `selection` 변경 또는 `.signIn` push. 로그인·로그아웃·탈퇴 시 `sessionGeneration`을 올려 `TabView`를 `.id()`로 재생성한다(탭 루트 VM이 세션을 다시 읽음) |
 
 - 탭 바 컴포넌트: Compose `component/PassmateBottomTabBar.kt`(Android·Desktop 공유). iOS는 네이티브 `TabView` 탭 바(SF Symbols, tint Primary)를 쓴다.
 
@@ -63,7 +63,7 @@
 ## 2. 홈 탭 (M-01 v6)
 
 - `Route.Home`이 `JoinScreen()` / `JoinView(initialPin: nil)`를 렌더한다. Join에는 원래 뒤로가기 버튼이 없어 `isTabRoot` 파라미터가 불필요하다(구현 중 확인).
-- 임시 `HomeScreen.kt`, iOS `HomeView.swift`·`HomeViewModel.swift`·`HomeUiState.swift`·`HomeAction.swift` 삭제(pbxproj 참조 제거).
+- 임시 `HomeScreen.kt`, iOS `HomeView.swift`·`HomeViewModel.swift`·`HomeUiState.swift`·`HomeAction.swift`·`HomeEvent.swift` 삭제(pbxproj 참조 제거).
 - 제외: "방 찾기"·"내 학습 기록"·"로그인" 링크(각각 시안 없음·참여한 방 탭·Join 폼 로그인 행이 대체).
 - `SignInScreen`의 `SignInCompleted`·`GuestEnterRequested`는 둘 다 홈 탭으로 수렴(기존 `NavigateToHome`/`NavigateToJoin()` 의미 유지). pendingRoute는 범위 밖.
 
@@ -121,21 +121,21 @@ isProcessing: Boolean (로그아웃 in-flight, 규칙 §9)
 ## 5. iOS 미러
 
 - `ContentView`: `TabView` + 탭별 `NavigationStack`. `destinationView(for:)`를 공유 함수로 추출. 탭 선택은 `AppShellViewModel.swift`(`KoinHelper.shared.isSignedInUseCase()` 재사용) 판정을 거친다.
-- 파일: `AppShellViewModel/UiState/Action/Event.swift`, `navigation/AppTab.swift`, `component/PassmateBottomTabBar.swift`, `JoinView`에 `isTabRoot`, `MyInfoView*`→`JoinedRoomsView*`, `SettingsView*`→`MyInfoView*`, 새 `SettingsView*`, `HomeView*` 삭제.
+- 파일: `AppShellViewModel/UiState/Action/Event.swift`, `navigation/AppTab.swift`, `MyInfoView*`→`JoinedRoomsView*`, `SettingsView*`→`MyInfoView*`, 새 `SettingsView*`, `HomeView*` 삭제.
 - pbxproj: 신규 파일 idx **145**부터 등록, 삭제 파일 참조 제거, **그룹 ID(`A10120xx`) 중복 재검사**(fix/ios-build에서 충돌 있었음).
-- 프리뷰: `JoinedRoomsView`·`MyInfoView`·`SettingsView`·`PassmateBottomTabBar`에 콘텐츠 뷰 기준 `#Preview`.
+- 프리뷰: `JoinedRoomsView`·`MyInfoView`·`SettingsView`에 콘텐츠 뷰 기준 `#Preview`.
 
 ## 6. 문서·정리
 
-- `docs/Passmate_코드_패턴_규칙.md` §2-1-1: 탭 루트 4개와 `JoinedRooms` 추가, "`Home` = 입장 폼(인라인)", §2-1-2 Result 진입 시 클리어 범위를 "Join·Waiting·Play 엔트리"로 명시. PR에서 홍희표 님 리뷰 요청.
+- `docs/Passmate_코드_패턴_규칙.md` §2-1-1: 탭 루트 4개와 `JoinedRooms` 추가, "`Home` = 입장 폼(인라인)", §2-1-2 Result 진입 시 클리어 범위를 "Join·Payment·Waiting·Play 엔트리"로 명시. PR에서 홍희표 님 리뷰 요청.
 - `docs/Passmate_Mac_검증_체크리스트.md` §9 추가: 홈 셸·탭 빌드·스모크 항목, 다음 가용 idx 갱신.
 - `SettingsScreen.kt`·`SettingsView.swift`의 "4탭 보류" 주석 제거.
-- 삭제: `HomeScreen.kt`, iOS `Home*` 4파일. `NavigateToRoomList`는 코드에 남김.
+- 삭제: `HomeScreen.kt`, iOS `Home*` 5파일. `NavigateToRoomList`는 코드에 남김.
 - `viewModelModule`: `AppShellViewModel`·`JoinedRoomsViewModel`·`MyInfoViewModel`·`SettingsViewModel` factory 갱신. `KoinHelper`는 기존 getter로 충분(신규 UseCase 없음).
 
 ## 7. 테스트 (composeApp `jvmTest`, fake UseCase 생성자 주입)
 
-- `AppShellViewModelTest`: 회원→`NavigateToTab` / 게스트+로그인 필수 탭→`RequireSignIn` / 게스트+홈→통과 / `Refresh` 후 상태 재계산
+- `AppShellViewModelTest`: 회원→`NavigateToTab` / 게스트+로그인 필수 탭→`RequireSignIn` / 게스트+홈→통과
 - `MyInfoViewModelTest`: 프로필 실패→`loadFailed` / 코인만 실패→`isCoinInfoFailed`만 true, 프로필 렌더 / 정산만 실패→`isEarningsFailed` / `ConfirmSignOut`→`isProcessing` true→`SignedOut` / 게스트→`RequireSignIn`
 - `JoinedRoomsViewModelTest`: 게스트→`RequireSignIn` / 첫 로드·더 보기 커서
 - `KoinWiringTest` 갱신. shared 무변경(테스트 추가 없음).
