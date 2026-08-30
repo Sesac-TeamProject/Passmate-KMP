@@ -69,7 +69,10 @@ private fun AppTab.toDestination(): JvmDestination {
 }
 
 private fun JvmDestination.isSessionFlow(): Boolean {
-    return this is JvmDestination.Join || this is JvmDestination.Waiting || this is JvmDestination.Play
+    return this is JvmDestination.Join ||
+        this is JvmDestination.Payment ||
+        this is JvmDestination.Waiting ||
+        this is JvmDestination.Play
 }
 
 @Composable
@@ -100,7 +103,7 @@ actual fun AppNavHost() {
             is NavigationAction.NavigateToWaiting -> routeStack.add(JvmDestination.Waiting(action.pin))
             is NavigationAction.NavigateToPlay -> routeStack.add(JvmDestination.Play(action.pin))
             is NavigationAction.NavigateToResult -> {
-                // 세션 플로우 엔트리(Join·Waiting·Play)만 제거, 탭 루트 유지 (규칙 §2-1-2, 스펙 §1-5)
+                // 세션 플로우 엔트리(Join·Payment·Waiting·Play)만 제거, 탭 루트 유지 (규칙 §2-1-2, 스펙 §1-5)
                 routeStack.removeAll { it.isSessionFlow() }
                 routeStack.add(JvmDestination.Result(action.roomId))
             }

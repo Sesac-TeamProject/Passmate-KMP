@@ -81,10 +81,11 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
         is NavigationAction.NavigateToWaiting -> navigate("waiting/${action.pin}")
         is NavigationAction.NavigateToPlay -> navigate("play/${action.pin}")
         is NavigationAction.NavigateToResult -> {
-            // 세션 플로우 엔트리(Waiting·Play·Join)만 제거하고 탭 루트는 유지한다 (규칙 §2-1-2, 스펙 §1-5)
+            // 세션 플로우 엔트리(Waiting·Play·Payment·Join)만 제거하고 탭 루트는 유지한다 (규칙 §2-1-2, 스펙 §1-5)
             val hadSession = popBackStack(Route.Waiting.route, inclusive = true)
 
             if (hadSession) {
+                popBackStack(Route.Payment.route, inclusive = true)
                 popBackStack(Route.Join.route, inclusive = true)
             }
             navigate("result/${action.roomId}")
