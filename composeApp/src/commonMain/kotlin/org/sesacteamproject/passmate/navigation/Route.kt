@@ -22,6 +22,9 @@ sealed class Route(val route: String) {
 
     data object MyInfo : Route("myInfo")
 
+    // 참여한 방 탭 루트 (M-08) — 하단 4탭 셸
+    data object JoinedRooms : Route("joinedRooms")
+
     // 내 명성·뱃지 상세 (M-09) — 마이페이지에서 진입
     data object Reputation : Route("reputation")
 

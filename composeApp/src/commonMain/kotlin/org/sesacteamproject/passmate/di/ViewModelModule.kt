@@ -1,6 +1,7 @@
 package org.sesacteamproject.passmate.di
 
 import org.koin.dsl.module
+import org.sesacteamproject.passmate.navigation.AppShellViewModel
 import org.sesacteamproject.passmate.ui.auth.SignInViewModel
 import org.sesacteamproject.passmate.ui.home.RoomListViewModel
 import org.sesacteamproject.passmate.ui.hostroom.CreateRoomViewModel
@@ -24,6 +25,7 @@ import org.sesacteamproject.passmate.ui.result.ResultViewModel
 import org.sesacteamproject.passmate.ui.waiting.WaitingViewModel
 
 val viewModelModule = module {
+    factory { AppShellViewModel(get()) }
     factory { SignInViewModel(get(), get(), get()) }
     factory { RoomListViewModel(get()) }
     factory { JoinViewModel(get(), get(), get(), get()) }
