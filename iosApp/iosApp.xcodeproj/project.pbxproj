@@ -11,11 +11,6 @@
 		A1010002AABBCCDDEEFF0002 /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002AABBCCDDEEFF0002 /* iOSApp.swift */; };
 		A1010004AABBCCDDEEFF0004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1011004AABBCCDDEEFF0004 /* Assets.xcassets */; };
 		A1010005AABBCCDDEEFF0005 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1011005AABBCCDDEEFF0005 /* Preview Assets.xcassets */; };
-		A1010022AABBCCDDEEFF0022 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011022AABBCCDDEEFF0022 /* HomeView.swift */; };
-		A1010023AABBCCDDEEFF0023 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011023AABBCCDDEEFF0023 /* HomeViewModel.swift */; };
-		A1010024AABBCCDDEEFF0024 /* HomeUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011024AABBCCDDEEFF0024 /* HomeUiState.swift */; };
-		A1010025AABBCCDDEEFF0025 /* HomeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011025AABBCCDDEEFF0025 /* HomeAction.swift */; };
-		A1010026AABBCCDDEEFF0026 /* HomeEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011026AABBCCDDEEFF0026 /* HomeEvent.swift */; };
 		A1010027AABBCCDDEEFF0027 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011027AABBCCDDEEFF0027 /* SignInView.swift */; };
 		A1010028AABBCCDDEEFF0028 /* SignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011028AABBCCDDEEFF0028 /* SignInViewModel.swift */; };
 		A1010029AABBCCDDEEFF0029 /* SignInUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011029AABBCCDDEEFF0029 /* SignInUiState.swift */; };
@@ -154,11 +149,6 @@
 		A1011005AABBCCDDEEFF0005 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A1011006AABBCCDDEEFF0006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FEA9D4AD37B8EF9BE110840A /* Passmate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Passmate.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A1011022AABBCCDDEEFF0022 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		A1011023AABBCCDDEEFF0023 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
-		A1011024AABBCCDDEEFF0024 /* HomeUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeUiState.swift; sourceTree = "<group>"; };
-		A1011025AABBCCDDEEFF0025 /* HomeAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeAction.swift; sourceTree = "<group>"; };
-		A1011026AABBCCDDEEFF0026 /* HomeEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeEvent.swift; sourceTree = "<group>"; };
 		A1011027AABBCCDDEEFF0027 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		A1011028AABBCCDDEEFF0028 /* SignInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewModel.swift; sourceTree = "<group>"; };
 		A1011029AABBCCDDEEFF0029 /* SignInUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInUiState.swift; sourceTree = "<group>"; };
@@ -369,16 +359,11 @@
 		A1012011AABBCCDDEEFF0011 /* home */ = {
 			isa = PBXGroup;
 			children = (
-				A1011022AABBCCDDEEFF0022 /* HomeView.swift */,
 				A101100074AABBCCDDEEFF0074 /* RoomListUiState.swift */,
 				A101100075AABBCCDDEEFF0075 /* RoomListAction.swift */,
 				A101100076AABBCCDDEEFF0076 /* RoomListEvent.swift */,
 				A101100077AABBCCDDEEFF0077 /* RoomListViewModel.swift */,
 				A101100078AABBCCDDEEFF0078 /* RoomListView.swift */,
-				A1011023AABBCCDDEEFF0023 /* HomeViewModel.swift */,
-				A1011024AABBCCDDEEFF0024 /* HomeUiState.swift */,
-				A1011025AABBCCDDEEFF0025 /* HomeAction.swift */,
-				A1011026AABBCCDDEEFF0026 /* HomeEvent.swift */,
 			);
 			path = home;
 			sourceTree = "<group>";
@@ -687,11 +672,6 @@
 			files = (
 				A1010001AABBCCDDEEFF0001 /* ContentView.swift in Sources */,
 				A1010002AABBCCDDEEFF0002 /* iOSApp.swift in Sources */,
-				A1010022AABBCCDDEEFF0022 /* HomeView.swift in Sources */,
-				A1010023AABBCCDDEEFF0023 /* HomeViewModel.swift in Sources */,
-				A1010024AABBCCDDEEFF0024 /* HomeUiState.swift in Sources */,
-				A1010025AABBCCDDEEFF0025 /* HomeAction.swift in Sources */,
-				A1010026AABBCCDDEEFF0026 /* HomeEvent.swift in Sources */,
 				A1010027AABBCCDDEEFF0027 /* SignInView.swift in Sources */,
 				A1010028AABBCCDDEEFF0028 /* SignInViewModel.swift in Sources */,
 				A1010029AABBCCDDEEFF0029 /* SignInUiState.swift in Sources */,
