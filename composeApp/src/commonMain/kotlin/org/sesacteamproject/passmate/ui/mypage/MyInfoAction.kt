@@ -6,23 +6,22 @@ sealed interface MyInfoAction {
 
     data object Retry : MyInfoAction
 
-    data object LoadMore : MyInfoAction
+    // 계정 정보·캐릭터 변경 시트 (M-12-1·M-12-7)
+    data object ClickEditProfile : MyInfoAction
 
-    data class ClickRoomReport(val roomId: Long) : MyInfoAction
+    data object ClickPaymentMethod : MyInfoAction
 
-    data class ClickRejoin(val pin: String) : MyInfoAction
+    data object ClickNotifications : MyInfoAction
 
     data object ClickCoinHistory : MyInfoAction
 
-    // 내 명성·뱃지 상세(M-09)로 이동
-    data object ClickReputation : MyInfoAction
+    // 확인 다이얼로그를 거친 뒤 호출된다 — 다이얼로그 소유는 화면 (규칙 §11-1)
+    data object ConfirmSignOut : MyInfoAction
 
-    // 내가 만든 방(M-13)으로 이동
-    data object ClickHostedRooms : MyInfoAction
+    data object ConfirmDeleteAccount : MyInfoAction
 
-    // 정산(M-T4)으로 이동
-    data object ClickEarnings : MyInfoAction
+    // 시트에서 프로필 저장 완료 — 카드 갱신
+    data object ProfileUpdated : MyInfoAction
 
-    // 설정(내 정보 관리, M-12)으로 이동
-    data object ClickSettings : MyInfoAction
+    data class Notice(val message: String) : MyInfoAction
 }

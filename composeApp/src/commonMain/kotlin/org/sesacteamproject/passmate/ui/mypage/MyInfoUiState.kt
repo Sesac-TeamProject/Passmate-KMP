@@ -1,15 +1,11 @@
 package org.sesacteamproject.passmate.ui.mypage
 
-import org.sesacteamproject.passmate.user.domain.model.JoinedRoom
-import org.sesacteamproject.passmate.user.domain.model.MyPageSummary
-import org.sesacteamproject.passmate.user.domain.model.OngoingRoom
+import org.sesacteamproject.passmate.user.domain.model.UserProfile
 
 data class MyInfoUiState(
     val isLoading: Boolean = true,
     val loadFailed: Boolean = false,
-    val summary: MyPageSummary? = null,
-    val ongoing: OngoingRoom? = null,
-    val rooms: List<JoinedRoom> = emptyList(),
-    val nextCursor: String? = null,
-    val isLoadingMore: Boolean = false
+    val profile: UserProfile? = null,
+    // 로그아웃·탈퇴 요청 in-flight — 중복 호출 방지 (규칙 §9)
+    val isProcessing: Boolean = false
 )

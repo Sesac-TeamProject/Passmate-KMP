@@ -6,49 +6,63 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.ReputationBadge
+import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.theme.PassmateColors
-import org.sesacteamproject.passmate.user.domain.model.JoinedRoom
-import org.sesacteamproject.passmate.user.domain.model.MyPageSummary
-import org.sesacteamproject.passmate.user.domain.model.OngoingRoom
+import org.sesacteamproject.passmate.ui.payment.PaymentMethodSheet
+import org.sesacteamproject.passmate.user.domain.model.UserProfile
 
-// Figma "UI 디자인 v6" M-08(349:9544) — 진행 중 방·누적 요약·보완 주제·참여한 방 목록(→리포트) (T064)
+// 시트 3종 중 무엇이 열려 있는지 — 표시 여부는 이 화면이 소유한다 (규칙 §11-1)
+private enum class MyInfoSheet {
+    EDIT_PROFILE,
+    PAYMENT_METHOD,
+    NOTIFICATIONS
+}
+
+// Figma "UI 디자인 v6" M-12(349:9683) — 마이 탭 루트: 프로필·계정·코인·정산·알림·로그아웃
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyInfoScreen(
-    viewModel: MyInfoViewModel = koinScreenViewModel(),
-    onNavigate: (NavigationAction) -> Unit
-) {
+fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
+    val viewModel: MyInfoViewModel = koinScreenViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val sheetState = rememberModalBottomSheetState()
+    var activeSheet by remember { mutableStateOf<MyInfoSheet?>(null) }
+    var editInitial by remember { mutableStateOf<Pair<String, Int?>>("" to null) }
+    var showSignOutConfirm by remember { mutableStateOf(false) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.onAction(MyInfoAction.Enter)
@@ -57,13 +71,15 @@ fun MyInfoScreen(
         viewModel.event.collect { event ->
             when (event) {
                 is MyInfoEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
-                is MyInfoEvent.OpenReport -> onNavigate(NavigationAction.NavigateToResult(event.roomId))
-                is MyInfoEvent.Rejoin -> onNavigate(NavigationAction.NavigateToWaiting(event.pin))
+                is MyInfoEvent.OpenEditProfile -> {
+                    editInitial = event.nickname to event.avatarId
+                    activeSheet = MyInfoSheet.EDIT_PROFILE
+                }
+                is MyInfoEvent.OpenPaymentMethod -> activeSheet = MyInfoSheet.PAYMENT_METHOD
+                is MyInfoEvent.OpenNotifications -> activeSheet = MyInfoSheet.NOTIFICATIONS
                 is MyInfoEvent.OpenCoinHistory -> onNavigate(NavigationAction.NavigateToCoinHistory)
-                is MyInfoEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
-                is MyInfoEvent.OpenHostedRooms -> onNavigate(NavigationAction.NavigateToHostedRooms)
-                is MyInfoEvent.OpenEarnings -> onNavigate(NavigationAction.NavigateToEarnings)
-                is MyInfoEvent.OpenSettings -> onNavigate(NavigationAction.NavigateToSettings)
+                is MyInfoEvent.SignedOut -> onNavigate(NavigationAction.NavigateToHome)
+                is MyInfoEvent.AccountDeleted -> onNavigate(NavigationAction.NavigateToHome)
                 is MyInfoEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -72,20 +88,120 @@ fun MyInfoScreen(
         MyInfoContentScreen(
             uiState = uiState,
             onAction = viewModel::onAction,
-            onClickBack = { onNavigate(NavigationAction.NavigateBack) }
+            onClickBack = { onNavigate(NavigationAction.NavigateBack) },
+            onClickSignOut = { showSignOutConfirm = true },
+            onClickDelete = { showDeleteConfirm = true }
         )
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
+    activeSheet?.let { sheet ->
+        ModalBottomSheet(
+            onDismissRequest = { activeSheet = null },
+            sheetState = sheetState,
+            containerColor = PassmateColors.Surface
+        ) {
+            when (sheet) {
+                MyInfoSheet.EDIT_PROFILE -> EditProfileSheet(
+                    initialNickname = editInitial.first,
+                    initialAvatarId = editInitial.second,
+                    onSaved = {
+                        activeSheet = null
+                        viewModel.onAction(MyInfoAction.ProfileUpdated)
+                    },
+                    onNotice = { viewModel.onAction(MyInfoAction.Notice(it)) },
+                    onClose = { activeSheet = null }
+                )
+                MyInfoSheet.PAYMENT_METHOD -> PaymentMethodSheet(
+                    onSaved = {
+                        activeSheet = null
+                        viewModel.onAction(MyInfoAction.Notice("기본 결제 수단을 저장했어요"))
+                    },
+                    onNotice = { viewModel.onAction(MyInfoAction.Notice(it)) },
+                    onClose = { activeSheet = null }
+                )
+                MyInfoSheet.NOTIFICATIONS -> NotificationSettingsSheet(
+                    onNotice = { viewModel.onAction(MyInfoAction.Notice(it)) },
+                    onClose = { activeSheet = null }
+                )
+            }
+        }
+    }
+    if (showSignOutConfirm) {
+        ConfirmDialog(
+            title = "로그아웃",
+            message = "로그아웃하면 게스트로 전환돼요. 기록은 계정에 안전하게 보관돼요.",
+            confirmLabel = "로그아웃",
+            onConfirm = {
+                showSignOutConfirm = false
+                viewModel.onAction(MyInfoAction.ConfirmSignOut)
+            },
+            onDismiss = { showSignOutConfirm = false }
+        )
+    }
+    if (showDeleteConfirm) {
+        ConfirmDialog(
+            title = "회원 탈퇴",
+            message = "탈퇴하면 참여·개설 기록과 보유 코인이 모두 삭제되고 되돌릴 수 없어요. 정산 대기 금액이나 진행 중인 방이 있으면 탈퇴할 수 없어요.",
+            confirmLabel = "탈퇴",
+            onConfirm = {
+                showDeleteConfirm = false
+                viewModel.onAction(MyInfoAction.ConfirmDeleteAccount)
+            },
+            onDismiss = { showDeleteConfirm = false }
+        )
+    }
+}
+
+@Composable
+private fun ConfirmDialog(
+    title: String,
+    message: String,
+    confirmLabel: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = title,
+                color = PassmateColors.TextPrimary,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Text(
+                text = message,
+                color = PassmateColors.TextSecondary,
+                fontSize = 14.sp,
+                letterSpacing = (-0.28).sp
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(text = confirmLabel, color = PassmateColors.WeakTopicText, fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "취소", color = PassmateColors.TextSecondary)
+            }
+        },
+        containerColor = PassmateColors.Surface
+    )
 }
 
 @Composable
 private fun MyInfoContentScreen(
     uiState: MyInfoUiState,
     onAction: (MyInfoAction) -> Unit,
-    onClickBack: () -> Unit
+    onClickBack: () -> Unit,
+    onClickSignOut: () -> Unit,
+    onClickDelete: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -98,22 +214,25 @@ private fun MyInfoContentScreen(
             else -> LoadedMyInfo(
                 uiState = uiState,
                 onAction = onAction,
-                onClickBack = onClickBack
+                onClickBack = onClickBack,
+                onClickSignOut = onClickSignOut,
+                onClickDelete = onClickDelete
             )
         }
     }
 }
 
 @Composable
-private fun ColumnScope.LoadedMyInfo(
+private fun LoadedMyInfo(
     uiState: MyInfoUiState,
     onAction: (MyInfoAction) -> Unit,
-    onClickBack: () -> Unit
+    onClickBack: () -> Unit,
+    onClickSignOut: () -> Unit,
+    onClickDelete: () -> Unit
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -124,443 +243,131 @@ private fun ColumnScope.LoadedMyInfo(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "참여한 방",
+                text = "설정",
                 color = PassmateColors.TextPrimary,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.48).sp
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = "설정",
-                    color = PassmateColors.PrimaryDeep,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = (-0.28).sp,
-                    modifier = Modifier
-                        .clickable { onAction(MyInfoAction.ClickSettings) }
-                        .padding(4.dp)
-                )
-                Text(
-                    text = "닫기",
-                    color = PassmateColors.TextSecondary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = (-0.28).sp,
-                    modifier = Modifier
-                        .clickable(onClick = onClickBack)
-                        .padding(4.dp)
-                )
-            }
-        }
-        val ongoing = uiState.ongoing
-        val summary = uiState.summary
-
-        if (ongoing != null) {
-            OngoingCard(
-                ongoing = ongoing,
-                onClickRejoin = { onAction(MyInfoAction.ClickRejoin(ongoing.pin)) }
-            )
-        }
-        if (summary != null) {
-            SummaryCard(summary = summary)
-            WeakTopicsRow(topics = summary.weakTopics)
-        }
-        HostedRoomsRow(onClick = { onAction(MyInfoAction.ClickHostedRooms) })
-        EarningsRow(onClick = { onAction(MyInfoAction.ClickEarnings) })
-        ReputationRow(onClick = { onAction(MyInfoAction.ClickReputation) })
-        CoinHistoryRow(onClick = { onAction(MyInfoAction.ClickCoinHistory) })
-        if (uiState.rooms.isEmpty() && ongoing == null) {
-            EmptyRooms()
-        } else {
-            uiState.rooms.forEach { room ->
-                JoinedRoomRow(
-                    room = room,
-                    onClickReport = { onAction(MyInfoAction.ClickRoomReport(room.roomId)) }
-                )
-            }
-        }
-        if (uiState.nextCursor != null) {
-            LoadMoreRow(
-                isLoadingMore = uiState.isLoadingMore,
-                onClick = { onAction(MyInfoAction.LoadMore) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun HostedRoomsRow(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "내가 만든 방",
-            color = PassmateColors.TextPrimary,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
-    }
-}
-
-@Composable
-private fun EarningsRow(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "정산",
-            color = PassmateColors.TextPrimary,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
-    }
-}
-
-@Composable
-private fun ReputationRow(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "내 명성·뱃지",
-            color = PassmateColors.TextPrimary,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
-    }
-}
-
-@Composable
-private fun CoinHistoryRow(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "코인·결제 내역",
-            color = PassmateColors.TextPrimary,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
-    }
-}
-
-@Composable
-private fun OngoingCard(
-    ongoing: OngoingRoom,
-    onClickRejoin: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, PassmateColors.Primary, RoundedCornerShape(16.dp))
-            .background(PassmateColors.BackgroundMint, RoundedCornerShape(16.dp))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
+            Text(
+                text = "닫기",
+                color = PassmateColors.TextSecondary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = (-0.28).sp,
                 modifier = Modifier
-                    .background(PassmateColors.Primary, CircleShape)
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    text = "진행 중",
-                    color = PassmateColors.Surface,
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.24).sp
-                )
-            }
-            Text(
-                text = ongoing.title,
-                color = PassmateColors.TextPrimary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp
+                    .clickable(onClick = onClickBack)
+                    .padding(4.dp)
             )
         }
-        Text(
-            text = ongoingSubtitle(ongoing),
-            color = PassmateColors.TextSecondary,
-            fontSize = 14.sp,
-            letterSpacing = (-0.28).sp
+        uiState.profile?.let { profile ->
+            ProfileCard(profile = profile)
+        }
+        SettingRow(label = "계정 정보 · 내 캐릭터", onClick = { onAction(MyInfoAction.ClickEditProfile) })
+        SettingRow(label = "결제 수단 관리", onClick = { onAction(MyInfoAction.ClickPaymentMethod) })
+        SettingRow(label = "알림 설정", onClick = { onAction(MyInfoAction.ClickNotifications) })
+        SettingRow(label = "코인·결제 내역", onClick = { onAction(MyInfoAction.ClickCoinHistory) })
+        SettingRow(
+            label = "로그아웃",
+            labelColor = PassmateColors.TextSecondary,
+            onClick = onClickSignOut
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(44.dp)
-                .background(PassmateColors.Primary, RoundedCornerShape(12.dp))
-                .clickable(onClick = onClickRejoin),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "다시 들어가기",
-                color = PassmateColors.Surface,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp
-            )
+        SettingRow(
+            label = "회원 탈퇴",
+            labelColor = PassmateColors.WeakTopicText,
+            onClick = onClickDelete
+        )
+        if (uiState.isProcessing) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = PassmateColors.Primary,
+                    strokeWidth = 2.dp
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun SummaryCard(summary: MyPageSummary) {
+private fun ProfileCard(profile: UserProfile) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .border(1.dp, PassmateColors.Border, RoundedCornerShape(20.dp))
             .background(PassmateColors.Surface, RoundedCornerShape(20.dp))
             .padding(horizontal = 18.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .size(70.dp)
-                .border(6.dp, PassmateColors.Primary, CircleShape),
-            contentAlignment = Alignment.Center
+        StudentAvatar(
+            avatarId = profile.avatarId,
+            modifier = Modifier.size(52.dp)
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "${summary.accuracyPercent}%",
-                    color = PassmateColors.PrimaryDeep,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = (-0.32).sp
+                    text = profile.nickname,
+                    color = PassmateColors.TextPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.36).sp
                 )
-                Text(
-                    text = "평균",
-                    color = PassmateColors.TextSecondary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = (-0.28).sp
-                )
-            }
-        }
-        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Text(
-                text = summaryLine(summary),
-                color = PassmateColors.TextPrimary,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.32).sp
-            )
-            val trendText = summary.trendText
-
-            if (trendText != null) {
-                Text(
-                    text = trendText,
-                    color = PassmateColors.TextSecondary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = (-0.28).sp
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun WeakTopicsRow(topics: List<String>) {
-    if (topics.isNotEmpty()) {
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "보완할 주제",
-                color = PassmateColors.TextSecondary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp,
-                modifier = Modifier.padding(vertical = 6.dp)
-            )
-            topics.forEach { topic ->
-                Box(
-                    modifier = Modifier
-                        .background(PassmateColors.WeakTopicBg, CircleShape)
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = topic,
-                        color = PassmateColors.WeakTopicText,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = (-0.28).sp
-                    )
+                profile.level?.let { level ->
+                    ReputationBadge(level = level)
                 }
             }
+            Text(
+                text = profileSubtitle(profile),
+                color = PassmateColors.TextSecondary,
+                fontSize = 13.sp,
+                letterSpacing = (-0.26).sp
+            )
+            profile.coins?.let { coins ->
+                Text(
+                    text = "보유 코인 ${formatCoins(coins)} C",
+                    color = PassmateColors.PrimaryDeep,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = (-0.26).sp
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun JoinedRoomRow(
-    room: JoinedRoom,
-    onClickReport: () -> Unit
+private fun SettingRow(
+    label: String,
+    labelColor: Color = PassmateColors.TextPrimary,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
             .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        RankBadge(rank = room.myRank)
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            Text(
-                text = room.title,
-                color = PassmateColors.TextPrimary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp
-            )
-            Text(
-                text = "${room.dateLabel} · ${room.questionCount}문항",
-                color = PassmateColors.TextSecondary,
-                fontSize = 12.sp,
-                letterSpacing = (-0.24).sp
-            )
-        }
-        val myScore = room.myScore
-
-        if (myScore != null) {
-            Text(
-                text = "${formatScore(myScore)}점",
-                color = PassmateColors.TextPrimary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp
-            )
-        }
-        if (room.hasReport) {
-            Box(
-                modifier = Modifier
-                    .height(30.dp)
-                    .background(PassmateColors.FieldGray, CircleShape)
-                    .clickable(onClick = onClickReport)
-                    .padding(horizontal = 12.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "리포트",
-                    color = PassmateColors.PrimaryDeep,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = (-0.28).sp
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun RankBadge(rank: Int?) {
-    val (background, textColor) = rankStyle(rank)
-
-    Box(
-        modifier = Modifier
-            .size(26.dp)
-            .background(background, CircleShape),
-        contentAlignment = Alignment.Center
-    ) {
         Text(
-            text = rank?.toString() ?: "-",
-            color = textColor,
-            fontSize = 14.sp,
+            text = label,
+            color = labelColor,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp
+            modifier = Modifier.weight(1f)
         )
-    }
-}
-
-@Composable
-private fun LoadMoreRow(
-    isLoadingMore: Boolean,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .border(1.dp, PassmateColors.Border, RoundedCornerShape(14.dp))
-            .clickable(enabled = !isLoadingMore, onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (isLoadingMore) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(18.dp),
-                color = PassmateColors.Primary,
-                strokeWidth = 2.dp
-            )
-        } else {
-            Text(
-                text = "더 보기",
-                color = PassmateColors.PrimaryDeep,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp
-            )
-        }
-    }
-}
-
-@Composable
-private fun EmptyRooms() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "아직 참여한 방이 없어요",
-            color = PassmateColors.TextSecondary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp
-        )
+        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
     }
 }
 
@@ -582,7 +389,7 @@ private fun ErrorBox(onRetry: () -> Unit) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "기록을 불러오지 못했어요",
+            text = "내 정보를 불러오지 못했어요",
             color = PassmateColors.TextPrimary,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
@@ -602,47 +409,15 @@ private fun ErrorBox(onRetry: () -> Unit) {
     }
 }
 
-private fun ongoingSubtitle(ongoing: OngoingRoom): String {
+private fun profileSubtitle(profile: UserProfile): String {
     val parts = mutableListOf<String>()
 
-    ongoing.progressLabel?.let { parts.add(it) }
-    ongoing.hostNickname?.let { parts.add("$it 선생님") }
-    parts.add("PIN ${formatPin(ongoing.pin)}")
+    profile.email?.let { parts.add(it) }
+    profile.joinedAt?.let { parts.add("${it.take(10)} 가입") }
 
-    return parts.joinToString(" · ")
+    return parts.joinToString(" · ").ifEmpty { "구글 계정으로 로그인" }
 }
 
-private fun summaryLine(summary: MyPageSummary): String {
-    val rankPart = summary.avgRank?.let { " · 평균 ${formatRank(it)}위" } ?: ""
-
-    return "${summary.participationCount}회 참여$rankPart"
-}
-
-private fun rankStyle(rank: Int?): Pair<Color, Color> {
-    return when (rank) {
-        1 -> PassmateColors.ChipGold to PassmateColors.ChipGoldText
-        2 -> PassmateColors.ChipBlue to PassmateColors.ChipBlueText
-        3 -> PassmateColors.ChipOrange to PassmateColors.ChipOrangeText
-        else -> PassmateColors.FieldGray to PassmateColors.TextSecondary
-    }
-}
-
-private fun formatPin(pin: String): String {
-    return pin.chunked(3).joinToString(" ")
-}
-
-private fun formatRank(rank: Double): String {
-    val rounded = (rank * 10).toLong()
-
-    return if (rounded % 10 == 0L) {
-        (rounded / 10).toString()
-    } else {
-        "${rounded / 10}.${rounded % 10}"
-    }
-}
-
-private fun formatScore(score: Double): String {
-    val digits = score.toLong().toString()
-
-    return digits.reversed().chunked(3).joinToString(",").reversed()
+private fun formatCoins(coins: Long): String {
+    return coins.toString().reversed().chunked(3).joinToString(",").reversed()
 }

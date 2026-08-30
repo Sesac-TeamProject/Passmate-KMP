@@ -21,6 +21,7 @@ import org.sesacteamproject.passmate.ui.join.JoinScreen
 import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsScreen
 import org.sesacteamproject.passmate.ui.hostroom.RoomReportScreen
 import org.sesacteamproject.passmate.ui.hostroom.SessionControlScreen
+import org.sesacteamproject.passmate.ui.mypage.JoinedRoomsScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.mypage.SettingsScreen
@@ -162,6 +163,9 @@ actual fun AppNavHost() {
         }
         composable(Route.MyInfo.route) {
             MyInfoScreen(onNavigate = navController::handleNavigationAction)
+        }
+        composable(Route.JoinedRooms.route) {
+            JoinedRoomsScreen(onNavigate = navController::handleNavigationAction)
         }
         composable(Route.Reputation.route) {
             ReputationScreen(onNavigate = navController::handleNavigationAction)

@@ -10,6 +10,7 @@ import org.sesacteamproject.passmate.ui.join.JoinScreen
 import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsScreen
 import org.sesacteamproject.passmate.ui.hostroom.RoomReportScreen
 import org.sesacteamproject.passmate.ui.hostroom.SessionControlScreen
+import org.sesacteamproject.passmate.ui.mypage.JoinedRoomsScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.mypage.SettingsScreen
@@ -42,6 +43,8 @@ private sealed interface JvmDestination {
     data class Result(val roomId: Long) : JvmDestination
 
     data object MyInfo : JvmDestination
+
+    data object JoinedRooms : JvmDestination
 
     data object Reputation : JvmDestination
 
@@ -122,6 +125,7 @@ actual fun AppNavHost() {
             onNavigate = onNavigate
         )
         is JvmDestination.MyInfo -> MyInfoScreen(onNavigate = onNavigate)
+        is JvmDestination.JoinedRooms -> JoinedRoomsScreen(onNavigate = onNavigate)
         is JvmDestination.Reputation -> ReputationScreen(onNavigate = onNavigate)
         is JvmDestination.HostedRooms -> HostedRoomsScreen(onNavigate = onNavigate)
         is JvmDestination.RoomReport -> RoomReportScreen(

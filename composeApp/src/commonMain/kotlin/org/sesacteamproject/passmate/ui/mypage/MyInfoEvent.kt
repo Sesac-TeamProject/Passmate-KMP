@@ -2,27 +2,21 @@ package org.sesacteamproject.passmate.ui.mypage
 
 sealed interface MyInfoEvent {
 
-    // 마이페이지는 회원 전용 — 게스트 진입 시 로그인 유도 (규칙 §8)
+    // 설정은 회원 전용 — 게스트 진입 시 로그인 유도 (규칙 §8)
     data object RequireSignIn : MyInfoEvent
 
-    data class OpenReport(val roomId: Long) : MyInfoEvent
+    data class OpenEditProfile(val nickname: String, val avatarId: Int?) : MyInfoEvent
 
-    data class Rejoin(val pin: String) : MyInfoEvent
+    data object OpenPaymentMethod : MyInfoEvent
 
-    // 코인·결제 내역 화면으로 이동 (US14, M-12)
+    data object OpenNotifications : MyInfoEvent
+
     data object OpenCoinHistory : MyInfoEvent
 
-    // 내 명성·뱃지 상세 화면으로 이동 (M-09)
-    data object OpenReputation : MyInfoEvent
+    // 로그아웃·탈퇴 완료 → 홈으로 (세션 정리는 shared가 수행)
+    data object SignedOut : MyInfoEvent
 
-    // 내가 만든 방 화면으로 이동 (M-13)
-    data object OpenHostedRooms : MyInfoEvent
-
-    // 정산 화면으로 이동 (M-T4)
-    data object OpenEarnings : MyInfoEvent
-
-    // 설정 화면으로 이동 (M-12)
-    data object OpenSettings : MyInfoEvent
+    data object AccountDeleted : MyInfoEvent
 
     data class ShowNotice(val message: String) : MyInfoEvent
 }

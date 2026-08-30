@@ -4,73 +4,24 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
-import org.sesacteamproject.passmate.auth.domain.usecase.SignOutUseCase
 import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.user.domain.usecase.DeleteAccountUseCase
-import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
 
+// 설정 (마이 탭 우상단 "설정") — 마이 루트에서 닿지 않는 회원 탈퇴(M-12-12)만 둔다
 class SettingsViewModel(
-    private val getMyProfileUseCase: GetMyProfileUseCase,
-    private val signOutUseCase: SignOutUseCase,
     private val deleteAccountUseCase: DeleteAccountUseCase,
     private val isSignedInUseCase: IsSignedInUseCase
 ) : MviViewModel<SettingsUiState, SettingsAction, SettingsEvent>(SettingsUiState()) {
 
-    private var hasEntered = false
-
     private fun onEnter() {
-        if (hasEntered) {
-            return
-        }
-        hasEntered = true
         // 회원 전용 가드 — 서버 검증이 최종 권위 (규칙 §8)
         if (!isSignedInUseCase.invoke()) {
             viewModelScope.launch {
                 _event.emit(SettingsEvent.RequireSignIn)
             }
-        } else {
-            load()
-        }
-    }
-
-    private fun load() {
-        _uiState.update { it.copy(isLoading = true, loadFailed = false) }
-        viewModelScope.launch {
-            getMyProfileUseCase.invoke()
-                .onSuccess { profile ->
-                    _uiState.update {
-                        it.copy(isLoading = false, loadFailed = false, profile = profile)
-                    }
-                }
-                .onFailure {
-                    _uiState.update { it.copy(isLoading = false, loadFailed = true) }
-                }
-        }
-    }
-
-    private fun onClickEditProfile() {
-        val profile = _uiState.value.profile
-
-        if (profile != null) {
-            viewModelScope.launch {
-                _event.emit(SettingsEvent.OpenEditProfile(profile.nickname, profile.avatarId))
-            }
-        }
-    }
-
-    private fun onConfirmSignOut() {
-        if (_uiState.value.isProcessing) {
-            return
-        }
-        _uiState.update { it.copy(isProcessing = true) }
-        viewModelScope.launch {
-            // 로컬 세션 정리는 shared가 항상 수행 — 실패 케이스 없음 (M-12-11)
-            signOutUseCase.invoke()
-            _uiState.update { it.copy(isProcessing = false) }
-            _event.emit(SettingsEvent.SignedOut)
         }
     }
 
@@ -103,35 +54,10 @@ class SettingsViewModel(
         }
     }
 
-    private fun onProfileUpdated() {
-        load()
-        emitNotice("내 정보를 저장했어요")
-    }
-
-    private fun emitNotice(message: String) {
-        viewModelScope.launch {
-            _event.emit(SettingsEvent.ShowNotice(message))
-        }
-    }
-
-    private fun emit(event: SettingsEvent) {
-        viewModelScope.launch {
-            _event.emit(event)
-        }
-    }
-
     override fun onAction(action: SettingsAction) {
         when (action) {
             is SettingsAction.Enter -> onEnter()
-            is SettingsAction.Retry -> load()
-            is SettingsAction.ClickEditProfile -> onClickEditProfile()
-            is SettingsAction.ClickPaymentMethod -> emit(SettingsEvent.OpenPaymentMethod)
-            is SettingsAction.ClickNotifications -> emit(SettingsEvent.OpenNotifications)
-            is SettingsAction.ClickCoinHistory -> emit(SettingsEvent.OpenCoinHistory)
-            is SettingsAction.ConfirmSignOut -> onConfirmSignOut()
             is SettingsAction.ConfirmDeleteAccount -> onConfirmDeleteAccount()
-            is SettingsAction.ProfileUpdated -> onProfileUpdated()
-            is SettingsAction.Notice -> emitNotice(action.message)
         }
     }
 }
