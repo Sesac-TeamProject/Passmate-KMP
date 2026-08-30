@@ -59,11 +59,6 @@ fun JoinedRoomsScreen(
                 is JoinedRoomsEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
                 is JoinedRoomsEvent.OpenReport -> onNavigate(NavigationAction.NavigateToResult(event.roomId))
                 is JoinedRoomsEvent.Rejoin -> onNavigate(NavigationAction.NavigateToWaiting(event.pin))
-                is JoinedRoomsEvent.OpenCoinHistory -> onNavigate(NavigationAction.NavigateToCoinHistory)
-                is JoinedRoomsEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
-                is JoinedRoomsEvent.OpenHostedRooms -> onNavigate(NavigationAction.NavigateToHostedRooms)
-                is JoinedRoomsEvent.OpenEarnings -> onNavigate(NavigationAction.NavigateToEarnings)
-                is JoinedRoomsEvent.OpenSettings -> onNavigate(NavigationAction.NavigateToSettings)
                 is JoinedRoomsEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -71,8 +66,7 @@ fun JoinedRoomsScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         JoinedRoomsContentScreen(
             uiState = uiState,
-            onAction = viewModel::onAction,
-            onClickBack = { onNavigate(NavigationAction.NavigateBack) }
+            onAction = viewModel::onAction
         )
         SnackbarHost(
             hostState = snackbarHostState,
@@ -84,8 +78,7 @@ fun JoinedRoomsScreen(
 @Composable
 private fun JoinedRoomsContentScreen(
     uiState: JoinedRoomsUiState,
-    onAction: (JoinedRoomsAction) -> Unit,
-    onClickBack: () -> Unit
+    onAction: (JoinedRoomsAction) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -97,8 +90,7 @@ private fun JoinedRoomsContentScreen(
             uiState.loadFailed -> ErrorBox(onRetry = { onAction(JoinedRoomsAction.Retry) })
             else -> LoadedJoinedRooms(
                 uiState = uiState,
-                onAction = onAction,
-                onClickBack = onClickBack
+                onAction = onAction
             )
         }
     }
@@ -107,52 +99,23 @@ private fun JoinedRoomsContentScreen(
 @Composable
 private fun ColumnScope.LoadedJoinedRooms(
     uiState: JoinedRoomsUiState,
-    onAction: (JoinedRoomsAction) -> Unit,
-    onClickBack: () -> Unit
+    onAction: (JoinedRoomsAction) -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .weight(1f)
             .verticalScroll(rememberScrollState())
-            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 24.dp),
+            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "참여한 방",
-                color = PassmateColors.TextPrimary,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.48).sp
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = "설정",
-                    color = PassmateColors.PrimaryDeep,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = (-0.28).sp,
-                    modifier = Modifier
-                        .clickable { onAction(JoinedRoomsAction.ClickSettings) }
-                        .padding(4.dp)
-                )
-                Text(
-                    text = "닫기",
-                    color = PassmateColors.TextSecondary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = (-0.28).sp,
-                    modifier = Modifier
-                        .clickable(onClick = onClickBack)
-                        .padding(4.dp)
-                )
-            }
-        }
+        Text(
+            text = "참여한 방",
+            color = PassmateColors.TextPrimary,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.48).sp
+        )
         val ongoing = uiState.ongoing
         val summary = uiState.summary
 
@@ -166,10 +129,6 @@ private fun ColumnScope.LoadedJoinedRooms(
             SummaryCard(summary = summary)
             WeakTopicsRow(topics = summary.weakTopics)
         }
-        HostedRoomsRow(onClick = { onAction(JoinedRoomsAction.ClickHostedRooms) })
-        EarningsRow(onClick = { onAction(JoinedRoomsAction.ClickEarnings) })
-        ReputationRow(onClick = { onAction(JoinedRoomsAction.ClickReputation) })
-        CoinHistoryRow(onClick = { onAction(JoinedRoomsAction.ClickCoinHistory) })
         if (uiState.rooms.isEmpty() && ongoing == null) {
             EmptyRooms()
         } else {
@@ -186,90 +145,6 @@ private fun ColumnScope.LoadedJoinedRooms(
                 onClick = { onAction(JoinedRoomsAction.LoadMore) }
             )
         }
-    }
-}
-
-@Composable
-private fun HostedRoomsRow(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "내가 만든 방",
-            color = PassmateColors.TextPrimary,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
-    }
-}
-
-@Composable
-private fun EarningsRow(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "정산",
-            color = PassmateColors.TextPrimary,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
-    }
-}
-
-@Composable
-private fun ReputationRow(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "내 명성·뱃지",
-            color = PassmateColors.TextPrimary,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
-    }
-}
-
-@Composable
-private fun CoinHistoryRow(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "코인·결제 내역",
-            color = PassmateColors.TextPrimary,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
     }
 }
 

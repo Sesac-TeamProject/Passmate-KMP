@@ -91,36 +91,6 @@ class JoinedRoomsViewModel(
         }
     }
 
-    private fun onClickCoinHistory() {
-        viewModelScope.launch {
-            _event.emit(JoinedRoomsEvent.OpenCoinHistory)
-        }
-    }
-
-    private fun onClickReputation() {
-        viewModelScope.launch {
-            _event.emit(JoinedRoomsEvent.OpenReputation)
-        }
-    }
-
-    private fun onClickHostedRooms() {
-        viewModelScope.launch {
-            _event.emit(JoinedRoomsEvent.OpenHostedRooms)
-        }
-    }
-
-    private fun onClickEarnings() {
-        viewModelScope.launch {
-            _event.emit(JoinedRoomsEvent.OpenEarnings)
-        }
-    }
-
-    private fun onClickSettings() {
-        viewModelScope.launch {
-            _event.emit(JoinedRoomsEvent.OpenSettings)
-        }
-    }
-
     override fun onAction(action: JoinedRoomsAction) {
         when (action) {
             is JoinedRoomsAction.Enter -> onEnter()
@@ -128,11 +98,6 @@ class JoinedRoomsViewModel(
             is JoinedRoomsAction.LoadMore -> onLoadMore()
             is JoinedRoomsAction.ClickRoomReport -> onClickRoomReport(action.roomId)
             is JoinedRoomsAction.ClickRejoin -> onClickRejoin(action.pin)
-            is JoinedRoomsAction.ClickCoinHistory -> onClickCoinHistory()
-            is JoinedRoomsAction.ClickReputation -> onClickReputation()
-            is JoinedRoomsAction.ClickHostedRooms -> onClickHostedRooms()
-            is JoinedRoomsAction.ClickEarnings -> onClickEarnings()
-            is JoinedRoomsAction.ClickSettings -> onClickSettings()
         }
     }
 }
