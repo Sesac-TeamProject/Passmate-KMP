@@ -54,6 +54,7 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
             popUpTo(Route.Home.route) { inclusive = true }
             launchSingleTop = true
         }
+        is NavigationAction.NavigateToTab -> navigate(action.tab.route)
         is NavigationAction.NavigateToRoomList -> navigate(Route.RoomList.route)
         is NavigationAction.NavigateToSignIn -> navigate(Route.SignIn.route)
         is NavigationAction.NavigateToJoin -> {

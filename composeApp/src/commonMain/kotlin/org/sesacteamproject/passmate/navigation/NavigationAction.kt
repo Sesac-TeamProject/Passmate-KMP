@@ -5,6 +5,9 @@ sealed interface NavigationAction {
 
     data object NavigateToHome : NavigationAction
 
+    // 하단 탭 전환 — 셸(AppShellViewModel) 가드 통과 후에만 발행된다
+    data class NavigateToTab(val tab: AppTab) : NavigationAction
+
     data object NavigateToRoomList : NavigationAction
 
     data object NavigateToSignIn : NavigationAction

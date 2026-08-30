@@ -69,6 +69,17 @@ actual fun AppNavHost() {
                 routeStack.clear()
                 routeStack.add(JvmDestination.Home)
             }
+            is NavigationAction.NavigateToTab -> {
+                routeStack.clear()
+                routeStack.add(
+                    when (action.tab) {
+                        AppTab.HOME -> JvmDestination.Home
+                        AppTab.HOSTED_ROOMS -> JvmDestination.HostedRooms
+                        AppTab.JOINED_ROOMS -> JvmDestination.JoinedRooms
+                        AppTab.MY_INFO -> JvmDestination.MyInfo
+                    }
+                )
+            }
             is NavigationAction.NavigateToRoomList -> routeStack.add(JvmDestination.RoomList)
             is NavigationAction.NavigateToSignIn -> routeStack.add(JvmDestination.SignIn)
             is NavigationAction.NavigateToJoin -> routeStack.add(JvmDestination.Join(action.pin))
