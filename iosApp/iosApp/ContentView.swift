@@ -74,9 +74,11 @@ struct ContentView: View {
         case .myInfo:
             MyInfoView(
                 onRequireSignIn: { path.append(.signIn) },
+                onOpenReputation: { path.append(.reputation) },
                 onOpenCoinHistory: { path.append(.coinHistory) },
-                onSignedOut: { path = [] },
-                onBack: { popOnce() }
+                onOpenEarnings: { path.append(.earnings) },
+                onOpenSettings: { path.append(.settings) },
+                onSignedOut: { path = [] }
             )
         case .joinedRooms:
             JoinedRoomsView(

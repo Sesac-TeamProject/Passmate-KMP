@@ -1,12 +1,17 @@
+import Foundation
+
 enum MyInfoEvent {
-    // 설정은 회원 전용 — 게스트 진입 시 로그인 유도 (규칙 §8)
+    // 마이는 회원 전용 — 딥링크 직접 진입 대비 보험 (탭 가드는 AppShellViewModel, 규칙 §8)
     case requireSignIn
+    case openReputation
     case openEditProfile(nickname: String, avatarId: Int?)
     case openPaymentMethod
-    case openNotifications
     case openCoinHistory
-    // 로그아웃·탈퇴 완료 → 홈으로 (세션 정리는 shared가 수행)
+    case openSettlementAccount
+    case openEarnings
+    case openNotifications
+    case openSettings
+    // 로그아웃 완료 → 홈 탭으로 (세션 정리는 shared가 수행)
     case signedOut
-    case accountDeleted
     case showNotice(message: String)
 }

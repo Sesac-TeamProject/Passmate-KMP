@@ -8,6 +8,13 @@ enum StudentAvatars {
     static let defaultId = 1
 
     static let ids = Array(1...count)
+
+    // Compose StudentAvatars.nameOf 미러 — 마이 탭 "내 캐릭터" 부제
+    static func nameOf(_ avatarId: Int) -> String {
+        let names = ["고양이", "강아지", "곰", "판다", "토끼", "여우", "개구리", "펭귄", "부엉이", "호랑이", "너구리", "공룡"]
+        let resolved = (avatarId >= 1 && avatarId <= count) ? avatarId : defaultId
+        return names[resolved - 1]
+    }
 }
 
 struct StudentAvatarView: View {

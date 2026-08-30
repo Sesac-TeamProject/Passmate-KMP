@@ -2,13 +2,15 @@ import Combine
 import Foundation
 import Shared
 
-// Compose MyInfoViewModel.kt 미러 — 내 정보 관리 허브 (M-12)
+// Compose MyInfoViewModel.kt 미러 — 마이 탭 루트 (M-12): 프로필·코인·정산 3섹션 독립 로드
 final class MyInfoViewModel: ObservableObject {
     private let getMyProfileUseCase: GetMyProfileUseCase
 
-    private let signOutUseCase: SignOutUseCase
+    private let getMyCoinsUseCase: GetMyCoinsUseCase
 
-    private let deleteAccountUseCase: DeleteAccountUseCase
+    private let getEarningsUseCase: GetEarningsUseCase
+
+    private let signOutUseCase: SignOutUseCase
 
     private let isSignedInUseCase: IsSignedInUseCase
 
@@ -25,27 +27,63 @@ final class MyInfoViewModel: ObservableObject {
         hasEntered = true
         // 회원 전용 가드 — 서버 검증이 최종 권위 (규칙 §8)
         if isSignedInUseCase.invoke() {
-            load()
+            loadAll()
         } else {
             event.send(.requireSignIn)
         }
     }
 
-    private func load() {
+    private func loadAll() {
+        loadProfile()
+        loadCoinInfo()
+        loadEarnings()
+    }
+
+    private func loadProfile() {
         uiState.isLoading = true
         uiState.loadFailed = false
         getMyProfileUseCase.invoke { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
                 let profile = (result as? AppResultSuccess<AnyObject>)?.value as? UserProfile
-
+                self.uiState.isLoading = false
                 if error == nil, let profile {
-                    self.uiState.isLoading = false
                     self.uiState.loadFailed = false
                     self.uiState.profile = profile
                 } else {
-                    self.uiState.isLoading = false
                     self.uiState.loadFailed = true
+                }
+            }
+        }
+    }
+
+    private func loadCoinInfo() {
+        getMyCoinsUseCase.invoke { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let coins = (result as? AppResultSuccess<AnyObject>)?.value as? CoinBalance
+                if error == nil, let coins {
+                    self.uiState.defaultMethod = coins.defaultMethod
+                    self.uiState.recentTransaction = coins.recent
+                    self.uiState.isCoinInfoFailed = false
+                } else {
+                    self.uiState.isCoinInfoFailed = true
+                }
+            }
+        }
+    }
+
+    private func loadEarnings() {
+        getEarningsUseCase.invoke(cursor: nil) { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let earnings = (result as? AppResultSuccess<AnyObject>)?.value as? Earnings
+                if error == nil, let earnings {
+                    self.uiState.settlementAccount = earnings.account
+                    self.uiState.nextPayout = earnings.nextPayout
+                    self.uiState.isEarningsFailed = false
+                } else {
+                    self.uiState.isEarningsFailed = true
                 }
             }
         }
@@ -75,58 +113,41 @@ final class MyInfoViewModel: ObservableObject {
         }
     }
 
-    private func onConfirmDeleteAccount() {
-        if uiState.isProcessing {
-            return
-        }
-        uiState.isProcessing = true
-        deleteAccountUseCase.invoke { [weak self] result, error in
-            DispatchQueue.main.async {
-                guard let self else { return }
-                self.uiState.isProcessing = false
-                if error == nil, result is AppResultSuccess<AnyObject> {
-                    self.event.send(.accountDeleted)
-                } else {
-                    let appError = (result as? AppResultFailure)?.error
-
-                    self.event.send(.showNotice(message: self.deleteFailMessage(appError)))
-                }
-            }
-        }
-    }
-
-    // 서버 code 기반 문구 분기 (규칙 §10) — 409=정산 미지급분·진행 중 방 거부
-    private func deleteFailMessage(_ error: AppError?) -> String {
-        if let conflict = error as? AppError.Conflict {
-            return conflict.serverMessage ?? "정산 대기 금액이나 진행 중인 방이 있어 탈퇴할 수 없어요"
-        } else if error is AppError.NetworkError {
-            return "네트워크 연결을 확인해 주세요"
-        } else {
-            return "탈퇴를 처리하지 못했어요. 다시 시도해 주세요"
-        }
-    }
-
     func action(_ action: MyInfoAction) {
         switch action {
         case .enter:
             onEnter()
         case .retry:
-            load()
+            loadAll()
+        case .clickProfile:
+            event.send(.openReputation)
         case .clickEditProfile:
             onClickEditProfile()
+        case .clickCharge:
+            event.send(.showNotice(message: "코인 충전은 준비 중이에요"))
         case .clickPaymentMethod:
             event.send(.openPaymentMethod)
-        case .clickNotifications:
-            event.send(.openNotifications)
         case .clickCoinHistory:
             event.send(.openCoinHistory)
+        case .clickSettlementAccount:
+            event.send(.openSettlementAccount)
+        case .clickEarnings:
+            event.send(.openEarnings)
+        case .clickNotifications:
+            event.send(.openNotifications)
+        case .clickSettings:
+            event.send(.openSettings)
         case .confirmSignOut:
             onConfirmSignOut()
-        case .confirmDeleteAccount:
-            onConfirmDeleteAccount()
         case .profileUpdated:
-            load()
+            loadProfile()
             event.send(.showNotice(message: "내 정보를 저장했어요"))
+        case .paymentMethodUpdated:
+            loadCoinInfo()
+            event.send(.showNotice(message: "기본 결제 수단을 저장했어요"))
+        case .accountUpdated:
+            loadEarnings()
+            event.send(.showNotice(message: "정산 계좌를 저장했어요"))
         case let .notice(message):
             event.send(.showNotice(message: message))
         }
@@ -134,13 +155,15 @@ final class MyInfoViewModel: ObservableObject {
 
     init(
         getMyProfileUseCase: GetMyProfileUseCase,
+        getMyCoinsUseCase: GetMyCoinsUseCase,
+        getEarningsUseCase: GetEarningsUseCase,
         signOutUseCase: SignOutUseCase,
-        deleteAccountUseCase: DeleteAccountUseCase,
         isSignedInUseCase: IsSignedInUseCase
     ) {
         self.getMyProfileUseCase = getMyProfileUseCase
+        self.getMyCoinsUseCase = getMyCoinsUseCase
+        self.getEarningsUseCase = getEarningsUseCase
         self.signOutUseCase = signOutUseCase
-        self.deleteAccountUseCase = deleteAccountUseCase
         self.isSignedInUseCase = isSignedInUseCase
     }
 }
