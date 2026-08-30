@@ -293,7 +293,7 @@ private struct PaymentContentView: View {
                 maxParticipants: KotlinInt(int: 30),
                 isPaid: true,
                 entryFee: KotlinInt(int: 500),
-                host: RoomHost(nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
+                host: RoomHost(userId: KotlinLong(value: 11), nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
             ),
             balance: 200,
             shortfall: 300,
@@ -323,7 +323,7 @@ private struct PaymentContentView: View {
                 maxParticipants: KotlinInt(int: 30),
                 isPaid: true,
                 entryFee: KotlinInt(int: 500),
-                host: RoomHost(nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
+                host: RoomHost(userId: KotlinLong(value: 11), nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
             ),
             balance: 800,
             shortfall: 0,

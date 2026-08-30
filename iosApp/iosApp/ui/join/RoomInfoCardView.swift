@@ -94,7 +94,7 @@ struct RoomInfoCardView: View {
             maxParticipants: KotlinInt(int: 30),
             isPaid: true,
             entryFee: KotlinInt(int: 500),
-            host: RoomHost(nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
+            host: RoomHost(userId: KotlinLong(value: 11), nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
         )
     )
     .padding()
@@ -115,7 +115,7 @@ struct RoomInfoCardView: View {
             maxParticipants: nil,
             isPaid: false,
             entryFee: nil,
-            host: RoomHost(nickname: "이선생", level: nil, avgStars: nil, ratingCount: nil)
+            host: RoomHost(userId: KotlinLong(value: 11), nickname: "이선생", level: nil, avgStars: nil, ratingCount: nil)
         )
     )
     .padding()
