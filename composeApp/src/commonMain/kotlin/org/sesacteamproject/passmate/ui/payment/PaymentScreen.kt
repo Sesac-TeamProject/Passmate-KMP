@@ -59,7 +59,7 @@ fun PaymentScreen(
         viewModel.event.collect { event ->
             when (event) {
                 is PaymentEvent.EnterRoom -> onNavigate(NavigationAction.NavigateToWaiting(event.pin))
-                is PaymentEvent.SignInRequired -> onNavigate(NavigationAction.NavigateToSignIn)
+                is PaymentEvent.SignInRequired -> onNavigate(NavigationAction.NavigateToSignIn())
                 is PaymentEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }

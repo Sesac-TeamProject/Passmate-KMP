@@ -79,6 +79,8 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
         is NavigationAction.NavigateToTab -> navigateToTab(action.tab)
         is NavigationAction.NavigateToRoomList -> navigate(Route.RoomList.route)
         is NavigationAction.NavigateToSignIn -> navigate(Route.SignIn.route)
+        // Task 3에서 AppNavHost의 onNavigate 래퍼가 가로챈다. 여기 분기는 when 완전성용이며 현행 동작(홈)을 유지한다
+        is NavigationAction.NavigateAfterSignIn -> navigateHome()
         is NavigationAction.NavigateToJoin -> {
             // 홈 탭이 곧 입장 폼 — pin 없는 Join은 홈 탭으로 (스펙 §1-1)
             if (action.pin != null) {
@@ -133,7 +135,7 @@ actual fun AppNavHost() {
                     NavigationAction.NavigateToTab(event.tab)
                 )
                 is AppShellEvent.RequireSignIn -> navController.handleNavigationAction(
-                    NavigationAction.NavigateToSignIn
+                    NavigationAction.NavigateToSignIn()
                 )
                 // TODO(pendingRoute Task 3 — Android/Desktop 배선): pendingRoute 소비 구현 예정, 현재는 컴파일 통과용 스텁
                 is AppShellEvent.ResumePendingRoute -> Unit

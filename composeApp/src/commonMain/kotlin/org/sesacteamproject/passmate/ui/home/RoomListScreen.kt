@@ -98,7 +98,7 @@ fun RoomListScreen(onNavigate: (NavigationAction) -> Unit) {
                 },
                 onRequireSignIn = {
                     profileHostId = null
-                    onNavigate(NavigationAction.NavigateToSignIn)
+                    onNavigate(NavigationAction.NavigateToSignIn())
                 },
                 onBlocked = {
                     profileHostId = null

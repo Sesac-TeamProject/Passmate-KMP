@@ -54,7 +54,7 @@ fun RoomReportScreen(
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is RoomReportEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
+                is RoomReportEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn())
                 is RoomReportEvent.ShareReport -> shareReport(event.summary)
             }
         }

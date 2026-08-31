@@ -10,7 +10,11 @@ sealed interface NavigationAction {
 
     data object NavigateToRoomList : NavigationAction
 
-    data object NavigateToSignIn : NavigationAction
+    // 로그인 유도 — pendingRoute는 로그인 성공 후 복귀할 목적지. null이면 홈으로 (규칙 §7, 스펙 §2-1)
+    data class NavigateToSignIn(val pendingRoute: NavigationAction? = null) : NavigationAction
+
+    // 로그인 성공 — 목적지 결정은 셸(AppShellViewModel)에 위임한다 (스펙 §2-4)
+    data object NavigateAfterSignIn : NavigationAction
 
     data class NavigateToJoin(val pin: String? = null) : NavigationAction
 

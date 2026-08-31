@@ -60,7 +60,7 @@ fun HostedRoomsScreen(onNavigate: (NavigationAction) -> Unit) {
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is HostedRoomsEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
+                is HostedRoomsEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn())
                 is HostedRoomsEvent.OpenCreateSheet -> isCreateSheetVisible = true
                 is HostedRoomsEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
                 is HostedRoomsEvent.OpenRoomReport -> onNavigate(NavigationAction.NavigateToRoomReport(event.roomId))

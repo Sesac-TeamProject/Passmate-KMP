@@ -55,7 +55,7 @@ fun SignInScreen(
         viewModel.event.collect { event ->
             when (event) {
                 is SignInEvent.OpenSignInPage -> openSignInPage(event.url)
-                is SignInEvent.SignInCompleted -> onNavigate(NavigationAction.NavigateToHome)
+                is SignInEvent.SignInCompleted -> onNavigate(NavigationAction.NavigateAfterSignIn)
                 is SignInEvent.GuestEnterRequested -> onNavigate(NavigationAction.NavigateToJoin())
                 is SignInEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }

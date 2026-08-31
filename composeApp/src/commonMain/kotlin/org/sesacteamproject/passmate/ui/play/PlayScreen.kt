@@ -80,7 +80,7 @@ fun PlayScreen(
                     }
                 }
                 is PlayEvent.OpenResult -> onNavigate(NavigationAction.NavigateToResult(event.roomId))
-                is PlayEvent.OpenSignup -> onNavigate(NavigationAction.NavigateToSignIn)
+                is PlayEvent.OpenSignup -> onNavigate(NavigationAction.NavigateToSignIn())
                 is PlayEvent.RoomClosed -> {
                     snackbarHostState.showSnackbar(event.message)
                     onNavigate(NavigationAction.NavigateToHome)

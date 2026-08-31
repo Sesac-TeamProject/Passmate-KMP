@@ -91,6 +91,8 @@ actual fun AppNavHost() {
             is NavigationAction.NavigateToTab -> switchTab(action.tab)
             is NavigationAction.NavigateToRoomList -> routeStack.add(JvmDestination.RoomList)
             is NavigationAction.NavigateToSignIn -> routeStack.add(JvmDestination.SignIn)
+            // Task 3에서 셸로 위임한다. 지금은 현행 동작(홈)을 유지한다
+            is NavigationAction.NavigateAfterSignIn -> switchTab(AppTab.HOME)
             is NavigationAction.NavigateToJoin -> {
                 // 홈 탭이 곧 입장 폼 — pin 없는 Join은 홈 탭으로 (스펙 §1-1)
                 if (action.pin != null) {
@@ -129,7 +131,7 @@ actual fun AppNavHost() {
         shellViewModel.event.collect { event ->
             when (event) {
                 is AppShellEvent.NavigateToTab -> onNavigate(NavigationAction.NavigateToTab(event.tab))
-                is AppShellEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
+                is AppShellEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn())
                 // TODO(pendingRoute Task 3 — Android/Desktop 배선): pendingRoute 소비 구현 예정, 현재는 컴파일 통과용 스텁
                 is AppShellEvent.ResumePendingRoute -> Unit
                 is AppShellEvent.NavigateToHome -> Unit

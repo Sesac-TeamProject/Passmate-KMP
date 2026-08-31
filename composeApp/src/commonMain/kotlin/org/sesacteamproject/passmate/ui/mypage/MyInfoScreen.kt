@@ -73,7 +73,7 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is MyInfoEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
+                is MyInfoEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn())
                 is MyInfoEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
                 is MyInfoEvent.OpenEditProfile -> {
                     editInitial = event.nickname to event.avatarId

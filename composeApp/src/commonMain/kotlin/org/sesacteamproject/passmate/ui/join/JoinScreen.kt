@@ -72,7 +72,7 @@ fun JoinScreen(
                 is JoinEvent.RequestQrScan -> currentQrScanLauncher?.invoke()
                 is JoinEvent.JoinCompleted -> onNavigate(NavigationAction.NavigateToWaiting(event.pin))
                 is JoinEvent.PaymentRequired -> onNavigate(NavigationAction.NavigateToPayment(event.pin))
-                is JoinEvent.SignInRequested -> onNavigate(NavigationAction.NavigateToSignIn)
+                is JoinEvent.SignInRequested -> onNavigate(NavigationAction.NavigateToSignIn())
                 is JoinEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
