@@ -83,6 +83,11 @@ struct ContentView: View {
             case .requireSignIn:
                 // 탭 루트 위에 로그인 push — 로그인 후 pendingRoute 복귀는 후속 작업(최상단 교체로 구현, 스펙 §2-5)
                 path.append(.signIn)
+            // TODO(pendingRoute Task 7 — ContentView 배선): pendingRoute 소비 구현 예정, 현재는 컴파일 통과용 스텁
+            case .resumePendingRoute:
+                break
+            case .navigateToHome:
+                break
             }
         }
     }
