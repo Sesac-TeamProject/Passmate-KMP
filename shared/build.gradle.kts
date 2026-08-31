@@ -26,7 +26,13 @@ kotlin {
         }
     }
     
-    jvm()
+    jvm {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = JvmTarget.JVM_11.target
+            }
+        }
+    }
     
     sourceSets {
         commonMain.dependencies {
