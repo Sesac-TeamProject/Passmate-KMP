@@ -247,32 +247,6 @@ private struct SummaryCard: View {
     }
 }
 
-private struct WeakTopicsRow: View {
-    let topics: [String]
-
-    var body: some View {
-        if !topics.isEmpty {
-            FlowLayout(spacing: 8) {
-                Text("보완할 주제")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.textSecondary)
-                    .padding(.vertical, 6)
-                ForEach(topics, id: \.self) { topic in
-                    Text(topic)
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.weakTopicText)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(PassmateColors.weakTopicBg)
-                        .clipShape(Capsule())
-                }
-            }
-        }
-    }
-}
-
 private struct JoinedRoomRow: View {
     let room: JoinedRoom
 
@@ -384,55 +358,6 @@ private func formatScore(_ score: Double) -> String {
         .joined()
         .reversed()
     )
-}
-
-// 칩 가로 흐름 배치 (iOS 16+)
-private struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) -> CGSize {
-        let maxWidth = proposal.width ?? .infinity
-        var rowWidth: CGFloat = 0
-        var rowHeight: CGFloat = 0
-        var totalHeight: CGFloat = 0
-        var totalWidth: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-
-            if rowWidth + size.width > maxWidth, rowWidth > 0 {
-                totalHeight += rowHeight + spacing
-                totalWidth = max(totalWidth, rowWidth - spacing)
-                rowWidth = 0
-                rowHeight = 0
-            }
-            rowWidth += size.width + spacing
-            rowHeight = max(rowHeight, size.height)
-        }
-        totalHeight += rowHeight
-        totalWidth = max(totalWidth, rowWidth - spacing)
-
-        return CGSize(width: min(totalWidth, maxWidth), height: totalHeight)
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) {
-        var x = bounds.minX
-        var y = bounds.minY
-        var rowHeight: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-
-            if x + size.width > bounds.maxX, x > bounds.minX {
-                x = bounds.minX
-                y += rowHeight + spacing
-                rowHeight = 0
-            }
-            subview.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(size))
-            x += size.width + spacing
-            rowHeight = max(rowHeight, size.height)
-        }
-    }
 }
 
 // MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
