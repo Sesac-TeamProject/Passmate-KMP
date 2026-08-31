@@ -114,3 +114,20 @@
 - [ ] Android: 홈 탭 "로그인" → 로그인 화면 "PIN으로 바로 입장 (게스트)" → 홈 입장 폼으로 복귀(로그인 화면 재등장 없음)
 - [ ] `[백엔드]` Android/iOS: 게스트 → 마이 → 로그인 완료 → 홈 탭 폼에 로그인 행이 사라지고 마이 탭에 새 프로필 · 로그아웃 → 홈 폼에 로그인 행 복귀
 - [ ] iOS: 게스트가 마이 탭 탭 → 현재 탭 스택 위에 SignIn push(탭 바 숨김), 하단 선택은 홈 유지(깜빡임 여부 확인)
+
+## 10. iOS 15 호환 — 배포 타깃 15.0 복귀 (fix/ios15-deployment-target, 2026-08-31 — 파트2)
+
+> 신규 Swift 4개 pbxproj idx **155~158**(navigation `RouteStackLevel` 155 · component `FlowLayout` 156 · `WeakTopicsRow` 157 · `SheetDetents` 158). **다음 가용 idx = 159.** 그룹 ID 신규 없음. 스펙: `docs/superpowers/specs/2026-08-31-ios15-compat-design.md`
+> 이 Mac엔 iOS 26.3 시뮬 런타임만 있어 **iOS 15 경로(NavigationView 재귀 스택·UIKit 시트 브리지·FlowLayout)의 정본 검증은 실기기**. 시뮬(iOS 26)은 iOS 16+ 경로(네이티브 detents)만 탄다.
+
+- [ ] 컴파일: pbxproj `IPHONEOS_DEPLOYMENT_TARGET = 15.0` 2곳 · `xcodebuild … build` 오류 0 · "only available in iOS 16" 0 · `grep -rn "NavigationStack\|presentationDetents\|: Layout" iosApp/iosApp --include='*.swift'`는 `component/SheetDetents.swift`의 `#available` 분기 1건만
+- [ ] 시뮬(iOS 26): 홈 폼 + 탭 4개 → 게스트 마이 탭 → SignIn push(탭 바 숨김) → 닫기 → 홈 탭·폼 유지
+- [ ] 시뮬(iOS 26): 마이 → 설정 2단 push → 뒤로 2회 → 마이 루트 · 홈 탭 재선택 시 폼 리셋
+- [ ] 시뮬(iOS 26): 방 목록 프로필 시트·마이 시트 4종 반높이(네이티브 detents 경로)
+- [ ] **실기기(iOS 15)** — Xcode에서 본인 Apple ID 팀으로 서명(`Configuration/Config.xcconfig` `TEAM_ID` 설정) 후 설치:
+  - [ ] 각 탭 루트 → push(SignIn·설정·명성·코인 내역·정산) → 뒤로 콜백으로 pop — push 중 탭 바 숨김, pop 후 탭 바 복귀
+  - [ ] 시트 반높이: 방 목록 프로필·정산 계좌·마이 시트 4종이 반높이로 열리고 위로 끌면 전체 높이(UIKit 브리지 경로)
+  - [ ] 칩 줄바꿈: 결과 화면 "보완할 주제" 행·평가 시트 태그 칩이 폭에 맞춰 줄바꿈되고 아래 요소와 겹치지 않음(FlowLayout 높이 고정)
+  - [ ] `[백엔드]` Play → Result 전환: Play가 오른쪽으로 밀려나며 Result가 드러남(빈 화면·깜빡임 없음), Result "홈으로" → 탭 루트
+  - [ ] 로그아웃/로그인 후 홈 탭 폼이 세션 상태를 다시 읽음(`sessionGeneration` 재생성)
+  - [ ] 숨은 `NavigationLink`가 트리거되지 않는 경우(push가 전혀 안 됨) → 스펙 §2-5의 `ZStack` + `.hidden()` 대안으로 전환

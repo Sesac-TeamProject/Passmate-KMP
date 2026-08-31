@@ -23,7 +23,8 @@
 ## 2-1. 플랫폼 네비게이션 규칙
 
 - Android는 `Jetpack Navigation`(`NavHost`, `NavController`)을 사용한다.
-- iOS는 `NavigationStack`(`NavigationPath`)을 사용한다.
+- iOS는 `NavigationView`(stack 스타일) 위에 상태 배열 `[Route]` 기반 push(`RouteStackLevel`)를 사용한다.
+- iOS 최소 배포 타깃은 15.0이다. iOS 16+ 전용 API(`NavigationStack`·`presentationDetents`·`Layout` 등)는 화면에서 직접 쓰지 않고 `#available` 분기를 가진 공통 컴포넌트(`component/`) 뒤로만 사용한다.
 - Desktop은 상태 기반 라우트 상태머신(`currentRoute`, `routeStack`)을 사용한다.
 - 라우트 이름과 로그인 가드 규칙은 3플랫폼에서 동일하게 유지한다.
 - 상세 화면은 모달이 아닌 route push 방식으로 이동한다.
@@ -275,6 +276,7 @@ private struct WaitingRoomContentView: View {
 - `event`를 상태처럼 재소비 가능한 구조로 저장하는 구현 금지
 - `onAction` 전용 내부 메서드를 `public/internal`로 노출하는 구현 금지
 - 계약 문서에 없는 필드·이벤트를 임의 추가하는 구현 금지 (계약 갱신이 먼저)
+- iOS 16+ 전용 API를 `#available` 없이 화면에서 직접 사용하는 구현 금지 (최소 배포 타깃 15.0 — 공통 컴포넌트 안에서만 분기)
 
 ## 14. 코드 리뷰 체크리스트
 

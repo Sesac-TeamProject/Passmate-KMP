@@ -48,7 +48,7 @@
 |---|---|
 | Android | `NavHost` 하나 유지 + `Scaffold(bottomBar = PassmateBottomTabBar)`. 현재 목적지(`currentBackStackEntryAsState`)가 탭 루트일 때만 바 표시. 탭 전환: `navigate(tab.route) { popUpTo(Home); launchSingleTop = true }` — 플랫 그래프라 saveState/restoreState는 쓰지 않는다(팝된 SignIn이 되살아남). `NavigateToHome`·`NavigateToJoin(pin=null)`은 `popUpTo(Home){inclusive}`로 홈 루트(JoinScreen)를 재생성해 세션 상태를 다시 읽는다 |
 | Desktop | `routeStack` 유지. 탭 전환 = 스택을 `[탭 루트]`로 교체(단일 스택, 탭별 보존 없음). 최상단이 탭 루트일 때만 바 표시 |
-| iOS | `TabView(selection:)` 4개, 탭마다 `NavigationStack(path)`. `ContentView.destinationView(for:)`를 탭이 공유하는 `@ViewBuilder` 함수로 추출(내용 무변경). 로그인 필수 탭 선택은 `AppShellViewModel` 판정 후 `selection` 변경 또는 `.signIn` push. 로그인·로그아웃·탈퇴 시 `sessionGeneration`을 올려 `TabView`를 `.id()`로 재생성한다(탭 루트 VM이 세션을 다시 읽음) |
+| iOS | `NavigationView`(stack) 하나가 `TabView(selection:)`를 감싸는 **단일 `[Route]` 스택** — 배열 push는 재귀 `RouteStackLevel`이 담당하고, push 시 TabView 전체가 밀려 탭 바가 숨는다. (2026-08-31 iOS 15 호환 작업으로 "탭마다 `NavigationStack`"에서 변경 — [2026-08-31-ios15-compat-design.md](2026-08-31-ios15-compat-design.md) §2.) 로그인 필수 탭 선택은 `AppShellViewModel` 판정 후 `selection` 변경 또는 `.signIn` push. 로그인·로그아웃·탈퇴 시 `sessionGeneration`을 올려 `NavigationView`를 `.id()`로 재생성한다(탭 루트 VM이 세션을 다시 읽음) |
 
 - 탭 바 컴포넌트: Compose `component/PassmateBottomTabBar.kt`(Android·Desktop 공유). iOS는 네이티브 `TabView` 탭 바(SF Symbols, tint Primary)를 쓴다.
 
@@ -120,7 +120,7 @@ isProcessing: Boolean (로그아웃 in-flight, 규칙 §9)
 
 ## 5. iOS 미러
 
-- `ContentView`: `TabView` + 탭별 `NavigationStack`. `destinationView(for:)`를 공유 함수로 추출. 탭 선택은 `AppShellViewModel.swift`(`KoinHelper.shared.isSignedInUseCase()` 재사용) 판정을 거친다.
+- `ContentView`: `NavigationView`(stack) + `TabView` 단일 스택(2026-08-31 iOS 15 호환 스펙 §2에서 "탭별 `NavigationStack`"을 대체). `destinationView(for:)`를 공유 함수로 추출. 탭 선택은 `AppShellViewModel.swift`(`KoinHelper.shared.isSignedInUseCase()` 재사용) 판정을 거친다.
 - 파일: `AppShellViewModel/UiState/Action/Event.swift`, `navigation/AppTab.swift`, `MyInfoView*`→`JoinedRoomsView*`, `SettingsView*`→`MyInfoView*`, 새 `SettingsView*`, `HomeView*` 삭제.
 - pbxproj: 신규 파일 idx **145**부터 등록, 삭제 파일 참조 제거, **그룹 ID(`A10120xx`) 중복 재검사**(fix/ios-build에서 충돌 있었음).
 - 프리뷰: `JoinedRoomsView`·`MyInfoView`·`SettingsView`에 콘텐츠 뷰 기준 `#Preview`.
