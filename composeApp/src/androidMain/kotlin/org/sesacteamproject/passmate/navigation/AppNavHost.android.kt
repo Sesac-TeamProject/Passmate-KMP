@@ -188,8 +188,16 @@ actual fun AppNavHost() {
                 is AppShellEvent.RequireSignIn -> navController.navigate(Route.SignIn.route)
                 is AppShellEvent.ResumePendingRoute -> {
                     navController.popSignInEntries()
+
+                    // 탭 복귀는 중복 판정에서 제외한다 — navigateToTab이 popUpTo(Home)+launchSingleTop이라
+                    // 중복이 생기지 않고(스펙 §4-0), 건너뛰면 탭 화면이 재생성되지 않아 로그인 이전 상태가
+                    // 그대로 남는다. iOS는 sessionGeneration 증가, Desktop은 최상단만 컴포즈라 둘 다 재생성한다
+                    val isTabResume = event.pendingRoute is NavigationAction.NavigateToTab
                     // 복귀 대상이 이미 최상단이면 이동하지 않는다 — 같은 화면이 두 번 쌓이는 것을 막는다 (스펙 §4-0)
-                    if (navController.currentDestination?.route != event.pendingRoute.destinationTemplate()) {
+                    val isAlreadyOnTop =
+                        navController.currentDestination?.route == event.pendingRoute.destinationTemplate()
+
+                    if (isTabResume || !isAlreadyOnTop) {
                         onNavigate(event.pendingRoute)
                     }
                 }
