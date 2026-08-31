@@ -120,7 +120,7 @@
 > 신규 Swift 4개 pbxproj idx **155~158**(navigation `RouteStackLevel` 155 · component `FlowLayout` 156 · `WeakTopicsRow` 157 · `SheetDetents` 158). **다음 가용 idx = 159.** 그룹 ID 신규 없음. 스펙: `docs/superpowers/specs/2026-08-31-ios15-compat-design.md`
 > 이 Mac엔 iOS 26.3 시뮬 런타임만 있어 **iOS 15 경로(NavigationView 재귀 스택·UIKit 시트 브리지·FlowLayout)의 정본 검증은 실기기**. 시뮬(iOS 26)은 iOS 16+ 경로(네이티브 detents)만 탄다.
 
-- [ ] 컴파일: pbxproj `IPHONEOS_DEPLOYMENT_TARGET = 15.0` 2곳 · `xcodebuild … build` 오류 0 · "only available in iOS 16" 0 · `grep -rn "NavigationStack\|presentationDetents\|: Layout" iosApp/iosApp --include='*.swift'`는 `component/SheetDetents.swift`의 `#available` 분기 1건만
+- [ ] 컴파일: pbxproj `IPHONEOS_DEPLOYMENT_TARGET = 15.0` 2곳 · `xcodebuild … build` 오류 0 · "only available in iOS 16" 0 · `grep -rn "NavigationStack\|presentationDetents\|: Layout" iosApp/iosApp --include='*.swift' | grep -v "^[^:]*:[0-9]*: *//"`는 `component/SheetDetents.swift`의 `#available` 분기 1건만(주석 미필터 시 `navigation/RouteStackLevel.swift`·`component/SheetDetents.swift` 주석 2건이 추가로 매치되어 3건으로 보임)
 - [ ] 시뮬(iOS 26): 홈 폼 + 탭 4개 → 게스트 마이 탭 → SignIn push(탭 바 숨김) → 닫기 → 홈 탭·폼 유지
 - [ ] 시뮬(iOS 26): 마이 → 설정 2단 push → 뒤로 2회 → 마이 루트 · 홈 탭 재선택 시 폼 리셋
 - [ ] 시뮬(iOS 26): 방 목록 프로필 시트·마이 시트 4종 반높이(네이티브 detents 경로)

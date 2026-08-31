@@ -61,7 +61,6 @@ struct ContentView: View {
                 .tabItem { Label(AppTab.myInfo.label, systemImage: AppTab.myInfo.systemImage) }
                 .tag(AppTab.myInfo)
             }
-            .tint(PassmateColors.primary)
             .navigationBarHidden(true)
             .background(
                 NavigationLink(isActive: isStackActive) {
@@ -76,6 +75,7 @@ struct ContentView: View {
         }
         .navigationViewStyle(.stack)
         .id(sessionGeneration)
+        .tint(PassmateColors.primary)
         .onReceive(shellViewModel.event) { event in
             switch event {
             case let .navigateToTab(tab):
