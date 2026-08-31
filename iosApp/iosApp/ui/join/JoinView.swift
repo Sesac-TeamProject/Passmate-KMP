@@ -188,6 +188,11 @@ private struct JoinContentView: View {
                 HStack(spacing: 8) {
                     ForEach(rowIds, id: \.self) { avatarId in
                         avatarPickItem(avatarId: avatarId)
+                            .frame(maxWidth: .infinity)
+                    }
+                    ForEach(0..<max(0, avatarsPerRow - rowIds.count), id: \.self) { _ in
+                        Color.clear
+                            .frame(maxWidth: .infinity)
                     }
                 }
             }
@@ -199,8 +204,8 @@ private struct JoinContentView: View {
     }
 
     private var avatarRows: [[Int]] {
-        stride(from: 0, to: StudentAvatars.ids.count, by: 6).map { start in
-            Array(StudentAvatars.ids[start..<min(start + 6, StudentAvatars.ids.count)])
+        stride(from: 0, to: StudentAvatars.ids.count, by: avatarsPerRow).map { start in
+            Array(StudentAvatars.ids[start..<min(start + avatarsPerRow, StudentAvatars.ids.count)])
         }
     }
 
@@ -218,6 +223,7 @@ private struct JoinContentView: View {
                     )
                 )
         }
+        .frame(maxWidth: 44)
     }
 
     private var joinButton: some View {
@@ -261,6 +267,8 @@ private struct JoinContentView: View {
         .padding(.vertical, 20)
     }
 }
+
+private let avatarsPerRow = 6
 
 // 6칸 PIN 박스 — 숨김 TextField가 입력을 받고 박스는 상태 렌더링만 한다
 private struct PinInputField: View {

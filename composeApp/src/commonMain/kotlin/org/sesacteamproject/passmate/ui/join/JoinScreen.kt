@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -371,13 +372,21 @@ private fun AvatarField(
             letterSpacing = (-0.28).sp
         )
         StudentAvatars.ids.chunked(AVATARS_PER_ROW).forEach { rowIds ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 rowIds.forEach { avatarId ->
-                    AvatarPickItem(
-                        avatarId = avatarId,
-                        isSelected = avatarId == selectedAvatarId,
-                        onClick = { onSelectAvatar(avatarId) }
-                    )
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        AvatarPickItem(
+                            avatarId = avatarId,
+                            isSelected = avatarId == selectedAvatarId,
+                            onClick = { onSelectAvatar(avatarId) }
+                        )
+                    }
+                }
+                repeat(AVATARS_PER_ROW - rowIds.size) {
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }
