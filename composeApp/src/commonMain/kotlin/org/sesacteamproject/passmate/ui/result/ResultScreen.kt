@@ -66,7 +66,9 @@ fun ResultScreen(
         viewModel.event.collect { event ->
             when (event) {
                 is ResultEvent.ShareReport -> shareReport(event.summary)
-                is ResultEvent.NavigateToSignup -> onNavigate(NavigationAction.NavigateToSignIn())
+                is ResultEvent.NavigateToSignup -> onNavigate(
+                    NavigationAction.NavigateToSignIn(NavigationAction.NavigateToResult(roomId))
+                )
                 is ResultEvent.RatingSubmitted -> snackbarHostState.showSnackbar(event.message)
                 is ResultEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }

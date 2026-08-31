@@ -53,7 +53,9 @@ fun ReputationScreen(
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is ReputationEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn())
+                is ReputationEvent.RequireSignIn -> onNavigate(
+                    NavigationAction.NavigateToSignIn(NavigationAction.NavigateToReputation)
+                )
             }
         }
     }
