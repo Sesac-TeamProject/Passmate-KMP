@@ -24,13 +24,16 @@ struct ContentView: View {
                     initialPin: nil,
                     onJoined: { pin in path.append(.waiting(pin: pin)) },
                     onPaymentRequired: { pin in path.append(.payment(pin: pin)) },
-                    onSignInRequested: { path.append(.signIn) }
+                    onSignInRequested: { pushSignIn(pendingRoute: nil, path: $path) },
+                    onSignInRequiredForPaidRoom: { pin in
+                        pushSignIn(pendingRoute: .payment(pin: pin), path: $path)
+                    }
                 )
                 .tabItem { Label(AppTab.home.label, systemImage: AppTab.home.systemImage) }
                 .tag(AppTab.home)
 
                 HostedRoomsView(
-                    onRequireSignIn: { path.append(.signIn) },
+                    onRequireSignIn: { pushSignIn(pendingRoute: .hostedRooms, path: $path) },
                     onOpenReputation: { path.append(.reputation) },
                     onOpenRoomReport: { roomId in path.append(.roomReport(roomId: roomId)) },
                     onOpenSessionControl: { roomId, pin in path.append(.sessionControl(roomId: roomId, pin: pin)) }
@@ -39,7 +42,7 @@ struct ContentView: View {
                 .tag(AppTab.hostedRooms)
 
                 JoinedRoomsView(
-                    onRequireSignIn: { path.append(.signIn) },
+                    onRequireSignIn: { pushSignIn(pendingRoute: .joinedRooms, path: $path) },
                     onOpenReport: { roomId in path.append(.result(roomId: roomId)) },
                     onRejoin: { pin in path.append(.waiting(pin: pin)) }
                 )
@@ -47,7 +50,7 @@ struct ContentView: View {
                 .tag(AppTab.joinedRooms)
 
                 MyInfoView(
-                    onRequireSignIn: { path.append(.signIn) },
+                    onRequireSignIn: { pushSignIn(pendingRoute: .myInfo, path: $path) },
                     onOpenReputation: { path.append(.reputation) },
                     onOpenCoinHistory: { path.append(.coinHistory) },
                     onOpenEarnings: { path.append(.earnings) },
@@ -81,13 +84,14 @@ struct ContentView: View {
             case let .navigateToTab(tab):
                 selectedTab = tab
             case .requireSignIn:
-                // 탭 루트 위에 로그인 push — 로그인 후 pendingRoute 복귀는 후속 작업(최상단 교체로 구현, 스펙 §2-5)
+                // 탭 가드 — pendingRoute는 셸이 이미 목적 탭으로 저장했다. pushSignIn을 거치면 nil로 덮어쓴다 (스펙 §2-2)
                 path.append(.signIn)
-            // TODO(pendingRoute Task 7 — ContentView 배선): pendingRoute 소비 구현 예정, 현재는 컴파일 통과용 스텁
-            case .resumePendingRoute:
-                break
+            case let .resumePendingRoute(route):
+                resume(to: route)
             case .navigateToHome:
-                break
+                path = []
+                selectedTab = .home
+                sessionGeneration += 1
             }
         }
     }
@@ -122,11 +126,11 @@ struct ContentView: View {
             RoomListView(
                 onOpenRoom: { pin in path.wrappedValue.append(.join(pin: pin)) },
                 onOpenPinEntry: { path.wrappedValue = [] },
-                onRequireSignIn: { path.wrappedValue.append(.signIn) }
+                onRequireSignIn: { pushSignIn(pendingRoute: .roomList, path: path) }
             )
         case .signIn:
             SignInView(
-                onSignedIn: { path.wrappedValue = []; sessionGeneration += 1 },
+                onSignedIn: { shellViewModel.action(.resumeAfterSignIn) },
                 onGuestEnter: { path.wrappedValue = [] }
             )
         case let .join(pin):
@@ -134,14 +138,17 @@ struct ContentView: View {
                 initialPin: pin,
                 onJoined: { pin in path.wrappedValue.append(.waiting(pin: pin)) },
                 onPaymentRequired: { pin in path.wrappedValue.append(.payment(pin: pin)) },
-                onSignInRequested: { path.wrappedValue.append(.signIn) },
+                onSignInRequested: { pushSignIn(pendingRoute: nil, path: path) },
+                onSignInRequiredForPaidRoom: { pin in
+                    pushSignIn(pendingRoute: .payment(pin: pin), path: path)
+                },
                 onBack: { popOnce(path) }
             )
         case let .payment(pin):
             PaymentView(
                 pin: pin,
                 onEnterRoom: { pin in path.wrappedValue.append(.waiting(pin: pin)) },
-                onSignInRequired: { path.wrappedValue.append(.signIn) },
+                onSignInRequired: { pushSignIn(pendingRoute: .payment(pin: pin), path: path) },
                 onBack: { popOnce(path) }
             )
         case .coinHistory:
@@ -163,41 +170,42 @@ struct ContentView: View {
                     path.wrappedValue.removeAll { $0.isSessionRoute }
                     path.wrappedValue.append(.result(roomId: roomId))
                 },
-                onOpenSignup: { path.wrappedValue.append(.signIn) }
+                // 풀이 중 로그인은 토큰 신원이 바뀌어 복귀 대상에서 제외한다 (스펙 §8-1)
+                onOpenSignup: { pushSignIn(pendingRoute: nil, path: path) }
             )
         case let .result(roomId):
             ResultView(
                 roomId: roomId,
                 onClickHome: { path.wrappedValue = [] },
-                onNavigateToSignup: { path.wrappedValue.append(.signIn) }
+                onNavigateToSignup: { pushSignIn(pendingRoute: .result(roomId: roomId), path: path) }
             )
         case .reputation:
             ReputationView(
-                onRequireSignIn: { path.wrappedValue.append(.signIn) },
+                onRequireSignIn: { pushSignIn(pendingRoute: .reputation, path: path) },
                 onBack: { popOnce(path) }
             )
         case .earnings:
             EarningsView(
-                onRequireSignIn: { path.wrappedValue.append(.signIn) },
+                onRequireSignIn: { pushSignIn(pendingRoute: .earnings, path: path) },
                 onBack: { popOnce(path) }
             )
         case let .sessionControl(roomId, pin):
             SessionControlView(
                 roomId: roomId,
                 pin: pin,
-                onRequireSignIn: { path.wrappedValue.append(.signIn) },
+                onRequireSignIn: { pushSignIn(pendingRoute: .sessionControl(roomId: roomId, pin: pin), path: path) },
                 onSessionEnded: { roomId in path.wrappedValue.append(.roomReport(roomId: roomId)) },
                 onBack: { popOnce(path) }
             )
         case let .roomReport(roomId):
             RoomReportView(
                 roomId: roomId,
-                onRequireSignIn: { path.wrappedValue.append(.signIn) },
+                onRequireSignIn: { pushSignIn(pendingRoute: .roomReport(roomId: roomId), path: path) },
                 onBack: { popOnce(path) }
             )
         case .settings:
             SettingsView(
-                onRequireSignIn: { path.wrappedValue.append(.signIn) },
+                onRequireSignIn: { pushSignIn(pendingRoute: .settings, path: path) },
                 onAccountDeleted: {
                     path.wrappedValue = []
                     selectedTab = .home
@@ -205,6 +213,28 @@ struct ContentView: View {
                 },
                 onBack: { popOnce(path) }
             )
+        }
+    }
+
+    // SignIn 진입은 항상 pendingRoute를 재정의한다 — 목적지가 없으면 nil로 덮어쓴다 (스펙 §0 stale 방지)
+    private func pushSignIn(pendingRoute: Route?, path: Binding<[Route]>) {
+        shellViewModel.action(.rememberPendingRoute(pendingRoute))
+        path.wrappedValue.append(.signIn)
+    }
+
+    // 로그인 성공 후 복귀 — 목적지가 탭 루트면 스택을 비우고 재생성, push 라우트면 SignIn을 걷어낸 자리로 (스펙 §4-3)
+    private func resume(to route: Route) {
+        if let tab = AppTab.allCases.first(where: { $0.route == route }) {
+            path = []
+            selectedTab = tab
+            sessionGeneration += 1
+        } else {
+            if !path.isEmpty {
+                path.removeLast()
+            }
+            if path.last != route {
+                path.append(route)
+            }
         }
     }
 

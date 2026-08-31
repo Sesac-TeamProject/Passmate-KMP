@@ -12,6 +12,8 @@ struct JoinView: View {
 
     var onSignInRequested: () -> Void = {}
 
+    var onSignInRequiredForPaidRoom: (String) -> Void = { _ in }
+
     var onBack: () -> Void = {}
 
     @StateObject private var viewModel = JoinViewModel(
@@ -45,6 +47,8 @@ struct JoinView: View {
                 onPaymentRequired(pin)
             case .signInRequested:
                 onSignInRequested()
+            case let .signInRequiredForPaidRoom(pin):
+                onSignInRequiredForPaidRoom(pin)
             case let .showNotice(message):
                 noticeMessage = message
             }
