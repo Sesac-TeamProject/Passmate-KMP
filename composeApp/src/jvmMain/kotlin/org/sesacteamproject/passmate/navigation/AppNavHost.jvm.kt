@@ -130,6 +130,9 @@ actual fun AppNavHost() {
             when (event) {
                 is AppShellEvent.NavigateToTab -> onNavigate(NavigationAction.NavigateToTab(event.tab))
                 is AppShellEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
+                // TODO(pendingRoute Task 3 — Android/Desktop 배선): pendingRoute 소비 구현 예정, 현재는 컴파일 통과용 스텁
+                is AppShellEvent.ResumePendingRoute -> Unit
+                is AppShellEvent.NavigateToHome -> Unit
             }
         }
     }
