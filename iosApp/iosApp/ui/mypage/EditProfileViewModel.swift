@@ -48,9 +48,9 @@ final class EditProfileViewModel: ObservableObject {
 
     // 서버 code 기반 문구 분기 (규칙 §10) — 닉네임 최종 검증은 서버가 한다
     private func saveFailMessage(_ error: AppError?) -> String {
-        if let validation = error as? AppErrorValidationFailed {
+        if let validation = error as? AppError.ValidationFailed {
             return validation.serverMessage ?? "닉네임을 확인해 주세요"
-        } else if error is AppErrorNetworkError {
+        } else if error is AppError.NetworkError {
             return "네트워크 연결을 확인해 주세요"
         } else {
             return "저장하지 못했어요. 다시 시도해 주세요"

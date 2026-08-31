@@ -345,10 +345,10 @@ final class PlayViewModel: ObservableObject {
     }
 
     private func handleSubmitFailure(error: AppError?) {
-        if error is AppErrorGone {
+        if error is AppError.Gone {
             uiState.hasSubmitted = true
             event.send(.showNotice(message: "이미 마감된 문항이에요"))
-        } else if error is AppErrorConflict {
+        } else if error is AppError.Conflict {
             uiState.hasSubmitted = true
             event.send(.showNotice(message: "이미 제출한 문항이에요"))
         } else {
@@ -404,11 +404,11 @@ final class PlayViewModel: ObservableObject {
     }
 
     private func errorMessage(_ error: AppError?) -> String {
-        if error is AppErrorNotFound {
+        if error is AppError.NotFound {
             return "방을 찾을 수 없어요"
-        } else if error is AppErrorGone {
+        } else if error is AppError.Gone {
             return "이미 종료된 방이에요"
-        } else if error is AppErrorNetworkError {
+        } else if error is AppError.NetworkError {
             return "네트워크 연결을 확인해 주세요"
         } else {
             return "요청에 실패했어요. 잠시 후 다시 시도해 주세요"

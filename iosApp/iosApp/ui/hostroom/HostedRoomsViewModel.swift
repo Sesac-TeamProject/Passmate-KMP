@@ -47,7 +47,7 @@ final class HostedRoomsViewModel: ObservableObject {
         getHostedRoomsUseCase.invoke(cursor: nil) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
-                let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult
+                let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult<AnyObject>
 
                 if error == nil, let page {
                     let rooms = self.hostedRooms(page)
@@ -73,7 +73,7 @@ final class HostedRoomsViewModel: ObservableObject {
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.uiState.isLoadingMore = false
-                if error == nil, let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult {
+                if error == nil, let page = (result as? AppResultSuccess<AnyObject>)?.value as? PagedResult<AnyObject> {
                     let rooms = self.hostedRooms(page)
 
                     self.uiState.ongoing += rooms.filter { $0.isOngoing }
@@ -91,7 +91,7 @@ final class HostedRoomsViewModel: ObservableObject {
         event.send(.showNotice(message: "방이 만들어졌어요 · PIN \(formatPin(pin))"))
     }
 
-    private func hostedRooms(_ page: PagedResult) -> [HostedRoom] {
+    private func hostedRooms(_ page: PagedResult<AnyObject>) -> [HostedRoom] {
         page.items.compactMap { $0 as? HostedRoom }
     }
 

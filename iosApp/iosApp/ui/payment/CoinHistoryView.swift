@@ -150,3 +150,29 @@ private struct TransactionRowView: View {
         Int(tx.amount) >= 0 ? PassmateColors.inkGreen : PassmateColors.textPrimary
     }
 }
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("내역 4건") {
+    CoinHistoryContentView(
+        uiState: CoinHistoryUiState(
+            isLoading: false,
+            items: [
+                CoinTransaction(id: 9001, type: .charge, amount: 1000, balanceAfter: 1000, method: .kakaoPay, roomTitle: nil, paymentNo: "PAY-20260810-01", createdAt: "2026.08.10"),
+                CoinTransaction(id: 9002, type: .deduct, amount: -500, balanceAfter: 500, method: nil, roomTitle: "8월 4주차 Spring 스터디", paymentNo: nil, createdAt: "2026.08.14"),
+                CoinTransaction(id: 9003, type: .refund, amount: 500, balanceAfter: 1000, method: nil, roomTitle: "확률과 통계 총정리", paymentNo: nil, createdAt: "2026.08.16"),
+                CoinTransaction(id: 9004, type: .deduct, amount: -300, balanceAfter: 700, method: nil, roomTitle: "함수의 극한 퀴즈", paymentNo: nil, createdAt: "2026.08.20")
+            ]
+        ),
+        onAction: { _ in },
+        onBack: {}
+    )
+}
+
+#Preview("내역 없음") {
+    CoinHistoryContentView(
+        uiState: CoinHistoryUiState(isLoading: false, items: []),
+        onAction: { _ in },
+        onBack: {}
+    )
+}

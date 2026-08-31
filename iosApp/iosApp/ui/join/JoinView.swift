@@ -440,11 +440,40 @@ final class QrCameraViewController: UIViewController, AVCaptureMetadataOutputObj
     }
 }
 
-struct JoinView_Previews: PreviewProvider {
-    static var previews: some View {
-        JoinContentView(
-            uiState: JoinUiState(),
-            onAction: { _ in }
-        )
-    }
+// MARK: - 프리뷰 (Figma 시안 비교용, Koin 미초기화 상태에서도 안전한 콘텐츠 뷰 기반)
+// JoinUiState에는 인라인 에러/알림 필드가 없다 — 알림은 이벤트로만 전달되고
+// 표시(오버레이) 소유는 컨테이너(JoinView)다 (규칙 §11-1) — 그래서 3번째 상태는 생략한다.
+
+#Preview("빈 입력 상태") {
+    JoinContentView(
+        uiState: JoinUiState(),
+        onAction: { _ in }
+    )
+}
+
+#Preview("PIN 입력 완료 + 닉네임 + 캐릭터 선택") {
+    JoinContentView(
+        uiState: JoinUiState(
+            pin: "482913",
+            nickname: "민지",
+            avatarId: 3,
+            isSignedIn: true,
+            roomInfo: RoomInfo(
+                roomId: 801,
+                pin: "482913",
+                title: "8월 4주차 Spring 스터디",
+                topic: "이차함수 심화",
+                status: .waiting,
+                questionCount: KotlinInt(int: 8),
+                estimatedMinutes: KotlinInt(int: 20),
+                scheduledAt: nil,
+                participantCount: KotlinInt(int: 12),
+                maxParticipants: KotlinInt(int: 30),
+                isPaid: false,
+                entryFee: nil,
+                host: RoomHost(userId: KotlinLong(value: 11), nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
+            )
+        ),
+        onAction: { _ in }
+    )
 }

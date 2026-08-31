@@ -219,11 +219,38 @@ private struct WaitingNoticeToast: View {
     }
 }
 
-struct WaitingView_Previews: PreviewProvider {
-    static var previews: some View {
-        WaitingContentView(
-            uiState: WaitingUiState(isLoading: false, roomTitle: "8월 4주차 Spring 스터디", pin: "482913"),
-            onAction: { _ in }
-        )
-    }
+// MARK: - 프리뷰 (Figma 시안 비교용, Koin 미초기화 상태에서도 안전한 콘텐츠 뷰 기반)
+
+#Preview("참가자 3명") {
+    WaitingContentView(
+        uiState: WaitingUiState(
+            isLoading: false,
+            roomTitle: "8월 4주차 Spring 스터디",
+            pin: "482913",
+            myParticipantId: 9001,
+            myNickname: "민지",
+            participants: [
+                Participant(participantId: 9001, nickname: "민지", avatarId: KotlinInt(int: 1), isGuest: false, isConnected: true),
+                Participant(participantId: 9002, nickname: "준영", avatarId: KotlinInt(int: 2), isGuest: false, isConnected: true),
+                Participant(participantId: 9003, nickname: "혜림", avatarId: KotlinInt(int: 5), isGuest: false, isConnected: true)
+            ],
+            totalCount: 3
+        ),
+        onAction: { _ in }
+    )
+}
+
+#Preview("참가자 0명") {
+    WaitingContentView(
+        uiState: WaitingUiState(
+            isLoading: false,
+            roomTitle: "8월 4주차 Spring 스터디",
+            pin: "482913",
+            myParticipantId: 9001,
+            myNickname: "민지",
+            participants: [],
+            totalCount: 0
+        ),
+        onAction: { _ in }
+    )
 }

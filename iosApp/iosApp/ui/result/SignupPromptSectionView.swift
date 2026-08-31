@@ -33,3 +33,10 @@ struct SignupPromptSectionView: View {
         .cornerRadius(16)
     }
 }
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("게스트 가입 유도") {
+    SignupPromptSectionView(onClickSignup: {})
+        .padding()
+}

@@ -30,7 +30,7 @@ struct RatingSectionView: View {
             }
             .frame(maxWidth: .infinity)
             FlowLayout(spacing: 8) {
-                ForEach(RatingTag.all, id: \.self) { tag in
+                ForEach(RatingTag.companion.all, id: \.self) { tag in
                     tagChip(tag)
                 }
             }
@@ -175,4 +175,25 @@ private struct FlowLayout: Layout {
             rowHeight = max(rowHeight, size.height)
         }
     }
+}
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("미평가") {
+    RatingSectionView(
+        uiState: ResultUiState(),
+        onAction: { _ in }
+    )
+}
+
+#Preview("평가 완료 (hasRated)") {
+    RatingSectionView(
+        uiState: ResultUiState(
+            ratingStars: 5,
+            ratingTags: [.clearExplanation, .helpfulHints],
+            ratingComment: "설명이 명확하고 힌트가 큰 도움이 됐어요!",
+            hasRated: true
+        ),
+        onAction: { _ in }
+    )
 }

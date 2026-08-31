@@ -59,8 +59,10 @@ struct HomeView: View {
     }
 }
 
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
-    }
+// MARK: - 프리뷰 (Figma 시안 비교용)
+// HomeView는 임시 셸(T098에서 M-01 v6로 대체 예정)로 UiState·ViewModel이 없어
+// 게스트/회원 상태를 구분하지 않는다 — 콜백만 받는 순수 뷰라 Koin 의존이 없다.
+
+#Preview("홈 (임시 셸)") {
+    HomeView()
 }

@@ -140,3 +140,139 @@ struct FeedbackSectionView: View {
         }
     }
 }
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("DONE — 핵심 포함 · 부족 · 개선") {
+    FeedbackSectionView(
+        question: QuestionResult(
+            questionId: 601,
+            questionNo: 5,
+            title: "이차방정식의 판별식 활용 서술형",
+            type: .essay,
+            verdict: .aiAnalyzed,
+            myAnswer: "판별식 D = b^2 - 4ac를 이용해 근의 개수를 구했습니다.",
+            correctAnswer: nil,
+            explanation: nil,
+            earnedScore: 85,
+            aiFeedback: AiFeedback(
+                status: .done,
+                coveredConcepts: ["판별식 공식", "근의 개수 판정"],
+                missingConcepts: ["중근 조건 설명"],
+                weaknesses: nil,
+                improvement: "부호 판정 과정을 한 단계 더 풀어써 주면 좋아요",
+                suggestedScore: KotlinDouble(double: 85)
+            ),
+            hostReview: nil
+        )
+    )
+    .padding()
+}
+
+#Preview("PENDING — 분석 중") {
+    FeedbackSectionView(
+        question: QuestionResult(
+            questionId: 602,
+            questionNo: 6,
+            title: "이차함수의 최댓값·최솟값 서술형",
+            type: .essay,
+            verdict: .aiPending,
+            myAnswer: "꼭짓점의 y좌표를 구해서 답했습니다.",
+            correctAnswer: nil,
+            explanation: nil,
+            earnedScore: 0,
+            aiFeedback: AiFeedback(
+                status: .pending,
+                coveredConcepts: [],
+                missingConcepts: [],
+                weaknesses: nil,
+                improvement: nil,
+                suggestedScore: nil
+            ),
+            hostReview: nil
+        )
+    )
+    .padding()
+}
+
+#Preview("FAILED — 분석 실패") {
+    FeedbackSectionView(
+        question: QuestionResult(
+            questionId: 603,
+            questionNo: 7,
+            title: "인수분해 서술형",
+            type: .essay,
+            verdict: .ungraded,
+            myAnswer: "공통인수로 묶어서 풀었습니다.",
+            correctAnswer: nil,
+            explanation: nil,
+            earnedScore: 0,
+            aiFeedback: AiFeedback(
+                status: .failed,
+                coveredConcepts: [],
+                missingConcepts: [],
+                weaknesses: nil,
+                improvement: nil,
+                suggestedScore: nil
+            ),
+            hostReview: nil
+        )
+    )
+    .padding()
+}
+
+#Preview("SKIPPED — 무료 한도 소진") {
+    FeedbackSectionView(
+        question: QuestionResult(
+            questionId: 604,
+            questionNo: 8,
+            title: "함수의 극한 서술형",
+            type: .essay,
+            verdict: .ungraded,
+            myAnswer: "극한값을 직접 대입해 계산했습니다.",
+            correctAnswer: nil,
+            explanation: nil,
+            earnedScore: 0,
+            aiFeedback: AiFeedback(
+                status: .skipped,
+                coveredConcepts: [],
+                missingConcepts: [],
+                weaknesses: nil,
+                improvement: nil,
+                suggestedScore: nil
+            ),
+            hostReview: nil
+        )
+    )
+    .padding()
+}
+
+#Preview("DONE + 선생님 첨삭") {
+    FeedbackSectionView(
+        question: QuestionResult(
+            questionId: 601,
+            questionNo: 5,
+            title: "이차방정식의 판별식 활용 서술형",
+            type: .essay,
+            verdict: .aiAnalyzed,
+            myAnswer: "판별식 D = b^2 - 4ac를 이용해 근의 개수를 구했습니다.",
+            correctAnswer: nil,
+            explanation: nil,
+            earnedScore: 90,
+            aiFeedback: AiFeedback(
+                status: .done,
+                coveredConcepts: ["판별식 공식", "근의 개수 판정"],
+                missingConcepts: ["중근 조건 설명"],
+                weaknesses: nil,
+                improvement: "부호 판정 과정을 한 단계 더 풀어써 주면 좋아요",
+                suggestedScore: KotlinDouble(double: 85)
+            ),
+            hostReview: HostReview(
+                comment: "판별식 적용은 정확해요. 근의 부호 판정 과정을 조금 더 자세히 써주면 좋겠어요.",
+                improvement: "부호 판정 단계 서술 보완",
+                adjustedScore: KotlinDouble(double: 90)
+            )
+        )
+    )
+    .padding()
+}

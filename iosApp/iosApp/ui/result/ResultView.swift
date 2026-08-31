@@ -389,8 +389,90 @@ private struct FlowLayout: Layout {
     }
 }
 
-struct ResultView_Previews: PreviewProvider {
-    static var previews: some View {
-        ResultView(roomId: 1)
-    }
+// MARK: - 프리뷰 (Figma 시안 비교용, Koin 미초기화 상태에서도 안전한 콘텐츠 뷰 기반)
+
+#Preview("데이터 (정답 6/8 · 3위 · 990점)") {
+    ResultContentView(
+        uiState: ResultUiState(
+            isLoading: false,
+            result: SessionResult(
+                roomTitle: "8월 4주차 Spring 스터디",
+                rank: KotlinInt(int: 3),
+                totalScore: 990,
+                correctCount: 6,
+                questionCount: 8,
+                questions: [
+                    QuestionResult(
+                        questionId: 1,
+                        questionNo: 1,
+                        title: "등차수열의 공차",
+                        type: .multipleChoice,
+                        verdict: .correct,
+                        myAnswer: "3",
+                        correctAnswer: "3",
+                        explanation: "이웃한 항의 차가 3으로 일정해요.",
+                        earnedScore: 120,
+                        aiFeedback: nil,
+                        hostReview: nil
+                    ),
+                    QuestionResult(
+                        questionId: 2,
+                        questionNo: 2,
+                        title: "이차함수의 최댓값 OX",
+                        type: .ox,
+                        verdict: .wrong,
+                        myAnswer: "O",
+                        correctAnswer: "X",
+                        explanation: "아래로 볼록한 이차함수는 최댓값이 없어요.",
+                        earnedScore: 0,
+                        aiFeedback: nil,
+                        hostReview: nil
+                    ),
+                    QuestionResult(
+                        questionId: 3,
+                        questionNo: 3,
+                        title: "이차방정식의 판별식 활용 서술형",
+                        type: .essay,
+                        verdict: .aiAnalyzed,
+                        myAnswer: "판별식 D = b^2 - 4ac를 이용해 근의 개수를 구했습니다.",
+                        correctAnswer: nil,
+                        explanation: nil,
+                        earnedScore: 85,
+                        aiFeedback: AiFeedback(
+                            status: .done,
+                            coveredConcepts: ["판별식 공식", "근의 개수 판정"],
+                            missingConcepts: ["중근 조건 설명"],
+                            weaknesses: nil,
+                            improvement: "부호 판정 과정을 한 단계 더 풀어써 주면 좋아요",
+                            suggestedScore: KotlinDouble(double: 85)
+                        ),
+                        hostReview: nil
+                    )
+                ],
+                canRate: true,
+                isGuest: false
+            ),
+            report: LearningReport(
+                accuracyPercent: 75,
+                weakTopics: ["이차함수", "확률과 통계"],
+                improvementPoints: ["판별식 부호 판정 연습이 필요해요"]
+            ),
+            selectedQuestionNo: 3
+        ),
+        onAction: { _ in }
+    )
+}
+
+#Preview("로딩 중") {
+    ResultContentView(
+        uiState: ResultUiState(isLoading: true),
+        onAction: { _ in }
+    )
+}
+
+#Preview("불러오기 실패") {
+    ResultContentView(
+        uiState: ResultUiState(isLoading: false, loadFailed: true),
+        onAction: { _ in }
+    )
 }

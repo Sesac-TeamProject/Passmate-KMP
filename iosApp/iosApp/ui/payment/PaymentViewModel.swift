@@ -186,12 +186,12 @@ final class PaymentViewModel: ObservableObject {
     }
 
     private func handleEntryFailure(room: RoomInfo, error: AppError?) {
-        if error is AppErrorPaymentRequired {
+        if error is AppError.PaymentRequired {
             let entryFee = Int(room.entryFee?.int32Value ?? 0)
 
             uiState.shortfall = Int(coinPolicy.shortfall(balance: Int32(uiState.balance), entryFee: Int32(entryFee)))
             startCharge()
-        } else if error is AppErrorLoginRequired || error is AppErrorUnauthorized {
+        } else if error is AppError.LoginRequired || error is AppError.Unauthorized {
             uiState.isProcessing = false
             event.send(.signInRequired)
         } else {
@@ -219,7 +219,7 @@ final class PaymentViewModel: ObservableObject {
     }
 
     private func chargeErrorMessage(_ error: AppError?) -> String {
-        if error is AppErrorNetworkError {
+        if error is AppError.NetworkError {
             return "네트워크 연결을 확인해 주세요"
         } else {
             return error?.serverMessage ?? "결제에 실패했어요. 다시 시도해 주세요"
@@ -227,11 +227,11 @@ final class PaymentViewModel: ObservableObject {
     }
 
     private func entryErrorMessage(_ error: AppError?) -> String {
-        if error is AppErrorConflict {
+        if error is AppError.Conflict {
             return "이미 사용 중인 닉네임이에요. 다른 이름을 입력해 주세요"
-        } else if error is AppErrorGone {
+        } else if error is AppError.Gone {
             return "이미 종료된 방이에요"
-        } else if error is AppErrorNetworkError {
+        } else if error is AppError.NetworkError {
             return "네트워크 연결을 확인해 주세요"
         } else {
             return error?.serverMessage ?? "입장하지 못했어요. 잠시 후 다시 시도해 주세요"

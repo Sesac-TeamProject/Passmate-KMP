@@ -103,7 +103,7 @@ final class SessionControlViewModel: ObservableObject {
                     }
                 } else if isFirstLoad {
                     // 세션 미시작 방은 스냅샷이 없을 수 있다 — 대기(WAITING) 상태로 취급
-                    if (result as? AppResultFailure)?.error is AppErrorNotFound {
+                    if (result as? AppResultFailure)?.error is AppError.NotFound {
                         self.uiState.isLoading = false
                         self.uiState.loadFailed = false
                         self.uiState.status = RoomStatus.waiting
@@ -271,11 +271,11 @@ final class SessionControlViewModel: ObservableObject {
 
     // 서버 code 기반 문구 분기 (규칙 §10)
     private func controlFailMessage(_ error: AppError?) -> String {
-        if error is AppErrorConflict {
+        if error is AppError.Conflict {
             return "확정된 문제 세트를 먼저 연결해 주세요"
-        } else if error is AppErrorPermissionDenied {
+        } else if error is AppError.PermissionDenied {
             return "방을 만든 선생님만 진행할 수 있어요"
-        } else if error is AppErrorNetworkError {
+        } else if error is AppError.NetworkError {
             return "네트워크 연결을 확인해 주세요"
         } else {
             return "요청을 처리하지 못했어요. 다시 시도해 주세요"

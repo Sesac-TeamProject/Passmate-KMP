@@ -558,3 +558,42 @@ private struct FlowLayout: Layout {
         }
     }
 }
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("진행 중 방 + 참여한 방 3개") {
+    MyInfoContentView(
+        uiState: MyInfoUiState(
+            isLoading: false,
+            summary: MyPageSummary(
+                participationCount: 12,
+                accuracyPercent: 78,
+                avgRank: KotlinDouble(double: 2.4),
+                trendText: "지난주보다 +5%",
+                weakTopics: ["이차함수", "확률과 통계"]
+            ),
+            ongoing: OngoingRoom(
+                roomId: 501,
+                pin: "482913",
+                title: "8월 4주차 Spring 스터디",
+                hostNickname: "김선생",
+                progressLabel: "5 / 8 문항 진행 중"
+            ),
+            rooms: [
+                JoinedRoom(roomId: 401, title: "7월 3주차 미적분 특강", dateLabel: "2026.07.18", questionCount: 10, myScore: KotlinDouble(double: 890), myRank: KotlinInt(int: 2), hasReport: true),
+                JoinedRoom(roomId: 402, title: "확률과 통계 총정리", dateLabel: "2026.07.10", questionCount: 8, myScore: KotlinDouble(double: 720), myRank: KotlinInt(int: 5), hasReport: true),
+                JoinedRoom(roomId: 403, title: "함수의 극한 퀴즈", dateLabel: "2026.06.28", questionCount: 6, myScore: nil, myRank: nil, hasReport: false)
+            ]
+        ),
+        onAction: { _ in },
+        onClickBack: {}
+    )
+}
+
+#Preview("참여한 방 없음") {
+    MyInfoContentView(
+        uiState: MyInfoUiState(isLoading: false, rooms: []),
+        onAction: { _ in },
+        onClickBack: {}
+    )
+}

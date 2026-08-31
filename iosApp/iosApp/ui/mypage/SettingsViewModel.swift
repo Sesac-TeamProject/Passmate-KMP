@@ -97,9 +97,9 @@ final class SettingsViewModel: ObservableObject {
 
     // 서버 code 기반 문구 분기 (규칙 §10) — 409=정산 미지급분·진행 중 방 거부
     private func deleteFailMessage(_ error: AppError?) -> String {
-        if let conflict = error as? AppErrorConflict {
+        if let conflict = error as? AppError.Conflict {
             return conflict.serverMessage ?? "정산 대기 금액이나 진행 중인 방이 있어 탈퇴할 수 없어요"
-        } else if error is AppErrorNetworkError {
+        } else if error is AppError.NetworkError {
             return "네트워크 연결을 확인해 주세요"
         } else {
             return "탈퇴를 처리하지 못했어요. 다시 시도해 주세요"
