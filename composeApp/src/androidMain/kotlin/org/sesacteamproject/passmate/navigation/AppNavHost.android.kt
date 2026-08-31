@@ -85,20 +85,31 @@ private fun NavHostController.popSignInEntries() {
 }
 
 // 복귀 중복 판정용 라우트 템플릿 (스펙 §4-0). handleNavigationAction의 navigate 대상과 1:1로 유지한다.
-// 인자는 비교하지 않는다 — 복귀 대상의 인자는 가드가 걸린 화면의 것과 항상 같다
+// 인자는 비교하지 않는다 — 복귀 대상의 인자는 가드가 걸린 화면의 것과 항상 같다.
+// else를 두지 않는다 — 새 NavigationAction이 생기면 여기서 컴파일이 깨져 템플릿 누락을 알려준다
 private fun NavigationAction.destinationTemplate(): String? {
     return when (this) {
+        is NavigationAction.NavigateToHome -> Route.Home.route
         is NavigationAction.NavigateToTab -> tab.route
         is NavigationAction.NavigateToRoomList -> Route.RoomList.route
+        // pin 없는 Join은 handleNavigationAction이 홈으로 보낸다 (스펙 §1-1)
+        is NavigationAction.NavigateToJoin -> if (pin != null) Route.Join.route else Route.Home.route
         is NavigationAction.NavigateToPayment -> Route.Payment.route
-        is NavigationAction.NavigateToResult -> Route.Result.route
-        is NavigationAction.NavigateToReputation -> Route.Reputation.route
-        is NavigationAction.NavigateToEarnings -> Route.Earnings.route
-        is NavigationAction.NavigateToSettings -> Route.Settings.route
         is NavigationAction.NavigateToCoinHistory -> Route.CoinHistory.route
+        is NavigationAction.NavigateToWaiting -> Route.Waiting.route
+        is NavigationAction.NavigateToPlay -> Route.Play.route
+        is NavigationAction.NavigateToResult -> Route.Result.route
+        is NavigationAction.NavigateToMyInfo -> Route.MyInfo.route
+        is NavigationAction.NavigateToReputation -> Route.Reputation.route
+        is NavigationAction.NavigateToHostedRooms -> Route.HostedRooms.route
         is NavigationAction.NavigateToRoomReport -> Route.RoomReport.route
         is NavigationAction.NavigateToSessionControl -> Route.SessionControl.route
-        else -> null
+        is NavigationAction.NavigateToEarnings -> Route.Earnings.route
+        is NavigationAction.NavigateToSettings -> Route.Settings.route
+        // 복귀 대상이 될 수 없는 액션 — SignIn·로그인 성공 처리·뒤로가기 (스펙 §0)
+        is NavigationAction.NavigateToSignIn -> null
+        is NavigationAction.NavigateAfterSignIn -> null
+        is NavigationAction.NavigateBack -> null
     }
 }
 
