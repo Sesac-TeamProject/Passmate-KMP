@@ -207,7 +207,7 @@ class MyInfoViewModelTest {
             listOf(
                 MyInfoEvent.OpenReputation,
                 MyInfoEvent.OpenEditProfile(nickname = "준영", avatarId = 3),
-                MyInfoEvent.ShowNotice("코인 충전은 준비 중이에요"),
+                MyInfoEvent.OpenCharge,
                 MyInfoEvent.OpenSettlementAccount,
                 MyInfoEvent.OpenSettings
             ),

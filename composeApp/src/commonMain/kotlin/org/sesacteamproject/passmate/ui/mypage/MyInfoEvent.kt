@@ -12,6 +12,9 @@ sealed interface MyInfoEvent {
 
     data object OpenCoinHistory : MyInfoEvent
 
+    // 코인 충전 화면 (M-12-4·M-12-6)
+    data object OpenCharge : MyInfoEvent
+
     data object OpenSettlementAccount : MyInfoEvent
 
     data object OpenEarnings : MyInfoEvent

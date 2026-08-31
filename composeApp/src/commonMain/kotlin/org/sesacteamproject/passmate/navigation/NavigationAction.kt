@@ -23,6 +23,9 @@ sealed interface NavigationAction {
 
     data object NavigateToCoinHistory : NavigationAction
 
+    // 코인 충전 (M-12-4·M-12-6) — 마이 탭 보유 코인 행에서 진입
+    data object NavigateToCoinCharge : NavigationAction
+
     data class NavigateToWaiting(val pin: String) : NavigationAction
 
     data class NavigateToPlay(val pin: String) : NavigationAction

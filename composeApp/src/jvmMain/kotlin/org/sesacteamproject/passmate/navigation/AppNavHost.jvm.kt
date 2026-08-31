@@ -21,6 +21,7 @@ import org.sesacteamproject.passmate.ui.mypage.JoinedRoomsScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.mypage.SettingsScreen
+import org.sesacteamproject.passmate.ui.payment.CoinChargeScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
 import org.sesacteamproject.passmate.ui.payment.EarningsScreen
 import org.sesacteamproject.passmate.ui.payment.PaymentScreen
@@ -36,6 +37,7 @@ private sealed interface JvmDestination {
     data class Join(val pin: String?) : JvmDestination
     data class Payment(val pin: String) : JvmDestination
     data object CoinHistory : JvmDestination
+    data object CoinCharge : JvmDestination
     data class Waiting(val pin: String) : JvmDestination
     data class Play(val pin: String) : JvmDestination
     data class Result(val roomId: Long) : JvmDestination
@@ -120,6 +122,7 @@ actual fun AppNavHost() {
                 JvmDestination.SessionControl(action.roomId, action.pin)
             )
             is NavigationAction.NavigateToCoinHistory -> routeStack.add(JvmDestination.CoinHistory)
+            is NavigationAction.NavigateToCoinCharge -> routeStack.add(JvmDestination.CoinCharge)
             is NavigationAction.NavigateToEarnings -> routeStack.add(JvmDestination.Earnings)
             is NavigationAction.NavigateToSettings -> routeStack.add(JvmDestination.Settings)
             is NavigationAction.NavigateBack -> {
@@ -162,6 +165,7 @@ actual fun AppNavHost() {
                     onNavigate = onNavigate
                 )
                 is JvmDestination.CoinHistory -> CoinHistoryScreen(onNavigate = onNavigate)
+                is JvmDestination.CoinCharge -> CoinChargeScreen(onNavigate = onNavigate)
                 is JvmDestination.Earnings -> EarningsScreen(onNavigate = onNavigate)
                 is JvmDestination.Settings -> SettingsScreen(onNavigate = onNavigate)
                 is JvmDestination.Waiting -> WaitingScreen(

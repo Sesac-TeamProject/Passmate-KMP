@@ -18,12 +18,20 @@ import org.sesacteamproject.passmate.payment.domain.repository.PaymentRepository
 
 class FakePaymentRepository(
     var coinsResult: AppResult<CoinBalance> = AppResult.Failure(AppError.Unknown()),
-    var earningsResult: AppResult<Earnings> = AppResult.Failure(AppError.Unknown())
+    var earningsResult: AppResult<Earnings> = AppResult.Failure(AppError.Unknown()),
+    var chargeResult: AppResult<CoinCheckout> = AppResult.Failure(AppError.Unknown()),
+    var confirmResult: AppResult<ChargeConfirm> = AppResult.Failure(AppError.Unknown())
 ) : PaymentRepository {
 
     var coinsCalls: Int = 0
 
     var earningsCalls: Int = 0
+
+    var chargedAmount: Int? = null
+
+    var chargedMethod: PaymentMethod? = null
+
+    var confirmedPaymentId: String? = null
 
     override suspend fun getMyCoins(): AppResult<CoinBalance> {
         coinsCalls += 1
@@ -35,11 +43,14 @@ class FakePaymentRepository(
     }
 
     override suspend fun requestCharge(amount: Int, method: PaymentMethod, roomId: Long?): AppResult<CoinCheckout> {
-        return AppResult.Failure(AppError.Unknown())
+        chargedAmount = amount
+        chargedMethod = method
+        return chargeResult
     }
 
     override suspend fun confirmCharge(chargeId: String, paymentId: String, roomId: Long?): AppResult<ChargeConfirm> {
-        return AppResult.Failure(AppError.Unknown())
+        confirmedPaymentId = paymentId
+        return confirmResult
     }
 
     override suspend fun payEntryFee(roomId: Long, nickname: String, avatarId: Int?): AppResult<EntryPayment> {

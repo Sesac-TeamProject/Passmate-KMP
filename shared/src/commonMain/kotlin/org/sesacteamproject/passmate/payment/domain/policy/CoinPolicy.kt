@@ -4,8 +4,9 @@ package org.sesacteamproject.passmate.payment.domain.policy
 // 최종 차감 판정은 서버(entry-payments 402)가 하며, 여기 계산은 UX용이다.
 class CoinPolicy {
 
-    // 프리셋 충전 금액(1 C = ₩1). 부족분보다 큰 정확한 프리셋 또는 부족분 자체를 제안한다.
-    val presets: List<Int> = listOf(10_000, 30_000, 50_000)
+    // 프리셋 충전 금액(1 C = ₩1) — 충전 화면 M-12-4의 2×2 그리드와 같은 목록.
+    // 부족분보다 큰 첫 프리셋 또는 부족분 자체를 제안한다.
+    val presets: List<Int> = listOf(5_000, 10_000, 30_000, 50_000)
 
     // 참가비 대비 부족 코인(0이면 충전 불필요)
     fun shortfall(balance: Int, entryFee: Int): Int {

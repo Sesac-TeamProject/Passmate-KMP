@@ -33,6 +33,7 @@ import org.sesacteamproject.passmate.ui.mypage.JoinedRoomsScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.mypage.SettingsScreen
+import org.sesacteamproject.passmate.ui.payment.CoinChargeScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
 import org.sesacteamproject.passmate.ui.payment.EarningsScreen
 import org.sesacteamproject.passmate.ui.payment.PaymentScreen
@@ -96,6 +97,7 @@ private fun NavigationAction.destinationTemplate(): String? {
         is NavigationAction.NavigateToJoin -> if (pin != null) Route.Join.route else Route.Home.route
         is NavigationAction.NavigateToPayment -> Route.Payment.route
         is NavigationAction.NavigateToCoinHistory -> Route.CoinHistory.route
+        is NavigationAction.NavigateToCoinCharge -> Route.CoinCharge.route
         is NavigationAction.NavigateToWaiting -> Route.Waiting.route
         is NavigationAction.NavigateToPlay -> Route.Play.route
         is NavigationAction.NavigateToResult -> Route.Result.route
@@ -148,6 +150,7 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
         is NavigationAction.NavigateToRoomReport -> navigate("roomReport/${action.roomId}")
         is NavigationAction.NavigateToSessionControl -> navigate("sessionControl/${action.roomId}/${action.pin}")
         is NavigationAction.NavigateToCoinHistory -> navigate(Route.CoinHistory.route)
+        is NavigationAction.NavigateToCoinCharge -> navigate(Route.CoinCharge.route)
         is NavigationAction.NavigateToEarnings -> navigate(Route.Earnings.route)
         is NavigationAction.NavigateToSettings -> navigate(Route.Settings.route)
         is NavigationAction.NavigateBack -> popBackStack()
@@ -314,6 +317,9 @@ actual fun AppNavHost() {
             }
             composable(Route.CoinHistory.route) {
                 CoinHistoryScreen(onNavigate = onNavigate)
+            }
+            composable(Route.CoinCharge.route) {
+                CoinChargeScreen(onNavigate = onNavigate)
             }
             composable(Route.Earnings.route) {
                 EarningsScreen(onNavigate = onNavigate)

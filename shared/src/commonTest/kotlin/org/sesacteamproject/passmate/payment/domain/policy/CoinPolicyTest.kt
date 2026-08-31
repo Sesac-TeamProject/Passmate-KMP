@@ -33,6 +33,16 @@ class CoinPolicyTest {
     }
 
     @Test
+    fun presetsMatchChargeScreenAmounts() {
+        assertEquals(listOf(5_000, 10_000, 30_000, 50_000), policy.presets)
+    }
+
+    @Test
+    fun suggestedChargePicksSmallestPresetForSmallShortfall() {
+        assertEquals(5_000, policy.suggestedChargeAmount(3_000))
+    }
+
+    @Test
     fun suggestedChargeFallsBackToShortfallBeyondPresets() {
         assertEquals(80_000, policy.suggestedChargeAmount(80_000))
     }

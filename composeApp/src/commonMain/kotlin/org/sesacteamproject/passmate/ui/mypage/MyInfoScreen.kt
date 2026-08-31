@@ -84,6 +84,7 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
                 }
                 is MyInfoEvent.OpenPaymentMethod -> activeSheet = MyInfoSheet.PAYMENT_METHOD
                 is MyInfoEvent.OpenCoinHistory -> onNavigate(NavigationAction.NavigateToCoinHistory)
+                is MyInfoEvent.OpenCharge -> onNavigate(NavigationAction.NavigateToCoinCharge)
                 is MyInfoEvent.OpenSettlementAccount -> activeSheet = MyInfoSheet.SETTLEMENT_ACCOUNT
                 is MyInfoEvent.OpenEarnings -> onNavigate(NavigationAction.NavigateToEarnings)
                 is MyInfoEvent.OpenNotifications -> activeSheet = MyInfoSheet.NOTIFICATIONS

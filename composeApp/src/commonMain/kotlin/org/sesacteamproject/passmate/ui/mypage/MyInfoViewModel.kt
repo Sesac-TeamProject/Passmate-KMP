@@ -139,7 +139,7 @@ class MyInfoViewModel(
             is MyInfoAction.Retry -> loadAll()
             is MyInfoAction.ClickProfile -> emit(MyInfoEvent.OpenReputation)
             is MyInfoAction.ClickEditProfile -> onClickEditProfile()
-            is MyInfoAction.ClickCharge -> emit(MyInfoEvent.ShowNotice("코인 충전은 준비 중이에요"))
+            is MyInfoAction.ClickCharge -> emit(MyInfoEvent.OpenCharge)
             is MyInfoAction.ClickPaymentMethod -> emit(MyInfoEvent.OpenPaymentMethod)
             is MyInfoAction.ClickCoinHistory -> emit(MyInfoEvent.OpenCoinHistory)
             is MyInfoAction.ClickSettlementAccount -> emit(MyInfoEvent.OpenSettlementAccount)

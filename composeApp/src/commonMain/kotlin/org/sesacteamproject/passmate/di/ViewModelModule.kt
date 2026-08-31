@@ -11,6 +11,7 @@ import org.sesacteamproject.passmate.ui.hostroom.SessionControlViewModel
 import org.sesacteamproject.passmate.ui.join.JoinViewModel
 import org.sesacteamproject.passmate.ui.mypage.JoinedRoomsViewModel
 import org.sesacteamproject.passmate.ui.mypage.MyInfoViewModel
+import org.sesacteamproject.passmate.ui.payment.CoinChargeViewModel
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryViewModel
 import org.sesacteamproject.passmate.ui.payment.EarningsViewModel
 import org.sesacteamproject.passmate.ui.payment.PaymentMethodViewModel
@@ -32,6 +33,7 @@ val viewModelModule = module {
     factory { JoinViewModel(get(), get(), get(), get()) }
     factory { PaymentViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory { CoinHistoryViewModel(get()) }
+    factory { CoinChargeViewModel(get(), get(), get(), get()) }
     factory { WaitingViewModel(get(), get(), get(), get(), get()) }
     factory { PlayViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory { ResultViewModel(get(), get(), get(), get(), get(), get(), get()) }
