@@ -26,6 +26,8 @@ struct MyInfoView: View {
 
     var onOpenCoinHistory: () -> Void = {}
 
+    var onOpenCharge: () -> Void = {}
+
     var onOpenEarnings: () -> Void = {}
 
     var onOpenSettings: () -> Void = {}
@@ -67,6 +69,8 @@ struct MyInfoView: View {
                 activeSheet = .paymentMethod
             case .openCoinHistory:
                 onOpenCoinHistory()
+            case .openCharge:
+                onOpenCharge()
             case .openSettlementAccount:
                 activeSheet = .settlementAccount
             case .openEarnings:

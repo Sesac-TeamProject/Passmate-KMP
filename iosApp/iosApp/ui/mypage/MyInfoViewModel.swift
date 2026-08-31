@@ -124,7 +124,7 @@ final class MyInfoViewModel: ObservableObject {
         case .clickEditProfile:
             onClickEditProfile()
         case .clickCharge:
-            event.send(.showNotice(message: "코인 충전은 준비 중이에요"))
+            event.send(.openCharge)
         case .clickPaymentMethod:
             event.send(.openPaymentMethod)
         case .clickCoinHistory:
