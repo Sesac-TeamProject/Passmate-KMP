@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHost
@@ -202,20 +201,7 @@ private fun GoogleSignInButton(
                 strokeWidth = 2.dp
             )
         } else {
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .background(PassmateColors.Surface, CircleShape)
-                    .border(1.dp, PassmateColors.Border, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "G",
-                    color = PassmateColors.BrandGoogleBlue,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
+            GoogleSignInIcon(modifier = Modifier.size(24.dp))
         }
         Text(
             text = "Google로 계속하기",
@@ -238,9 +224,12 @@ private fun AppleSignInButton(
             .background(PassmateColors.BrandAppleBlack, RoundedCornerShape(14.dp))
             .clickable(enabled = !isSigningIn, onClick = onClick)
             .padding(vertical = 16.dp),
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        if (!isSigningIn) {
+            AppleSignInIcon(modifier = Modifier.size(20.dp))
+        }
         Text(
             text = "Apple로 계속하기",
             color = PassmateColors.Surface,
@@ -302,3 +291,9 @@ private fun GuestEnterButton(
         )
     }
 }
+
+@Composable
+internal expect fun GoogleSignInIcon(modifier: Modifier = Modifier)
+
+@Composable
+internal expect fun AppleSignInIcon(modifier: Modifier = Modifier)

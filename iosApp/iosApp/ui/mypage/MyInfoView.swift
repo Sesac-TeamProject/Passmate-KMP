@@ -83,7 +83,7 @@ struct MyInfoView: View {
         }
         .sheet(item: $activeSheet) { sheet in
             sheetContent(sheet)
-                .presentationDetents([.medium, .large])
+                .passmateDetents([.medium, .large])
         }
         .alert("로그아웃 할까요?", isPresented: $showSignOutConfirm) {
             Button("로그아웃", role: .destructive) {

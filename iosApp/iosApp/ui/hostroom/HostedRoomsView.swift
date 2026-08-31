@@ -60,7 +60,7 @@ struct HostedRoomsView: View {
                 },
                 onClose: { isCreateSheetVisible = false }
             )
-            .presentationDetents([.large])
+            .passmateDetents([.large])
         }
         .overlay(alignment: .bottom) {
             if let noticeMessage {
