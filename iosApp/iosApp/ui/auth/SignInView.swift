@@ -148,11 +148,10 @@ private struct SignInContentView: View {
                     ProgressView()
                         .frame(width: 24, height: 24)
                 } else {
-                    Text("G")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(PassmateColors.brandGoogleBlue)
+                    Image("GoogleSignIn")
+                        .resizable()
+                        .scaledToFit()
                         .frame(width: 24, height: 24)
-                        .overlay(Circle().stroke(PassmateColors.border, lineWidth: 1))
                 }
                 Text("Google로 계속하기")
                     .font(.system(size: 14, weight: .medium))
@@ -172,14 +171,22 @@ private struct SignInContentView: View {
         Button {
             onAction(.clickAppleSignIn)
         } label: {
-            Text("Apple로 계속하기")
-                .font(.system(size: 14, weight: .medium))
-                .kerning(-0.28)
-                .foregroundColor(PassmateColors.surface)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(PassmateColors.brandAppleBlack)
-                .cornerRadius(14)
+            HStack(spacing: 10) {
+                if !uiState.isSigningIn {
+                    Image("AppleSignIn")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                }
+                Text("Apple로 계속하기")
+                    .font(.system(size: 14, weight: .medium))
+                    .kerning(-0.28)
+                    .foregroundColor(PassmateColors.surface)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(PassmateColors.brandAppleBlack)
+            .cornerRadius(14)
         }
         .disabled(uiState.isSigningIn)
     }
