@@ -60,7 +60,7 @@ struct RoomListView: View {
                     viewModel.action(.notice(message: message))
                 }
             )
-            .presentationDetents([.medium, .large])
+            .passmateDetents([.medium, .large])
         }
         .overlay(alignment: .bottom) {
             if let noticeMessage {

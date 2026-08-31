@@ -53,7 +53,7 @@ struct ResultView: View {
                 uiState: viewModel.uiState,
                 onAction: { viewModel.action($0) }
             )
-            .presentationDetents([.large])
+            .passmateDetents([.large])
         }
         .sheet(isPresented: Binding(get: { shareText != nil }, set: { if !$0 { shareText = nil } })) {
             if let shareText {

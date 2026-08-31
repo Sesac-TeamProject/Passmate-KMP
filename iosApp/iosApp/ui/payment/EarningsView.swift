@@ -46,7 +46,7 @@ struct EarningsView: View {
                 },
                 onClose: { isAccountSheetVisible = false }
             )
-            .presentationDetents([.medium, .large])
+            .passmateDetents([.medium, .large])
         }
         .overlay(alignment: .bottom) {
             if let noticeMessage {
