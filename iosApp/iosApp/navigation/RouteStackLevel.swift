@@ -62,6 +62,7 @@ struct RouteStackLevel<Destination: View>: View {
             }
         }
         .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
         .background(nextLevelLink)
         .onAppear { syncShownRoute(path) }
         .onChange(of: path) { syncShownRoute($0) }

@@ -100,7 +100,7 @@ struct ContentView: View {
         Binding(
             get: { !path.isEmpty },
             set: { isActive in
-                if !isActive {
+                if !isActive && !path.isEmpty {
                     path = []
                 }
             }
