@@ -272,14 +272,21 @@ private struct PinInputField: View {
 
     var body: some View {
         ZStack {
-            HStack(spacing: 8) {
-                ForEach(0..<6, id: \.self) { index in
-                    PinDigitBox(
-                        digit: digit(at: index),
-                        isActive: index == pin.count
-                    )
+            GeometryReader { geometry in
+                let spacing: CGFloat = 8
+                let digitWidth = (geometry.size.width - (spacing * 5)) / 6
+
+                HStack(spacing: spacing) {
+                    ForEach(0..<6, id: \.self) { index in
+                        PinDigitBox(
+                            digit: digit(at: index),
+                            isActive: index == pin.count
+                        )
+                        .frame(width: digitWidth, height: 56)
+                    }
                 }
             }
+            .frame(height: 56)
             TextField(
                 "",
                 text: Binding(

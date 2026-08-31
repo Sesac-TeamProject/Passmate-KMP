@@ -3,6 +3,7 @@ package org.sesacteamproject.passmate.ui.join
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -231,12 +232,19 @@ private fun PinInputField(
         textStyle = TextStyle(color = Color.Transparent),
         decorationBox = { innerTextField ->
             Box {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    repeat(JoinInputPolicy.PIN_LENGTH) { index ->
-                        PinDigitBox(
-                            digit = pin.getOrNull(index),
-                            isActive = index == pin.length
-                        )
+                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                    val spacing = 8.dp
+                    val totalSpacing = spacing * (JoinInputPolicy.PIN_LENGTH - 1)
+                    val digitWidth = (maxWidth - totalSpacing) / JoinInputPolicy.PIN_LENGTH
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
+                        repeat(JoinInputPolicy.PIN_LENGTH) { index ->
+                            PinDigitBox(
+                                digit = pin.getOrNull(index),
+                                isActive = index == pin.length,
+                                modifier = Modifier.size(width = digitWidth, height = 56.dp)
+                            )
+                        }
                     }
                 }
                 Box(modifier = Modifier.matchParentSize().alpha(0f)) {
@@ -250,7 +258,8 @@ private fun PinInputField(
 @Composable
 private fun PinDigitBox(
     digit: Char?,
-    isActive: Boolean
+    isActive: Boolean,
+    modifier: Modifier = Modifier
 ) {
     val background = if (isActive) {
         PassmateColors.Surface
@@ -264,8 +273,7 @@ private fun PinDigitBox(
     }
 
     Box(
-        modifier = Modifier
-            .size(width = 46.dp, height = 56.dp)
+        modifier = modifier
             .then(borderModifier)
             .background(background, RoundedCornerShape(12.dp)),
         contentAlignment = Alignment.Center
