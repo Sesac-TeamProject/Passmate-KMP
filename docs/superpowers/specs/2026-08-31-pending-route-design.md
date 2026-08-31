@@ -13,6 +13,7 @@
 | pendingRoute 타입 | Compose `NavigationAction?` · iOS `Route?` | 각 플랫폼에서 "인자를 담을 수 있는 유일한 목적지 타입". §2-3 참조 |
 | 유실 대응 | **메모리만** (프로세스 사망 시 홈 = 현행 동작으로 폴백) | iOS는 `ASWebAuthenticationSession`(앱 내 시트)이라 무관. Android Custom Tabs 중 프로세스 사망은 드물고, 폴백이 현행 동작이라 회귀 없음 |
 | stale 방지 | **SignIn 진입 시 항상 덮어쓴다**(인자 없으면 `null`) | 뒤로가기로 로그인을 벗어나 값이 남아도 다음 진입이 재정의. 로그인 완료는 SignIn 화면에서만 발생하므로 오복귀 창이 없음 |
+| 복귀 절차 | **SignIn 제거 후, 목적지가 이미 최상단이 아닐 때만 이동** | 매핑표 대부분이 "가드가 걸린 화면 = 복귀 대상"이라 무조건 이동하면 같은 화면이 두 번 쌓인다. §4-0 |
 | Play 복귀 | **제외**(현행 유지 = 홈) | 로그인이 토큰 신원을 바꾸는데 진행 중 세션 참여 자격 처리가 계약상 불명확. §8-1 참조 |
 
 ## 1. 배경 — 현재 가드 실태
@@ -140,6 +141,22 @@ iOS도 동일하다(`JoinViewModel.swift:79`·`127`·`156`). 두 이벤트로 �
 
 ## 4. 플랫폼 적용
 
+### 4-0. 복귀 절차 — 3플랫폼 공통 규칙
+
+> **SignIn을 제거한 뒤, 목적지가 이미 최상단이 아닐 때만 이동한다.**
+
+§3 매핑표의 대부분은 **가드가 걸린 화면 자신이 복귀 대상**이다(RoomList·Result·Payment·Reputation·Earnings·Settings·RoomReport·SessionControl 8곳). SignIn만 걷어내면 그 화면이 이미 최상단에 드러나므로, 무조건 이동하면 같은 화면이 두 번 쌓인다.
+
+```
+가드 전:  Home → RoomList
+SignIn:   Home → RoomList → SignIn
+무조건 이동: Home → RoomList → RoomList   ← 뒤로가기가 같은 화면을 다시 보여준다
+```
+
+탭 복귀는 영향받지 않는다(`navigateToTab`이 `popUpTo(Home)` + `launchSingleTop`). Join → `Payment(pin)`도 원래 다른 화면이라 무관하다.
+
+**"그 엔트리까지 걷어내고 새로 push"(= 화면 재생성) 대신 재사용을 택한 이유**: Android `popBackStack(route, inclusive)`의 인자 매칭 동작이 Navigation 버전에 따라 다르고 오프라인에서 확인할 수 없으며, iOS는 pop+push가 경로 길이를 두 번 바꿔 iOS 15 호환 스펙 §2-5가 경고한 조용한 실패 위험이 있다. 검증 가능한 쪽을 택했다. 재사용의 대가는 §5에 기록한다.
+
 ### 4-1. Android
 
 `handleNavigationAction`은 `NavHostController` 확장함수라 셸 VM에 접근할 수 없다. 확장함수는 그대로 두고 **두 액션만 가로채는 얇은 래퍼**를 `AppNavHost` 안에 둔다(Desktop이 이미 쓰는 형태와 동일).
@@ -168,10 +185,34 @@ is AppShellEvent.ResumePendingRoute -> {
     while (navController.currentDestination?.route?.startsWith(Route.SignIn.route) == true) {
         if (!navController.popBackStack()) break
     }
-    onNavigate(event.pendingRoute)
+    // §4-0 — 복귀 대상이 이미 최상단이면 이동하지 않는다
+    if (navController.currentDestination?.route != event.pendingRoute.destinationTemplate()) {
+        onNavigate(event.pendingRoute)
+    }
 }
 is AppShellEvent.NavigateToHome -> navController.navigateHome()
 is AppShellEvent.RequireSignIn -> navController.navigate(Route.SignIn.route)
+```
+
+중복 판정은 **라우트 템플릿** 비교로 한다. `Route`의 기존 템플릿 상수를 그대로 쓰므로 새 문자열을 만들지 않는다. 인자는 비교하지 않는다 — 복귀 대상의 인자는 가드가 걸린 화면의 것과 항상 같기 때문이다.
+
+```kotlin
+// 복귀 중복 판정용 (§4-0). handleNavigationAction의 navigate 대상과 1:1로 유지한다
+private fun NavigationAction.destinationTemplate(): String? {
+    return when (this) {
+        is NavigationAction.NavigateToTab -> tab.route
+        is NavigationAction.NavigateToRoomList -> Route.RoomList.route
+        is NavigationAction.NavigateToPayment -> Route.Payment.route
+        is NavigationAction.NavigateToResult -> Route.Result.route
+        is NavigationAction.NavigateToReputation -> Route.Reputation.route
+        is NavigationAction.NavigateToEarnings -> Route.Earnings.route
+        is NavigationAction.NavigateToSettings -> Route.Settings.route
+        is NavigationAction.NavigateToCoinHistory -> Route.CoinHistory.route
+        is NavigationAction.NavigateToRoomReport -> Route.RoomReport.route
+        is NavigationAction.NavigateToSessionControl -> Route.SessionControl.route
+        else -> null
+    }
+}
 ```
 
 ### 4-2. Desktop
@@ -180,11 +221,15 @@ is AppShellEvent.RequireSignIn -> navController.navigate(Route.SignIn.route)
 is AppShellEvent.ResumePendingRoute -> {
     routeStack.removeAll { it is JvmDestination.SignIn }
     onNavigate(event.pendingRoute)
+    // §4-0 — 같은 화면이 중복 push됐으면 걷어낸다. JvmDestination은 data class/object라 구조적 동등 비교가 된다
+    if (routeStack.size >= 2 && routeStack.last() == routeStack[routeStack.lastIndex - 1]) {
+        routeStack.removeAt(routeStack.lastIndex)
+    }
 }
 is AppShellEvent.NavigateToHome -> onNavigate(NavigationAction.NavigateToHome)
 ```
 
-탭 복귀는 `switchTab`이 스택을 통째로 교체하므로 SignIn 제거가 자동 처리된다.
+Desktop은 `NavigationAction → JvmDestination` 매핑이 `onNavigate` 안에만 있으므로, 템플릿 비교 대신 **이동 후 중복 제거**로 §4-0을 만족시킨다. 탭 복귀는 `switchTab`이 스택을 통째로 교체하므로 SignIn 제거도 자동 처리된다.
 
 ### 4-3. iOS — 목적지 종류에 따라 두 갈래
 
@@ -201,10 +246,14 @@ sessionGeneration += 1
 **B. push 라우트 복귀**(`.payment(pin)` 등)
 
 ```swift
-path[path.count - 1] = route   // 최상단 교체 (iOS 15 호환 스펙 §2-5)
+// SignIn은 로그인 완료 시점에 항상 path.last다. 걷어낸 뒤 목적지가 이미 최상단이 아닐 때만 push (§4-0)
+path.removeLast()
+if path.last != route {
+    path.append(route)   // 1단계 append (iOS 15 호환 스펙 §2-5)
+}
 ```
 
-SignIn은 로그인 완료 시점에 항상 `path.last`이므로, 교체가 곧 "SignIn 제거 + 목적지 push"다. **경로 길이가 변하지 않아** 2단계 증가 실패(iOS 15 호환 스펙 §2-5의 조용한 실패)를 원천 회피한다.
+두 변경을 한 함수 안에서 처리하므로 SwiftUI는 최종 상태만 렌더한다. 결과적으로 §2-5의 "최상단 교체"와 같아 **경로 길이가 늘지 않고**, 2단계 증가 실패를 원천 회피한다. 복귀 대상이 이미 아래에 있으면 길이가 1 줄어드는 pop이 되는데, 이 역시 1단계 변경이라 안전하다.
 
 **B에서 `sessionGeneration`을 올리지 않는 이유**: `.id(sessionGeneration)` 변경은 `NavigationView`를 통째로 재생성하는데, path가 이미 비어있지 않은 채로 시작하는 첫 렌더에서 `NavigationLink(isActive: true)`가 실제 push로 이어지는지 검증된 적이 없다. 검증된 조합(빈 path로 재생성 → 이후 1단계 append)만 쓴다. 지연 push(`DispatchQueue.main.async { path = [target] }`)도 검토했으나 타이밍 의존 + 깜빡임 위험으로 기각했다.
 
@@ -217,6 +266,8 @@ push 라우트로 복귀하면 **그 아래 백스택의 탭 루트는 로그인
 - Android: 백스택의 홈 엔트리가 재생성되지 않는다
 - Desktop: `routeStack` 아래 항목이 그대로다
 - iOS: §4-3 B가 `sessionGeneration`을 올리지 않는다
+
+또한 §4-0에 따라 **복귀 대상이 가드 직전 화면과 같으면 그 화면은 재사용되고 재생성되지 않는다.** 예: Result에서 가입 유도 → 로그인 → Result로 돌아와도 화면이 스스로 새로고침하지 않아 "가입하고 기록 저장" 버튼이 남아 있을 수 있다(claim 자체는 `SignInViewModel.claimPendingGuestRecord()`가 이미 수행한 뒤다).
 
 근본 해법은 규칙 §8이 지정한 `observeCurrentUser()` 스트림이며, 이미 후속 과제로 잡혀 있다(홈 셸 스펙 §9). 이번 범위 밖.
 
