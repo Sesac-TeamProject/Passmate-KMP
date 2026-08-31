@@ -22,10 +22,13 @@ sealed class Route(val route: String) {
 
     data object MyInfo : Route("myInfo")
 
-    // 내 명성·뱃지 상세 (M-09) — 마이페이지에서 진입
+    // 참여한 방 탭 루트 (M-08) — 하단 4탭 셸
+    data object JoinedRooms : Route("joinedRooms")
+
+    // 내 명성·뱃지 상세 (M-09) — 마이 탭 프로필 카드에서 진입
     data object Reputation : Route("reputation")
 
-    // 내가 만든 방 (M-13) — 마이페이지에서 진입, 새 방 만들기 시트 포함
+    // 내가 만든 방 (M-13) — 하단 탭 루트, 새 방 만들기 시트 포함
     data object HostedRooms : Route("hostedRooms")
 
     // 방 리포트 (M-14) — 내가 만든 방 › 종료 › 상세
@@ -34,12 +37,12 @@ sealed class Route(val route: String) {
     // 진행 리모컨 (M-T2) — 내가 만든 방 › 진행 중 › 진행
     data object SessionControl : Route("sessionControl/{roomId}/{pin}")
 
-    // 정산 (M-T4) — 마이페이지에서 진입, 정산 계좌 시트(M-12-3) 포함
+    // 정산 (M-T4) — 마이 탭에서 진입, 정산 계좌 시트(M-12-3) 포함
     data object Earnings : Route("earnings")
 
     data object Payment : Route("payment/{pin}")
 
-    // 코인·결제 내역 (M-12) — 마이페이지에서 진입
+    // 코인·결제 내역 (M-12) — 마이 탭에서 진입
     data object CoinHistory : Route("coinHistory")
 
     data object Settings : Route("settings")

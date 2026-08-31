@@ -4,13 +4,20 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
+import org.sesacteamproject.passmate.auth.domain.usecase.SignOutUseCase
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.mvi.MviViewModel
-import org.sesacteamproject.passmate.user.domain.usecase.GetMyPageUseCase
+import org.sesacteamproject.passmate.payment.domain.usecase.GetEarningsUseCase
+import org.sesacteamproject.passmate.payment.domain.usecase.GetMyCoinsUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
 
+// 마이 탭 루트 (M-12) — 프로필·코인·정산 3섹션을 독립 로드한다. 금액·등급 계산은 전부 서버 값 렌더 (규칙 §1)
 class MyInfoViewModel(
-    private val getMyPageUseCase: GetMyPageUseCase,
+    private val getMyProfileUseCase: GetMyProfileUseCase,
+    private val getMyCoinsUseCase: GetMyCoinsUseCase,
+    private val getEarningsUseCase: GetEarningsUseCase,
+    private val signOutUseCase: SignOutUseCase,
     private val isSignedInUseCase: IsSignedInUseCase
 ) : MviViewModel<MyInfoUiState, MyInfoAction, MyInfoEvent>(MyInfoUiState()) {
 
@@ -21,31 +28,26 @@ class MyInfoViewModel(
             return
         }
         hasEntered = true
-        // 회원 전용 가드 — 서버 검증이 최종 권위지만 UX상 진입 시 먼저 로그인 유도한다 (규칙 §8)
+        // 회원 전용 가드 — 서버 검증이 최종 권위 (규칙 §8)
         if (!isSignedInUseCase.invoke()) {
-            viewModelScope.launch {
-                _event.emit(MyInfoEvent.RequireSignIn)
-            }
+            emit(MyInfoEvent.RequireSignIn)
         } else {
-            loadFirstPage()
+            loadAll()
         }
     }
 
-    private fun loadFirstPage() {
+    private fun loadAll() {
+        loadProfile()
+        loadCoinInfo()
+        loadEarnings()
+    }
+
+    private fun loadProfile() {
         _uiState.update { it.copy(isLoading = true, loadFailed = false) }
         viewModelScope.launch {
-            getMyPageUseCase.invoke(null)
-                .onSuccess { myPage ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            loadFailed = false,
-                            summary = myPage.summary,
-                            ongoing = myPage.ongoing,
-                            rooms = myPage.rooms,
-                            nextCursor = myPage.nextCursor
-                        )
-                    }
+            getMyProfileUseCase.invoke()
+                .onSuccess { profile ->
+                    _uiState.update { it.copy(isLoading = false, loadFailed = false, profile = profile) }
                 }
                 .onFailure {
                     _uiState.update { it.copy(isLoading = false, loadFailed = true) }
@@ -53,86 +55,102 @@ class MyInfoViewModel(
         }
     }
 
-    private fun onLoadMore() {
-        val state = _uiState.value
-        val cursor = state.nextCursor
-
-        if (cursor == null || state.isLoadingMore) {
-            return
-        }
-        _uiState.update { it.copy(isLoadingMore = true) }
+    private fun loadCoinInfo() {
         viewModelScope.launch {
-            getMyPageUseCase.invoke(cursor)
-                .onSuccess { myPage ->
+            getMyCoinsUseCase.invoke()
+                .onSuccess { coins ->
                     _uiState.update {
                         it.copy(
-                            isLoadingMore = false,
-                            rooms = it.rooms + myPage.rooms,
-                            nextCursor = myPage.nextCursor
+                            defaultMethod = coins.defaultMethod,
+                            recentTransaction = coins.recent,
+                            isCoinInfoFailed = false
                         )
                     }
                 }
                 .onFailure {
-                    _uiState.update { it.copy(isLoadingMore = false) }
-                    _event.emit(MyInfoEvent.ShowNotice("목록을 더 불러오지 못했어요"))
+                    _uiState.update { it.copy(isCoinInfoFailed = true) }
                 }
         }
     }
 
-    private fun onClickRoomReport(roomId: Long) {
+    private fun loadEarnings() {
         viewModelScope.launch {
-            _event.emit(MyInfoEvent.OpenReport(roomId))
+            getEarningsUseCase.invoke(null)
+                .onSuccess { earnings ->
+                    _uiState.update {
+                        it.copy(
+                            settlementAccount = earnings.account,
+                            nextPayout = earnings.nextPayout,
+                            isEarningsFailed = false
+                        )
+                    }
+                }
+                .onFailure {
+                    _uiState.update { it.copy(isEarningsFailed = true) }
+                }
         }
     }
 
-    private fun onClickRejoin(pin: String) {
-        viewModelScope.launch {
-            _event.emit(MyInfoEvent.Rejoin(pin))
+    private fun onClickEditProfile() {
+        val profile = _uiState.value.profile
+
+        if (profile != null) {
+            emit(MyInfoEvent.OpenEditProfile(profile.nickname, profile.avatarId))
         }
     }
 
-    private fun onClickCoinHistory() {
+    private fun onConfirmSignOut() {
+        if (_uiState.value.isProcessing) {
+            return
+        }
+        _uiState.update { it.copy(isProcessing = true) }
         viewModelScope.launch {
-            _event.emit(MyInfoEvent.OpenCoinHistory)
+            // 로컬 세션 정리는 shared가 항상 수행 — 실패 케이스 없음 (M-12-11)
+            signOutUseCase.invoke()
+            _uiState.update { it.copy(isProcessing = false) }
+            _event.emit(MyInfoEvent.SignedOut)
         }
     }
 
-    private fun onClickReputation() {
-        viewModelScope.launch {
-            _event.emit(MyInfoEvent.OpenReputation)
-        }
+    private fun onProfileUpdated() {
+        loadProfile()
+        emit(MyInfoEvent.ShowNotice("내 정보를 저장했어요"))
     }
 
-    private fun onClickHostedRooms() {
-        viewModelScope.launch {
-            _event.emit(MyInfoEvent.OpenHostedRooms)
-        }
+    private fun onPaymentMethodUpdated() {
+        loadCoinInfo()
+        emit(MyInfoEvent.ShowNotice("기본 결제 수단을 저장했어요"))
     }
 
-    private fun onClickEarnings() {
-        viewModelScope.launch {
-            _event.emit(MyInfoEvent.OpenEarnings)
-        }
+    private fun onAccountUpdated() {
+        loadEarnings()
+        emit(MyInfoEvent.ShowNotice("정산 계좌를 저장했어요"))
     }
 
-    private fun onClickSettings() {
+    private fun emit(event: MyInfoEvent) {
         viewModelScope.launch {
-            _event.emit(MyInfoEvent.OpenSettings)
+            _event.emit(event)
         }
     }
 
     override fun onAction(action: MyInfoAction) {
         when (action) {
             is MyInfoAction.Enter -> onEnter()
-            is MyInfoAction.Retry -> loadFirstPage()
-            is MyInfoAction.LoadMore -> onLoadMore()
-            is MyInfoAction.ClickRoomReport -> onClickRoomReport(action.roomId)
-            is MyInfoAction.ClickRejoin -> onClickRejoin(action.pin)
-            is MyInfoAction.ClickCoinHistory -> onClickCoinHistory()
-            is MyInfoAction.ClickReputation -> onClickReputation()
-            is MyInfoAction.ClickHostedRooms -> onClickHostedRooms()
-            is MyInfoAction.ClickEarnings -> onClickEarnings()
-            is MyInfoAction.ClickSettings -> onClickSettings()
+            is MyInfoAction.Retry -> loadAll()
+            is MyInfoAction.ClickProfile -> emit(MyInfoEvent.OpenReputation)
+            is MyInfoAction.ClickEditProfile -> onClickEditProfile()
+            is MyInfoAction.ClickCharge -> emit(MyInfoEvent.ShowNotice("코인 충전은 준비 중이에요"))
+            is MyInfoAction.ClickPaymentMethod -> emit(MyInfoEvent.OpenPaymentMethod)
+            is MyInfoAction.ClickCoinHistory -> emit(MyInfoEvent.OpenCoinHistory)
+            is MyInfoAction.ClickSettlementAccount -> emit(MyInfoEvent.OpenSettlementAccount)
+            is MyInfoAction.ClickEarnings -> emit(MyInfoEvent.OpenEarnings)
+            is MyInfoAction.ClickNotifications -> emit(MyInfoEvent.OpenNotifications)
+            is MyInfoAction.ClickSettings -> emit(MyInfoEvent.OpenSettings)
+            is MyInfoAction.ConfirmSignOut -> onConfirmSignOut()
+            is MyInfoAction.ProfileUpdated -> onProfileUpdated()
+            is MyInfoAction.PaymentMethodUpdated -> onPaymentMethodUpdated()
+            is MyInfoAction.AccountUpdated -> onAccountUpdated()
+            is MyInfoAction.Notice -> emit(MyInfoEvent.ShowNotice(action.message))
         }
     }
 }

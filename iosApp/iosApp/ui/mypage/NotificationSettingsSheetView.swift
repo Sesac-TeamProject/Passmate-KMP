@@ -2,7 +2,7 @@ import SwiftUI
 import Shared
 
 // Figma "UI 디자인 v6" M-12-10 미러 — 알림 설정 3종, 토글 즉시 저장.
-// 시트 표시 여부는 호스팅 화면(SettingsView)이 소유한다 (규칙 §11-1)
+// 시트 표시 여부는 호스팅 화면(MyInfoView)이 소유한다 (규칙 §11-1)
 struct NotificationSettingsSheetView: View {
     var onNotice: (String) -> Void = { _ in }
 

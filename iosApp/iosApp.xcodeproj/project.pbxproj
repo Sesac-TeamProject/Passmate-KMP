@@ -11,11 +11,6 @@
 		A1010002AABBCCDDEEFF0002 /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002AABBCCDDEEFF0002 /* iOSApp.swift */; };
 		A1010004AABBCCDDEEFF0004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1011004AABBCCDDEEFF0004 /* Assets.xcassets */; };
 		A1010005AABBCCDDEEFF0005 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1011005AABBCCDDEEFF0005 /* Preview Assets.xcassets */; };
-		A1010022AABBCCDDEEFF0022 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011022AABBCCDDEEFF0022 /* HomeView.swift */; };
-		A1010023AABBCCDDEEFF0023 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011023AABBCCDDEEFF0023 /* HomeViewModel.swift */; };
-		A1010024AABBCCDDEEFF0024 /* HomeUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011024AABBCCDDEEFF0024 /* HomeUiState.swift */; };
-		A1010025AABBCCDDEEFF0025 /* HomeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011025AABBCCDDEEFF0025 /* HomeAction.swift */; };
-		A1010026AABBCCDDEEFF0026 /* HomeEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011026AABBCCDDEEFF0026 /* HomeEvent.swift */; };
 		A1010027AABBCCDDEEFF0027 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011027AABBCCDDEEFF0027 /* SignInView.swift */; };
 		A1010028AABBCCDDEEFF0028 /* SignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011028AABBCCDDEEFF0028 /* SignInViewModel.swift */; };
 		A1010029AABBCCDDEEFF0029 /* SignInUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011029AABBCCDDEEFF0029 /* SignInUiState.swift */; };
@@ -44,11 +39,11 @@
 		A1010049AABBCCDDEEFF0049 /* ResultUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011049AABBCCDDEEFF0049 /* ResultUiState.swift */; };
 		A1010050AABBCCDDEEFF0050 /* ResultAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011050AABBCCDDEEFF0050 /* ResultAction.swift */; };
 		A1010051AABBCCDDEEFF0051 /* ResultEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011051AABBCCDDEEFF0051 /* ResultEvent.swift */; };
-		A1010052AABBCCDDEEFF0052 /* MyInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011052AABBCCDDEEFF0052 /* MyInfoView.swift */; };
-		A1010053AABBCCDDEEFF0053 /* MyInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011053AABBCCDDEEFF0053 /* MyInfoViewModel.swift */; };
-		A1010054AABBCCDDEEFF0054 /* MyInfoUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011054AABBCCDDEEFF0054 /* MyInfoUiState.swift */; };
-		A1010055AABBCCDDEEFF0055 /* MyInfoAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011055AABBCCDDEEFF0055 /* MyInfoAction.swift */; };
-		A1010056AABBCCDDEEFF0056 /* MyInfoEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011056AABBCCDDEEFF0056 /* MyInfoEvent.swift */; };
+		A1010052AABBCCDDEEFF0052 /* JoinedRoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011052AABBCCDDEEFF0052 /* JoinedRoomsView.swift */; };
+		A1010053AABBCCDDEEFF0053 /* JoinedRoomsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011053AABBCCDDEEFF0053 /* JoinedRoomsViewModel.swift */; };
+		A1010054AABBCCDDEEFF0054 /* JoinedRoomsUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011054AABBCCDDEEFF0054 /* JoinedRoomsUiState.swift */; };
+		A1010055AABBCCDDEEFF0055 /* JoinedRoomsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011055AABBCCDDEEFF0055 /* JoinedRoomsAction.swift */; };
+		A1010056AABBCCDDEEFF0056 /* JoinedRoomsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011056AABBCCDDEEFF0056 /* JoinedRoomsEvent.swift */; };
 		A1010057AABBCCDDEEFF0057 /* PaymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011057AABBCCDDEEFF0057 /* PaymentView.swift */; };
 		A1010058AABBCCDDEEFF0058 /* PaymentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011058AABBCCDDEEFF0058 /* PaymentViewModel.swift */; };
 		A1010059AABBCCDDEEFF0059 /* PaymentUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011059AABBCCDDEEFF0059 /* PaymentUiState.swift */; };
@@ -110,11 +105,11 @@
 		A1010001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */; };
 		A1010001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */; };
 		A1010001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift */; };
-		A1010001125AABBCCDDEEFF0125 /* SettingsUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001125AABBCCDDEEFF0125 /* SettingsUiState.swift */; };
-		A1010001126AABBCCDDEEFF0126 /* SettingsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001126AABBCCDDEEFF0126 /* SettingsAction.swift */; };
-		A1010001127AABBCCDDEEFF0127 /* SettingsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001127AABBCCDDEEFF0127 /* SettingsEvent.swift */; };
-		A1010001128AABBCCDDEEFF0128 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001128AABBCCDDEEFF0128 /* SettingsViewModel.swift */; };
-		A1010001129AABBCCDDEEFF0129 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001129AABBCCDDEEFF0129 /* SettingsView.swift */; };
+		A1010001125AABBCCDDEEFF0125 /* MyInfoUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001125AABBCCDDEEFF0125 /* MyInfoUiState.swift */; };
+		A1010001126AABBCCDDEEFF0126 /* MyInfoAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001126AABBCCDDEEFF0126 /* MyInfoAction.swift */; };
+		A1010001127AABBCCDDEEFF0127 /* MyInfoEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001127AABBCCDDEEFF0127 /* MyInfoEvent.swift */; };
+		A1010001128AABBCCDDEEFF0128 /* MyInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001128AABBCCDDEEFF0128 /* MyInfoViewModel.swift */; };
+		A1010001129AABBCCDDEEFF0129 /* MyInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001129AABBCCDDEEFF0129 /* MyInfoView.swift */; };
 		A1010001130AABBCCDDEEFF0130 /* EditProfileUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001130AABBCCDDEEFF0130 /* EditProfileUiState.swift */; };
 		A1010001131AABBCCDDEEFF0131 /* EditProfileAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001131AABBCCDDEEFF0131 /* EditProfileAction.swift */; };
 		A1010001132AABBCCDDEEFF0132 /* EditProfileEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001132AABBCCDDEEFF0132 /* EditProfileEvent.swift */; };
@@ -130,6 +125,16 @@
 		A1010001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */; };
 		A1010001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */; };
 		A1010001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift */; };
+		A1010001145AABBCCDDEEFF0145 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001145AABBCCDDEEFF0145 /* AppTab.swift */; };
+		A1010001146AABBCCDDEEFF0146 /* AppShellUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001146AABBCCDDEEFF0146 /* AppShellUiState.swift */; };
+		A1010001147AABBCCDDEEFF0147 /* AppShellAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */; };
+		A1010001148AABBCCDDEEFF0148 /* AppShellEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001148AABBCCDDEEFF0148 /* AppShellEvent.swift */; };
+		A1010001149AABBCCDDEEFF0149 /* AppShellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001149AABBCCDDEEFF0149 /* AppShellViewModel.swift */; };
+		A1010001150AABBCCDDEEFF0150 /* SettingsUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001150AABBCCDDEEFF0150 /* SettingsUiState.swift */; };
+		A1010001151AABBCCDDEEFF0151 /* SettingsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001151AABBCCDDEEFF0151 /* SettingsAction.swift */; };
+		A1010001152AABBCCDDEEFF0152 /* SettingsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001152AABBCCDDEEFF0152 /* SettingsEvent.swift */; };
+		A1010001153AABBCCDDEEFF0153 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001153AABBCCDDEEFF0153 /* SettingsViewModel.swift */; };
+		A1010001154AABBCCDDEEFF0154 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001154AABBCCDDEEFF0154 /* SettingsView.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
@@ -144,11 +149,6 @@
 		A1011005AABBCCDDEEFF0005 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A1011006AABBCCDDEEFF0006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FEA9D4AD37B8EF9BE110840A /* Passmate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Passmate.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A1011022AABBCCDDEEFF0022 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		A1011023AABBCCDDEEFF0023 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
-		A1011024AABBCCDDEEFF0024 /* HomeUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeUiState.swift; sourceTree = "<group>"; };
-		A1011025AABBCCDDEEFF0025 /* HomeAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeAction.swift; sourceTree = "<group>"; };
-		A1011026AABBCCDDEEFF0026 /* HomeEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeEvent.swift; sourceTree = "<group>"; };
 		A1011027AABBCCDDEEFF0027 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		A1011028AABBCCDDEEFF0028 /* SignInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewModel.swift; sourceTree = "<group>"; };
 		A1011029AABBCCDDEEFF0029 /* SignInUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInUiState.swift; sourceTree = "<group>"; };
@@ -177,11 +177,11 @@
 		A1011049AABBCCDDEEFF0049 /* ResultUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultUiState.swift; sourceTree = "<group>"; };
 		A1011050AABBCCDDEEFF0050 /* ResultAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultAction.swift; sourceTree = "<group>"; };
 		A1011051AABBCCDDEEFF0051 /* ResultEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultEvent.swift; sourceTree = "<group>"; };
-		A1011052AABBCCDDEEFF0052 /* MyInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoView.swift; sourceTree = "<group>"; };
-		A1011053AABBCCDDEEFF0053 /* MyInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoViewModel.swift; sourceTree = "<group>"; };
-		A1011054AABBCCDDEEFF0054 /* MyInfoUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoUiState.swift; sourceTree = "<group>"; };
-		A1011055AABBCCDDEEFF0055 /* MyInfoAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoAction.swift; sourceTree = "<group>"; };
-		A1011056AABBCCDDEEFF0056 /* MyInfoEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoEvent.swift; sourceTree = "<group>"; };
+		A1011052AABBCCDDEEFF0052 /* JoinedRoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoomsView.swift; sourceTree = "<group>"; };
+		A1011053AABBCCDDEEFF0053 /* JoinedRoomsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoomsViewModel.swift; sourceTree = "<group>"; };
+		A1011054AABBCCDDEEFF0054 /* JoinedRoomsUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoomsUiState.swift; sourceTree = "<group>"; };
+		A1011055AABBCCDDEEFF0055 /* JoinedRoomsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoomsAction.swift; sourceTree = "<group>"; };
+		A1011056AABBCCDDEEFF0056 /* JoinedRoomsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoomsEvent.swift; sourceTree = "<group>"; };
 		A1011057AABBCCDDEEFF0057 /* PaymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentView.swift; sourceTree = "<group>"; };
 		A1011058AABBCCDDEEFF0058 /* PaymentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentViewModel.swift; sourceTree = "<group>"; };
 		A1011059AABBCCDDEEFF0059 /* PaymentUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentUiState.swift; sourceTree = "<group>"; };
@@ -243,11 +243,11 @@
 		A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountViewModel.swift; sourceTree = "<group>"; };
 		A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountSheetView.swift; sourceTree = "<group>"; };
 		A1011001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceHintRecorder.swift; sourceTree = "<group>"; };
-		A1011001125AABBCCDDEEFF0125 /* SettingsUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsUiState.swift; sourceTree = "<group>"; };
-		A1011001126AABBCCDDEEFF0126 /* SettingsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAction.swift; sourceTree = "<group>"; };
-		A1011001127AABBCCDDEEFF0127 /* SettingsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsEvent.swift; sourceTree = "<group>"; };
-		A1011001128AABBCCDDEEFF0128 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
-		A1011001129AABBCCDDEEFF0129 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A1011001125AABBCCDDEEFF0125 /* MyInfoUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoUiState.swift; sourceTree = "<group>"; };
+		A1011001126AABBCCDDEEFF0126 /* MyInfoAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoAction.swift; sourceTree = "<group>"; };
+		A1011001127AABBCCDDEEFF0127 /* MyInfoEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoEvent.swift; sourceTree = "<group>"; };
+		A1011001128AABBCCDDEEFF0128 /* MyInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoViewModel.swift; sourceTree = "<group>"; };
+		A1011001129AABBCCDDEEFF0129 /* MyInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoView.swift; sourceTree = "<group>"; };
 		A1011001130AABBCCDDEEFF0130 /* EditProfileUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileUiState.swift; sourceTree = "<group>"; };
 		A1011001131AABBCCDDEEFF0131 /* EditProfileAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileAction.swift; sourceTree = "<group>"; };
 		A1011001132AABBCCDDEEFF0132 /* EditProfileEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileEvent.swift; sourceTree = "<group>"; };
@@ -263,6 +263,16 @@
 		A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodEvent.swift; sourceTree = "<group>"; };
 		A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodViewModel.swift; sourceTree = "<group>"; };
 		A1011001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodSheetView.swift; sourceTree = "<group>"; };
+		A1011001145AABBCCDDEEFF0145 /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
+		A1011001146AABBCCDDEEFF0146 /* AppShellUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellUiState.swift; sourceTree = "<group>"; };
+		A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellAction.swift; sourceTree = "<group>"; };
+		A1011001148AABBCCDDEEFF0148 /* AppShellEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellEvent.swift; sourceTree = "<group>"; };
+		A1011001149AABBCCDDEEFF0149 /* AppShellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellViewModel.swift; sourceTree = "<group>"; };
+		A1011001150AABBCCDDEEFF0150 /* SettingsUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsUiState.swift; sourceTree = "<group>"; };
+		A1011001151AABBCCDDEEFF0151 /* SettingsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAction.swift; sourceTree = "<group>"; };
+		A1011001152AABBCCDDEEFF0152 /* SettingsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsEvent.swift; sourceTree = "<group>"; };
+		A1011001153AABBCCDDEEFF0153 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		A1011001154AABBCCDDEEFF0154 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
@@ -349,16 +359,11 @@
 		A1012011AABBCCDDEEFF0011 /* home */ = {
 			isa = PBXGroup;
 			children = (
-				A1011022AABBCCDDEEFF0022 /* HomeView.swift */,
 				A101100074AABBCCDDEEFF0074 /* RoomListUiState.swift */,
 				A101100075AABBCCDDEEFF0075 /* RoomListAction.swift */,
 				A101100076AABBCCDDEEFF0076 /* RoomListEvent.swift */,
 				A101100077AABBCCDDEEFF0077 /* RoomListViewModel.swift */,
 				A101100078AABBCCDDEEFF0078 /* RoomListView.swift */,
-				A1011023AABBCCDDEEFF0023 /* HomeViewModel.swift */,
-				A1011024AABBCCDDEEFF0024 /* HomeUiState.swift */,
-				A1011025AABBCCDDEEFF0025 /* HomeAction.swift */,
-				A1011026AABBCCDDEEFF0026 /* HomeEvent.swift */,
 			);
 			path = home;
 			sourceTree = "<group>";
@@ -431,21 +436,21 @@
 		A1012017AABBCCDDEEFF0017 /* mypage */ = {
 			isa = PBXGroup;
 			children = (
-				A1011052AABBCCDDEEFF0052 /* MyInfoView.swift */,
-				A1011053AABBCCDDEEFF0053 /* MyInfoViewModel.swift */,
-				A1011054AABBCCDDEEFF0054 /* MyInfoUiState.swift */,
-				A1011055AABBCCDDEEFF0055 /* MyInfoAction.swift */,
-				A1011056AABBCCDDEEFF0056 /* MyInfoEvent.swift */,
+				A1011052AABBCCDDEEFF0052 /* JoinedRoomsView.swift */,
+				A1011053AABBCCDDEEFF0053 /* JoinedRoomsViewModel.swift */,
+				A1011054AABBCCDDEEFF0054 /* JoinedRoomsUiState.swift */,
+				A1011055AABBCCDDEEFF0055 /* JoinedRoomsAction.swift */,
+				A1011056AABBCCDDEEFF0056 /* JoinedRoomsEvent.swift */,
 				A101100084AABBCCDDEEFF0084 /* ReputationUiState.swift */,
 				A101100085AABBCCDDEEFF0085 /* ReputationAction.swift */,
 				A101100086AABBCCDDEEFF0086 /* ReputationEvent.swift */,
 				A101100087AABBCCDDEEFF0087 /* ReputationViewModel.swift */,
 				A101100088AABBCCDDEEFF0088 /* ReputationView.swift */,
-				A1011001125AABBCCDDEEFF0125 /* SettingsUiState.swift */,
-				A1011001126AABBCCDDEEFF0126 /* SettingsAction.swift */,
-				A1011001127AABBCCDDEEFF0127 /* SettingsEvent.swift */,
-				A1011001128AABBCCDDEEFF0128 /* SettingsViewModel.swift */,
-				A1011001129AABBCCDDEEFF0129 /* SettingsView.swift */,
+				A1011001125AABBCCDDEEFF0125 /* MyInfoUiState.swift */,
+				A1011001126AABBCCDDEEFF0126 /* MyInfoAction.swift */,
+				A1011001127AABBCCDDEEFF0127 /* MyInfoEvent.swift */,
+				A1011001128AABBCCDDEEFF0128 /* MyInfoViewModel.swift */,
+				A1011001129AABBCCDDEEFF0129 /* MyInfoView.swift */,
 				A1011001130AABBCCDDEEFF0130 /* EditProfileUiState.swift */,
 				A1011001131AABBCCDDEEFF0131 /* EditProfileAction.swift */,
 				A1011001132AABBCCDDEEFF0132 /* EditProfileEvent.swift */,
@@ -456,6 +461,11 @@
 				A1011001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift */,
 				A1011001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift */,
 				A1011001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift */,
+				A1011001150AABBCCDDEEFF0150 /* SettingsUiState.swift */,
+				A1011001151AABBCCDDEEFF0151 /* SettingsAction.swift */,
+				A1011001152AABBCCDDEEFF0152 /* SettingsEvent.swift */,
+				A1011001153AABBCCDDEEFF0153 /* SettingsViewModel.swift */,
+				A1011001154AABBCCDDEEFF0154 /* SettingsView.swift */,
 			);
 			path = mypage;
 			sourceTree = "<group>";
@@ -536,6 +546,11 @@
 			isa = PBXGroup;
 			children = (
 				A1011062AABBCCDDEEFF0062 /* Route.swift */,
+				A1011001145AABBCCDDEEFF0145 /* AppTab.swift */,
+				A1011001146AABBCCDDEEFF0146 /* AppShellUiState.swift */,
+				A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */,
+				A1011001148AABBCCDDEEFF0148 /* AppShellEvent.swift */,
+				A1011001149AABBCCDDEEFF0149 /* AppShellViewModel.swift */,
 			);
 			path = navigation;
 			sourceTree = "<group>";
@@ -657,11 +672,6 @@
 			files = (
 				A1010001AABBCCDDEEFF0001 /* ContentView.swift in Sources */,
 				A1010002AABBCCDDEEFF0002 /* iOSApp.swift in Sources */,
-				A1010022AABBCCDDEEFF0022 /* HomeView.swift in Sources */,
-				A1010023AABBCCDDEEFF0023 /* HomeViewModel.swift in Sources */,
-				A1010024AABBCCDDEEFF0024 /* HomeUiState.swift in Sources */,
-				A1010025AABBCCDDEEFF0025 /* HomeAction.swift in Sources */,
-				A1010026AABBCCDDEEFF0026 /* HomeEvent.swift in Sources */,
 				A1010027AABBCCDDEEFF0027 /* SignInView.swift in Sources */,
 				A1010028AABBCCDDEEFF0028 /* SignInViewModel.swift in Sources */,
 				A1010029AABBCCDDEEFF0029 /* SignInUiState.swift in Sources */,
@@ -692,11 +702,11 @@
 				A1010049AABBCCDDEEFF0049 /* ResultUiState.swift in Sources */,
 				A1010050AABBCCDDEEFF0050 /* ResultAction.swift in Sources */,
 				A1010051AABBCCDDEEFF0051 /* ResultEvent.swift in Sources */,
-				A1010052AABBCCDDEEFF0052 /* MyInfoView.swift in Sources */,
-				A1010053AABBCCDDEEFF0053 /* MyInfoViewModel.swift in Sources */,
-				A1010054AABBCCDDEEFF0054 /* MyInfoUiState.swift in Sources */,
-				A1010055AABBCCDDEEFF0055 /* MyInfoAction.swift in Sources */,
-				A1010056AABBCCDDEEFF0056 /* MyInfoEvent.swift in Sources */,
+				A1010052AABBCCDDEEFF0052 /* JoinedRoomsView.swift in Sources */,
+				A1010053AABBCCDDEEFF0053 /* JoinedRoomsViewModel.swift in Sources */,
+				A1010054AABBCCDDEEFF0054 /* JoinedRoomsUiState.swift in Sources */,
+				A1010055AABBCCDDEEFF0055 /* JoinedRoomsAction.swift in Sources */,
+				A1010056AABBCCDDEEFF0056 /* JoinedRoomsEvent.swift in Sources */,
 				A1010057AABBCCDDEEFF0057 /* PaymentView.swift in Sources */,
 				A1010058AABBCCDDEEFF0058 /* PaymentViewModel.swift in Sources */,
 				A1010059AABBCCDDEEFF0059 /* PaymentUiState.swift in Sources */,
@@ -759,11 +769,11 @@
 				A1010001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift in Sources */,
 				A1010001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift in Sources */,
 				A1010001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift in Sources */,
-				A1010001125AABBCCDDEEFF0125 /* SettingsUiState.swift in Sources */,
-				A1010001126AABBCCDDEEFF0126 /* SettingsAction.swift in Sources */,
-				A1010001127AABBCCDDEEFF0127 /* SettingsEvent.swift in Sources */,
-				A1010001128AABBCCDDEEFF0128 /* SettingsViewModel.swift in Sources */,
-				A1010001129AABBCCDDEEFF0129 /* SettingsView.swift in Sources */,
+				A1010001125AABBCCDDEEFF0125 /* MyInfoUiState.swift in Sources */,
+				A1010001126AABBCCDDEEFF0126 /* MyInfoAction.swift in Sources */,
+				A1010001127AABBCCDDEEFF0127 /* MyInfoEvent.swift in Sources */,
+				A1010001128AABBCCDDEEFF0128 /* MyInfoViewModel.swift in Sources */,
+				A1010001129AABBCCDDEEFF0129 /* MyInfoView.swift in Sources */,
 				A1010001130AABBCCDDEEFF0130 /* EditProfileUiState.swift in Sources */,
 				A1010001131AABBCCDDEEFF0131 /* EditProfileAction.swift in Sources */,
 				A1010001132AABBCCDDEEFF0132 /* EditProfileEvent.swift in Sources */,
@@ -779,6 +789,16 @@
 				A1010001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift in Sources */,
 				A1010001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift in Sources */,
 				A1010001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift in Sources */,
+				A1010001145AABBCCDDEEFF0145 /* AppTab.swift in Sources */,
+				A1010001146AABBCCDDEEFF0146 /* AppShellUiState.swift in Sources */,
+				A1010001147AABBCCDDEEFF0147 /* AppShellAction.swift in Sources */,
+				A1010001148AABBCCDDEEFF0148 /* AppShellEvent.swift in Sources */,
+				A1010001149AABBCCDDEEFF0149 /* AppShellViewModel.swift in Sources */,
+				A1010001150AABBCCDDEEFF0150 /* SettingsUiState.swift in Sources */,
+				A1010001151AABBCCDDEEFF0151 /* SettingsAction.swift in Sources */,
+				A1010001152AABBCCDDEEFF0152 /* SettingsEvent.swift in Sources */,
+				A1010001153AABBCCDDEEFF0153 /* SettingsViewModel.swift in Sources */,
+				A1010001154AABBCCDDEEFF0154 /* SettingsView.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

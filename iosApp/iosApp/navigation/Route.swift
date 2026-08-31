@@ -8,6 +8,7 @@ enum Route: Hashable {
     case play(pin: String)
     case result(roomId: Int64)
     case myInfo
+    case joinedRooms
     case reputation
     case hostedRooms
     case roomReport(roomId: Int64)
@@ -16,4 +17,12 @@ enum Route: Hashable {
     case payment(pin: String)
     case coinHistory
     case settings
+
+    // 세션 플로우 엔트리(Join·Payment·Waiting·Play) — Result 진입 시 이것만 제거하고 탭 루트는 유지한다 (규칙 §2-1-2, 스펙 §1-5)
+    var isSessionRoute: Bool {
+        switch self {
+        case .join, .payment, .waiting, .play: return true
+        default: return false
+        }
+    }
 }

@@ -2,12 +2,19 @@ import Combine
 import Foundation
 import Shared
 
+// Compose MyInfoViewModel.kt 미러 — 마이 탭 루트 (M-12): 프로필·코인·정산 3섹션 독립 로드
 final class MyInfoViewModel: ObservableObject {
-    private let getMyPageUseCase: GetMyPageUseCase
+    private let getMyProfileUseCase: GetMyProfileUseCase
+
+    private let getMyCoinsUseCase: GetMyCoinsUseCase
+
+    private let getEarningsUseCase: GetEarningsUseCase
+
+    private let signOutUseCase: SignOutUseCase
 
     private let isSignedInUseCase: IsSignedInUseCase
 
-    @Published private(set) var uiState: MyInfoUiState
+    @Published private(set) var uiState = MyInfoUiState()
 
     let event = PassthroughSubject<MyInfoEvent, Never>()
 
@@ -18,53 +25,90 @@ final class MyInfoViewModel: ObservableObject {
             return
         }
         hasEntered = true
-        // 회원 전용 가드 — 서버 검증이 최종 권위지만 UX상 진입 시 먼저 로그인 유도 (규칙 §8)
+        // 회원 전용 가드 — 서버 검증이 최종 권위 (규칙 §8)
         if isSignedInUseCase.invoke() {
-            loadFirstPage()
+            loadAll()
         } else {
             event.send(.requireSignIn)
         }
     }
 
-    private func loadFirstPage() {
+    private func loadAll() {
+        loadProfile()
+        loadCoinInfo()
+        loadEarnings()
+    }
+
+    private func loadProfile() {
         uiState.isLoading = true
         uiState.loadFailed = false
-        getMyPageUseCase.invoke(cursor: nil) { [weak self] result, error in
+        getMyProfileUseCase.invoke { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
-                let success = result as? AppResultSuccess<AnyObject>
-
-                if error == nil, let myPage = success?.value as? MyPage {
-                    self.uiState.isLoading = false
+                let profile = (result as? AppResultSuccess<AnyObject>)?.value as? UserProfile
+                self.uiState.isLoading = false
+                if error == nil, let profile {
                     self.uiState.loadFailed = false
-                    self.uiState.summary = myPage.summary
-                    self.uiState.ongoing = myPage.ongoing
-                    self.uiState.rooms = myPage.rooms
-                    self.uiState.nextCursor = myPage.nextCursor
+                    self.uiState.profile = profile
                 } else {
-                    self.uiState.isLoading = false
                     self.uiState.loadFailed = true
                 }
             }
         }
     }
 
-    private func onLoadMore() {
-        guard let cursor = uiState.nextCursor, !uiState.isLoadingMore else { return }
-        uiState.isLoadingMore = true
-        getMyPageUseCase.invoke(cursor: cursor) { [weak self] result, error in
+    private func loadCoinInfo() {
+        getMyCoinsUseCase.invoke { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
-                let success = result as? AppResultSuccess<AnyObject>
-
-                if error == nil, let myPage = success?.value as? MyPage {
-                    self.uiState.isLoadingMore = false
-                    self.uiState.rooms = self.uiState.rooms + myPage.rooms
-                    self.uiState.nextCursor = myPage.nextCursor
+                let coins = (result as? AppResultSuccess<AnyObject>)?.value as? CoinBalance
+                if error == nil, let coins {
+                    self.uiState.defaultMethod = coins.defaultMethod
+                    self.uiState.recentTransaction = coins.recent
+                    self.uiState.isCoinInfoFailed = false
                 } else {
-                    self.uiState.isLoadingMore = false
-                    self.event.send(.showNotice(message: "목록을 더 불러오지 못했어요"))
+                    self.uiState.isCoinInfoFailed = true
                 }
+            }
+        }
+    }
+
+    private func loadEarnings() {
+        getEarningsUseCase.invoke(cursor: nil) { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let earnings = (result as? AppResultSuccess<AnyObject>)?.value as? Earnings
+                if error == nil, let earnings {
+                    self.uiState.settlementAccount = earnings.account
+                    self.uiState.nextPayout = earnings.nextPayout
+                    self.uiState.isEarningsFailed = false
+                } else {
+                    self.uiState.isEarningsFailed = true
+                }
+            }
+        }
+    }
+
+    private func onClickEditProfile() {
+        if let profile = uiState.profile {
+            event.send(.openEditProfile(
+                nickname: profile.nickname,
+                avatarId: profile.avatarId.map { Int(truncating: $0) }
+            ))
+        }
+    }
+
+    private func onConfirmSignOut() {
+        if uiState.isProcessing {
+            return
+        }
+        uiState.isProcessing = true
+        // 로컬 세션 정리는 shared가 항상 수행 — 실패 케이스 없음 (M-12-11)
+        signOutUseCase.invoke { [weak self] _, _ in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.uiState.isProcessing = false
+                self.event.send(.signedOut)
             }
         }
     }
@@ -74,32 +118,52 @@ final class MyInfoViewModel: ObservableObject {
         case .enter:
             onEnter()
         case .retry:
-            loadFirstPage()
-        case .loadMore:
-            onLoadMore()
-        case let .clickRoomReport(roomId):
-            event.send(.openReport(roomId: roomId))
-        case let .clickRejoin(pin):
-            event.send(.rejoin(pin: pin))
+            loadAll()
+        case .clickProfile:
+            event.send(.openReputation)
+        case .clickEditProfile:
+            onClickEditProfile()
+        case .clickCharge:
+            event.send(.showNotice(message: "코인 충전은 준비 중이에요"))
+        case .clickPaymentMethod:
+            event.send(.openPaymentMethod)
         case .clickCoinHistory:
             event.send(.openCoinHistory)
-        case .clickReputation:
-            event.send(.openReputation)
-        case .clickHostedRooms:
-            event.send(.openHostedRooms)
+        case .clickSettlementAccount:
+            event.send(.openSettlementAccount)
         case .clickEarnings:
             event.send(.openEarnings)
+        case .clickNotifications:
+            event.send(.openNotifications)
         case .clickSettings:
             event.send(.openSettings)
+        case .confirmSignOut:
+            onConfirmSignOut()
+        case .profileUpdated:
+            loadProfile()
+            event.send(.showNotice(message: "내 정보를 저장했어요"))
+        case .paymentMethodUpdated:
+            loadCoinInfo()
+            event.send(.showNotice(message: "기본 결제 수단을 저장했어요"))
+        case .accountUpdated:
+            loadEarnings()
+            event.send(.showNotice(message: "정산 계좌를 저장했어요"))
+        case let .notice(message):
+            event.send(.showNotice(message: message))
         }
     }
 
     init(
-        getMyPageUseCase: GetMyPageUseCase,
+        getMyProfileUseCase: GetMyProfileUseCase,
+        getMyCoinsUseCase: GetMyCoinsUseCase,
+        getEarningsUseCase: GetEarningsUseCase,
+        signOutUseCase: SignOutUseCase,
         isSignedInUseCase: IsSignedInUseCase
     ) {
-        self.getMyPageUseCase = getMyPageUseCase
+        self.getMyProfileUseCase = getMyProfileUseCase
+        self.getMyCoinsUseCase = getMyCoinsUseCase
+        self.getEarningsUseCase = getEarningsUseCase
+        self.signOutUseCase = signOutUseCase
         self.isSignedInUseCase = isSignedInUseCase
-        self.uiState = MyInfoUiState()
     }
 }

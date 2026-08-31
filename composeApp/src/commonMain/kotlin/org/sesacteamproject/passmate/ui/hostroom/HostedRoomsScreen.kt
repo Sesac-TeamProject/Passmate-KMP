@@ -74,8 +74,7 @@ fun HostedRoomsScreen(onNavigate: (NavigationAction) -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         HostedRoomsContentScreen(
             uiState = uiState,
-            onAction = viewModel::onAction,
-            onClickBack = { onNavigate(NavigationAction.NavigateBack) }
+            onAction = viewModel::onAction
         )
         CreateFab(
             onClick = { viewModel.onAction(HostedRoomsAction.ClickCreate) },
@@ -111,8 +110,7 @@ fun HostedRoomsScreen(onNavigate: (NavigationAction) -> Unit) {
 @Composable
 private fun HostedRoomsContentScreen(
     uiState: HostedRoomsUiState,
-    onAction: (HostedRoomsAction) -> Unit,
-    onClickBack: () -> Unit
+    onAction: (HostedRoomsAction) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -124,8 +122,7 @@ private fun HostedRoomsContentScreen(
             uiState.loadFailed -> ErrorBox(onRetry = { onAction(HostedRoomsAction.Retry) })
             else -> LoadedHostedRooms(
                 uiState = uiState,
-                onAction = onAction,
-                onClickBack = onClickBack
+                onAction = onAction
             )
         }
     }
@@ -134,8 +131,7 @@ private fun HostedRoomsContentScreen(
 @Composable
 private fun LoadedHostedRooms(
     uiState: HostedRoomsUiState,
-    onAction: (HostedRoomsAction) -> Unit,
-    onClickBack: () -> Unit
+    onAction: (HostedRoomsAction) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -144,29 +140,13 @@ private fun LoadedHostedRooms(
             .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "내가 만든 방",
-                color = PassmateColors.TextPrimary,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.48).sp
-            )
-            Text(
-                text = "닫기",
-                color = PassmateColors.TextSecondary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp,
-                modifier = Modifier
-                    .clickable(onClick = onClickBack)
-                    .padding(4.dp)
-            )
-        }
+        Text(
+            text = "내가 만든 방",
+            color = PassmateColors.TextPrimary,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.48).sp
+        )
         val grade = uiState.grade
 
         if (grade != null) {

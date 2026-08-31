@@ -12,8 +12,6 @@ struct HostedRoomsView: View {
 
     var onOpenSessionControl: (Int64, String) -> Void = { _, _ in }
 
-    var onBack: () -> Void = {}
-
     @StateObject private var viewModel = HostedRoomsViewModel(
         getHostedRoomsUseCase: KoinHelper.shared.getHostedRoomsUseCase(),
         getMyGradeUseCase: KoinHelper.shared.getMyGradeUseCase(),
@@ -28,8 +26,7 @@ struct HostedRoomsView: View {
         ZStack(alignment: .bottomTrailing) {
             HostedRoomsContentView(
                 uiState: viewModel.uiState,
-                onAction: { viewModel.action($0) },
-                onClickBack: onBack
+                onAction: { viewModel.action($0) }
             )
             createFab
         }
@@ -112,8 +109,6 @@ private struct HostedRoomsContentView: View {
 
     let onAction: (HostedRoomsAction) -> Void
 
-    let onClickBack: () -> Void
-
     var body: some View {
         Group {
             if uiState.isLoading {
@@ -151,19 +146,10 @@ private struct HostedRoomsContentView: View {
     private var loadedView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text("내가 만든 방")
-                        .font(.system(size: 24, weight: .bold))
-                        .kerning(-0.48)
-                        .foregroundColor(PassmateColors.textPrimary)
-                    Spacer()
-                    Button(action: onClickBack) {
-                        Text("닫기")
-                            .font(.system(size: 14, weight: .medium))
-                            .kerning(-0.28)
-                            .foregroundColor(PassmateColors.textSecondary)
-                    }
-                }
+                Text("내가 만든 방")
+                    .font(.system(size: 24, weight: .bold))
+                    .kerning(-0.48)
+                    .foregroundColor(PassmateColors.textPrimary)
                 if let grade = uiState.grade {
                     GradeSummaryCardView(grade: grade, onClick: { onAction(.clickReputation) })
                 }

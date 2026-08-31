@@ -2,7 +2,7 @@ import SwiftUI
 import Shared
 
 // Figma "UI 디자인 v6" M-12-8 미러 — 결제 수단 관리: 기본 수단 5종 선택(카드 정보는 포트원 처리).
-// 시트 표시 여부는 호스팅 화면(SettingsView)이 소유한다 (규칙 §11-1)
+// 시트 표시 여부는 호스팅 화면(MyInfoView)이 소유한다 (규칙 §11-1)
 struct PaymentMethodSheetView: View {
     var onSaved: () -> Void = {}
 
