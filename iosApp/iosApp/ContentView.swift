@@ -206,6 +206,11 @@ struct ContentView: View {
         case .settings:
             SettingsView(
                 onRequireSignIn: { pushSignIn(pendingRoute: .settings, path: path) },
+                onOpenDeleteAccount: { path.wrappedValue.append(.deleteAccount) },
+                onBack: { popOnce(path) }
+            )
+        case .deleteAccount:
+            DeleteAccountView(
                 onAccountDeleted: {
                     path.wrappedValue = []
                     selectedTab = .home
