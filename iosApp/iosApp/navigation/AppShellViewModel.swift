@@ -2,7 +2,7 @@ import Combine
 import Foundation
 import Shared
 
-// Compose AppShellViewModel.kt 미러 — 하단 탭 게스트 가드 (규칙 §8, 결정 2)
+// Compose AppShellViewModel.kt 미러 — 하단 탭 게스트 가드 + pendingRoute 보관 (규칙 §7·§8, 스펙 §2-2)
 final class AppShellViewModel: ObservableObject {
     private let isSignedInUseCase: IsSignedInUseCase
 
@@ -12,12 +12,30 @@ final class AppShellViewModel: ObservableObject {
 
     private func onSelectTab(_ tab: AppTab) {
         let isSignedIn = isSignedInUseCase.invoke()
+        let isGuarded = tab.requiresSignIn && !isSignedIn
 
         uiState.isSignedIn = isSignedIn
-        if tab.requiresSignIn && !isSignedIn {
+        if isGuarded {
+            uiState.pendingRoute = tab.route
             event.send(.requireSignIn)
         } else {
             event.send(.navigateToTab(tab))
+        }
+    }
+
+    private func onRememberPendingRoute(_ pendingRoute: Route?) {
+        uiState.pendingRoute = pendingRoute
+    }
+
+    private func onResumeAfterSignIn() {
+        let pendingRoute = uiState.pendingRoute
+
+        uiState.isSignedIn = isSignedInUseCase.invoke()
+        uiState.pendingRoute = nil
+        if let pendingRoute {
+            event.send(.resumePendingRoute(pendingRoute))
+        } else {
+            event.send(.navigateToHome)
         }
     }
 
@@ -25,6 +43,10 @@ final class AppShellViewModel: ObservableObject {
         switch action {
         case let .selectTab(tab):
             onSelectTab(tab)
+        case let .rememberPendingRoute(pendingRoute):
+            onRememberPendingRoute(pendingRoute)
+        case .resumeAfterSignIn:
+            onResumeAfterSignIn()
         }
     }
 

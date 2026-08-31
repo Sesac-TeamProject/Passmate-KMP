@@ -28,4 +28,14 @@ enum AppTab: Hashable, CaseIterable {
     var requiresSignIn: Bool {
         return self != .home
     }
+
+    // 탭 루트에 대응하는 Route — pendingRoute로 탭 복귀를 표현할 때 쓴다 (스펙 §2-3)
+    var route: Route {
+        switch self {
+        case .home: return .home
+        case .hostedRooms: return .hostedRooms
+        case .joinedRooms: return .joinedRooms
+        case .myInfo: return .myInfo
+        }
+    }
 }
