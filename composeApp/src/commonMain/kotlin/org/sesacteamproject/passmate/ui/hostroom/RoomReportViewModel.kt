@@ -56,6 +56,10 @@ class RoomReportViewModel(
         _uiState.update { it.copy(selectedTab = tab) }
     }
 
+    private fun onSelectStudentSort(sort: StudentSort) {
+        _uiState.update { it.copy(studentSort = sort) }
+    }
+
     private fun onClickExport() {
         val report = _uiState.value.report
 
@@ -73,6 +77,7 @@ class RoomReportViewModel(
             is RoomReportAction.Enter -> onEnter(action.roomId)
             is RoomReportAction.Retry -> load(action.roomId)
             is RoomReportAction.SelectTab -> onSelectTab(action.tab)
+            is RoomReportAction.SelectStudentSort -> onSelectStudentSort(action.sort)
             is RoomReportAction.ClickExport -> onClickExport()
         }
     }

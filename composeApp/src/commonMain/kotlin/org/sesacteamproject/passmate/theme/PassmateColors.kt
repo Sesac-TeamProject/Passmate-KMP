@@ -56,6 +56,12 @@ object PassmateColors {
 
     val WeakTopicText = Color(0xFFBF3F0C)
 
+    // 연한 오류 배경 — 목록 불러오기 실패 아이콘 원·미제출 카드 (v6 E-List 실패 공통·M-14 학생별). 대응 텍스트는 WrongPinkText
+    val ErrorIconBg = Color(0xFFFDEEEF)
+
+    // 정답률 분포 41~60% 구간 막대 (v6 M-14 개요) — 0~40% WrongPink · 61~80% RatingTagSelectedBg · 81~100% Primary
+    val AccuracyBandMid = Color(0xFFFFD79A)
+
     // 별점 전용 골드 (디자인 시스템 §StarRating — 별점에만 허용)
     val StarGold = Color(0xFFF2C94C)
 

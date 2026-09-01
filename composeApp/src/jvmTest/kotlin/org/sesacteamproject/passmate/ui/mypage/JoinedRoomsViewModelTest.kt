@@ -112,4 +112,18 @@ class JoinedRoomsViewModelTest {
             events
         )
     }
+
+    // 목록 불러오기 실패 화면의 "계속 안 되면 문의하기" — 문의 창구 연결 전까지 안내만 노출한다
+    @Test
+    fun contactSupportEmitsNotice() = runTest {
+        val viewModel = viewModel(isSignedIn = true, pages = emptyList())
+        val events = mutableListOf<JoinedRoomsEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinedRoomsAction.ClickContactSupport)
+
+        assertEquals(listOf<JoinedRoomsEvent>(JoinedRoomsEvent.ShowNotice(CONTACT_SUPPORT_NOTICE)), events)
+    }
 }

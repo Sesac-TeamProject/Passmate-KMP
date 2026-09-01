@@ -53,6 +53,12 @@ enum PassmateColors {
 
     static let weakTopicText = Color(hex: 0xBF3F0C)
 
+    // 연한 오류 배경 — 목록 불러오기 실패 아이콘 원·미제출 카드 (v6 E-List 실패 공통·M-14 학생별). 대응 텍스트는 wrongPinkText
+    static let errorIconBg = Color(hex: 0xFDEEEF)
+
+    // 정답률 분포 41~60% 구간 막대 (v6 M-14 개요) — 0~40% wrongPink · 61~80% ratingTagSelectedBg · 81~100% primary
+    static let accuracyBandMid = Color(hex: 0xFFD79A)
+
     // 별점 전용 골드 (디자인 시스템 §StarRating)
     static let starGold = Color(hex: 0xF2C94C)
 

@@ -91,6 +91,12 @@ class JoinedRoomsViewModel(
         }
     }
 
+    private fun onClickContactSupport() {
+        viewModelScope.launch {
+            _event.emit(JoinedRoomsEvent.ShowNotice(CONTACT_SUPPORT_NOTICE))
+        }
+    }
+
     override fun onAction(action: JoinedRoomsAction) {
         when (action) {
             is JoinedRoomsAction.Enter -> onEnter()
@@ -98,6 +104,10 @@ class JoinedRoomsViewModel(
             is JoinedRoomsAction.LoadMore -> onLoadMore()
             is JoinedRoomsAction.ClickRoomReport -> onClickRoomReport(action.roomId)
             is JoinedRoomsAction.ClickRejoin -> onClickRejoin(action.pin)
+            is JoinedRoomsAction.ClickContactSupport -> onClickContactSupport()
         }
     }
 }
+
+// 문의 창구(고객센터·메일)는 아직 계약·라우트에 없다 — 연결 전까지 안내 문구만 노출한다
+internal const val CONTACT_SUPPORT_NOTICE = "문의 창구는 준비 중이에요"

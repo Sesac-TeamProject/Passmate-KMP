@@ -3,6 +3,9 @@ import Foundation
 import Shared
 
 final class JoinedRoomsViewModel: ObservableObject {
+    // 문의 창구(고객센터·메일)는 아직 계약·라우트에 없다 — 연결 전까지 안내 문구만 노출한다
+    private static let contactSupportNotice = "문의 창구는 준비 중이에요"
+
     private let getMyPageUseCase: GetMyPageUseCase
 
     private let isSignedInUseCase: IsSignedInUseCase
@@ -81,6 +84,8 @@ final class JoinedRoomsViewModel: ObservableObject {
             event.send(.openReport(roomId: roomId))
         case let .clickRejoin(pin):
             event.send(.rejoin(pin: pin))
+        case .clickContactSupport:
+            event.send(.showNotice(message: Self.contactSupportNotice))
         }
     }
 

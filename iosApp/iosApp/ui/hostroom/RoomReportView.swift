@@ -54,7 +54,31 @@ private struct ReportShareSheet: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
+// 정답률 구간 1칸 — 라벨·인원·막대 색 (v6 M-14 개요 "정답률 분포")
+private struct AccuracyBand: Identifiable {
+    let id: Int
+
+    let label: String
+
+    let count: Int
+
+    let color: Color
+}
+
 private struct RoomReportContentView: View {
+    static let mostMissedLimit = 3
+
+    static let topRankLimit = 3
+
+    static let accuracyBandLabels = ["0~40%", "41~60%", "61~80%", "81~100%"]
+
+    static let accuracyBandColors: [Color] = [
+        PassmateColors.wrongPink,
+        PassmateColors.accuracyBandMid,
+        PassmateColors.ratingTagSelectedBg,
+        PassmateColors.primary
+    ]
+
     let uiState: RoomReportUiState
 
     let onAction: (RoomReportAction) -> Void
@@ -194,21 +218,155 @@ private struct RoomReportContentView: View {
         }
     }
 
+    // 개요 탭 — 정답률 분포 · 많이 틀린 문항 TOP 3 · 요약 (v6 M-14 개요)
+    // 시안의 "AI 총평" 카드는 계약(RoomReportResponse)에 총평 텍스트 필드가 없어 제외하고, 같은 자리에 요약 카드를 둔다
     private func overviewTab(_ report: RoomReport) -> some View {
+        VStack(spacing: 14) {
+            accuracyDistributionCard(report)
+            mostMissedQuestionsCard(report)
+            overviewSummaryCard(report)
+        }
+    }
+
+    // 정답률 분포 — 서버가 준 학생별 정답 수를 4구간으로 묶어 보여준다 (점수·정오 판정은 하지 않는다)
+    private func accuracyDistributionCard(_ report: RoomReport) -> some View {
+        let bands = accuracyBands(students: reportStudents(report), questionCount: Int(report.summary.questionCount))
+        let bandTotal = bands.reduce(0) { $0 + $1.count }
+
+        return VStack(spacing: 14) {
+            cardHeaderRow(title: "정답률 분포") {
+                Text("학생 \(report.summary.studentCount)명")
+                    .font(.system(size: 12))
+                    .kerning(-0.12)
+                    .foregroundColor(PassmateColors.textTertiary)
+            }
+            if bandTotal == 0 {
+                emptyTabText("정답률 분포를 계산할 수 없어요")
+            } else {
+                ForEach(bands) { band in
+                    accuracyBandRow(band: band, total: bandTotal)
+                }
+            }
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+        .background(PassmateColors.surface)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
+    }
+
+    private func accuracyBandRow(band: AccuracyBand, total: Int) -> some View {
+        HStack(spacing: 8) {
+            Text(band.label)
+                .font(.system(size: 12, weight: .medium))
+                .kerning(-0.12)
+                .foregroundColor(PassmateColors.textSecondary)
+                .frame(width: 60, alignment: .leading)
+            GeometryReader { geo in
+                let fraction = CGFloat(band.count) / CGFloat(total)
+
+                ZStack(alignment: .leading) {
+                    Capsule().fill(PassmateColors.fieldGray)
+                    if fraction > 0 {
+                        Capsule()
+                            .fill(band.color)
+                            .frame(width: geo.size.width * fraction)
+                    }
+                }
+            }
+            .frame(height: 10)
+            Text("\(band.count)명")
+                .font(.system(size: 12, weight: .bold))
+                .kerning(-0.12)
+                .foregroundColor(PassmateColors.textPrimary)
+                .frame(width: 40, alignment: .trailing)
+        }
+    }
+
+    // 많이 틀린 문항 TOP 3 — 서버가 준 정답률의 여집합을 오답률로 표시한다 (미채점 서술형은 제외)
+    private func mostMissedQuestionsCard(_ report: RoomReport) -> some View {
+        let mostMissed = reportQuestions(report)
+            .filter { $0.accuracyPercent != nil }
+            .sorted { ($0.accuracyPercent?.intValue ?? 0) < ($1.accuracyPercent?.intValue ?? 0) }
+            .prefix(Self.mostMissedLimit)
+
+        return VStack(spacing: 14) {
+            cardHeaderRow(title: "많이 틀린 문항 TOP \(Self.mostMissedLimit)") {
+                Button {
+                    onAction(.selectTab(tab: .questions))
+                } label: {
+                    Text("문항별 ›")
+                        .font(.system(size: 12, weight: .bold))
+                        .kerning(-0.12)
+                        .foregroundColor(PassmateColors.primaryDeep)
+                }
+            }
+            if mostMissed.isEmpty {
+                emptyTabText("채점된 문항이 아직 없어요")
+            } else {
+                ForEach(Array(mostMissed), id: \.questionId) { question in
+                    mostMissedRow(question)
+                }
+            }
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+        .background(PassmateColors.surface)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
+    }
+
+    private func mostMissedRow(_ question: ReportQuestion) -> some View {
+        let accuracyPercent = question.accuracyPercent?.intValue ?? 0
+
+        return HStack(spacing: 8) {
+            Text("Q\(question.questionNo)")
+                .font(.system(size: 12, weight: .bold))
+                .kerning(-0.12)
+                .foregroundColor(PassmateColors.textSecondary)
+                .frame(width: 30, height: 22)
+                .background(PassmateColors.fieldGray)
+                .cornerRadius(6)
+            Text(question.title)
+                .font(.system(size: 13, weight: .medium))
+                .kerning(-0.13)
+                .foregroundColor(PassmateColors.textPrimary)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text("오답 \(100 - accuracyPercent)%")
+                .font(.system(size: 12, weight: .bold))
+                .kerning(-0.12)
+                .foregroundColor(PassmateColors.wrongPinkText)
+        }
+    }
+
+    private func overviewSummaryCard(_ report: RoomReport) -> some View {
         let questions = reportQuestions(report)
         let choiceCount = questions.filter { $0.type == QuestionType.multipleChoice }.count
         let oxCount = questions.filter { $0.type == QuestionType.ox }.count
         let essayCount = questions.filter { $0.type == QuestionType.essay }.count
 
         return VStack(spacing: 10) {
-            overviewRow(label: "평균 점수", value: report.summary.avgScore.map { "\(Int($0.doubleValue))점" } ?? "—")
-            overviewRow(label: "최고 점수", value: report.summary.topScore.map { "\(Int($0.doubleValue))점" } ?? "—")
+            overviewRow(label: "평균 점수", value: report.summary.avgScore.map { "\(formatScore($0.doubleValue))점" } ?? "—")
+            overviewRow(label: "최고 점수", value: report.summary.topScore.map { "\(formatScore($0.doubleValue))점" } ?? "—")
             overviewRow(label: "문항 구성", value: "객관식 \(choiceCount) · OX \(oxCount) · 서술형 \(essayCount)")
             overviewRow(label: "AI 분석", value: "\(report.summary.aiAnalysisCount)건")
         }
         .padding(16)
         .background(PassmateColors.surface)
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
+    }
+
+    private func cardHeaderRow<Trailing: View>(
+        title: String,
+        @ViewBuilder trailing: () -> Trailing
+    ) -> some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 15, weight: .bold))
+                .kerning(-0.15)
+                .foregroundColor(PassmateColors.textPrimary)
+            Spacer()
+            trailing()
+        }
     }
 
     private func overviewRow(label: String, value: String) -> some View {
@@ -296,55 +454,96 @@ private struct RoomReportContentView: View {
         .frame(height: 8)
     }
 
+    // 학생별 탭 — 학생 수·정렬 칩 + 순위/정답 수/점수 목록 (v6 M-14 학생별)
+    // 시안의 "제출 N" · "미제출 N명" 카드는 계약에 제출 여부 필드가 없어 제외한다
     private func studentsTab(_ report: RoomReport) -> some View {
-        VStack(spacing: 0) {
-            let students = reportStudents(report)
+        let students = sortedStudents(students: reportStudents(report), sort: uiState.studentSort)
 
-            if students.isEmpty {
-                emptyTabText("참가 학생이 없어요")
-            }
-            ForEach(Array(students.enumerated()), id: \.element.participantId) { index, student in
-                if index > 0 {
-                    Divider().background(PassmateColors.border)
+        return VStack(spacing: 10) {
+            HStack {
+                Text("학생 \(report.summary.studentCount)명")
+                    .font(.system(size: 13, weight: .bold))
+                    .kerning(-0.13)
+                    .foregroundColor(PassmateColors.textPrimary)
+                Spacer()
+                HStack(spacing: 8) {
+                    ForEach(StudentSort.allCases, id: \.self) { sort in
+                        studentSortChip(sort: sort, isSelected: sort == uiState.studentSort)
+                    }
                 }
-                studentRow(student)
             }
+            VStack(spacing: 0) {
+                if students.isEmpty {
+                    emptyTabText("참가 학생이 없어요")
+                }
+                ForEach(Array(students.enumerated()), id: \.element.participantId) { index, student in
+                    if index > 0 {
+                        Divider().background(PassmateColors.border)
+                    }
+                    studentRow(student, questionCount: Int(report.summary.questionCount))
+                }
+            }
+            .background(PassmateColors.surface)
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-        .background(PassmateColors.surface)
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    private func studentRow(_ student: ReportStudent) -> some View {
-        HStack(spacing: 10) {
-            Text(student.rank?.stringValue ?? "-")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(PassmateColors.textSecondary)
+    private func studentSortChip(sort: StudentSort, isSelected: Bool) -> some View {
+        Button {
+            onAction(.selectStudentSort(sort: sort))
+        } label: {
+            Text(sort.label)
+                .font(.system(size: 12, weight: isSelected ? .bold : .medium))
+                .kerning(-0.12)
+                .foregroundColor(isSelected ? PassmateColors.textSecondary : PassmateColors.textTertiary)
+                .frame(width: 66, height: 30)
+                .background(isSelected ? PassmateColors.fieldGray : PassmateColors.surface)
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule().stroke(isSelected ? PassmateColors.fieldGray : PassmateColors.border, lineWidth: 1)
+                )
+        }
+    }
+
+    private func studentRow(_ student: ReportStudent, questionCount: Int) -> some View {
+        let rank = student.rank?.intValue
+        let isTopRank = rank != nil && rank! <= Self.topRankLimit
+
+        return HStack(spacing: 12) {
+            Text(rank.map { "\($0)" } ?? "-")
+                .font(.system(size: 12, weight: .bold))
+                .kerning(-0.12)
+                .foregroundColor(isTopRank ? PassmateColors.primaryDeep : PassmateColors.textTertiary)
                 .frame(width: 26, height: 26)
-                .background(PassmateColors.fieldGray)
+                .background(isTopRank ? PassmateColors.backgroundMint : PassmateColors.fieldGray)
                 .clipShape(Circle())
-            Text(student.nickname)
-                .font(.system(size: 14, weight: .medium))
-                .kerning(-0.28)
-                .foregroundColor(PassmateColors.textPrimary)
-            if student.isGuest {
-                Text("게스트")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(PassmateColors.textTertiary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(PassmateColors.fieldGray)
-                    .clipShape(Capsule())
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 6) {
+                    Text(student.nickname)
+                        .font(.system(size: 14, weight: .bold))
+                        .kerning(-0.14)
+                        .foregroundColor(PassmateColors.textPrimary)
+                    if student.isGuest {
+                        Text("게스트")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(PassmateColors.textTertiary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(PassmateColors.fieldGray)
+                            .clipShape(Capsule())
+                    }
+                }
+                Text("정답 \(student.correctCount)/\(questionCount)")
+                    .font(.system(size: 12))
+                    .kerning(-0.12)
+                    .foregroundColor(PassmateColors.textSecondary)
             }
-            Spacer()
-            Text("정답 \(student.correctCount)")
-                .font(.system(size: 13))
-                .kerning(-0.26)
-                .foregroundColor(PassmateColors.textSecondary)
-            Text("\(Int(student.totalScore))점")
-                .font(.system(size: 14, weight: .bold))
-                .kerning(-0.28)
-                .foregroundColor(PassmateColors.textPrimary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            Text("\(formatScore(student.totalScore))점")
+                .font(.system(size: 13, weight: .bold))
+                .kerning(-0.13)
+                .foregroundColor(isTopRank ? PassmateColors.primary : PassmateColors.textSecondary)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -365,6 +564,63 @@ private struct RoomReportContentView: View {
 
     private func reportStudents(_ report: RoomReport) -> [ReportStudent] {
         report.students.compactMap { $0 as? ReportStudent }
+    }
+
+    private func accuracyBands(students: [ReportStudent], questionCount: Int) -> [AccuracyBand] {
+        var counts = [Int](repeating: 0, count: Self.accuracyBandLabels.count)
+
+        if questionCount > 0 {
+            for student in students {
+                let percent = Int(student.correctCount) * 100 / questionCount
+                let index: Int
+
+                if percent <= 40 {
+                    index = 0
+                } else if percent <= 60 {
+                    index = 1
+                } else if percent <= 80 {
+                    index = 2
+                } else {
+                    index = 3
+                }
+                counts[index] += 1
+            }
+        }
+
+        return Self.accuracyBandLabels.enumerated().map { index, label in
+            AccuracyBand(id: index, label: label, count: counts[index], color: Self.accuracyBandColors[index])
+        }
+    }
+
+    private func sortedStudents(students: [ReportStudent], sort: StudentSort) -> [ReportStudent] {
+        switch sort {
+        // 순위는 서버 값 — 점수순은 서버 순위를 그대로 따르고, 순위가 없는 학생만 점수 내림차순으로 뒤에 둔다
+        case .score:
+            return students.sorted { lhs, rhs in
+                let lhsRank = lhs.rank?.intValue ?? Int.max
+                let rhsRank = rhs.rank?.intValue ?? Int.max
+
+                if lhsRank == rhsRank {
+                    return lhs.totalScore > rhs.totalScore
+                } else {
+                    return lhsRank < rhsRank
+                }
+            }
+        case .name:
+            return students.sorted { $0.nickname < $1.nickname }
+        }
+    }
+
+    private func formatScore(_ score: Double) -> String {
+        let digits = String(Int(score))
+
+        return String(
+            digits.reversed().enumerated().map { index, char -> String in
+                index > 0 && index % 3 == 0 ? ",\(char)" : String(char)
+            }
+            .joined()
+            .reversed()
+        )
     }
 
     private func subtitle(_ report: RoomReport) -> String {
