@@ -58,7 +58,9 @@ fun EarningsScreen(onNavigate: (NavigationAction) -> Unit) {
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is EarningsEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
+                is EarningsEvent.RequireSignIn -> onNavigate(
+                    NavigationAction.NavigateToSignIn(NavigationAction.NavigateToEarnings)
+                )
                 is EarningsEvent.OpenAccountSheet -> isAccountSheetVisible = true
                 is EarningsEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }

@@ -131,3 +131,28 @@
   - [ ] `[백엔드]` Play → Result 전환: Play가 오른쪽으로 밀려나며 Result가 드러남(빈 화면·깜빡임 없음), Result "홈으로" → 탭 루트
   - [ ] 로그아웃/로그인 후 홈 탭 폼이 세션 상태를 다시 읽음(`sessionGeneration` 재생성)
   - [ ] 숨은 `NavigationLink`가 트리거되지 않는 경우(push가 전혀 안 됨) → 스펙 §2-5의 `ZStack` + `.hidden()` 대안으로 전환
+
+## 11. pendingRoute — 로그인 후 복귀 (feature/pending-route, 2026-08-31 — 파트2)
+
+> 신규 Swift 파일 없음(pbxproj 무변경, **다음 가용 idx = 159** 유지). 스펙: `docs/superpowers/specs/2026-08-31-pending-route-design.md`
+> **로그인 완료까지 가는 복귀는 백엔드 OAuth가 필요해 이 Mac에서 검증할 수 없다.** 복귀 판단은 단위 테스트 6건이 덮고, 셸 배선은 상태 주입으로 확인한다(계획서 Task 8 Step 4~6).
+> **상태 주입 검증의 읽는 법**: 하네스는 `ResumeAfterSignIn`만 주입하고 실제 로그인은 하지 않으므로, 복귀 대상이 로그인 필수 화면(마이·내가 만든 방 탭, Payment)이면 **복귀 직후 그 화면의 자체 가드가 다시 발동해 SignIn으로 되돌아간다.** 판정은 `resume` 직후 상태로 하고, 그 뒤 SignIn 재진입은 정상으로 본다.
+
+- [x] 단위 테스트: `sh gradlew :composeApp:jvmTest :shared:jvmTest` **80건 통과**(실패·에러 0, 셸 pendingRoute 4건 + Join 유료 방 2건 포함) — 2026-08-31 확인
+- [x] 3타깃 컴파일: `sh gradlew :shared:compileDebugKotlinAndroid :composeApp:compileDebugKotlinAndroid` BUILD SUCCESSFUL · `xcodebuild … clean build` BUILD SUCCEEDED(오류·Swift 경고 0) — 2026-08-31 확인
+- [x] Desktop 상태 주입(`routeStack` 덤프, 12건 전부 기대값 일치) — 2026-08-31 확인
+  - 게스트가 로그인 필수 탭 3개 선택 → 각각 `[Home, SignIn]`
+  - 마이 탭 가드 → `ResumeAfterSignIn` → `[MyInfo]`(SignIn 사라짐)
+  - 방 목록 가드 `[Home, RoomList, SignIn]` → 복귀 → `[Home, RoomList]` (RoomList 1개 — 중복 없음, 스펙 §4-0)
+  - 유료 방 가드 → 복귀 → `[Home, Payment(pin=482913)]`
+  - 목적지 없는 가드 → 복귀 → `[Home]`
+- [x] 시뮬(iOS 26) 상태 주입(`path`·`selectedTab` 덤프, `resume` 직후 12건 전부 기대값 일치, SwiftUI 경고 0) — 2026-08-31 확인
+  - 탭 복귀: `path=[]` + `selectedTab` 전환(스펙 §4-3 A)
+  - push 복귀: `[roomList, signIn]` → `[roomList]`(중복 없음) · `[signIn]` → `[payment("482913")]`(경로 길이 유지 — 2단계 증가 없음, 스펙 §4-3 B)
+  - 목적지 없음 → `selectedTab=home`, `path=[]`
+- [ ] Desktop 육안: 게스트가 로그인 필수 탭 3개를 누르면 각각 SignIn이 열리고 탭 바가 숨는다(상태 주입으로는 스택만 확인했다)
+- [ ] `[백엔드]` 게스트가 유료 방 PIN 입장 → "유료 방은 로그인 후 입장할 수 있어요" → 로그인 → **결제 화면(Payment)으로 복귀**
+- [ ] `[백엔드]` 게스트가 결과 화면에서 "가입하고 기록 저장" → 로그인 → 결과 화면으로 복귀(기록 연동 완료)
+- [ ] `[백엔드]` Play 화면 가입 유도 → 로그인 → **홈으로**(스펙 §8-1대로 복귀하지 않는 것이 정상)
+- [ ] `[백엔드]` push 라우트로 복귀한 뒤 뒤로 나오면 아래 탭 루트가 로그인 이전 UI로 보일 수 있다(스펙 §5 알려진 한계 — 결함 아님, `observeCurrentUser()` 후속 과제)
+- [ ] `[실기기 iOS 15]` 위 복귀 경로에서 push/pop이 조용히 실패하지 않는지(빈 화면·상단 빈 띠 없음)

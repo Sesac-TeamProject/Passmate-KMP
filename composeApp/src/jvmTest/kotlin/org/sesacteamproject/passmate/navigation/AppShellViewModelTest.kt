@@ -55,6 +55,10 @@ class AppShellViewModelTest {
 
         assertEquals(listOf<AppShellEvent>(AppShellEvent.RequireSignIn), events)
         assertEquals(false, viewModel.uiState.value.isSignedIn)
+        assertEquals(
+            NavigationAction.NavigateToTab(AppTab.JOINED_ROOMS),
+            viewModel.uiState.value.pendingRoute
+        )
     }
 
     @Test
@@ -87,6 +91,75 @@ class AppShellViewModelTest {
             listOf(AppShellEvent.RequireSignIn, AppShellEvent.NavigateToTab(AppTab.MY_INFO)),
             events
         )
+    }
+
+    @Test
+    fun rememberPendingRouteStoresTarget() = runTest {
+        val viewModel = viewModel(isSignedIn = false)
+
+        viewModel.onAction(
+            AppShellAction.RememberPendingRoute(NavigationAction.NavigateToPayment("123456"))
+        )
+
+        assertEquals(
+            NavigationAction.NavigateToPayment("123456"),
+            viewModel.uiState.value.pendingRoute
+        )
+    }
+
+    @Test
+    fun resumeAfterSignInWithPendingRouteResumesAndClears() = runTest {
+        val viewModel = viewModel(isSignedIn = true)
+        val events = mutableListOf<AppShellEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(
+            AppShellAction.RememberPendingRoute(NavigationAction.NavigateToPayment("123456"))
+        )
+        viewModel.onAction(AppShellAction.ResumeAfterSignIn)
+
+        assertEquals(
+            listOf<AppShellEvent>(
+                AppShellEvent.ResumePendingRoute(NavigationAction.NavigateToPayment("123456"))
+            ),
+            events
+        )
+        assertEquals(null, viewModel.uiState.value.pendingRoute)
+    }
+
+    @Test
+    fun resumeAfterSignInWithoutPendingRouteGoesHome() = runTest {
+        val viewModel = viewModel(isSignedIn = true)
+        val events = mutableListOf<AppShellEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(AppShellAction.ResumeAfterSignIn)
+
+        assertEquals(listOf<AppShellEvent>(AppShellEvent.NavigateToHome), events)
+    }
+
+    // 스펙 §0 stale 방지 — SignIn 진입은 항상 pendingRoute를 재정의한다
+    @Test
+    fun rememberPendingRouteNullOverwritesPreviousTarget() = runTest {
+        val viewModel = viewModel(isSignedIn = false)
+        val events = mutableListOf<AppShellEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(AppShellAction.SelectTab(AppTab.MY_INFO))
+        viewModel.onAction(AppShellAction.RememberPendingRoute(null))
+        viewModel.onAction(AppShellAction.ResumeAfterSignIn)
+
+        assertEquals(
+            listOf(AppShellEvent.RequireSignIn, AppShellEvent.NavigateToHome),
+            events
+        )
+        assertEquals(null, viewModel.uiState.value.pendingRoute)
     }
 
     @Test

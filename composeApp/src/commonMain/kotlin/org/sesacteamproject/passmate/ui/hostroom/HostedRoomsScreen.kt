@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.LevelEmblem
 import org.sesacteamproject.passmate.di.koinScreenViewModel
+import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.room.domain.model.HostedRoom
 import org.sesacteamproject.passmate.theme.PassmateColors
@@ -60,7 +61,9 @@ fun HostedRoomsScreen(onNavigate: (NavigationAction) -> Unit) {
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is HostedRoomsEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
+                is HostedRoomsEvent.RequireSignIn -> onNavigate(
+                    NavigationAction.NavigateToSignIn(NavigationAction.NavigateToTab(AppTab.HOSTED_ROOMS))
+                )
                 is HostedRoomsEvent.OpenCreateSheet -> isCreateSheetVisible = true
                 is HostedRoomsEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
                 is HostedRoomsEvent.OpenRoomReport -> onNavigate(NavigationAction.NavigateToRoomReport(event.roomId))

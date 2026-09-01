@@ -48,7 +48,9 @@ fun SettingsScreen(onNavigate: (NavigationAction) -> Unit) {
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is SettingsEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
+                is SettingsEvent.RequireSignIn -> onNavigate(
+                    NavigationAction.NavigateToSignIn(NavigationAction.NavigateToSettings)
+                )
                 is SettingsEvent.AccountDeleted -> onNavigate(NavigationAction.NavigateToHome)
                 is SettingsEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }

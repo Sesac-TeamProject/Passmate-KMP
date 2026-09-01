@@ -68,7 +68,11 @@ fun SessionControlScreen(
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is SessionControlEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
+                is SessionControlEvent.RequireSignIn -> onNavigate(
+                    NavigationAction.NavigateToSignIn(
+                        NavigationAction.NavigateToSessionControl(roomId, pin)
+                    )
+                )
                 is SessionControlEvent.SessionEnded -> onNavigate(NavigationAction.NavigateToRoomReport(event.roomId))
                 is SessionControlEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }

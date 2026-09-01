@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.di.koinScreenViewModel
+import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.theme.PassmateColors
 import org.sesacteamproject.passmate.user.domain.model.JoinedRoom
@@ -56,7 +57,9 @@ fun JoinedRoomsScreen(
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is JoinedRoomsEvent.RequireSignIn -> onNavigate(NavigationAction.NavigateToSignIn)
+                is JoinedRoomsEvent.RequireSignIn -> onNavigate(
+                    NavigationAction.NavigateToSignIn(NavigationAction.NavigateToTab(AppTab.JOINED_ROOMS))
+                )
                 is JoinedRoomsEvent.OpenReport -> onNavigate(NavigationAction.NavigateToResult(event.roomId))
                 is JoinedRoomsEvent.Rejoin -> onNavigate(NavigationAction.NavigateToWaiting(event.pin))
                 is JoinedRoomsEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)

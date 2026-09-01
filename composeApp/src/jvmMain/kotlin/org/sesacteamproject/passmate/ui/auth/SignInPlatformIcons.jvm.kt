@@ -43,16 +43,12 @@ private val googleSignInIconVector: ImageVector by lazy {
             stroke = SolidColor(Color(0xFFE5E7EB)),
             strokeLineWidth = 1f
         ) {
-            addRoundRect(
-                androidx.compose.ui.graphics.RoundRect(
-                    left = 0.5f,
-                    top = 0.5f,
-                    right = 23.5f,
-                    bottom = 23.5f,
-                    radiusX = 11.5f,
-                    radiusY = 11.5f
-                )
-            )
+            // 24x24 뷰포트에 반지름 11.5 원 테두리 — PathBuilder에는 addRoundRect가 없어 반원 호 2개로 그린다
+            // (원본 수치 left/top 0.5·right/bottom 23.5·radius 11.5 = 중심 (12,12) 반지름 11.5의 원과 동일)
+            moveTo(0.5f, 12f)
+            arcTo(11.5f, 11.5f, 0f, true, true, 23.5f, 12f)
+            arcTo(11.5f, 11.5f, 0f, true, true, 0.5f, 12f)
+            close()
         }
         path(fill = SolidColor(Color(0xFFEA4335)), pathFillType = PathFillType.NonZero) {
             moveTo(12f, 7.16667f)
