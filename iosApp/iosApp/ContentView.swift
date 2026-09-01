@@ -53,6 +53,7 @@ struct ContentView: View {
                     onRequireSignIn: { pushSignIn(pendingRoute: .myInfo, path: $path) },
                     onOpenReputation: { path.append(.reputation) },
                     onOpenCoinHistory: { path.append(.coinHistory) },
+                    onOpenCharge: { path.append(.coinCharge) },
                     onOpenEarnings: { path.append(.earnings) },
                     onOpenSettings: { path.append(.settings) },
                     onSignedOut: {
@@ -153,6 +154,8 @@ struct ContentView: View {
             )
         case .coinHistory:
             CoinHistoryView(onBack: { popOnce(path) })
+        case .coinCharge:
+            CoinChargeView(onBack: { popOnce(path) })
         case let .waiting(pin):
             WaitingView(
                 pin: pin,

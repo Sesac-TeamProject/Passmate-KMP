@@ -7,6 +7,8 @@ enum MyInfoEvent {
     case openEditProfile(nickname: String, avatarId: Int?)
     case openPaymentMethod
     case openCoinHistory
+    // 코인 충전 화면 (M-12-4·M-12-6)
+    case openCharge
     case openSettlementAccount
     case openEarnings
     case openNotifications

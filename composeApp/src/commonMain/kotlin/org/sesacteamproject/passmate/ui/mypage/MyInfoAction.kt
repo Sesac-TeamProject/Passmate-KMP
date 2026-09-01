@@ -11,7 +11,7 @@ sealed interface MyInfoAction {
     // 닉네임·내 캐릭터 변경 시트 (M-12-1·M-12-7)
     data object ClickEditProfile : MyInfoAction
 
-    // 코인 충전 (M-12-4~6) — 전용 화면은 후속 작업, 지금은 안내만
+    // 코인 충전 화면 (M-12-4·M-12-6)
     data object ClickCharge : MyInfoAction
 
     data object ClickPaymentMethod : MyInfoAction

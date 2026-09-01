@@ -45,5 +45,8 @@ sealed class Route(val route: String) {
     // 코인·결제 내역 (M-12) — 마이 탭에서 진입
     data object CoinHistory : Route("coinHistory")
 
+    // 코인 충전 (M-12-4·M-12-6) — 마이 탭 보유 코인 행에서 진입
+    data object CoinCharge : Route("coinCharge")
+
     data object Settings : Route("settings")
 }
