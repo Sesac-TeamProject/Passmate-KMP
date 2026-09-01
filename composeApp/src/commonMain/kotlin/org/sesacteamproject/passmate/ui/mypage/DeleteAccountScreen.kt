@@ -31,7 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // 회원 탈퇴 (M-12-12) — 삭제 대상 안내 + "위 내용을 확인했어요" 체크 후에만 탈퇴.
 // 설정에서 push로 진입한다 (이전에는 설정 안의 확인 다이얼로그였다)
@@ -226,4 +228,50 @@ private fun DeleteButton(
 
 private fun formatNumber(value: Int): String {
     return value.toString().reversed().chunked(3).joinToString(",").reversed()
+}
+
+// --- Preview ---
+
+// 확인 체크 완료 — 탈퇴 버튼 활성
+@PassmatePreview
+@Composable
+private fun DeleteAccountContentScreenPreview() {
+    PassmateTheme {
+        DeleteAccountContentScreen(
+            uiState = DeleteAccountUiState(isLoading = false, coins = 1200, isConfirmed = true),
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+// 미체크 — 탈퇴 버튼 비활성 (게이트는 canDelete가 판단)
+@PassmatePreview
+@Composable
+private fun DeleteAccountContentScreenUncheckedPreview() {
+    PassmateTheme {
+        DeleteAccountContentScreen(
+            uiState = DeleteAccountUiState(isLoading = false, coins = 1200, isConfirmed = false),
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+// 탈퇴 요청 in-flight — 중복 호출 방지로 버튼 비활성 (규칙 §9)
+@PassmatePreview
+@Composable
+private fun DeleteAccountContentScreenProcessingPreview() {
+    PassmateTheme {
+        DeleteAccountContentScreen(
+            uiState = DeleteAccountUiState(
+                isLoading = false,
+                coins = 1200,
+                isConfirmed = true,
+                isProcessing = true
+            ),
+            onAction = {},
+            onBack = {}
+        )
+    }
 }

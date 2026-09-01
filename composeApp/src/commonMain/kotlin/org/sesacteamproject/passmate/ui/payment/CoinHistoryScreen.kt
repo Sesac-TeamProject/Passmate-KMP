@@ -31,7 +31,10 @@ import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.payment.domain.model.CoinTransaction
 import org.sesacteamproject.passmate.payment.domain.model.CoinTransactionType
+import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // 코인 사용·충전 내역 (M-12) — 충전(+)·차감(-)·환급(+) 목록, 건별 잔액 표시.
 @Composable
@@ -186,6 +189,53 @@ private fun RetryState(onRetry: () -> Unit) {
                 .background(PassmateColors.Primary, RoundedCornerShape(12.dp))
                 .clickable { onRetry() }
                 .padding(horizontal = 24.dp, vertical = 10.dp)
+        )
+    }
+}
+
+// --- Preview ---
+
+@PassmatePreview
+@Composable
+private fun CoinHistoryContentScreenPreview() {
+    PassmateTheme {
+        CoinHistoryContentScreen(
+            uiState = CoinHistoryUiState(
+                isLoading = false,
+                items = listOf(
+                    CoinTransaction(id = 9001, type = CoinTransactionType.CHARGE, amount = 1000, balanceAfter = 1000, method = PaymentMethod.KAKAO_PAY, roomTitle = null, paymentNo = "PAY-20260810-01", createdAt = "2026.08.10"),
+                    CoinTransaction(id = 9002, type = CoinTransactionType.DEDUCT, amount = -500, balanceAfter = 500, method = null, roomTitle = "8월 4주차 Spring 스터디", paymentNo = null, createdAt = "2026.08.14"),
+                    CoinTransaction(id = 9003, type = CoinTransactionType.REFUND, amount = 500, balanceAfter = 1000, method = null, roomTitle = "확률과 통계 총정리", paymentNo = null, createdAt = "2026.08.16"),
+                    CoinTransaction(id = 9004, type = CoinTransactionType.DEDUCT, amount = -300, balanceAfter = 700, method = null, roomTitle = "함수의 극한 퀴즈", paymentNo = null, createdAt = "2026.08.20")
+                )
+            ),
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+// 내역 없음 — 빈 상태
+@PassmatePreview
+@Composable
+private fun CoinHistoryContentScreenEmptyPreview() {
+    PassmateTheme {
+        CoinHistoryContentScreen(
+            uiState = CoinHistoryUiState(isLoading = false, items = emptyList()),
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun CoinHistoryContentScreenErrorPreview() {
+    PassmateTheme {
+        CoinHistoryContentScreen(
+            uiState = CoinHistoryUiState(isLoading = false, hasError = true),
+            onAction = {},
+            onBack = {}
         )
     }
 }

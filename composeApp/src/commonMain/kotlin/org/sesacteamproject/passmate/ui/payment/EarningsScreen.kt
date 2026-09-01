@@ -38,9 +38,13 @@ import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.payment.domain.model.Earnings
+import org.sesacteamproject.passmate.payment.domain.model.NextPayout
+import org.sesacteamproject.passmate.payment.domain.model.SettlementAccountSummary
 import org.sesacteamproject.passmate.payment.domain.model.SettlementItem
 import org.sesacteamproject.passmate.payment.domain.model.SettlementStatus
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // Figma "UI 디자인 v6" M-T4(349:10199) — 정산: 이번 달 수익(80%)·다음 지급·결제/정산 내역+계좌 관리(M-12-3 시트)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -457,4 +461,77 @@ private fun summaryLine(earnings: Earnings): String {
 
 private fun formatAmount(amount: Long): String {
     return amount.toString().reversed().chunked(3).joinToString(",").reversed()
+}
+
+// --- Preview ---
+
+private val previewSettlementItems = listOf(
+    SettlementItem(settlementId = 8001, dateLabel = "2026.08.28", roomTitle = "8월 4주차 Spring 스터디", participantCount = 24, entryFeeTotal = 12000L, feeAmount = 2400L, payoutAmount = 9600L, status = SettlementStatus.SCHEDULED),
+    SettlementItem(settlementId = 8002, dateLabel = "2026.08.14", roomTitle = "확률과 통계 총정리", participantCount = 18, entryFeeTotal = 9000L, feeAmount = 1800L, payoutAmount = 7200L, status = SettlementStatus.PAID),
+    SettlementItem(settlementId = 8003, dateLabel = "2026.08.02", roomTitle = "함수의 극한 퀴즈", participantCount = 11, entryFeeTotal = 5500L, feeAmount = 1100L, payoutAmount = 4400L, status = SettlementStatus.HELD)
+)
+
+@PassmatePreview
+@Composable
+private fun EarningsContentScreenPreview() {
+    PassmateTheme {
+        EarningsContentScreen(
+            uiState = EarningsUiState(
+                isLoading = false,
+                earnings = Earnings(
+                    monthlyTotal = 64000L,
+                    hostSharePercent = 80,
+                    nextPayout = NextPayout(dateLabel = "9/5", amount = 9600L),
+                    paidRoomCount = 3,
+                    studentCount = 53,
+                    items = previewSettlementItems,
+                    nextCursor = null,
+                    hasNext = false,
+                    account = SettlementAccountSummary(bankName = "국민", maskedNumber = "***-***-4821", payoutNote = "매월 5일 지급")
+                ),
+                items = previewSettlementItems
+            ),
+            onAction = {},
+            onClickBack = {}
+        )
+    }
+}
+
+// 정산 내역 없음 — 계좌 미등록
+@PassmatePreview
+@Composable
+private fun EarningsContentScreenEmptyPreview() {
+    PassmateTheme {
+        EarningsContentScreen(
+            uiState = EarningsUiState(
+                isLoading = false,
+                earnings = Earnings(
+                    monthlyTotal = 0L,
+                    hostSharePercent = 80,
+                    nextPayout = null,
+                    paidRoomCount = 0,
+                    studentCount = 0,
+                    items = emptyList(),
+                    nextCursor = null,
+                    hasNext = false,
+                    account = null
+                ),
+                items = emptyList()
+            ),
+            onAction = {},
+            onClickBack = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun EarningsContentScreenFailedPreview() {
+    PassmateTheme {
+        EarningsContentScreen(
+            uiState = EarningsUiState(isLoading = false, loadFailed = true),
+            onAction = {},
+            onClickBack = {}
+        )
+    }
 }

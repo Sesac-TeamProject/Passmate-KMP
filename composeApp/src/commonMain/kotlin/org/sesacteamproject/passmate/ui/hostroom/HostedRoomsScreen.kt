@@ -40,9 +40,16 @@ import org.sesacteamproject.passmate.component.LevelEmblem
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
+import org.sesacteamproject.passmate.room.domain.model.HostLevel
 import org.sesacteamproject.passmate.room.domain.model.HostedRoom
+import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
+import org.sesacteamproject.passmate.user.domain.model.GradeCriterion
+import org.sesacteamproject.passmate.user.domain.model.GradeStats
 import org.sesacteamproject.passmate.user.domain.model.MyGrade
+import org.sesacteamproject.passmate.user.domain.model.NextGrade
 
 // Figma "UI 디자인 v6" M-13(384:5121) — 내가 만든 방: 명성 카드+진행 중/종료 목록+새 방 만들기 FAB.
 // 진행 리모컨(M-T2)·방 리포트(M-14) 연결은 후속 태스크(T118·T119)
@@ -488,4 +495,73 @@ private fun formatStars(value: Double): String {
     val rounded = (value * 10).toInt()
 
     return "${rounded / 10}.${rounded % 10}"
+}
+
+// --- Preview ---
+
+private val previewMyGrade = MyGrade(
+    level = HostLevel.VERIFIED,
+    achievedAt = "2026.08.12",
+    stats = GradeStats(
+        participationCount = 48,
+        avgAccuracyPercent = 74,
+        roomCount = 12,
+        totalStudents = 186,
+        avgStars = 4.6,
+        ratingCount = 32
+    ),
+    next = NextGrade(
+        level = HostLevel.POPULAR,
+        progressPercent = 62,
+        criteria = listOf(
+            GradeCriterion(label = "방 운영 횟수", current = 12.0, target = 20.0, met = false),
+            GradeCriterion(label = "누적 학생 수", current = 186.0, target = 150.0, met = true),
+            GradeCriterion(label = "평균 별점", current = 4.6, target = 4.5, met = true)
+        )
+    )
+)
+
+@PassmatePreview
+@Composable
+private fun HostedRoomsContentScreenPreview() {
+    PassmateTheme {
+        HostedRoomsContentScreen(
+            uiState = HostedRoomsUiState(
+                isLoading = false,
+                grade = previewMyGrade,
+                ongoing = listOf(
+                    HostedRoom(roomId = 301, pin = "482913", title = "8월 4주차 Spring 스터디", status = RoomStatus.RUNNING, participantCount = 12, scheduledAt = null, endedAtLabel = null, avgAccuracyPercent = null),
+                    HostedRoom(roomId = 302, pin = "115820", title = "확률과 통계 총정리", status = RoomStatus.WAITING, participantCount = 3, scheduledAt = "2026.09.02 20:00", endedAtLabel = null, avgAccuracyPercent = null)
+                ),
+                ended = listOf(
+                    HostedRoom(roomId = 303, pin = "930447", title = "7월 3주차 미적분 특강", status = RoomStatus.FINISHED, participantCount = 24, scheduledAt = null, endedAtLabel = "2026.07.18", avgAccuracyPercent = 78),
+                    HostedRoom(roomId = 304, pin = "620118", title = "함수의 극한 퀴즈", status = RoomStatus.FINISHED, participantCount = 16, scheduledAt = null, endedAtLabel = "2026.06.28", avgAccuracyPercent = 65)
+                )
+            ),
+            onAction = {}
+        )
+    }
+}
+
+// 만든 방 없음 — 빈 상태
+@PassmatePreview
+@Composable
+private fun HostedRoomsContentScreenEmptyPreview() {
+    PassmateTheme {
+        HostedRoomsContentScreen(
+            uiState = HostedRoomsUiState(isLoading = false, grade = previewMyGrade),
+            onAction = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun HostedRoomsContentScreenFailedPreview() {
+    PassmateTheme {
+        HostedRoomsContentScreen(
+            uiState = HostedRoomsUiState(isLoading = false, loadFailed = true),
+            onAction = {}
+        )
+    }
 }

@@ -47,8 +47,11 @@ import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.payment.domain.model.PublicRoom
 import org.sesacteamproject.passmate.payment.domain.model.RoomTypeFilter
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.room.domain.model.HostLevel
+import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 import org.sesacteamproject.passmate.ui.profile.HostProfileSheet
 
 // 공개 방 목록·탐색 (M-11) — 검색 + 유형 필터 + 인기 방 카드. 방 선택 시 입장 화면으로 이동한다.
@@ -377,6 +380,93 @@ private fun RetryState(onRetry: () -> Unit) {
                 .background(PassmateColors.Primary, RoundedCornerShape(12.dp))
                 .clickable { onRetry() }
                 .padding(horizontal = 24.dp, vertical = 10.dp)
+        )
+    }
+}
+
+// --- Preview ---
+
+private val previewPublicRooms = listOf(
+    PublicRoom(
+        roomId = 701,
+        pin = "482913",
+        title = "8월 4주차 Spring 스터디",
+        topic = "이차함수 심화",
+        hostId = 11,
+        hostName = "김선생",
+        hostLevel = 3,
+        hostRating = 4.8,
+        status = RoomStatus.WAITING,
+        participantCount = 12,
+        maxParticipants = 30,
+        isPaid = true,
+        entryFee = 500,
+        scheduledAt = null
+    ),
+    PublicRoom(
+        roomId = 702,
+        pin = "115820",
+        title = "확률과 통계 총정리",
+        topic = "조건부확률",
+        hostId = 11,
+        hostName = "이선생",
+        hostLevel = 2,
+        hostRating = 4.5,
+        status = RoomStatus.WAITING,
+        participantCount = 8,
+        maxParticipants = null,
+        isPaid = false,
+        entryFee = null,
+        scheduledAt = null
+    ),
+    PublicRoom(
+        roomId = 703,
+        pin = "930447",
+        title = "함수의 극한 무료 특강",
+        topic = null,
+        hostId = 11,
+        hostName = "박선생",
+        hostLevel = null,
+        hostRating = null,
+        status = RoomStatus.RUNNING,
+        participantCount = 20,
+        maxParticipants = 20,
+        isPaid = false,
+        entryFee = null,
+        scheduledAt = null
+    )
+)
+
+@PassmatePreview
+@Composable
+private fun RoomListContentScreenPreview() {
+    PassmateTheme {
+        RoomListContentScreen(
+            uiState = RoomListUiState(isLoading = false, rooms = previewPublicRooms),
+            onAction = {}
+        )
+    }
+}
+
+// 검색 결과 없음 — 빈 상태 (규칙 §11)
+@PassmatePreview
+@Composable
+private fun RoomListContentScreenEmptyPreview() {
+    PassmateTheme {
+        RoomListContentScreen(
+            uiState = RoomListUiState(isLoading = false, query = "미적분", rooms = emptyList()),
+            onAction = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun RoomListContentScreenErrorPreview() {
+    PassmateTheme {
+        RoomListContentScreen(
+            uiState = RoomListUiState(isLoading = false, hasError = true),
+            onAction = {}
         )
     }
 }

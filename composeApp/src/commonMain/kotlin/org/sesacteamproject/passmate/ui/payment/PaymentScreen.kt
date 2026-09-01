@@ -39,7 +39,12 @@ import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
+import org.sesacteamproject.passmate.preview.PassmatePreview
+import org.sesacteamproject.passmate.room.domain.model.RoomHost
+import org.sesacteamproject.passmate.room.domain.model.RoomInfo
+import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // 유료 방 입장 결제 (M-01 v2 / W-11). 방 정보 + 보유 코인/참가비 + 닉네임·캐릭터 + 결제 CTA.
 // 포트원 결제창(웹뷰) 오버레이는 이 컨테이너가 소유한다 (규칙 §11-1).
@@ -313,6 +318,78 @@ private fun RetryState(onRetry: () -> Unit) {
                 .background(PassmateColors.Primary, RoundedCornerShape(12.dp))
                 .clickable { onRetry() }
                 .padding(horizontal = 24.dp, vertical = 10.dp)
+        )
+    }
+}
+
+// --- Preview ---
+
+private val previewPaidRoom = RoomInfo(
+    roomId = 601,
+    pin = "731204",
+    title = "8월 4주차 Spring 스터디",
+    topic = "이차방정식 심화",
+    status = RoomStatus.WAITING,
+    questionCount = 8,
+    estimatedMinutes = 20,
+    scheduledAt = null,
+    participantCount = 12,
+    maxParticipants = 30,
+    isPaid = true,
+    entryFee = 500,
+    host = RoomHost(userId = 11, nickname = "김선생", level = 3, avgStars = 4.8, ratingCount = 32)
+)
+
+// 보유 코인이 참가비에 모자란 상태 — 충전 후 결제 유도
+@PassmatePreview
+@Composable
+private fun PaymentContentScreenShortfallPreview() {
+    PassmateTheme {
+        PaymentContentScreen(
+            uiState = PaymentUiState(
+                isLoading = false,
+                room = previewPaidRoom,
+                balance = 200,
+                shortfall = 300,
+                nickname = "민지",
+                avatarId = 3,
+                selectedMethod = PaymentMethod.KAKAO_PAY
+            ),
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+// 결제 요청 in-flight — 버튼 비활성 (규칙 §9)
+@PassmatePreview
+@Composable
+private fun PaymentContentScreenProcessingPreview() {
+    PassmateTheme {
+        PaymentContentScreen(
+            uiState = PaymentUiState(
+                isLoading = false,
+                room = previewPaidRoom,
+                balance = 800,
+                shortfall = 0,
+                nickname = "민지",
+                avatarId = 3,
+                isProcessing = true
+            ),
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun PaymentContentScreenErrorPreview() {
+    PassmateTheme {
+        PaymentContentScreen(
+            uiState = PaymentUiState(isLoading = false, hasLoadError = true),
+            onAction = {},
+            onBack = {}
         )
     }
 }

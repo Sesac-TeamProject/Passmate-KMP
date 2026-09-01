@@ -31,11 +31,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.report.domain.model.ReportQuestion
 import org.sesacteamproject.passmate.report.domain.model.ReportStudent
 import org.sesacteamproject.passmate.report.domain.model.RoomReport
+import org.sesacteamproject.passmate.report.domain.model.RoomReportSummary
+import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 import org.sesacteamproject.passmate.ui.result.rememberReportSharer
 
 // Figma "UI 디자인 v6" M-14(432:5366) — 방 리포트: 요약 카드+개요/문항별/학생별 탭+내보내기(텍스트 공유)
@@ -541,4 +545,84 @@ private fun reportSubtitle(report: RoomReport): String {
     parts.add("PIN ${report.pin.chunked(3).joinToString(" ")}")
 
     return parts.joinToString(" · ")
+}
+
+// --- Preview ---
+
+private val previewRoomReport = RoomReport(
+    roomTitle = "8월 4주차 Spring 스터디",
+    pin = "482913",
+    status = RoomStatus.FINISHED,
+    dateLabel = "2026.08.28",
+    summary = RoomReportSummary(
+        avgAccuracyPercent = 74,
+        studentCount = 24,
+        questionCount = 8,
+        aiAnalysisCount = 12,
+        avgScore = 820.0,
+        topScore = 1240.0
+    ),
+    questions = listOf(
+        ReportQuestion(questionId = 1, questionNo = 1, title = "등차수열의 공차", type = QuestionType.MULTIPLE_CHOICE, accuracyPercent = 92, aiFeedbackCount = null),
+        ReportQuestion(questionId = 2, questionNo = 2, title = "이차함수의 최댓값 OX", type = QuestionType.OX, accuracyPercent = 58, aiFeedbackCount = null),
+        // 서술형 미채점 — accuracyPercent가 null이면 "—"로 렌더링한다
+        ReportQuestion(questionId = 3, questionNo = 3, title = "이차방정식의 판별식 활용 서술형", type = QuestionType.ESSAY, accuracyPercent = null, aiFeedbackCount = 12)
+    ),
+    students = listOf(
+        ReportStudent(participantId = 9002, nickname = "준영", rank = 1, totalScore = 1240.0, correctCount = 8, isGuest = false),
+        ReportStudent(participantId = 9003, nickname = "혜림", rank = 2, totalScore = 1180.0, correctCount = 7, isGuest = false),
+        ReportStudent(participantId = 9001, nickname = "민지", rank = 3, totalScore = 990.0, correctCount = 6, isGuest = true)
+    )
+)
+
+@PassmatePreview
+@Composable
+private fun RoomReportContentScreenQuestionsPreview() {
+    PassmateTheme {
+        RoomReportContentScreen(
+            uiState = RoomReportUiState(isLoading = false, report = previewRoomReport, selectedTab = ReportTab.QUESTIONS),
+            onAction = {},
+            onRetry = {},
+            onClickBack = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun RoomReportContentScreenOverviewPreview() {
+    PassmateTheme {
+        RoomReportContentScreen(
+            uiState = RoomReportUiState(isLoading = false, report = previewRoomReport, selectedTab = ReportTab.OVERVIEW),
+            onAction = {},
+            onRetry = {},
+            onClickBack = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun RoomReportContentScreenStudentsPreview() {
+    PassmateTheme {
+        RoomReportContentScreen(
+            uiState = RoomReportUiState(isLoading = false, report = previewRoomReport, selectedTab = ReportTab.STUDENTS),
+            onAction = {},
+            onRetry = {},
+            onClickBack = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun RoomReportContentScreenFailedPreview() {
+    PassmateTheme {
+        RoomReportContentScreen(
+            uiState = RoomReportUiState(isLoading = false, loadFailed = true),
+            onAction = {},
+            onRetry = {},
+            onClickBack = {}
+        )
+    }
 }

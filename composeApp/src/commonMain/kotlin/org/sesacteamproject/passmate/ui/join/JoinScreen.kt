@@ -3,9 +3,9 @@ package org.sesacteamproject.passmate.ui.join
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,8 +45,13 @@ import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.component.StudentAvatars
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
+import org.sesacteamproject.passmate.room.domain.model.RoomHost
+import org.sesacteamproject.passmate.room.domain.model.RoomInfo
+import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.room.domain.policy.JoinInputPolicy
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // Figma "UI 디자인 v6" M-01(349:9151) 기준 — PIN 6칸·QR 입장·닉네임·캐릭터 선택·입장하기
 @Composable
@@ -488,3 +493,56 @@ private fun SignInLinkRow(onClickSignIn: () -> Unit) {
 }
 
 private const val AVATARS_PER_ROW = 6
+
+// --- Preview ---
+
+@PassmatePreview
+@Composable
+private fun JoinContentScreenPreview() {
+    PassmateTheme {
+        JoinContentScreen(
+            uiState = JoinUiState(),
+            isQrScanAvailable = true,
+            onAction = {}
+        )
+    }
+}
+
+// PIN 6자리 입력 완료 — 방 정보 프리페치 결과 + 닉네임·캐릭터 선택
+@PassmatePreview
+@Composable
+private fun JoinContentScreenFilledPreview() {
+    PassmateTheme {
+        JoinContentScreen(
+            uiState = JoinUiState(
+                pin = "482913",
+                nickname = "민지",
+                avatarId = 3,
+                isSignedIn = true,
+                roomInfo = RoomInfo(
+                    roomId = 801,
+                    pin = "482913",
+                    title = "8월 4주차 Spring 스터디",
+                    topic = "이차함수 심화",
+                    status = RoomStatus.WAITING,
+                    questionCount = 8,
+                    estimatedMinutes = 20,
+                    scheduledAt = null,
+                    participantCount = 12,
+                    maxParticipants = 30,
+                    isPaid = false,
+                    entryFee = null,
+                    host = RoomHost(
+                        userId = 11,
+                        nickname = "김선생",
+                        level = 3,
+                        avgStars = 4.8,
+                        ratingCount = 32
+                    )
+                )
+            ),
+            isQrScanAvailable = true,
+            onAction = {}
+        )
+    }
+}
