@@ -54,6 +54,14 @@ final class ResultViewModel: ObservableObject {
                         if self.uiState.selectedQuestionNo == nil {
                             self.uiState.selectedQuestionNo = self.firstAiQuestionNo(sessionResult)
                         }
+                        let shouldPromptRating = sessionResult.canRate
+                            && !self.uiState.hasRated
+                            && !self.uiState.hasPromptedRating
+
+                        if shouldPromptRating {
+                            self.uiState.isRatingSheetVisible = true
+                            self.uiState.hasPromptedRating = true
+                        }
                     } else {
                         self.uiState.isLoading = false
                         self.uiState.loadFailed = true

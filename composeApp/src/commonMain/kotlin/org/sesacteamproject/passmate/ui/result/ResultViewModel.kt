@@ -51,12 +51,16 @@ class ResultViewModel(
             getSessionResultUseCase.invoke(roomId)
                 .onSuccess { result ->
                     _uiState.update { state ->
+                        val shouldPromptRating = result.canRate && !state.hasRated && !state.hasPromptedRating
+
                         state.copy(
                             isLoading = false,
                             loadFailed = false,
                             result = result,
                             report = reportResult.getOrNull(),
-                            selectedQuestionNo = state.selectedQuestionNo ?: firstAiQuestionNo(result)
+                            selectedQuestionNo = state.selectedQuestionNo ?: firstAiQuestionNo(result),
+                            isRatingSheetVisible = state.isRatingSheetVisible || shouldPromptRating,
+                            hasPromptedRating = state.hasPromptedRating || shouldPromptRating
                         )
                     }
                 }
