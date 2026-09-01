@@ -110,20 +110,6 @@ private fun SettingsContentScreen(
 private fun SettingsContentScreenPreview() {
     PassmateTheme {
         SettingsContentScreen(
-            uiState = SettingsUiState(isProcessing = false),
-            onClickBack = {},
-            onClickDelete = {}
-        )
-    }
-}
-
-// 탈퇴 요청 in-flight — 하단 스피너
-@PassmatePreview
-@Composable
-private fun SettingsContentScreenProcessingPreview() {
-    PassmateTheme {
-        SettingsContentScreen(
-            uiState = SettingsUiState(isProcessing = true),
             onClickBack = {},
             onClickDelete = {}
         )
