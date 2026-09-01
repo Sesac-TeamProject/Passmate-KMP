@@ -103,7 +103,7 @@ private struct ReputationContentView: View {
                     ProfileCardView(
                         profile: profile,
                         stats: uiState.grade?.stats,
-                        level: uiState.grade?.level ?? profile.level
+                        level: emblemLevel(grade: uiState.grade, profile: profile)
                     )
                 }
                 if let grade = uiState.grade {
@@ -131,6 +131,14 @@ private struct ReputationContentView: View {
             .background(PassmateColors.fieldGray)
             .cornerRadius(16)
     }
+}
+
+// Kotlin(Shared)의 HostLevel과 화면용 Swift enum HostLevel은 이름이 같아 서로 가린다.
+// MyInfoView.localLevel과 같은 방식으로 level 값만 꺼내 변환한다.
+private func emblemLevel(grade: MyGrade?, profile: UserProfile) -> HostLevel? {
+    let raw = grade?.level.level ?? profile.level?.level
+
+    return HostLevel.from(raw.map { Int($0) })
 }
 
 private struct ProfileCardView: View {
