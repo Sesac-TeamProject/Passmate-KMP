@@ -157,6 +157,23 @@ class MyInfoViewModelTest {
         assertEquals(profile, state.profile)
         assertEquals(true, state.isCoinInfoFailed)
         assertEquals(false, state.isEarningsFailed)
+        assertEquals(true, state.hasPartialFailure)
+    }
+
+    @Test
+    fun cardRetryReloadsOnlyThatCard() = runTest {
+        paymentRepository.coinsResult = AppResult.Failure(AppError.NetworkError())
+        val viewModel = viewModel()
+
+        viewModel.onAction(MyInfoAction.Enter)
+        paymentRepository.coinsResult = AppResult.Success(coins)
+        viewModel.onAction(MyInfoAction.RetryCoinInfo)
+
+        val state = viewModel.uiState.value
+        assertEquals(2, paymentRepository.coinsCalls)
+        assertEquals(1, paymentRepository.earningsCalls)
+        assertEquals(false, state.isCoinInfoFailed)
+        assertEquals(false, state.hasPartialFailure)
     }
 
     @Test
@@ -202,6 +219,7 @@ class MyInfoViewModelTest {
         viewModel.onAction(MyInfoAction.ClickCharge)
         viewModel.onAction(MyInfoAction.ClickSettlementAccount)
         viewModel.onAction(MyInfoAction.ClickSettings)
+        viewModel.onAction(MyInfoAction.ClickDeleteAccount)
 
         assertEquals(
             listOf(
@@ -209,10 +227,27 @@ class MyInfoViewModelTest {
                 MyInfoEvent.OpenEditProfile(nickname = "준영", avatarId = 3),
                 MyInfoEvent.OpenCharge,
                 MyInfoEvent.OpenSettlementAccount,
-                MyInfoEvent.OpenSettings
+                MyInfoEvent.OpenSettings,
+                MyInfoEvent.OpenDeleteAccount
             ),
             events
         )
+    }
+
+    // 약관 전용 화면이 없어 안내 문구만 내보낸다 (card/기타 4행)
+    @Test
+    fun clickTermsShowsPreparingNotice() = runTest {
+        val viewModel = viewModel()
+        val events = mutableListOf<MyInfoEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(MyInfoAction.Enter)
+        viewModel.onAction(MyInfoAction.ClickTerms)
+
+        assertEquals(1, events.size)
+        assertEquals(true, events.first() is MyInfoEvent.ShowNotice)
     }
 
     @Test

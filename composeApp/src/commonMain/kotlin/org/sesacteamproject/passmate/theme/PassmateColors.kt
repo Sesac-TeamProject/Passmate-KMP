@@ -52,9 +52,15 @@ object PassmateColors {
 
     val WrongPinkText = Color(0xFF7C1F26)
 
+    // 오류 아이콘 원형 배경 — WrongPink 계열 연한 톤 (v6 M-05e 리포트 불러오기 실패)
+    val ErrorIconBg = Color(0xFFFDEEEF)
+
     val WeakTopicBg = Color(0xFFFDEFDE)
 
     val WeakTopicText = Color(0xFFBF3F0C)
+
+    // 파괴적 동작(로그아웃·회원 탈퇴) — 시안 M-12 card/기타
+    val Destructive = Color(0xFFD9534F)
 
     // 별점 전용 골드 (디자인 시스템 §StarRating — 별점에만 허용)
     val StarGold = Color(0xFFF2C94C)

@@ -23,6 +23,8 @@ sealed interface MyInfoEvent {
 
     data object OpenSettings : MyInfoEvent
 
+    data object OpenDeleteAccount : MyInfoEvent
+
     // 로그아웃 완료 → 홈 탭으로 (세션 정리는 shared가 수행)
     data object SignedOut : MyInfoEvent
 

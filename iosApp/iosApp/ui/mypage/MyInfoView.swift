@@ -32,6 +32,8 @@ struct MyInfoView: View {
 
     var onOpenSettings: () -> Void = {}
 
+    var onOpenDeleteAccount: () -> Void = {}
+
     var onSignedOut: () -> Void = {}
 
     @StateObject private var viewModel = MyInfoViewModel(
@@ -79,6 +81,8 @@ struct MyInfoView: View {
                 activeSheet = .notifications
             case .openSettings:
                 onOpenSettings()
+            case .openDeleteAccount:
+                onOpenDeleteAccount()
             case .signedOut:
                 onSignedOut()
             case let .showNotice(message):
@@ -222,6 +226,9 @@ private struct MyInfoContentView: View {
                             .foregroundColor(PassmateColors.textSecondary)
                     }
                 }
+                if uiState.hasPartialFailure {
+                    partialFailureBanner
+                }
                 if let profile = uiState.profile {
                     ProfileCardView(profile: profile, onClick: { onAction(.clickProfile) })
                     sectionCard {
@@ -229,23 +236,44 @@ private struct MyInfoContentView: View {
                         rowDivider
                         infoRow(title: "내 캐릭터", subtitle: avatarName(profile), actionLabel: "변경") { onAction(.clickEditProfile) }
                     }
-                    sectionCard {
-                        coinRow(coins: profile.coins?.int64Value ?? 0) { onAction(.clickCharge) }
-                        rowDivider
-                        infoRow(title: "결제 수단", subtitle: paymentMethodSubtitle, actionLabel: "관리") { onAction(.clickPaymentMethod) }
-                        rowDivider
-                        infoRow(title: "코인 내역", subtitle: recentTransactionSubtitle, actionLabel: "보기") { onAction(.clickCoinHistory) }
+                    // 코인·정산은 카드 단위로만 실패시킨다 — 프로필이 정상이면 화면 전체를 덮지 않는다 (규칙 §9)
+                    if uiState.isCoinInfoFailed {
+                        failureCard(message: "코인 정보를 불러오지 못했어요") { onAction(.retryCoinInfo) }
+                    } else {
+                        sectionCard {
+                            coinRow(coins: profile.coins?.int64Value ?? 0) { onAction(.clickCharge) }
+                            rowDivider
+                            infoRow(title: "결제 수단", subtitle: paymentMethodSubtitle, actionLabel: "관리") { onAction(.clickPaymentMethod) }
+                            rowDivider
+                            infoRow(title: "코인 내역", subtitle: recentTransactionSubtitle, actionLabel: "보기") { onAction(.clickCoinHistory) }
+                        }
+                    }
+                    if uiState.isEarningsFailed {
+                        failureCard(message: "정산 정보를 불러오지 못했어요") { onAction(.retryEarnings) }
+                    } else {
+                        sectionCard {
+                            infoRow(title: "정산 계좌", subtitle: settlementAccountSubtitle, actionLabel: "변경") { onAction(.clickSettlementAccount) }
+                            rowDivider
+                            infoRow(title: "이번 달 정산 예정", subtitle: nextPayoutSubtitle, actionLabel: "내역") { onAction(.clickEarnings) }
+                        }
                     }
                     sectionCard {
-                        infoRow(title: "정산 계좌", subtitle: settlementAccountSubtitle, actionLabel: "변경") { onAction(.clickSettlementAccount) }
+                        infoRow(title: "알림 설정", subtitle: "세션 시작 · 별점 요청 · 정산", actionLabel: "변경") { onAction(.clickNotifications) }
                         rowDivider
-                        infoRow(title: "이번 달 정산 예정", subtitle: nextPayoutSubtitle, actionLabel: "내역") { onAction(.clickEarnings) }
-                    }
-                    sectionCard {
-                        infoRow(title: "알림", subtitle: "세션 시작 · 별점 요청 · 정산", actionLabel: "설정") { onAction(.clickNotifications) }
+                        // 확인 알림을 거쳐야 실제 로그아웃 — 알림 소유는 상위 View (규칙 §11-1)
+                        infoRow(title: "로그아웃", subtitle: nil, actionLabel: "", actionColor: PassmateColors.destructive) {
+                            if !uiState.isProcessing {
+                                onClickSignOut()
+                            }
+                        }
+                        rowDivider
+                        infoRow(title: "회원 탈퇴", subtitle: nil, actionLabel: "", actionColor: PassmateColors.destructive) {
+                            onAction(.clickDeleteAccount)
+                        }
+                        rowDivider
+                        infoRow(title: "약관 · 개인정보 처리방침", subtitle: "버전 1.0.0", actionLabel: "보기") { onAction(.clickTerms) }
                     }
                 }
-                signOutButton
             }
             .padding(.horizontal, 20)
             .padding(.top, 32)
@@ -259,30 +287,47 @@ private struct MyInfoContentView: View {
             .frame(height: 1)
     }
 
-    private var signOutButton: some View {
-        Button(action: onClickSignOut) {
-            HStack {
-                Spacer()
-                if uiState.isProcessing {
-                    ProgressView().tint(PassmateColors.primary)
-                } else {
-                    Text("로그아웃")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(PassmateColors.textSecondary)
-                }
-                Spacer()
-            }
-            .padding(.vertical, 16)
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
-        }
-        .disabled(uiState.isProcessing)
-        .padding(.top, 10)
+    // 카드 하나라도 실패했을 때의 상단 안내 (시안 M-12e banner/부분 실패)
+    private var partialFailureBanner: some View {
+        Text("일부 정보를 불러오지 못했어요 · 아래에서 다시 시도")
+            .font(.system(size: 13, weight: .medium))
+            .kerning(-0.13)
+            .foregroundColor(PassmateColors.wrongPinkText)
+            .frame(maxWidth: .infinity)
+            .frame(height: 44)
+            .background(PassmateColors.errorIconBg)
+            .cornerRadius(12)
     }
 
+    // 카드 단위 실패 자리표시자 (시안 M-12e card/실패) — 해당 섹션만 다시 불러온다
+    private func failureCard(message: String, onRetry: @escaping () -> Void) -> some View {
+        VStack(spacing: 0) {
+            Image(systemName: "exclamationmark.circle")
+                .font(.system(size: 20, weight: .regular))
+                .foregroundColor(PassmateColors.textTertiary)
+            Text(message)
+                .font(.system(size: 14, weight: .medium))
+                .kerning(-0.14)
+                .foregroundColor(PassmateColors.textPrimary)
+                .padding(.top, 10)
+            Button(action: onRetry) {
+                Text("다시 시도")
+                    .font(.system(size: 13, weight: .bold))
+                    .kerning(-0.13)
+                    .foregroundColor(PassmateColors.primaryDeep)
+                    .padding(8)
+            }
+            .padding(.top, 2)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 150)
+        .background(PassmateColors.surface)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
+    }
+
+    // 실패는 카드 자체가 failureCard로 대체되므로 여기서는 성공·빈 값만 다룬다
     private var paymentMethodSubtitle: String {
-        if uiState.isCoinInfoFailed {
-            return "불러오지 못했어요"
-        } else if let method = uiState.defaultMethod {
+        if let method = uiState.defaultMethod {
             return "\(method.label) · 포트원 안전결제"
         } else {
             return "기본 결제 수단을 설정해 주세요"
@@ -290,9 +335,7 @@ private struct MyInfoContentView: View {
     }
 
     private var recentTransactionSubtitle: String {
-        if uiState.isCoinInfoFailed {
-            return "불러오지 못했어요"
-        } else if let recent = uiState.recentTransaction {
+        if let recent = uiState.recentTransaction {
             return "최근 \(shortDate(recent.createdAt)) \(signedCoins(Int(recent.amount))) C"
         } else {
             return "아직 내역이 없어요"
@@ -300,9 +343,7 @@ private struct MyInfoContentView: View {
     }
 
     private var settlementAccountSubtitle: String {
-        if uiState.isEarningsFailed {
-            return "불러오지 못했어요"
-        } else if let account = uiState.settlementAccount {
+        if let account = uiState.settlementAccount {
             return "\(account.bankName) \(account.maskedNumber)"
         } else {
             return "계좌를 등록해 주세요"
@@ -310,9 +351,7 @@ private struct MyInfoContentView: View {
     }
 
     private var nextPayoutSubtitle: String {
-        if uiState.isEarningsFailed {
-            return "불러오지 못했어요"
-        } else if let payout = uiState.nextPayout {
+        if let payout = uiState.nextPayout {
             return "₩\(formatNumber(payout.amount)) · \(payout.dateLabel) 지급"
         } else {
             return "정산 예정 없음"
@@ -333,7 +372,13 @@ private struct MyInfoContentView: View {
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
     }
 
-    private func infoRow(title: String, subtitle: String, actionLabel: String, action: @escaping () -> Void) -> some View {
+    private func infoRow(
+        title: String,
+        subtitle: String?,
+        actionLabel: String,
+        actionColor: Color = PassmateColors.primaryDeep,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
@@ -341,16 +386,18 @@ private struct MyInfoContentView: View {
                         .font(.system(size: 15, weight: .medium))
                         .kerning(-0.3)
                         .foregroundColor(PassmateColors.textPrimary)
-                    Text(subtitle)
-                        .font(.system(size: 13))
-                        .kerning(-0.26)
-                        .foregroundColor(PassmateColors.textSecondary)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(.system(size: 13))
+                            .kerning(-0.26)
+                            .foregroundColor(PassmateColors.textSecondary)
+                    }
                 }
                 Spacer()
-                Text("\(actionLabel) ›")
+                Text(actionLabel.isEmpty ? "›" : "\(actionLabel) ›")
                     .font(.system(size: 14, weight: .medium))
                     .kerning(-0.28)
-                    .foregroundColor(PassmateColors.primaryDeep)
+                    .foregroundColor(actionColor)
             }
             .padding(.vertical, 14)
         }

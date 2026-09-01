@@ -56,6 +56,7 @@ struct ContentView: View {
                     onOpenCharge: { path.append(.coinCharge) },
                     onOpenEarnings: { path.append(.earnings) },
                     onOpenSettings: { path.append(.settings) },
+                    onOpenDeleteAccount: { path.append(.deleteAccount) },
                     onSignedOut: {
                         path = []
                         selectedTab = .home

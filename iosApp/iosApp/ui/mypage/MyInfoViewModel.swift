@@ -2,6 +2,9 @@ import Combine
 import Foundation
 import Shared
 
+// 약관 전용 화면·계약이 아직 없다 — 라우트가 생기기 전까지는 안내 문구만 노출한다
+private let termsNotice = "약관 · 개인정보 처리방침은 준비 중이에요"
+
 // Compose MyInfoViewModel.kt 미러 — 마이 탭 루트 (M-12): 프로필·코인·정산 3섹션 독립 로드
 final class MyInfoViewModel: ObservableObject {
     private let getMyProfileUseCase: GetMyProfileUseCase
@@ -119,6 +122,10 @@ final class MyInfoViewModel: ObservableObject {
             onEnter()
         case .retry:
             loadAll()
+        case .retryCoinInfo:
+            loadCoinInfo()
+        case .retryEarnings:
+            loadEarnings()
         case .clickProfile:
             event.send(.openReputation)
         case .clickEditProfile:
@@ -137,6 +144,10 @@ final class MyInfoViewModel: ObservableObject {
             event.send(.openNotifications)
         case .clickSettings:
             event.send(.openSettings)
+        case .clickDeleteAccount:
+            event.send(.openDeleteAccount)
+        case .clickTerms:
+            event.send(.showNotice(message: termsNotice))
         case .confirmSignOut:
             onConfirmSignOut()
         case .profileUpdated:

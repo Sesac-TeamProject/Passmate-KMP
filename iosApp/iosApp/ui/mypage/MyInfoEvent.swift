@@ -13,6 +13,7 @@ enum MyInfoEvent {
     case openEarnings
     case openNotifications
     case openSettings
+    case openDeleteAccount
     // 로그아웃 완료 → 홈 탭으로 (세션 정리는 shared가 수행)
     case signedOut
     case showNotice(message: String)
