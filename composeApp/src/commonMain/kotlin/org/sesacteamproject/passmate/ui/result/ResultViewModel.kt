@@ -136,6 +136,13 @@ class ResultViewModel(
         }
     }
 
+    // 문의 채널이 계약(contracts/)·라우트에 아직 없다 — 안내 문구만 노출하고 채널이 정해지면 교체한다
+    private fun onClickContactSupport() {
+        viewModelScope.launch {
+            _event.emit(ResultEvent.ShowNotice(CONTACT_NOTICE))
+        }
+    }
+
     // 게스트 가입 유도 — participantId를 대기 큐에 넣고 로그인 화면으로 (로그인 완료 후 claim, FR-036)
     private fun onClickSignup() {
         val participation = getMyParticipationUseCase.invoke()
@@ -232,6 +239,7 @@ class ResultViewModel(
             is ResultAction.ClickExport -> onClickExport()
             is ResultAction.ClickSignup -> onClickSignup()
             is ResultAction.Retry -> onRetry()
+            is ResultAction.ClickContactSupport -> onClickContactSupport()
             is ResultAction.OpenRatingSheet -> onOpenRatingSheet()
             is ResultAction.DismissRatingSheet -> onDismissRatingSheet()
             is ResultAction.SelectRatingStars -> onSelectRatingStars(action.stars)
@@ -244,5 +252,7 @@ class ResultViewModel(
 
     companion object {
         private const val RATING_COMMENT_MAX = 100
+
+        private const val CONTACT_NOTICE = "문의 접수는 준비 중이에요. 잠시 후 다시 시도해 주세요"
     }
 }
