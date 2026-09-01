@@ -14,12 +14,3 @@ internal actual fun GoogleSignInIcon(modifier: Modifier) {
         modifier = modifier
     )
 }
-
-@Composable
-internal actual fun AppleSignInIcon(modifier: Modifier) {
-    Image(
-        painter = painterResource(id = R.drawable.apple),
-        contentDescription = null,
-        modifier = modifier
-    )
-}

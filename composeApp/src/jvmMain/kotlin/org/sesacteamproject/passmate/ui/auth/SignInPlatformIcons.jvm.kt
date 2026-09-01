@@ -21,15 +21,6 @@ internal actual fun GoogleSignInIcon(modifier: Modifier) {
     )
 }
 
-@Composable
-internal actual fun AppleSignInIcon(modifier: Modifier) {
-    Image(
-        imageVector = appleSignInIconVector,
-        contentDescription = null,
-        modifier = modifier
-    )
-}
-
 private val googleSignInIconVector: ImageVector by lazy {
     ImageVector.Builder(
         name = "GoogleSignInIcon",
@@ -89,40 +80,6 @@ private val googleSignInIconVector: ImageVector by lazy {
             curveTo(9.91334f, 16.8297f, 8.14334f, 15.423f, 7.51f, 13.5264f)
             lineTo(4.85001f, 15.5897f)
             curveTo(6.17001f, 18.2064f, 8.87334f, 19.9997f, 12f, 19.9997f)
-            close()
-        }
-    }.build()
-}
-
-private val appleSignInIconVector: ImageVector by lazy {
-    ImageVector.Builder(
-        name = "AppleSignInIcon",
-        defaultWidth = 20.dp,
-        defaultHeight = 20.dp,
-        viewportWidth = 20f,
-        viewportHeight = 20f
-    ).apply {
-        path(
-            fill = SolidColor(Color.White),
-            strokeLineCap = StrokeCap.Butt,
-            strokeLineJoin = StrokeJoin.Miter,
-            pathFillType = PathFillType.NonZero
-        ) {
-            moveTo(14.2083f, 16.9f)
-            curveTo(13.3917f, 17.6917f, 12.5f, 17.5667f, 11.6417f, 17.1917f)
-            curveTo(10.7333f, 16.8083f, 9.89999f, 16.7917f, 8.94166f, 17.1917f)
-            curveTo(7.74166f, 17.7083f, 7.10833f, 17.5583f, 6.39166f, 16.9f)
-            curveTo(2.32499f, 12.7083f, 2.92499f, 6.325f, 7.54166f, 6.09167f)
-            curveTo(8.66666f, 6.15f, 9.44999f, 6.70833f, 10.1083f, 6.75833f)
-            curveTo(11.0917f, 6.55833f, 12.0333f, 5.98333f, 13.0833f, 6.05833f)
-            curveTo(14.3417f, 6.15833f, 15.2917f, 6.65833f, 15.9167f, 7.55833f)
-            curveTo(13.3167f, 9.11667f, 13.9333f, 12.5417f, 16.3167f, 13.5f)
-            curveTo(15.8417f, 14.75f, 15.225f, 15.9917f, 14.2f, 16.9083f)
-            lineTo(14.2083f, 16.9f)
-            close()
-            moveTo(10.025f, 6.04167f)
-            curveTo(9.89999f, 4.18333f, 11.4083f, 2.65f, 13.1417f, 2.5f)
-            curveTo(13.3833f, 4.65f, 11.1917f, 6.25f, 10.025f, 6.04167f)
             close()
         }
     }.build()
