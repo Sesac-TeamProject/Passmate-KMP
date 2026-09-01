@@ -20,7 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // 설정 — 마이 탭 우상단 "설정"에서 push. 회원 탈퇴는 전용 화면(M-12-12)으로 push한다
 @Composable
@@ -98,5 +100,18 @@ private fun SettingsContentScreen(
             )
             Text(text = "›", color = PassmateColors.TextTertiary, fontSize = 18.sp)
         }
+    }
+}
+
+// --- Preview ---
+
+@PassmatePreview
+@Composable
+private fun SettingsContentScreenPreview() {
+    PassmateTheme {
+        SettingsContentScreen(
+            onClickBack = {},
+            onClickDelete = {}
+        )
     }
 }

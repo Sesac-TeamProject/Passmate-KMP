@@ -48,10 +48,13 @@ import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
+import org.sesacteamproject.passmate.session.domain.model.AnswerResult
 import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.session.domain.model.RankEntry
 import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // Figma "UI 디자인 v6" M-03(349:9277)·M-04(349:9333)·M-05(349:9352) 기준 —
 // 문항 풀이·제출 결과·최종 결과를 서버 이벤트 단계(Phase)로 렌더링한다
@@ -988,4 +991,110 @@ private fun formatScore(total: Double): String {
     val digits = total.toLong().toString()
 
     return digits.reversed().chunked(3).joinToString(",").reversed()
+}
+
+// --- Preview ---
+
+private fun previewQuestion(isClosed: Boolean): SessionQuestion {
+    return SessionQuestion(
+        questionId = 501,
+        questionNo = 3,
+        type = QuestionType.MULTIPLE_CHOICE,
+        body = "등차수열 2, 5, 8, 11, ...의 공차를 구하세요.",
+        choices = listOf("1", "2", "3", "4"),
+        points = 100,
+        timeLimitSec = 30,
+        endsAt = "2026-08-28T10:15:30Z",
+        isClosed = isClosed
+    )
+}
+
+// 문항 풀이 중 — 남은 시간은 서버 endsAt 기준 렌더링만 한다 (규칙 §5)
+@PassmatePreview
+@Composable
+private fun PlayContentScreenQuestionPreview() {
+    PassmateTheme {
+        PlayContentScreen(
+            uiState = PlayUiState(
+                isLoading = false,
+                phase = PlayUiState.Phase.QUESTION,
+                questionCount = 8,
+                question = previewQuestion(isClosed = false),
+                selectedChoiceIndex = 2,
+                remainingSeconds = 18,
+                myParticipantId = 9001,
+                myNickname = "민지",
+                isGuest = false
+            ),
+            onAction = {},
+            onClickLeave = {}
+        )
+    }
+}
+
+// QUESTION_ENDED 정답 공개 — 정답은 이 시점에만 온다 (규칙 §13)
+@PassmatePreview
+@Composable
+private fun PlayContentScreenRevealPreview() {
+    PassmateTheme {
+        PlayContentScreen(
+            uiState = PlayUiState(
+                isLoading = false,
+                phase = PlayUiState.Phase.QUESTION,
+                questionCount = 8,
+                question = previewQuestion(isClosed = true),
+                remainingSeconds = 0,
+                hasSubmitted = true,
+                myAnswerResult = AnswerResult(
+                    correct = true,
+                    baseScore = 100.0,
+                    speedBonus = 20.0,
+                    earnedScore = 120.0,
+                    totalScore = 480.0,
+                    rank = 2,
+                    rankDelta = 1,
+                    isProvisional = false
+                ),
+                reveal = PlayUiState.Reveal(
+                    answer = "3",
+                    explanation = "이웃한 두 항의 차 5-2=3, 8-5=3으로 공차는 3이에요.",
+                    correctAnswererCount = 5
+                ),
+                totalScore = 480.0,
+                rank = 2,
+                myParticipantId = 9001,
+                myNickname = "민지"
+            ),
+            onAction = {},
+            onClickLeave = {}
+        )
+    }
+}
+
+// GAME_FINISHED 직후 최종 순위 — Result 라우트 전환 전 화면
+@PassmatePreview
+@Composable
+private fun PlayContentScreenFinishedPreview() {
+    PassmateTheme {
+        PlayContentScreen(
+            uiState = PlayUiState(
+                isLoading = false,
+                phase = PlayUiState.Phase.FINISHED,
+                questionCount = 8,
+                totalScore = 990.0,
+                myCorrectCount = 6,
+                rank = 3,
+                finalRanking = listOf(
+                    RankEntry(rank = 1, participantId = 9002, nickname = "준영", avatarId = 2, total = 1240.0),
+                    RankEntry(rank = 2, participantId = 9003, nickname = "혜림", avatarId = 5, total = 1180.0),
+                    RankEntry(rank = 3, participantId = 9001, nickname = "민지", avatarId = 1, total = 990.0)
+                ),
+                myParticipantId = 9001,
+                myNickname = "민지",
+                isGuest = false
+            ),
+            onAction = {},
+            onClickLeave = {}
+        )
+    }
 }

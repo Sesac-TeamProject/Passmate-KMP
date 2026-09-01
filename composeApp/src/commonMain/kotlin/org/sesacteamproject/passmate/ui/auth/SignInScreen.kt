@@ -33,7 +33,9 @@ import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // Figma "UI 디자인 v6" M-Login(349:9040) 기준 — 민트 히어로 + 하단 로그인 시트
 @Composable
@@ -263,3 +265,31 @@ private fun GuestEnterButton(
 
 @Composable
 internal expect fun GoogleSignInIcon(modifier: Modifier = Modifier)
+
+@Composable
+internal expect fun AppleSignInIcon(modifier: Modifier = Modifier)
+
+// --- Preview ---
+
+@PassmatePreview
+@Composable
+private fun SignInContentScreenPreview() {
+    PassmateTheme {
+        SignInContentScreen(
+            uiState = SignInUiState(),
+            onAction = {}
+        )
+    }
+}
+
+// 소셜 로그인 진행 중 — 버튼 비활성 + 스피너
+@PassmatePreview
+@Composable
+private fun SignInContentScreenSigningInPreview() {
+    PassmateTheme {
+        SignInContentScreen(
+            uiState = SignInUiState(isSigningIn = true),
+            onAction = {}
+        )
+    }
+}
