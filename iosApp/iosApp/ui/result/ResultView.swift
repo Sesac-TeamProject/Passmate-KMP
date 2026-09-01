@@ -100,7 +100,7 @@ private struct ResultContentView: View {
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
-    // 시안 M-06e 불러오기 실패 — 상단 경고 바·헤더·알림 아이콘·안내 문구·재시도/문의 버튼
+    // 시안 M-05e 최종 결과 불러오기 실패 — 상단 경고 바·헤더·알림 아이콘·안내 문구·재시도/홈으로 버튼
     private var errorView: some View {
         VStack(spacing: 0) {
             Rectangle()
@@ -109,19 +109,19 @@ private struct ResultContentView: View {
             errorHeader
             VStack(spacing: 0) {
                 alertCircleIcon
-                Text("리포트를 불러오지 못했어요")
+                Text("결과를 불러오지 못했어요")
                     .font(.system(size: 22, weight: .bold))
                     .kerning(-0.22)
                     .multilineTextAlignment(.center)
                     .foregroundColor(PassmateColors.textPrimary)
                     .padding(.top, 20)
-                Text("잠시 후 다시 시도해 주세요.\n계속 안 되면 방이 삭제됐을 수 있어요.")
+                Text("잠시 후 다시 시도해 주세요.\n제출한 답안은 이미 저장돼 사라지지 않아요.")
                     .font(.system(size: 15))
                     .lineSpacing(15 * 0.65)
                     .multilineTextAlignment(.center)
                     .foregroundColor(PassmateColors.textSecondary)
                     .padding(.top, 10)
-                Text("이미 저장된 리포트는\n마이 › 참여한 방에서 볼 수 있어요")
+                Text("결과는 마이 › 참여한 방에서도\n나중에 다시 볼 수 있어요")
                     .font(.system(size: 14))
                     .lineSpacing(14 * 0.65)
                     .multilineTextAlignment(.center)
@@ -131,7 +131,7 @@ private struct ResultContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, 20)
             retryButton
-            contactButton
+            goHomeButton
                 .padding(.top, 10)
                 .padding(.bottom, 24)
         }
@@ -144,7 +144,7 @@ private struct ResultContentView: View {
                     .font(.system(size: 20))
                     .foregroundColor(PassmateColors.textPrimary)
             }
-            Text("리포트")
+            Text("최종 결과")
                 .font(.system(size: 15, weight: .bold))
                 .kerning(-0.3)
                 .foregroundColor(PassmateColors.textPrimary)
@@ -185,11 +185,10 @@ private struct ResultContentView: View {
         .padding(.horizontal, 20)
     }
 
-    private var contactButton: some View {
-        Button {
-            onAction(.clickContactSupport)
-        } label: {
-            Text("문의하기")
+    // 시안 M-05e — 두 번째 버튼은 홈으로. onBack은 ResultView에서 onClickHome으로 배선된다
+    private var goHomeButton: some View {
+        Button(action: onBack) {
+            Text("홈으로")
                 .font(.system(size: 16, weight: .bold))
                 .kerning(-0.32)
                 .foregroundColor(PassmateColors.textPrimary)

@@ -49,7 +49,7 @@ enum PassmateColors {
 
     static let wrongPinkText = Color(hex: 0x7C1F26)
 
-    // 오류 아이콘 원형 배경 — wrongPink 계열 연한 톤 (v6 M-06e 리포트 불러오기 실패)
+    // 오류 아이콘 원형 배경 — wrongPink 계열 연한 톤 (v6 M-05e 리포트 불러오기 실패)
     static let errorIconBg = Color(hex: 0xFDEEEF)
 
     static let weakTopicBg = Color(hex: 0xFDEFDE)

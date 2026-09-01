@@ -52,7 +52,7 @@ object PassmateColors {
 
     val WrongPinkText = Color(0xFF7C1F26)
 
-    // 오류 아이콘 원형 배경 — WrongPink 계열 연한 톤 (v6 M-06e 리포트 불러오기 실패)
+    // 오류 아이콘 원형 배경 — WrongPink 계열 연한 톤 (v6 M-05e 리포트 불러오기 실패)
     val ErrorIconBg = Color(0xFFFDEEEF)
 
     val WeakTopicBg = Color(0xFFFDEFDE)

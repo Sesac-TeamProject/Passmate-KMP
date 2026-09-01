@@ -6,8 +6,7 @@ enum ResultAction {
     case clickExport
     case clickSignup
     case retry
-    // 불러오기 실패(M-06e) 하단 문의 버튼 — 문의 채널이 계약에 없어 안내만 한다
-    case clickContactSupport
+    // 불러오기 실패(M-05e) 하단 문의 버튼 — 문의 채널이 계약에 없어 안내만 한다
     // 평가 시트 (T080)
     case openRatingSheet
     case dismissRatingSheet

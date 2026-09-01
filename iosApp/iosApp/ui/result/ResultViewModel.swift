@@ -140,9 +140,6 @@ final class ResultViewModel: ObservableObject {
     }
 
     // 문의 채널이 계약(contracts/)·라우트에 아직 없다 — 안내 문구만 노출하고 채널이 정해지면 교체한다
-    private func onClickContactSupport() {
-        event.send(.showNotice(message: Self.contactNotice))
-    }
 
     // 게스트 가입 유도 — participantId를 대기 큐에 넣고 로그인 화면으로 (FR-036)
     private func onClickSignup() {
@@ -218,8 +215,6 @@ final class ResultViewModel: ObservableObject {
             onClickSignup()
         case .retry:
             onRetry()
-        case .clickContactSupport:
-            onClickContactSupport()
         case .openRatingSheet:
             uiState.isRatingSheetVisible = true
         case .dismissRatingSheet:
