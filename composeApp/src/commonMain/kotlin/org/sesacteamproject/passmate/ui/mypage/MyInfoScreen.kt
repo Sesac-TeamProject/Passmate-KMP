@@ -43,7 +43,13 @@ import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.payment.domain.model.CoinTransaction
+import org.sesacteamproject.passmate.payment.domain.model.NextPayout
+import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
+import org.sesacteamproject.passmate.payment.domain.model.SettlementAccountSummary
+import org.sesacteamproject.passmate.preview.PassmatePreview
+import org.sesacteamproject.passmate.room.domain.model.HostLevel
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 import org.sesacteamproject.passmate.ui.payment.PaymentMethodSheet
 import org.sesacteamproject.passmate.ui.payment.SettlementAccountSheet
 import org.sesacteamproject.passmate.user.domain.model.UserProfile
@@ -603,4 +609,77 @@ private fun signedCoins(amount: Int): String {
 
 private fun formatNumber(value: Long): String {
     return value.toString().reversed().chunked(3).joinToString(",").reversed()
+}
+
+// --- Preview ---
+
+@PassmatePreview
+@Composable
+private fun MyInfoContentScreenPreview() {
+    PassmateTheme {
+        MyInfoContentScreen(
+            uiState = MyInfoUiState(
+                isLoading = false,
+                profile = UserProfile(
+                    nickname = "준영",
+                    email = "junyoung@example.com",
+                    joinedAt = "2026-08-01",
+                    avatarId = 1,
+                    level = HostLevel.GROWING,
+                    coins = 1200L,
+                    joinedRoomCount = 32,
+                    hostedRoomCount = 12
+                ),
+                defaultMethod = PaymentMethod.KAKAO_PAY,
+                settlementAccount = SettlementAccountSummary(
+                    bankName = "국민",
+                    maskedNumber = "***-***-4821",
+                    payoutNote = null
+                ),
+                nextPayout = NextPayout(dateLabel = "9/5", amount = 64000L)
+            ),
+            onAction = {},
+            onClickSignOut = {}
+        )
+    }
+}
+
+// 코인·정산 카드만 실패 — 프로필은 정상이라 전체 에러로 처리하지 않는다 (규칙 §9)
+@PassmatePreview
+@Composable
+private fun MyInfoContentScreenPartialFailurePreview() {
+    PassmateTheme {
+        MyInfoContentScreen(
+            uiState = MyInfoUiState(
+                isLoading = false,
+                profile = UserProfile(
+                    nickname = "준영",
+                    email = null,
+                    joinedAt = null,
+                    avatarId = 1,
+                    level = null,
+                    coins = null,
+                    joinedRoomCount = null,
+                    hostedRoomCount = null
+                ),
+                isCoinInfoFailed = true,
+                isEarningsFailed = true
+            ),
+            onAction = {},
+            onClickSignOut = {}
+        )
+    }
+}
+
+// 프로필 로드 실패 — 전체 에러
+@PassmatePreview
+@Composable
+private fun MyInfoContentScreenFailedPreview() {
+    PassmateTheme {
+        MyInfoContentScreen(
+            uiState = MyInfoUiState(isLoading = false, loadFailed = true),
+            onAction = {},
+            onClickSignOut = {}
+        )
+    }
 }
