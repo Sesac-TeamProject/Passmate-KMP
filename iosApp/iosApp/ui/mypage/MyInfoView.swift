@@ -240,9 +240,9 @@ private struct MyInfoContentView: View {
                         rowDivider
                         infoRow(
                             title: "회원 탈퇴",
-                            subtitle: "기록과 보유 코인이 모두 삭제돼요",
-                            actionLabel: "탈퇴",
-                            actionColor: PassmateColors.weakTopicText
+                            subtitle: nil,
+                            actionLabel: "",
+                            actionColor: PassmateColors.destructive
                         ) { onAction(.clickDeleteAccount) }
                     }
                 }
@@ -334,7 +334,7 @@ private struct MyInfoContentView: View {
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
     }
 
-    private func infoRow(title: String, subtitle: String, actionLabel: String, actionColor: Color = PassmateColors.primaryDeep, action: @escaping () -> Void) -> some View {
+    private func infoRow(title: String, subtitle: String?, actionLabel: String, actionColor: Color = PassmateColors.primaryDeep, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
@@ -342,13 +342,15 @@ private struct MyInfoContentView: View {
                         .font(.system(size: 15, weight: .medium))
                         .kerning(-0.3)
                         .foregroundColor(PassmateColors.textPrimary)
-                    Text(subtitle)
-                        .font(.system(size: 13))
-                        .kerning(-0.26)
-                        .foregroundColor(PassmateColors.textSecondary)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(.system(size: 13))
+                            .kerning(-0.26)
+                            .foregroundColor(PassmateColors.textSecondary)
+                    }
                 }
                 Spacer()
-                Text("\(actionLabel) ›")
+                Text(actionLabel.isEmpty ? "›" : "\(actionLabel) ›")
                     .font(.system(size: 14, weight: .medium))
                     .kerning(-0.28)
                     .foregroundColor(actionColor)

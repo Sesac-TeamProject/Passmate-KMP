@@ -299,9 +299,9 @@ private fun LoadedMyInfo(
                 RowDivider()
                 InfoRow(
                     title = "회원 탈퇴",
-                    subtitle = "기록과 보유 코인이 모두 삭제돼요",
-                    actionLabel = "탈퇴",
-                    actionColor = PassmateColors.WeakTopicText,
+                    subtitle = null,
+                    actionLabel = "",
+                    actionColor = PassmateColors.Destructive,
                     onClick = { onAction(MyInfoAction.ClickDeleteAccount) }
                 )
             }
@@ -382,7 +382,7 @@ private fun RowDivider() {
 @Composable
 private fun InfoRow(
     title: String,
-    subtitle: String,
+    subtitle: String?,
     actionLabel: String,
     actionColor: Color = PassmateColors.PrimaryDeep,
     onClick: () -> Unit
@@ -405,15 +405,17 @@ private fun InfoRow(
                 fontWeight = FontWeight.Medium,
                 letterSpacing = (-0.3).sp
             )
-            Text(
-                text = subtitle,
-                color = PassmateColors.TextSecondary,
-                fontSize = 13.sp,
-                letterSpacing = (-0.26).sp
-            )
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    color = PassmateColors.TextSecondary,
+                    fontSize = 13.sp,
+                    letterSpacing = (-0.26).sp
+                )
+            }
         }
         Text(
-            text = "$actionLabel ›",
+            text = if (actionLabel.isEmpty()) "›" else "$actionLabel ›",
             color = actionColor,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
