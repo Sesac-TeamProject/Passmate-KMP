@@ -140,6 +140,11 @@
 		A1010001152AABBCCDDEEFF0152 /* SettingsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001152AABBCCDDEEFF0152 /* SettingsEvent.swift */; };
 		A1010001153AABBCCDDEEFF0153 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001153AABBCCDDEEFF0153 /* SettingsViewModel.swift */; };
 		A1010001154AABBCCDDEEFF0154 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001154AABBCCDDEEFF0154 /* SettingsView.swift */; };
+		A1010000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift */; };
+		A1010000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift */; };
+		A1010000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */; };
+		A1010000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift */; };
+		A1010000168AABBCCDDEEFF0168 /* DeleteAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEEFF0168 /* DeleteAccountView.swift */; };
 		A1010001155AABBCCDDEEFF0155 /* RouteStackLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001155AABBCCDDEEFF0155 /* RouteStackLevel.swift */; };
 		A1010001156AABBCCDDEEFF0156 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */; };
 		A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */; };
@@ -287,6 +292,11 @@
 		A1011001152AABBCCDDEEFF0152 /* SettingsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsEvent.swift; sourceTree = "<group>"; };
 		A1011001153AABBCCDDEEFF0153 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		A1011001154AABBCCDDEEFF0154 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A1011000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountUiState.swift; sourceTree = "<group>"; };
+		A1011000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountAction.swift; sourceTree = "<group>"; };
+		A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountEvent.swift; sourceTree = "<group>"; };
+		A1011000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountViewModel.swift; sourceTree = "<group>"; };
+		A1011000168AABBCCDDEEFF0168 /* DeleteAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountView.swift; sourceTree = "<group>"; };
 		A1011001155AABBCCDDEEFF0155 /* RouteStackLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteStackLevel.swift; sourceTree = "<group>"; };
 		A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakTopicsRow.swift; sourceTree = "<group>"; };
@@ -484,6 +494,11 @@
 				A1011001152AABBCCDDEEFF0152 /* SettingsEvent.swift */,
 				A1011001153AABBCCDDEEFF0153 /* SettingsViewModel.swift */,
 				A1011001154AABBCCDDEEFF0154 /* SettingsView.swift */,
+				A1011000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift */,
+				A1011000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift */,
+				A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */,
+				A1011000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift */,
+				A1011000168AABBCCDDEEFF0168 /* DeleteAccountView.swift */,
 			);
 			path = mypage;
 			sourceTree = "<group>";
@@ -831,6 +846,11 @@
 				A1010001152AABBCCDDEEFF0152 /* SettingsEvent.swift in Sources */,
 				A1010001153AABBCCDDEEFF0153 /* SettingsViewModel.swift in Sources */,
 				A1010001154AABBCCDDEEFF0154 /* SettingsView.swift in Sources */,
+				A1010000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift in Sources */,
+				A1010000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift in Sources */,
+				A1010000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift in Sources */,
+				A1010000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift in Sources */,
+				A1010000168AABBCCDDEEFF0168 /* DeleteAccountView.swift in Sources */,
 				A1010001155AABBCCDDEEFF0155 /* RouteStackLevel.swift in Sources */,
 				A1010001156AABBCCDDEEFF0156 /* FlowLayout.swift in Sources */,
 				A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */,

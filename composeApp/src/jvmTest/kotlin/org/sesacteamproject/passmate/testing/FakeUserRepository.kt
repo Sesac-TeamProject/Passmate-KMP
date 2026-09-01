@@ -19,6 +19,8 @@ class FakeUserRepository(
 
     var myPageCalls: MutableList<String?> = mutableListOf()
 
+    var deleteCalls: Int = 0
+
     override suspend fun getMyPage(cursor: String?): AppResult<MyPage> {
         val index = myPageCalls.size
 
@@ -59,6 +61,7 @@ class FakeUserRepository(
     }
 
     override suspend fun deleteAccount(): AppResult<Unit> {
+        deleteCalls += 1
         return deleteResult
     }
 

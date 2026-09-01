@@ -29,6 +29,7 @@ import org.sesacteamproject.passmate.ui.join.JoinScreen
 import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsScreen
 import org.sesacteamproject.passmate.ui.hostroom.RoomReportScreen
 import org.sesacteamproject.passmate.ui.hostroom.SessionControlScreen
+import org.sesacteamproject.passmate.ui.mypage.DeleteAccountScreen
 import org.sesacteamproject.passmate.ui.mypage.JoinedRoomsScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
@@ -108,6 +109,7 @@ private fun NavigationAction.destinationTemplate(): String? {
         is NavigationAction.NavigateToSessionControl -> Route.SessionControl.route
         is NavigationAction.NavigateToEarnings -> Route.Earnings.route
         is NavigationAction.NavigateToSettings -> Route.Settings.route
+        is NavigationAction.NavigateToDeleteAccount -> Route.DeleteAccount.route
         // 복귀 대상이 될 수 없는 액션 — SignIn·로그인 성공 처리·뒤로가기 (스펙 §0)
         is NavigationAction.NavigateToSignIn -> null
         is NavigationAction.NavigateAfterSignIn -> null
@@ -153,6 +155,7 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
         is NavigationAction.NavigateToCoinCharge -> navigate(Route.CoinCharge.route)
         is NavigationAction.NavigateToEarnings -> navigate(Route.Earnings.route)
         is NavigationAction.NavigateToSettings -> navigate(Route.Settings.route)
+        is NavigationAction.NavigateToDeleteAccount -> navigate(Route.DeleteAccount.route)
         is NavigationAction.NavigateBack -> popBackStack()
     }
 }
@@ -326,6 +329,9 @@ actual fun AppNavHost() {
             }
             composable(Route.Settings.route) {
                 SettingsScreen(onNavigate = onNavigate)
+            }
+            composable(Route.DeleteAccount.route) {
+                DeleteAccountScreen(onNavigate = onNavigate)
             }
         }
     }

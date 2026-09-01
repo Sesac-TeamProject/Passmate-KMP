@@ -9,37 +9,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
-import org.sesacteamproject.passmate.core.model.AppError
-import org.sesacteamproject.passmate.core.model.AppResult
 import org.sesacteamproject.passmate.testing.FakeAuthRepository
-import org.sesacteamproject.passmate.testing.FakeUserRepository
 import org.sesacteamproject.passmate.testing.TestMainDispatcher
-import org.sesacteamproject.passmate.user.domain.usecase.DeleteAccountUseCase
 
+// 탈퇴 동작 테스트는 DeleteAccountViewModelTest로 옮겼다 (M-12-12 전용 화면 분리)
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsViewModelTest {
 
-    private fun viewModel(
-        isSignedIn: Boolean,
-        deleteResult: AppResult<Unit> = AppResult.Success(Unit)
-    ): SettingsViewModel {
-        val authRepository = FakeAuthRepository(isSignedIn)
-        val userRepository = FakeUserRepository(deleteResult = deleteResult)
-
-        return SettingsViewModel(
-            deleteAccountUseCase = DeleteAccountUseCase(userRepository, authRepository),
-            isSignedInUseCase = IsSignedInUseCase(authRepository)
-        )
-    }
-
-    @BeforeTest
-    fun setUp() {
-        TestMainDispatcher.install()
-    }
-
-    @AfterTest
-    fun tearDown() {
-        TestMainDispatcher.reset()
+    private fun viewModel(isSignedIn: Boolean): SettingsViewModel {
+        return SettingsViewModel(isSignedInUseCase = IsSignedInUseCase(FakeAuthRepository(isSignedIn)))
     }
 
     @Test
@@ -56,7 +34,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun deleteAccountSuccessEmitsAccountDeleted() = runTest {
+    fun memberEnterEmitsNothing() = runTest {
         val viewModel = viewModel(isSignedIn = true)
         val events = mutableListOf<SettingsEvent>()
 
@@ -64,26 +42,17 @@ class SettingsViewModelTest {
             viewModel.event.collect { events.add(it) }
         }
         viewModel.onAction(SettingsAction.Enter)
-        viewModel.onAction(SettingsAction.ConfirmDeleteAccount)
 
-        assertEquals(listOf<SettingsEvent>(SettingsEvent.AccountDeleted), events)
-        assertEquals(false, viewModel.uiState.value.isProcessing)
+        assertEquals(emptyList(), events)
     }
 
-    @Test
-    fun deleteAccountConflictShowsServerMessage() = runTest {
-        val viewModel = viewModel(
-            isSignedIn = true,
-            deleteResult = AppResult.Failure(AppError.Conflict(serverMessage = "정산 대기 금액이 있어요"))
-        )
-        val events = mutableListOf<SettingsEvent>()
+    @BeforeTest
+    fun setUp() {
+        TestMainDispatcher.install()
+    }
 
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.event.collect { events.add(it) }
-        }
-        viewModel.onAction(SettingsAction.Enter)
-        viewModel.onAction(SettingsAction.ConfirmDeleteAccount)
-
-        assertEquals(listOf<SettingsEvent>(SettingsEvent.ShowNotice("정산 대기 금액이 있어요")), events)
+    @AfterTest
+    fun tearDown() {
+        TestMainDispatcher.reset()
     }
 }

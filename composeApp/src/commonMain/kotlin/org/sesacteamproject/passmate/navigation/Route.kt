@@ -49,4 +49,7 @@ sealed class Route(val route: String) {
     data object CoinCharge : Route("coinCharge")
 
     data object Settings : Route("settings")
+
+    // 회원 탈퇴 (M-12-12) — 설정에서 진입
+    data object DeleteAccount : Route("deleteAccount")
 }

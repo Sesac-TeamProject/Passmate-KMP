@@ -9,6 +9,7 @@ import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsViewModel
 import org.sesacteamproject.passmate.ui.hostroom.RoomReportViewModel
 import org.sesacteamproject.passmate.ui.hostroom.SessionControlViewModel
 import org.sesacteamproject.passmate.ui.join.JoinViewModel
+import org.sesacteamproject.passmate.ui.mypage.DeleteAccountViewModel
 import org.sesacteamproject.passmate.ui.mypage.JoinedRoomsViewModel
 import org.sesacteamproject.passmate.ui.mypage.MyInfoViewModel
 import org.sesacteamproject.passmate.ui.payment.CoinChargeViewModel
@@ -39,7 +40,8 @@ val viewModelModule = module {
     factory { ResultViewModel(get(), get(), get(), get(), get(), get(), get()) }
     factory { JoinedRoomsViewModel(get(), get()) }
     factory { MyInfoViewModel(get(), get(), get(), get(), get()) }
-    factory { SettingsViewModel(get(), get()) }
+    factory { SettingsViewModel(get()) }
+    factory { DeleteAccountViewModel(get(), get()) }
     factory { ReputationViewModel(get(), get(), get()) }
     factory { HostProfileViewModel(get(), get(), get(), get()) }
     factory { HostedRoomsViewModel(get(), get(), get()) }

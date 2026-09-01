@@ -52,5 +52,8 @@ sealed interface NavigationAction {
     // 설정(내 정보 관리, M-12) — 마이 탭 우상단 "설정"에서 진입 (규칙 §2-1-1: Settings는 MyInfo의 상세 push)
     data object NavigateToSettings : NavigationAction
 
+    // 회원 탈퇴 (M-12-12) — 설정에서 진입
+    data object NavigateToDeleteAccount : NavigationAction
+
     data object NavigateBack : NavigationAction
 }

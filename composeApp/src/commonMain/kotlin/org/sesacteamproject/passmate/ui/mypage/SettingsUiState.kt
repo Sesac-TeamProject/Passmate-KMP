@@ -1,6 +1,4 @@
 package org.sesacteamproject.passmate.ui.mypage
 
-data class SettingsUiState(
-    // 탈퇴 요청 in-flight — 중복 호출 방지 (규칙 §9)
-    val isProcessing: Boolean = false
-)
+// 설정 — 회원 탈퇴는 전용 화면(M-12-12)으로 분리했다. 여기는 회원 가드만 남는다
+class SettingsUiState
