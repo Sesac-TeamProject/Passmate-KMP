@@ -83,6 +83,8 @@ final class EarningsViewModel: ObservableObject {
             load()
         case .loadMore:
             onLoadMore()
+        case .clickViewAllHistory:
+            event.send(.openCoinHistory)
         case .clickManageAccount:
             event.send(.openAccountSheet)
         case .accountSaved:

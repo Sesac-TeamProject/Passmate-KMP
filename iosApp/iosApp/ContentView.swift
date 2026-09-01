@@ -190,6 +190,7 @@ struct ContentView: View {
         case .earnings:
             EarningsView(
                 onRequireSignIn: { pushSignIn(pendingRoute: .earnings, path: path) },
+                onOpenCoinHistory: { path.wrappedValue.append(.coinHistory) },
                 onBack: { popOnce(path) }
             )
         case let .sessionControl(roomId, pin):
