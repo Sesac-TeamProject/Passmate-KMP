@@ -1,7 +1,10 @@
 import SwiftUI
 import Shared
 
-// Figma "UI 디자인 v6" M-09(349:9770) 미러 — 내 명성·뱃지 상세: 등급 카드(승급 진행도·조건)+뱃지 컬렉션
+// 한 줄에 놓는 뱃지 수 (시안 M-09 뱃지 컬렉션 그리드)
+private let badgesPerRow = 4
+
+// Figma "UI 디자인 v6" M-09(349:9770) 미러 — 명성 · 뱃지 상세: 프로필+등급 카드(승급 진행도·조건)+뱃지 컬렉션
 struct ReputationView: View {
     var onRequireSignIn: () -> Void = {}
 
@@ -10,6 +13,7 @@ struct ReputationView: View {
     @StateObject private var viewModel = ReputationViewModel(
         getMyGradeUseCase: KoinHelper.shared.getMyGradeUseCase(),
         getMyBadgesUseCase: KoinHelper.shared.getMyBadgesUseCase(),
+        getMyProfileUseCase: KoinHelper.shared.getMyProfileUseCase(),
         isSignedInUseCase: KoinHelper.shared.isSignedInUseCase()
     )
 
@@ -39,7 +43,8 @@ private struct ReputationContentView: View {
     let onClickBack: () -> Void
 
     var body: some View {
-        Group {
+        VStack(alignment: .leading, spacing: 0) {
+            header
             if uiState.isLoading {
                 ProgressView()
                     .tint(PassmateColors.primary)
@@ -50,8 +55,27 @@ private struct ReputationContentView: View {
                 loadedView
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(PassmateColors.surface.ignoresSafeArea())
+    }
+
+    private var header: some View {
+        HStack(spacing: 12) {
+            Button(action: onClickBack) {
+                Text("←")
+                    .font(.system(size: 22))
+                    .foregroundColor(PassmateColors.textPrimary)
+                    .frame(width: 24, height: 24)
+            }
+            Text("명성 · 뱃지")
+                .font(.system(size: 24, weight: .bold))
+                .kerning(-0.48)
+                .foregroundColor(PassmateColors.textPrimary)
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 12)
     }
 
     private var errorView: some View {
@@ -74,29 +98,88 @@ private struct ReputationContentView: View {
 
     private var loadedView: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text("내 명성")
-                        .font(.system(size: 24, weight: .bold))
-                        .kerning(-0.48)
-                        .foregroundColor(PassmateColors.textPrimary)
-                    Spacer()
-                    Button(action: onClickBack) {
-                        Text("닫기")
-                            .font(.system(size: 14, weight: .medium))
-                            .kerning(-0.28)
-                            .foregroundColor(PassmateColors.textSecondary)
-                    }
+            VStack(alignment: .leading, spacing: 12) {
+                if let profile = uiState.profile {
+                    ProfileCardView(
+                        profile: profile,
+                        stats: uiState.grade?.stats,
+                        level: uiState.grade?.level ?? profile.level
+                    )
                 }
                 if let grade = uiState.grade {
                     GradeCardView(grade: grade)
                 }
                 BadgeSectionView(badges: uiState.badges)
+                if let grade = uiState.grade, grade.level.level < Shared.HostLevel.verified.level {
+                    paidRoomLockedCta
+                }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 32)
-            .padding(.bottom, 24)
+            .padding(.top, 8)
+            .padding(.bottom, 20)
         }
+    }
+
+    // 시안의 잠긴 CTA — Lv.3 미만에서만 노출한다. 방 개설 진입은 '내가 만든 방' 탭이 담당하므로 안내 전용이다
+    private var paidRoomLockedCta: some View {
+        Text("🔒 유료 방 만들기 — Lv.3부터")
+            .font(.system(size: 14, weight: .medium))
+            .kerning(-0.28)
+            .foregroundColor(PassmateColors.textTertiary)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(PassmateColors.fieldGray)
+            .cornerRadius(16)
+    }
+}
+
+private struct ProfileCardView: View {
+    let profile: UserProfile
+
+    let stats: GradeStats?
+
+    let level: HostLevel?
+
+    var body: some View {
+        HStack(spacing: 14) {
+            StudentAvatarView(avatarId: profile.avatarId.map { Int(truncating: $0) } ?? StudentAvatars.defaultId)
+                .frame(width: 56, height: 56)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Text(profile.nickname)
+                        .font(.system(size: 16, weight: .medium))
+                        .kerning(-0.32)
+                        .foregroundColor(PassmateColors.textPrimary)
+                    if let level {
+                        ReputationBadgeView(level: level)
+                    }
+                }
+                if let stats {
+                    Text(statsLine(stats))
+                        .font(.system(size: 12))
+                        .kerning(-0.24)
+                        .foregroundColor(PassmateColors.textSecondary)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(PassmateColors.surface)
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(PassmateColors.border, lineWidth: 1))
+    }
+
+    // 시안 "참여 18회 · 평균 정답률 72% · 방 운영 12회" — 서버가 준 집계만 이어 붙인다
+    private func statsLine(_ stats: GradeStats) -> String {
+        var parts = ["참여 \(stats.participationCount)회"]
+
+        if let accuracy = stats.avgAccuracyPercent?.intValue {
+            parts.append("평균 정답률 \(accuracy)%")
+        }
+        parts.append("방 운영 \(stats.roomCount)회")
+
+        return parts.joined(separator: " · ")
     }
 }
 
@@ -110,19 +193,19 @@ private struct GradeCardView: View {
                     .frame(width: 48, height: 48)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Lv.\(grade.level.level) \(grade.level.label)")
-                        .font(.system(size: 18, weight: .bold))
-                        .kerning(-0.36)
+                        .font(.system(size: 16, weight: .medium))
+                        .kerning(-0.32)
                         .foregroundColor(PassmateColors.textPrimary)
                     Text(nextLevelLine)
-                        .font(.system(size: 13))
-                        .kerning(-0.26)
+                        .font(.system(size: 12))
+                        .kerning(-0.24)
                         .foregroundColor(PassmateColors.textSecondary)
                 }
                 Spacer()
                 if let next = grade.next {
                     Text("\(next.progressPercent)%")
-                        .font(.system(size: 18, weight: .bold))
-                        .kerning(-0.36)
+                        .font(.system(size: 14, weight: .medium))
+                        .kerning(-0.28)
                         .foregroundColor(PassmateColors.primaryDeep)
                 }
             }
@@ -136,11 +219,12 @@ private struct GradeCardView: View {
                 }
             }
             Text("Lv.3 달성 후 하락 없음 · Lv.4~5만 30일 활동 유지 조건")
-                .font(.system(size: 12))
-                .kerning(-0.24)
-                .foregroundColor(PassmateColors.textTertiary)
+                .font(.system(size: 14, weight: .medium))
+                .kerning(-0.28)
+                .foregroundColor(PassmateColors.textSecondary)
         }
-        .padding(18)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
         .background(PassmateColors.surface)
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(PassmateColors.border, lineWidth: 1))
     }
@@ -156,15 +240,15 @@ private struct GradeCardView: View {
     private var unlockNoteBox: some View {
         HStack(spacing: 8) {
             LevelEmblemView(level: .verified)
-                .frame(width: 18, height: 18)
+                .frame(width: 24, height: 24)
             Text("Lv.3이 되면 유료 방을 열고 참가비의 80%를 정산받아요")
-                .font(.system(size: 13, weight: .medium))
-                .kerning(-0.26)
-                .foregroundColor(PassmateColors.primaryDeep)
+                .font(.system(size: 14, weight: .medium))
+                .kerning(-0.28)
+                .foregroundColor(PassmateColors.reputationBadgeText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .background(PassmateColors.backgroundMint)
         .cornerRadius(12)
     }
@@ -182,7 +266,7 @@ private struct GradeCardView: View {
                 }
             }
         }
-        .frame(height: 10)
+        .frame(height: 8)
     }
 
     private func criteria(_ next: NextGrade) -> [GradeCriterion] {
@@ -202,12 +286,12 @@ private struct CriterionRowView: View {
             Spacer()
             if criterion.met {
                 Text("✓ \(formatNumber(criterion.current))")
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.system(size: 14, weight: .medium))
                     .kerning(-0.28)
                     .foregroundColor(PassmateColors.primaryDeep)
             } else {
                 Text("\(formatNumber(criterion.current)) / \(formatNumber(criterion.target))")
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.system(size: 14, weight: .medium))
                     .kerning(-0.28)
                     .foregroundColor(PassmateColors.weakTopicText)
             }
@@ -236,23 +320,23 @@ private struct BadgeSectionView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("내 뱃지")
-                    .font(.system(size: 18, weight: .bold))
-                    .kerning(-0.36)
+                    .font(.system(size: 16, weight: .medium))
+                    .kerning(-0.32)
                     .foregroundColor(PassmateColors.textPrimary)
                 Spacer()
                 Text("\(earnedCount) / \(badges.count)")
                     .font(.system(size: 14, weight: .medium))
                     .kerning(-0.28)
-                    .foregroundColor(PassmateColors.textSecondary)
+                    .foregroundColor(PassmateColors.primaryDeep)
             }
-            VStack(spacing: 14) {
+            VStack(spacing: 12) {
                 ForEach(0..<rows.count, id: \.self) { rowIndex in
-                    HStack(alignment: .top, spacing: 10) {
+                    HStack(alignment: .top, spacing: 8) {
                         ForEach(rows[rowIndex], id: \.type) { badge in
                             BadgeCellView(badge: badge)
                                 .frame(maxWidth: .infinity)
                         }
-                        ForEach(0..<(4 - rows[rowIndex].count), id: \.self) { _ in
+                        ForEach(0..<(badgesPerRow - rows[rowIndex].count), id: \.self) { _ in
                             Spacer().frame(maxWidth: .infinity)
                         }
                     }
@@ -260,14 +344,14 @@ private struct BadgeSectionView: View {
             }
             .padding(14)
             .frame(maxWidth: .infinity)
-            .background(PassmateColors.backgroundMint)
-            .cornerRadius(20)
+            .background(PassmateColors.surface)
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(PassmateColors.border, lineWidth: 1))
         }
     }
 
     private var rows: [[Badge]] {
-        stride(from: 0, to: badges.count, by: 4).map { start in
-            Array(badges[start..<min(start + 4, badges.count)])
+        stride(from: 0, to: badges.count, by: badgesPerRow).map { start in
+            Array(badges[start..<min(start + badgesPerRow, badges.count)])
         }
     }
 }
@@ -276,20 +360,21 @@ private struct BadgeCellView: View {
     let badge: Badge
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 5) {
             Text(glyph)
                 .font(.system(size: 16, weight: .bold))
-                .foregroundColor(badge.earned ? PassmateColors.primaryDeep : PassmateColors.textTertiary)
-                .frame(width: 52, height: 52)
-                .background(badge.earned ? PassmateColors.surface : PassmateColors.fieldGray)
-                .cornerRadius(14)
+                .foregroundColor(PassmateColors.primaryDeep)
+                .frame(width: 44, height: 44)
+                .background(PassmateColors.backgroundMint)
+                .cornerRadius(13)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(badge.earned ? PassmateColors.primary : PassmateColors.border, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 13)
+                        .stroke(PassmateColors.achievementBadgeBorder, lineWidth: 1.5)
                 )
-            Text(label)
-                .font(.system(size: 12, weight: .medium))
-                .kerning(-0.24)
+                .opacity(badge.earned ? 1 : 0.3)
+            Text(badge.type.label)
+                .font(.system(size: 14, weight: .medium))
+                .kerning(-0.28)
                 .foregroundColor(badge.earned ? PassmateColors.textPrimary : PassmateColors.textTertiary)
                 .multilineTextAlignment(.center)
         }
@@ -312,14 +397,6 @@ private struct BadgeCellView: View {
             return "₩"
         } else {
             return "AI"
-        }
-    }
-
-    private var label: String {
-        if !badge.earned, let current = badge.progressCurrent?.intValue, let target = badge.progressTarget?.intValue {
-            return "\(badge.type.label) \(current)/\(target)"
-        } else {
-            return badge.type.label
         }
     }
 }

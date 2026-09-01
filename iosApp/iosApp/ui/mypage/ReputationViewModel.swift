@@ -2,11 +2,13 @@ import Combine
 import Foundation
 import Shared
 
-// Compose ReputationViewModel.kt 미러 — 내 명성·뱃지 로드 (M-09)
+// Compose ReputationViewModel.kt 미러 — 내 프로필·명성·뱃지 로드 (M-09)
 final class ReputationViewModel: ObservableObject {
     private let getMyGradeUseCase: GetMyGradeUseCase
 
     private let getMyBadgesUseCase: GetMyBadgesUseCase
+
+    private let getMyProfileUseCase: GetMyProfileUseCase
 
     private let isSignedInUseCase: IsSignedInUseCase
 
@@ -54,8 +56,25 @@ final class ReputationViewModel: ObservableObject {
                 let badges = (badgesResult as? AppResultSuccess<AnyObject>)?.value as? [Badge]
 
                 if badgesError == nil, let badges {
+                    self.loadProfile(grade: grade, badges: badges)
+                } else {
+                    self.uiState.isLoading = false
+                    self.uiState.loadFailed = true
+                }
+            }
+        }
+    }
+
+    private func loadProfile(grade: MyGrade, badges: [Badge]) {
+        getMyProfileUseCase.invoke { [weak self] profileResult, profileError in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let profile = (profileResult as? AppResultSuccess<AnyObject>)?.value as? UserProfile
+
+                if profileError == nil, let profile {
                     self.uiState.isLoading = false
                     self.uiState.loadFailed = false
+                    self.uiState.profile = profile
                     self.uiState.grade = grade
                     self.uiState.badges = badges
                 } else {
@@ -78,10 +97,12 @@ final class ReputationViewModel: ObservableObject {
     init(
         getMyGradeUseCase: GetMyGradeUseCase,
         getMyBadgesUseCase: GetMyBadgesUseCase,
+        getMyProfileUseCase: GetMyProfileUseCase,
         isSignedInUseCase: IsSignedInUseCase
     ) {
         self.getMyGradeUseCase = getMyGradeUseCase
         self.getMyBadgesUseCase = getMyBadgesUseCase
+        self.getMyProfileUseCase = getMyProfileUseCase
         self.isSignedInUseCase = isSignedInUseCase
     }
 }

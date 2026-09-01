@@ -68,6 +68,9 @@ object PassmateColors {
 
     val RatingTagSelectedText = Color(0xFF0B6B4C)
 
+    // 업적 뱃지 타일 테두리 (v6 M-09 명성 · 뱃지 컬렉션)
+    val AchievementBadgeBorder = Color(0xFFBFEBD8)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     val BrandGoogleBlue = Color(0xFF4285F4)
 
