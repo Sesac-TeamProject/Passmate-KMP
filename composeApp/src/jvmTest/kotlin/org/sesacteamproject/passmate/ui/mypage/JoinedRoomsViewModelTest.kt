@@ -112,4 +112,18 @@ class JoinedRoomsViewModelTest {
             events
         )
     }
+
+    // 빈 상태 CTA — 홈 탭(PIN 입장 폼)으로 보내는 이벤트만 내고 화면 판단은 하지 않는다 (규칙 §7)
+    @Test
+    fun enterPinEmitsOpenPinEntry() = runTest {
+        val viewModel = viewModel(isSignedIn = true, pages = emptyList())
+        val events = mutableListOf<JoinedRoomsEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinedRoomsAction.ClickEnterPin)
+
+        assertEquals(listOf<JoinedRoomsEvent>(JoinedRoomsEvent.OpenPinEntry), events)
+    }
 }

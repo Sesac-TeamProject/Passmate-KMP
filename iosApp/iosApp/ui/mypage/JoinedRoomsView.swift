@@ -9,6 +9,9 @@ struct JoinedRoomsView: View {
 
     var onRejoin: (String) -> Void = { _ in }
 
+    // 홈 탭이 곧 PIN 입장 폼 (규칙 §2-1-1) — Compose는 NavigationAction.NavigateToHome
+    var onOpenPinEntry: () -> Void = {}
+
     @StateObject private var viewModel = JoinedRoomsViewModel(
         getMyPageUseCase: KoinHelper.shared.getMyPageUseCase(),
         isSignedInUseCase: KoinHelper.shared.isSignedInUseCase()
@@ -32,6 +35,8 @@ struct JoinedRoomsView: View {
                 onOpenReport(roomId)
             case let .rejoin(pin):
                 onRejoin(pin)
+            case .openPinEntry:
+                onOpenPinEntry()
             case let .showNotice(message):
                 noticeMessage = message
             }
@@ -103,12 +108,7 @@ private struct JoinedRoomsContentView: View {
                     WeakTopicsRow(topics: summary.weakTopics)
                 }
                 if uiState.rooms.isEmpty, uiState.ongoing == nil {
-                    Text("아직 참여한 방이 없어요")
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.textSecondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
+                    JoinedRoomsEmptyView(onClickEnterPin: { onAction(.clickEnterPin) })
                 } else {
                     ForEach(uiState.rooms, id: \.roomId) { room in
                         JoinedRoomRow(room: room, onClickReport: { onAction(.clickRoomReport(roomId: room.roomId)) })
@@ -143,6 +143,115 @@ private struct JoinedRoomsContentView: View {
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(PassmateColors.border, lineWidth: 1))
         }
         .disabled(uiState.isLoadingMore)
+    }
+}
+
+// 빈 상태 (v6 M-08) 미러 — 아이콘 원형 64 · 제목 19/Bold · 안내 문구 · PIN 입장 CTA 200x52
+private struct JoinedRoomsEmptyView: View {
+    let onClickEnterPin: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ZStack {
+                Circle()
+                    .fill(PassmateColors.emptyIconBg)
+                DoorOpenIcon(tint: PassmateColors.textSecondary, size: 28)
+            }
+            .frame(width: 64, height: 64)
+            Text("아직 참여한 방이 없어요")
+                .font(.system(size: 19, weight: .bold))
+                .kerning(-0.19)
+                .foregroundColor(PassmateColors.textPrimary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 16)
+            // lineSpacing 6.4 = Compose lineHeight 23.1(14 x 1.65) - 기본 행높이
+            Text("선생님에게 받은 PIN 6자리를\n홈에서 입력해 보세요.")
+                .font(.system(size: 14))
+                .lineSpacing(6.4)
+                .foregroundColor(PassmateColors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 8)
+            Button(action: onClickEnterPin) {
+                Text("PIN으로 입장")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(PassmateColors.surface)
+                    .frame(width: 200, height: 52)
+                    .background(PassmateColors.primary)
+                    .cornerRadius(14)
+            }
+            .padding(.top, 24)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+    }
+}
+
+// door-open 아이콘 — SF Symbol door.left.hand.open은 iOS 16+라 직접 그린다 (규칙 §2-1).
+// lucide "door-open"(24 뷰포트) 지오메트리로, Compose JoinedRoomsScreen.kt의 doorOpenVector와 좌표가 1:1이다
+private struct DoorOpenIcon: View {
+    let tint: Color
+
+    let size: CGFloat
+
+    private var scale: CGFloat {
+        return size / 24
+    }
+
+    private func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+        return CGPoint(x: x * scale, y: y * scale)
+    }
+
+    private var frameAndFloor: Path {
+        var path = Path()
+
+        path.move(to: point(13, 4))
+        path.addLine(to: point(16, 4))
+        path.addQuadCurve(to: point(18, 6), control: point(18, 4))
+        path.addLine(to: point(18, 20))
+        path.move(to: point(2, 20))
+        path.addLine(to: point(5, 20))
+        path.move(to: point(13, 20))
+        path.addLine(to: point(22, 20))
+
+        return path
+    }
+
+    private var panel: Path {
+        var path = Path()
+
+        path.move(to: point(13, 4.56))
+        path.addLine(to: point(13, 20.72))
+        path.addLine(to: point(5, 20))
+        path.addLine(to: point(5, 5.56))
+        path.closeSubpath()
+
+        return path
+    }
+
+    private var handle: Path {
+        let radius: CGFloat = 0.9 * scale
+        let center = point(10, 12)
+
+        return Path(
+            ellipseIn: CGRect(
+                x: center.x - radius,
+                y: center.y - radius,
+                width: radius * 2,
+                height: radius * 2
+            )
+        )
+    }
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            frameAndFloor
+                .stroke(tint, style: StrokeStyle(lineWidth: 2 * scale, lineCap: .round, lineJoin: .round))
+            panel
+                .stroke(tint, style: StrokeStyle(lineWidth: 2 * scale, lineCap: .round, lineJoin: .round))
+            handle
+                .fill(tint)
+        }
+        .frame(width: size, height: size)
     }
 }
 
