@@ -1,5 +1,6 @@
 package org.sesacteamproject.passmate.ui.payment
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -7,11 +8,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,10 +35,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.di.koinScreenViewModel
+import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.payment.domain.model.Earnings
 import org.sesacteamproject.passmate.payment.domain.model.NextPayout
@@ -66,6 +77,10 @@ fun EarningsScreen(onNavigate: (NavigationAction) -> Unit) {
                     NavigationAction.NavigateToSignIn(NavigationAction.NavigateToEarnings)
                 )
                 is EarningsEvent.OpenAccountSheet -> isAccountSheetVisible = true
+                // 방 개설 진입점은 「내가 만든 방」 탭의 새 방 만들기 시트(M-13)다
+                is EarningsEvent.OpenHostedRooms -> onNavigate(
+                    NavigationAction.NavigateToTab(AppTab.HOSTED_ROOMS)
+                )
                 is EarningsEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -114,7 +129,10 @@ private fun EarningsContentScreen(
     ) {
         when {
             uiState.isLoading -> LoadingBox()
-            uiState.loadFailed || uiState.earnings == null -> ErrorBox(onRetry = { onAction(EarningsAction.Retry) })
+            uiState.loadFailed || uiState.earnings == null -> LoadFailedContent(
+                onRetry = { onAction(EarningsAction.Retry) },
+                onClickBack = onClickBack
+            )
             else -> LoadedEarnings(
                 earnings = uiState.earnings,
                 uiState = uiState,
@@ -184,7 +202,17 @@ private fun LoadedEarnings(
             letterSpacing = (-0.36).sp
         )
         if (uiState.items.isEmpty()) {
-            EmptyItems()
+            // 빈 상태는 두 갈래다 — 계좌가 없으면 계좌 등록이 먼저다(정산 금액이 쌓여도 지급되지 않는다).
+            // 계좌가 있으면 "정산 내역이 없어요" + 유료 방 개설 유도 (v6 M-T4 빈 상태 2종)
+            if (earnings.account == null) {
+                EmptyAccountUnregistered(
+                    onClickRegister = { onAction(EarningsAction.ClickManageAccount) }
+                )
+            } else {
+                EmptySettlements(
+                    onClickCreateRoom = { onAction(EarningsAction.ClickCreatePaidRoom) }
+                )
+            }
         }
         uiState.items.forEach { item ->
             SettlementRow(item = item)
@@ -398,17 +426,99 @@ private fun LoadMoreRow(
     }
 }
 
+// 빈 상태 — 정산 (v6 M-T4) — 북마크 아이콘 원형 64 · 제목 19/Bold · 안내 2줄 · CTA 200x52
 @Composable
-private fun EmptyItems() {
-    Text(
-        text = "아직 정산 내역이 없어요 · 유료 방을 열면 여기에 쌓여요",
-        color = PassmateColors.TextSecondary,
-        fontSize = 14.sp,
-        letterSpacing = (-0.28).sp,
+private fun EmptySettlements(onClickCreateRoom: () -> Unit) {
+    EmptyStateBlock(
+        title = "아직 정산 내역이 없어요",
+        description = "유료 방을 열고 참가비가 모이면\n매월 5일에 정산해 드려요.",
+        buttonLabel = "유료 방 만들기",
+        onClickButton = onClickCreateRoom,
+        icon = {
+            BookmarkIcon(
+                tint = PassmateColors.PrimaryDeep,
+                modifier = Modifier.size(28.dp)
+            )
+        }
+    )
+}
+
+// 빈 상태 — 정산 · 계좌 미등록 (v6 M-T4) — 아이콘만 alert-circle이고 나머지 배치는 위와 동일
+@Composable
+private fun EmptyAccountUnregistered(onClickRegister: () -> Unit) {
+    EmptyStateBlock(
+        title = "정산 계좌를 등록해 주세요",
+        description = "계좌가 없으면 정산 금액이 쌓여도\n지급되지 않아요.",
+        buttonLabel = "계좌 등록하기",
+        onClickButton = onClickRegister,
+        icon = {
+            AlertCircleIcon(
+                tint = PassmateColors.WrongPinkText,
+                modifier = Modifier.size(28.dp)
+            )
+        }
+    )
+}
+
+@Composable
+private fun EmptyStateBlock(
+    title: String,
+    description: String,
+    buttonLabel: String,
+    onClickButton: () -> Unit,
+    icon: @Composable () -> Unit
+) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 24.dp)
-    )
+            .padding(vertical = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .background(PassmateColors.EmptyIconBg, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            icon()
+        }
+        Text(
+            text = title,
+            color = PassmateColors.TextPrimary,
+            fontSize = 19.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.19).sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 24.dp)
+        )
+        Text(
+            text = description,
+            color = PassmateColors.TextSecondary,
+            fontSize = 14.sp,
+            lineHeight = 23.sp,
+            letterSpacing = (-0.14).sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+        Row(
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .width(200.dp)
+                .height(52.dp)
+                .background(PassmateColors.Primary, RoundedCornerShape(14.dp))
+                .clickable(onClick = onClickButton),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = buttonLabel,
+                color = PassmateColors.Surface,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.15).sp
+            )
+        }
+    }
 }
 
 @Composable
@@ -421,32 +531,191 @@ private fun LoadingBox() {
     }
 }
 
+// 목록 불러오기 실패 (v6 E-List 공통 패턴) — 제목은 네 화면 공통, 둘째 줄과 버튼 뒤 링크만 화면별로 다르다.
+// TODO 공통화 대상: 코인 내역·참여한 방·마이가 같은 패턴을 쓴다. 화면별 적용이 끝나면 공통 컴포넌트로 승격한다
 @Composable
-private fun ErrorBox(onRetry: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+private fun LoadFailedContent(
+    onRetry: () -> Unit,
+    onClickBack: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        LoadFailedHeader(onClickBack = onClickBack)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(PassmateColors.ErrorIconBg, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                AlertCircleIcon(
+                    tint = PassmateColors.WrongPinkText,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+            Text(
+                text = "목록을 불러오지 못했어요",
+                color = PassmateColors.TextPrimary,
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.19).sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 24.dp)
+            )
+            Text(
+                text = "연결이 잠시 끊겼어요.\n정산 금액은 사라지지 않아요.",
+                color = PassmateColors.TextSecondary,
+                fontSize = 14.sp,
+                lineHeight = 23.sp,
+                letterSpacing = (-0.14).sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .height(52.dp)
+                .background(PassmateColors.Primary, RoundedCornerShape(14.dp))
+                .clickable(onClick = onRetry),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "다시 시도",
+                color = PassmateColors.Surface,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.15).sp
+            )
+        }
+        // 정산은 마이 탭에서 push된 화면이라 뒤로가기가 곧 마이다
+        Text(
+            text = "계좌 정보는 마이에서 확인",
+            color = PassmateColors.PrimaryDeep,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.13).sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+                .clickable(onClick = onClickBack)
+                .padding(vertical = 10.dp)
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun LoadFailedHeader(onClickBack: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "정산 정보를 불러오지 못했어요",
+            text = "←",
             color = PassmateColors.TextPrimary,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.32).sp
+            fontSize = 20.sp,
+            modifier = Modifier
+                .clickable(onClick = onClickBack)
+                .padding(end = 12.dp, top = 4.dp, bottom = 4.dp)
         )
         Text(
-            text = "다시 시도",
-            color = PassmateColors.PrimaryDeep,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp,
-            modifier = Modifier
-                .padding(top = 12.dp)
-                .clickable(onClick = onRetry)
-                .padding(8.dp)
+            text = "정산",
+            color = PassmateColors.TextPrimary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.15).sp
         )
     }
+}
+
+// alert-circle — 원형 외곽선 + 느낌표. 아이콘 에셋이 없어 기본 도형으로 구성한다
+@Composable
+private fun AlertCircleIcon(
+    tint: Color,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.border(2.dp, tint, CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "!",
+            color = tint,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+// bookmark 아이콘 — 프로젝트에 북마크 리소스가 없어 시안 벡터(24 뷰포트)를 그대로 옮겼다.
+// iOS EarningsView.swift의 BookmarkIcon과 좌표가 1:1이다
+@Composable
+private fun BookmarkIcon(
+    tint: Color,
+    modifier: Modifier = Modifier
+) {
+    val vector = remember(tint) { bookmarkVector(tint) }
+
+    Image(
+        imageVector = vector,
+        contentDescription = null,
+        modifier = modifier
+    )
+}
+
+private fun bookmarkVector(tint: Color): ImageVector {
+    val brush = SolidColor(tint)
+    val builder = ImageVector.Builder(
+        name = "Bookmark",
+        defaultWidth = 28.dp,
+        defaultHeight = 28.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    )
+
+    // 리본 외곽선 — 위쪽 모서리는 반경 1로 둥글다
+    builder.path(
+        stroke = brush,
+        strokeLineWidth = 2f,
+        strokeLineCap = StrokeCap.Round,
+        strokeLineJoin = StrokeJoin.Round
+    ) {
+        moveTo(6f, 3f)
+        lineTo(18f, 3f)
+        quadTo(19f, 3f, 19f, 4f)
+        lineTo(19f, 21f)
+        lineTo(12f, 17f)
+        lineTo(5f, 21f)
+        lineTo(5f, 4f)
+        quadTo(5f, 3f, 6f, 3f)
+        close()
+    }
+    // 안쪽 두 줄
+    builder.path(
+        stroke = brush,
+        strokeLineWidth = 2f,
+        strokeLineCap = StrokeCap.Round,
+        strokeLineJoin = StrokeJoin.Round
+    ) {
+        moveTo(9f, 8f)
+        lineTo(15f, 8f)
+        moveTo(9f, 12f)
+        lineTo(15f, 12f)
+    }
+
+    return builder.build()
 }
 
 private fun summaryLine(earnings: Earnings): String {

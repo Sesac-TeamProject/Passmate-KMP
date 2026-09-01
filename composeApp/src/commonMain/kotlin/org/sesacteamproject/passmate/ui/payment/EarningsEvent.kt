@@ -7,5 +7,8 @@ sealed interface EarningsEvent {
 
     data object OpenAccountSheet : EarningsEvent
 
+    // 빈 상태 CTA — 「내가 만든 방」 탭으로 보낸다 (방 개설 진입점이 그 탭의 FAB다)
+    data object OpenHostedRooms : EarningsEvent
+
     data class ShowNotice(val message: String) : EarningsEvent
 }

@@ -84,6 +84,12 @@ class EarningsViewModel(
         }
     }
 
+    private fun onClickCreatePaidRoom() {
+        viewModelScope.launch {
+            _event.emit(EarningsEvent.OpenHostedRooms)
+        }
+    }
+
     private fun onAccountSaved() {
         load()
         viewModelScope.launch {
@@ -103,6 +109,7 @@ class EarningsViewModel(
             is EarningsAction.Retry -> load()
             is EarningsAction.LoadMore -> onLoadMore()
             is EarningsAction.ClickManageAccount -> onClickManageAccount()
+            is EarningsAction.ClickCreatePaidRoom -> onClickCreatePaidRoom()
             is EarningsAction.AccountSaved -> onAccountSaved()
             is EarningsAction.Notice -> onNotice(action.message)
         }

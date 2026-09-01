@@ -13,6 +13,9 @@ enum PassmateColors {
     // 입력 필드·비활성 칩 배경 (v6 M-01 PIN 박스·닉네임 필드)
     static let fieldGray = Color(hex: 0xF3F4F6)
 
+    // 빈 상태 일러스트 원형 배경 (v6 M-08 참여한 방 빈 상태) — fieldGray보다 한 톤 밝다
+    static let emptyIconBg = Color(hex: 0xF6F6F7)
+
     static let textPrimary = Color(hex: 0x1B1F24)
 
     static let textSecondary = Color(hex: 0x6B7280)
@@ -48,6 +51,9 @@ enum PassmateColors {
     static let wrongPink = Color(hex: 0xF7ADB1)
 
     static let wrongPinkText = Color(hex: 0x7C1F26)
+
+    // 오류 아이콘 원형 배경 — wrongPink 계열 연한 톤 (v6 M-05e 리포트 불러오기 실패)
+    static let errorIconBg = Color(hex: 0xFDEEEF)
 
     static let weakTopicBg = Color(hex: 0xFDEFDE)
 
