@@ -172,7 +172,11 @@ private struct SignInContentView: View {
             onAction(.clickAppleSignIn)
         } label: {
             HStack(spacing: 10) {
-                if !uiState.isSigningIn {
+                if uiState.isSigningIn {
+                    ProgressView()
+                        .tint(PassmateColors.surface)
+                        .frame(width: 20, height: 20)
+                } else {
                     Image("AppleSignIn")
                         .resizable()
                         .scaledToFit()
