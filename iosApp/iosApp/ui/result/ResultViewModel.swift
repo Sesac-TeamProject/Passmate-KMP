@@ -3,6 +3,9 @@ import Foundation
 import Shared
 
 final class ResultViewModel: ObservableObject {
+    // Compose ResultViewModel.CONTACT_NOTICE와 동일 문구 (규칙 §14 미러 1:1)
+    private static let contactNotice = "문의 접수는 준비 중이에요. 잠시 후 다시 시도해 주세요"
+
     private let getSessionResultUseCase: GetSessionResultUseCase
 
     private let getLearningReportUseCase: GetLearningReportUseCase
@@ -50,6 +53,14 @@ final class ResultViewModel: ObservableObject {
                         self.uiState.report = report
                         if self.uiState.selectedQuestionNo == nil {
                             self.uiState.selectedQuestionNo = self.firstAiQuestionNo(sessionResult)
+                        }
+                        let shouldPromptRating = sessionResult.canRate
+                            && !self.uiState.hasRated
+                            && !self.uiState.hasPromptedRating
+
+                        if shouldPromptRating {
+                            self.uiState.isRatingSheetVisible = true
+                            self.uiState.hasPromptedRating = true
                         }
                     } else {
                         self.uiState.isLoading = false
@@ -127,6 +138,8 @@ final class ResultViewModel: ObservableObject {
             load(roomId: roomId)
         }
     }
+
+    // 문의 채널이 계약(contracts/)·라우트에 아직 없다 — 안내 문구만 노출하고 채널이 정해지면 교체한다
 
     // 게스트 가입 유도 — participantId를 대기 큐에 넣고 로그인 화면으로 (FR-036)
     private func onClickSignup() {

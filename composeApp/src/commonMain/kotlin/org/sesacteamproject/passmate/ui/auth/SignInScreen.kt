@@ -266,9 +266,6 @@ private fun GuestEnterButton(
 @Composable
 internal expect fun GoogleSignInIcon(modifier: Modifier = Modifier)
 
-@Composable
-internal expect fun AppleSignInIcon(modifier: Modifier = Modifier)
-
 // --- Preview ---
 
 @PassmatePreview

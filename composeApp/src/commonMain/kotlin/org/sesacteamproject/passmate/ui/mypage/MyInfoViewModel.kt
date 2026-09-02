@@ -145,7 +145,7 @@ class MyInfoViewModel(
             is MyInfoAction.ClickSettlementAccount -> emit(MyInfoEvent.OpenSettlementAccount)
             is MyInfoAction.ClickEarnings -> emit(MyInfoEvent.OpenEarnings)
             is MyInfoAction.ClickNotifications -> emit(MyInfoEvent.OpenNotifications)
-            is MyInfoAction.ClickSettings -> emit(MyInfoEvent.OpenSettings)
+            is MyInfoAction.ClickDeleteAccount -> emit(MyInfoEvent.OpenDeleteAccount)
             is MyInfoAction.ConfirmSignOut -> onConfirmSignOut()
             is MyInfoAction.ProfileUpdated -> onProfileUpdated()
             is MyInfoAction.PaymentMethodUpdated -> onPaymentMethodUpdated()

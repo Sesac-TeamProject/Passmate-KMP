@@ -8,5 +8,8 @@ sealed interface JoinedRoomsEvent {
 
     data class Rejoin(val pin: String) : JoinedRoomsEvent
 
+    // PIN 입장 폼(홈 탭) 열기 — 빈 상태 CTA (규칙 §2-1-1)
+    data object OpenPinEntry : JoinedRoomsEvent
+
     data class ShowNotice(val message: String) : JoinedRoomsEvent
 }
