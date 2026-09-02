@@ -55,12 +55,15 @@ object PassmateColors {
 
     val WrongPinkText = Color(0xFF7C1F26)
 
-    // 오류 아이콘 원형 배경 — WrongPink 계열 연한 톤 (v6 M-05e 리포트 불러오기 실패)
+    // 오류 아이콘 원형 배경 — WrongPink 계열 연한 톤 (v6 M-05e 리포트 불러오기 실패·E-List 목록 실패·M-14 미제출 카드). 대응 텍스트는 WrongPinkText
     val ErrorIconBg = Color(0xFFFDEEEF)
 
     val WeakTopicBg = Color(0xFFFDEFDE)
 
     val WeakTopicText = Color(0xFFBF3F0C)
+
+    // 정답률 분포 41~60% 구간 막대 (v6 M-14 개요) — 0~40% WrongPink · 61~80% RatingTagSelectedBg · 81~100% Primary
+    val AccuracyBandMid = Color(0xFFFFD79A)
 
     // 파괴적 동작(로그아웃·회원 탈퇴) — 시안 M-12 card/기타
     val Destructive = Color(0xFFD9534F)

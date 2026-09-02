@@ -15,6 +15,19 @@ enum ReportTab: CaseIterable {
     }
 }
 
+// 학생별 탭 정렬 — 서버는 순위·점수를 그대로 주고 나열 순서만 화면에서 바꾼다 (Compose StudentSort 미러)
+enum StudentSort: CaseIterable {
+    case score
+    case name
+
+    var label: String {
+        switch self {
+        case .score: return "점수순"
+        case .name: return "이름순"
+        }
+    }
+}
+
 struct RoomReportUiState {
     var isLoading: Bool = true
 
@@ -23,4 +36,6 @@ struct RoomReportUiState {
     var report: RoomReport?
 
     var selectedTab: ReportTab = .questions
+
+    var studentSort: StudentSort = .score
 }

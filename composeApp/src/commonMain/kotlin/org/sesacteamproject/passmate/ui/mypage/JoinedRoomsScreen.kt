@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -98,7 +99,10 @@ private fun JoinedRoomsContentScreen(
     ) {
         when {
             uiState.isLoading -> LoadingBox()
-            uiState.loadFailed -> ErrorBox(onRetry = { onAction(JoinedRoomsAction.Retry) })
+            uiState.loadFailed -> LoadFailureBox(
+                onRetry = { onAction(JoinedRoomsAction.Retry) },
+                onClickContactSupport = { onAction(JoinedRoomsAction.ClickContactSupport) }
+            )
             else -> LoadedJoinedRooms(
                 uiState = uiState,
                 onAction = onAction
@@ -543,30 +547,93 @@ private fun LoadingBox() {
     }
 }
 
+// 실패 아이콘 크기 (시안 icon/alert-circle 30x30) — iOS FailureIconSize와 1:1
+private val FailureIconSize = 30.dp
+
+// 목록 불러오기 실패 — v6 "E-List 목록 불러오기 실패 — 공통 패턴"(코인 내역·정산·마이와 동일 레이아웃, 공통화 대상)
 @Composable
-private fun ErrorBox(onRetry: () -> Unit) {
+private fun LoadFailureBox(
+    onRetry: () -> Unit,
+    onClickContactSupport: () -> Unit
+) {
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 24.dp)
     ) {
         Text(
-            text = "기록을 불러오지 못했어요",
+            text = "참여한 방",
             color = PassmateColors.TextPrimary,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.32).sp
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.15).sp
         )
-        Text(
-            text = "다시 시도",
-            color = PassmateColors.PrimaryDeep,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp,
+        Spacer(modifier = Modifier.weight(1f))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(PassmateColors.ErrorIconBg, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                PassmateIcon(
+                    icon = PassmateIcons.AlertCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(FailureIconSize),
+                    tint = PassmateColors.WrongPinkText
+                )
+            }
+            Text(
+                text = "목록을 불러오지 못했어요",
+                color = PassmateColors.TextPrimary,
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.19).sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 24.dp)
+            )
+            Text(
+                text = "연결이 잠시 끊겼어요.\n다시 시도해 주세요.",
+                color = PassmateColors.TextSecondary,
+                fontSize = 14.sp,
+                lineHeight = 23.sp,
+                letterSpacing = (-0.14).sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 9.dp)
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Box(
             modifier = Modifier
-                .padding(top = 12.dp)
-                .clickable(onClick = onRetry)
-                .padding(8.dp)
+                .fillMaxWidth()
+                .height(52.dp)
+                .background(PassmateColors.Primary, RoundedCornerShape(14.dp))
+                .clickable(onClick = onRetry),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "다시 시도",
+                color = PassmateColors.Surface,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.15).sp
+            )
+        }
+        Text(
+            text = "계속 안 되면 문의하기",
+            color = PassmateColors.PrimaryDeep,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.13).sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .fillMaxWidth()
+                .clickable(onClick = onClickContactSupport)
+                .padding(vertical = 8.dp)
         )
     }
 }
