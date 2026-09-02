@@ -30,7 +30,7 @@ struct MyInfoView: View {
 
     var onOpenEarnings: () -> Void = {}
 
-    var onOpenSettings: () -> Void = {}
+    var onOpenDeleteAccount: () -> Void = {}
 
     var onSignedOut: () -> Void = {}
 
@@ -77,8 +77,8 @@ struct MyInfoView: View {
                 onOpenEarnings()
             case .openNotifications:
                 activeSheet = .notifications
-            case .openSettings:
-                onOpenSettings()
+            case .openDeleteAccount:
+                onOpenDeleteAccount()
             case .signedOut:
                 onSignedOut()
             case let .showNotice(message):
@@ -215,12 +215,6 @@ private struct MyInfoContentView: View {
                         .kerning(-0.48)
                         .foregroundColor(PassmateColors.textPrimary)
                     Spacer()
-                    Button(action: { onAction(.clickSettings) }) {
-                        Text("설정")
-                            .font(.system(size: 14, weight: .medium))
-                            .kerning(-0.28)
-                            .foregroundColor(PassmateColors.textSecondary)
-                    }
                 }
                 if let profile = uiState.profile {
                     ProfileCardView(profile: profile, onClick: { onAction(.clickProfile) })
@@ -243,6 +237,13 @@ private struct MyInfoContentView: View {
                     }
                     sectionCard {
                         infoRow(title: "알림", subtitle: "세션 시작 · 별점 요청 · 정산", actionLabel: "설정") { onAction(.clickNotifications) }
+                        rowDivider
+                        infoRow(
+                            title: "회원 탈퇴",
+                            subtitle: nil,
+                            actionLabel: "",
+                            actionColor: PassmateColors.destructive
+                        ) { onAction(.clickDeleteAccount) }
                     }
                 }
                 signOutButton
@@ -333,7 +334,7 @@ private struct MyInfoContentView: View {
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
     }
 
-    private func infoRow(title: String, subtitle: String, actionLabel: String, action: @escaping () -> Void) -> some View {
+    private func infoRow(title: String, subtitle: String?, actionLabel: String, actionColor: Color = PassmateColors.primaryDeep, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
@@ -341,16 +342,18 @@ private struct MyInfoContentView: View {
                         .font(.system(size: 15, weight: .medium))
                         .kerning(-0.3)
                         .foregroundColor(PassmateColors.textPrimary)
-                    Text(subtitle)
-                        .font(.system(size: 13))
-                        .kerning(-0.26)
-                        .foregroundColor(PassmateColors.textSecondary)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(.system(size: 13))
+                            .kerning(-0.26)
+                            .foregroundColor(PassmateColors.textSecondary)
+                    }
                 }
                 Spacer()
-                Text("\(actionLabel) ›")
+                Text(actionLabel.isEmpty ? "›" : "\(actionLabel) ›")
                     .font(.system(size: 14, weight: .medium))
                     .kerning(-0.28)
-                    .foregroundColor(PassmateColors.primaryDeep)
+                    .foregroundColor(actionColor)
             }
             .padding(.vertical, 14)
         }

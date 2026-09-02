@@ -78,6 +78,12 @@ class EarningsViewModel(
         }
     }
 
+    private fun onClickViewAllHistory() {
+        viewModelScope.launch {
+            _event.emit(EarningsEvent.OpenCoinHistory)
+        }
+    }
+
     private fun onClickManageAccount() {
         viewModelScope.launch {
             _event.emit(EarningsEvent.OpenAccountSheet)
@@ -108,6 +114,7 @@ class EarningsViewModel(
             is EarningsAction.Enter -> onEnter()
             is EarningsAction.Retry -> load()
             is EarningsAction.LoadMore -> onLoadMore()
+            is EarningsAction.ClickViewAllHistory -> onClickViewAllHistory()
             is EarningsAction.ClickManageAccount -> onClickManageAccount()
             is EarningsAction.ClickCreatePaidRoom -> onClickCreatePaidRoom()
             is EarningsAction.AccountSaved -> onAccountSaved()

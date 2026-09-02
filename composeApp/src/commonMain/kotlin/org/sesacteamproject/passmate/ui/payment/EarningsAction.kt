@@ -8,6 +8,9 @@ sealed interface EarningsAction {
 
     data object LoadMore : EarningsAction
 
+    // 결제 · 정산 내역 헤더의 "전체 보기 ›" — 코인·결제 내역 전체 목록으로 이동
+    data object ClickViewAllHistory : EarningsAction
+
     // 계좌 관리 → 정산 계좌 시트 (M-12-3, 시트 표시는 화면이 소유).
     // 빈 상태 「계좌 등록하기」 CTA도 같은 시트를 열어 같은 액션을 쓴다
     data object ClickManageAccount : EarningsAction

@@ -1,5 +1,6 @@
 package org.sesacteamproject.passmate
 
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import org.sesacteamproject.passmate.core.di.initKoin
@@ -13,6 +14,7 @@ fun main() {
         Window(
             onCloseRequest = ::exitApplication,
             title = "Passmate",
+            icon = painterResource("passmate-icon.png"),
         ) {
             App()
         }

@@ -17,8 +17,7 @@ enum Route: Hashable {
     case payment(pin: String)
     case coinHistory
     case coinCharge
-    case settings
-    // 회원 탈퇴 (M-12-12) — 설정에서 진입
+    // 회원 탈퇴 (M-12-12) — 마이 › 회원 탈퇴 행에서 진입
     case deleteAccount
 
     // 세션 플로우 엔트리(Join·Payment·Waiting·Play) — Result 진입 시 이것만 제거하고 탭 루트는 유지한다 (규칙 §2-1-2, 스펙 §1-5)

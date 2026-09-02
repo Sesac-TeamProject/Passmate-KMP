@@ -81,6 +81,7 @@ fun EarningsScreen(onNavigate: (NavigationAction) -> Unit) {
                 is EarningsEvent.OpenHostedRooms -> onNavigate(
                     NavigationAction.NavigateToTab(AppTab.HOSTED_ROOMS)
                 )
+                is EarningsEvent.OpenCoinHistory -> onNavigate(NavigationAction.NavigateToCoinHistory)
                 is EarningsEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -194,13 +195,7 @@ private fun LoadedEarnings(
             )
         }
         SummaryCard(earnings = earnings)
-        Text(
-            text = "결제 · 정산 내역",
-            color = PassmateColors.TextPrimary,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.36).sp
-        )
+        HistorySectionHeader(onClickViewAll = { onAction(EarningsAction.ClickViewAllHistory) })
         if (uiState.items.isEmpty()) {
             // 빈 상태는 두 갈래다 — 계좌가 없으면 계좌 등록이 먼저다(정산 금액이 쌓여도 지급되지 않는다).
             // 계좌가 있으면 "정산 내역이 없어요" + 유료 방 개설 유도 (v6 M-T4 빈 상태 2종)
@@ -231,6 +226,34 @@ private fun LoadedEarnings(
                 onClick = { onAction(EarningsAction.ClickManageAccount) }
             )
         }
+    }
+}
+
+// 시안 M-T4 — 섹션 제목과 "전체 보기 ›" 링크를 좌우 양끝 정렬한다
+@Composable
+private fun HistorySectionHeader(onClickViewAll: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "결제 · 정산 내역",
+            color = PassmateColors.TextPrimary,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.36).sp
+        )
+        Text(
+            text = "전체 보기 ›",
+            color = PassmateColors.PrimaryDeep,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.28).sp,
+            modifier = Modifier
+                .clickable(onClick = onClickViewAll)
+                .padding(4.dp)
+        )
     }
 }
 
@@ -416,7 +439,7 @@ private fun LoadMoreRow(
             )
         } else {
             Text(
-                text = "전체 보기",
+                text = "더 보기",
                 color = PassmateColors.PrimaryDeep,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,

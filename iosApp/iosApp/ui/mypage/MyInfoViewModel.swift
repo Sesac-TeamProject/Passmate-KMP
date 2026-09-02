@@ -135,8 +135,8 @@ final class MyInfoViewModel: ObservableObject {
             event.send(.openEarnings)
         case .clickNotifications:
             event.send(.openNotifications)
-        case .clickSettings:
-            event.send(.openSettings)
+        case .clickDeleteAccount:
+            event.send(.openDeleteAccount)
         case .confirmSignOut:
             onConfirmSignOut()
         case .profileUpdated:

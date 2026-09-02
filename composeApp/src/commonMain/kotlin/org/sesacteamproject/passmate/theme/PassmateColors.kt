@@ -62,6 +62,9 @@ object PassmateColors {
 
     val WeakTopicText = Color(0xFFBF3F0C)
 
+    // 파괴적 동작(로그아웃·회원 탈퇴) — 시안 M-12 card/기타
+    val Destructive = Color(0xFFD9534F)
+
     // 별점 전용 골드 (디자인 시스템 §StarRating — 별점에만 허용)
     val StarGold = Color(0xFFF2C94C)
 
