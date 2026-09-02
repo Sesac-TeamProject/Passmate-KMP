@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.PassmateEmptyState
 import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.PassmateIcons
@@ -159,17 +160,10 @@ private fun LoadedEarnings(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "←",
-                    color = PassmateColors.TextPrimary,
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                        .clickable(onClick = onClickBack)
-                        .padding(4.dp)
-                )
+                PassmateBackButton(onClick = onClickBack)
                 Text(
                     text = "정산",
                     color = PassmateColors.TextPrimary,

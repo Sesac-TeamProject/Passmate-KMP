@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.PortOnePaymentView
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -104,13 +105,11 @@ private fun CoinChargeContentScreen(
 
 @Composable
 private fun TopBar(onBack: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = "←",
-            color = PassmateColors.TextPrimary,
-            fontSize = 22.sp,
-            modifier = Modifier.clickable { onBack() }.padding(end = 12.dp, top = 4.dp, bottom = 4.dp)
-        )
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        PassmateBackButton(onClick = onBack)
         Text(
             text = "코인 충전",
             color = PassmateColors.TextPrimary,

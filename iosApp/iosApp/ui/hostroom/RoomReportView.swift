@@ -122,17 +122,12 @@ private struct RoomReportContentView: View {
     private func loadedView(_ report: RoomReport) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Button(action: onClickBack) {
-                        Text("←")
-                            .font(.system(size: 20))
-                            .foregroundColor(PassmateColors.textPrimary)
-                    }
+                HStack(spacing: 12) {
+                    PassmateBackButton(onClick: onClickBack)
                     Text("방 리포트")
                         .font(.system(size: 18, weight: .bold))
                         .kerning(-0.36)
                         .foregroundColor(PassmateColors.textPrimary)
-                        .padding(.leading, 8)
                     Spacer()
                     Button(action: { onAction(.clickExport) }) {
                         Text("내보내기")

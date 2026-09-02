@@ -186,17 +186,12 @@ private struct EarningsContentView: View {
     private func loadedView(_ earnings: Earnings) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Button(action: onClickBack) {
-                        Text("←")
-                            .font(.system(size: 20))
-                            .foregroundColor(PassmateColors.textPrimary)
-                    }
+                HStack(spacing: 12) {
+                    PassmateBackButton(onClick: onClickBack)
                     Text("정산")
                         .font(.system(size: 24, weight: .bold))
                         .kerning(-0.48)
                         .foregroundColor(PassmateColors.textPrimary)
-                        .padding(.leading, 8)
                     Spacer()
                     Button(action: { onAction(.clickManageAccount) }) {
                         Text("계좌 관리")

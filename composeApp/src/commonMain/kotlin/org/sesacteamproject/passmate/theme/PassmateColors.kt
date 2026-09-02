@@ -85,6 +85,8 @@ object PassmateColors {
 
     // 목록 불러오기 실패 아이콘 틴트 (v6 E-List 공통 패턴)
     val ErrorIconTint = Color(0xFF7C1F26)
+    // 업적 뱃지 타일 테두리 (v6 M-09 명성 · 뱃지 컬렉션)
+    val AchievementBadgeBorder = Color(0xFFBFEBD8)
 
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     val BrandGoogleBlue = Color(0xFF4285F4)

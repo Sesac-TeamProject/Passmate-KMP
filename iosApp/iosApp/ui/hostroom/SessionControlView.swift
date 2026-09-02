@@ -141,17 +141,12 @@ private struct SessionControlContentView: View {
     private var loadedView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Button(action: onClickBack) {
-                        Text("←")
-                            .font(.system(size: 20))
-                            .foregroundColor(PassmateColors.textPrimary)
-                    }
+                HStack(spacing: 12) {
+                    PassmateBackButton(onClick: onClickBack)
                     Text(uiState.roomTitle)
                         .font(.system(size: 17, weight: .bold))
                         .kerning(-0.34)
                         .foregroundColor(PassmateColors.textPrimary)
-                        .padding(.leading, 8)
                     Spacer()
                     Text("PIN \(formatPin(uiState.pin))")
                         .font(.system(size: 14, weight: .bold))

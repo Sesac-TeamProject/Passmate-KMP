@@ -9,10 +9,12 @@ import org.sesacteamproject.passmate.core.model.AppResult
 import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyBadgesUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyGradeUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
 
 class ReputationViewModel(
     private val getMyGradeUseCase: GetMyGradeUseCase,
     private val getMyBadgesUseCase: GetMyBadgesUseCase,
+    private val getMyProfileUseCase: GetMyProfileUseCase,
     private val isSignedInUseCase: IsSignedInUseCase
 ) : MviViewModel<ReputationUiState, ReputationAction, ReputationEvent>(ReputationUiState()) {
 
@@ -38,14 +40,17 @@ class ReputationViewModel(
         viewModelScope.launch {
             val gradeDeferred = async { getMyGradeUseCase.invoke() }
             val badgesDeferred = async { getMyBadgesUseCase.invoke() }
+            val profileDeferred = async { getMyProfileUseCase.invoke() }
             val gradeResult = gradeDeferred.await()
             val badgesResult = badgesDeferred.await()
+            val profileResult = profileDeferred.await()
 
-            if (gradeResult is AppResult.Success && badgesResult is AppResult.Success) {
+            if (gradeResult is AppResult.Success && badgesResult is AppResult.Success && profileResult is AppResult.Success) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         loadFailed = false,
+                        profile = profileResult.value,
                         grade = gradeResult.value,
                         badges = badgesResult.value
                     )

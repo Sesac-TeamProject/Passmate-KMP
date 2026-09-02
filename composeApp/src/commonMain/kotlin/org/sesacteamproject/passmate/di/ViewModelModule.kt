@@ -40,7 +40,7 @@ val viewModelModule = module {
     factory { JoinedRoomsViewModel(get(), get()) }
     factory { MyInfoViewModel(get(), get(), get(), get(), get()) }
     factory { DeleteAccountViewModel(get(), get()) }
-    factory { ReputationViewModel(get(), get(), get()) }
+    factory { ReputationViewModel(get(), get(), get(), get()) }
     factory { HostProfileViewModel(get(), get(), get(), get()) }
     factory { HostedRoomsViewModel(get(), get(), get()) }
     factory { CreateRoomViewModel(get(), get()) }

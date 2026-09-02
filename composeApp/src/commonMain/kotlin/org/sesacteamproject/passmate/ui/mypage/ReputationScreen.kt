@@ -25,11 +25,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.LevelEmblem
+import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.ReputationBadge
+import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.preview.PassmatePreview
@@ -42,8 +46,12 @@ import org.sesacteamproject.passmate.user.domain.model.GradeCriterion
 import org.sesacteamproject.passmate.user.domain.model.GradeStats
 import org.sesacteamproject.passmate.user.domain.model.MyGrade
 import org.sesacteamproject.passmate.user.domain.model.NextGrade
+import org.sesacteamproject.passmate.user.domain.model.UserProfile
 
-// Figma "UI 디자인 v6" M-09(349:9770) — 내 명성·뱃지 상세: 등급 카드(승급 진행도·조건)+뱃지 컬렉션
+// 한 줄에 놓는 뱃지 수 (시안 M-09 뱃지 컬렉션 그리드)
+private const val BADGES_PER_ROW = 4
+
+// Figma "UI 디자인 v6" M-09(349:9770) — 명성 · 뱃지 상세: 프로필+등급 카드(승급 진행도·조건)+뱃지 컬렉션
 @Composable
 fun ReputationScreen(
     viewModel: ReputationViewModel = koinScreenViewModel(),
@@ -81,58 +89,111 @@ private fun ReputationContentScreen(
             .fillMaxSize()
             .background(PassmateColors.Surface)
     ) {
+        ReputationHeader(onClickBack = onClickBack)
         when {
             uiState.isLoading -> LoadingBox()
             uiState.loadFailed -> ErrorBox(onRetry = { onAction(ReputationAction.Retry) })
-            else -> LoadedReputation(
-                uiState = uiState,
-                onClickBack = onClickBack
-            )
+            else -> LoadedReputation(uiState = uiState)
         }
     }
 }
 
 @Composable
-private fun LoadedReputation(
-    uiState: ReputationUiState,
-    onClickBack: () -> Unit
-) {
+private fun ReputationHeader(onClickBack: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, top = 52.dp, end = 20.dp, bottom = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        PassmateBackButton(onClick = onClickBack)
+        Text(
+            text = "명성 · 뱃지",
+            color = PassmateColors.TextPrimary,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.48).sp
+        )
+    }
+}
+
+@Composable
+private fun LoadedReputation(uiState: ReputationUiState) {
+    val grade = uiState.grade
+    val profile = uiState.profile
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+            .padding(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "내 명성",
-                color = PassmateColors.TextPrimary,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.48).sp
-            )
-            Text(
-                text = "닫기",
-                color = PassmateColors.TextSecondary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp,
-                modifier = Modifier
-                    .clickable(onClick = onClickBack)
-                    .padding(4.dp)
+        if (profile != null) {
+            ProfileCard(
+                profile = profile,
+                stats = grade?.stats,
+                level = grade?.level ?: profile.level
             )
         }
-        val grade = uiState.grade
-
         if (grade != null) {
             GradeCard(grade = grade)
         }
         BadgeSection(badges = uiState.badges)
+        if (grade != null && grade.level.level < HostLevel.VERIFIED.level) {
+            PaidRoomLockedCta()
+        }
+    }
+}
+
+@Composable
+private fun ProfileCard(
+    profile: UserProfile,
+    stats: GradeStats?,
+    level: HostLevel?
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, PassmateColors.Border, RoundedCornerShape(20.dp))
+            .background(PassmateColors.Surface, RoundedCornerShape(20.dp))
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        StudentAvatar(
+            avatarId = profile.avatarId,
+            modifier = Modifier.size(56.dp)
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = profile.nickname,
+                    color = PassmateColors.TextPrimary,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = (-0.32).sp
+                )
+                if (level != null) {
+                    ReputationBadge(level = level)
+                }
+            }
+            if (stats != null) {
+                Text(
+                    text = statsLine(stats),
+                    color = PassmateColors.TextSecondary,
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.24).sp
+                )
+            }
+        }
     }
 }
 
@@ -145,10 +206,11 @@ private fun GradeCard(grade: MyGrade) {
             .fillMaxWidth()
             .border(1.dp, PassmateColors.Border, RoundedCornerShape(20.dp))
             .background(PassmateColors.Surface, RoundedCornerShape(20.dp))
-            .padding(18.dp),
+            .padding(horizontal = 18.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -163,24 +225,24 @@ private fun GradeCard(grade: MyGrade) {
                 Text(
                     text = "Lv.${grade.level.level} ${grade.level.label}",
                     color = PassmateColors.TextPrimary,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.36).sp
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = (-0.32).sp
                 )
                 Text(
                     text = nextLevelLine(grade),
                     color = PassmateColors.TextSecondary,
-                    fontSize = 13.sp,
-                    letterSpacing = (-0.26).sp
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.24).sp
                 )
             }
             if (next != null) {
                 Text(
                     text = "${next.progressPercent}%",
                     color = PassmateColors.PrimaryDeep,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.36).sp
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = (-0.28).sp
                 )
             }
         }
@@ -195,9 +257,10 @@ private fun GradeCard(grade: MyGrade) {
         }
         Text(
             text = "Lv.3 달성 후 하락 없음 · Lv.4~5만 30일 활동 유지 조건",
-            color = PassmateColors.TextTertiary,
-            fontSize = 12.sp,
-            letterSpacing = (-0.24).sp
+            color = PassmateColors.TextSecondary,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.28).sp
         )
     }
 }
@@ -207,7 +270,7 @@ private fun ProgressBar(percent: Int) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(10.dp)
+            .height(8.dp)
             .background(PassmateColors.FieldGray, CircleShape)
     ) {
         val fraction = percent.coerceIn(0, 100) / 100f
@@ -216,7 +279,7 @@ private fun ProgressBar(percent: Int) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(fraction)
-                    .height(10.dp)
+                    .height(8.dp)
                     .background(PassmateColors.Primary, CircleShape)
             )
         }
@@ -229,20 +292,20 @@ private fun UnlockNoteBox(note: String) {
         modifier = Modifier
             .fillMaxWidth()
             .background(PassmateColors.BackgroundMint, RoundedCornerShape(12.dp))
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         LevelEmblem(
             level = HostLevel.VERIFIED,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(24.dp)
         )
         Text(
             text = note,
-            color = PassmateColors.PrimaryDeep,
-            fontSize = 13.sp,
+            color = PassmateColors.ReputationBadgeText,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.26).sp
+            letterSpacing = (-0.28).sp
         )
     }
 }
@@ -266,7 +329,7 @@ private fun CriterionRow(criterion: GradeCriterion) {
                 text = "✓ ${formatNumber(criterion.current)}",
                 color = PassmateColors.PrimaryDeep,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Medium,
                 letterSpacing = (-0.28).sp
             )
         } else {
@@ -274,7 +337,7 @@ private fun CriterionRow(criterion: GradeCriterion) {
                 text = "${formatNumber(criterion.current)} / ${formatNumber(criterion.target)}",
                 color = PassmateColors.WeakTopicText,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Medium,
                 letterSpacing = (-0.28).sp
             )
         }
@@ -292,13 +355,13 @@ private fun BadgeSection(badges: List<Badge>) {
             Text(
                 text = "내 뱃지",
                 color = PassmateColors.TextPrimary,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.36).sp
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = (-0.32).sp
             )
             Text(
                 text = "${badges.count { it.earned }} / ${badges.size}",
-                color = PassmateColors.TextSecondary,
+                color = PassmateColors.PrimaryDeep,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 letterSpacing = (-0.28).sp
@@ -307,14 +370,16 @@ private fun BadgeSection(badges: List<Badge>) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(PassmateColors.BackgroundMint, RoundedCornerShape(20.dp))
+                .border(1.dp, PassmateColors.Border, RoundedCornerShape(20.dp))
+                .background(PassmateColors.Surface, RoundedCornerShape(20.dp))
                 .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            badges.chunked(4).forEach { rowBadges ->
+            badges.chunked(BADGES_PER_ROW).forEach { rowBadges ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.Top
                 ) {
                     rowBadges.forEach { badge ->
                         BadgeCell(
@@ -322,7 +387,7 @@ private fun BadgeSection(badges: List<Badge>) {
                             modifier = Modifier.weight(1f)
                         )
                     }
-                    repeat(4 - rowBadges.size) {
+                    repeat(BADGES_PER_ROW - rowBadges.size) {
                         Spacer(modifier = Modifier.weight(1f))
                     }
                 }
@@ -336,37 +401,56 @@ private fun BadgeCell(
     badge: Badge,
     modifier: Modifier = Modifier
 ) {
-    val iconBg = if (badge.earned) PassmateColors.Surface else PassmateColors.FieldGray
-    val iconBorder = if (badge.earned) PassmateColors.Primary else PassmateColors.Border
-    val iconColor = if (badge.earned) PassmateColors.PrimaryDeep else PassmateColors.TextTertiary
     val labelColor = if (badge.earned) PassmateColors.TextPrimary else PassmateColors.TextTertiary
+    val tileAlpha = if (badge.earned) 1f else 0.3f
 
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(52.dp)
-                .border(1.dp, iconBorder, RoundedCornerShape(14.dp))
-                .background(iconBg, RoundedCornerShape(14.dp)),
+                .size(44.dp)
+                .alpha(tileAlpha)
+                .border(1.5.dp, PassmateColors.AchievementBadgeBorder, RoundedCornerShape(13.dp))
+                .background(PassmateColors.BackgroundMint, RoundedCornerShape(13.dp)),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = badgeGlyph(badge),
-                color = iconColor,
+                color = PassmateColors.PrimaryDeep,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
         }
         Text(
-            text = badgeLabel(badge),
+            text = badge.type.label,
             color = labelColor,
-            fontSize = 12.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.24).sp,
+            letterSpacing = (-0.28).sp,
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+// 시안의 잠긴 CTA — Lv.3 미만에서만 노출한다. 방 개설 진입은 '내가 만든 방' 탭이 담당하므로 안내 전용이다
+@Composable
+private fun PaidRoomLockedCta() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp)
+            .background(PassmateColors.FieldGray, RoundedCornerShape(16.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "🔒 유료 방 만들기 — Lv.3부터",
+            color = PassmateColors.TextTertiary,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.28).sp
         )
     }
 }
@@ -409,6 +493,16 @@ private fun ErrorBox(onRetry: () -> Unit) {
     }
 }
 
+// 시안 "참여 18회 · 평균 정답률 72% · 방 운영 12회" — 서버가 준 집계만 이어 붙인다
+private fun statsLine(stats: GradeStats): String {
+    val parts = mutableListOf("참여 ${stats.participationCount}회")
+
+    stats.avgAccuracyPercent?.let { parts.add("평균 정답률 ${it}%") }
+    parts.add("방 운영 ${stats.roomCount}회")
+
+    return parts.joinToString(" · ")
+}
+
 private fun nextLevelLine(grade: MyGrade): String {
     val next = grade.next
 
@@ -441,17 +535,6 @@ private fun badgeGlyph(badge: Badge): String {
     }
 }
 
-private fun badgeLabel(badge: Badge): String {
-    val progressCurrent = badge.progressCurrent
-    val progressTarget = badge.progressTarget
-
-    return if (!badge.earned && progressCurrent != null && progressTarget != null) {
-        "${badge.type.label} ${progressCurrent}/${progressTarget}"
-    } else {
-        badge.type.label
-    }
-}
-
 private fun formatNumber(value: Double): String {
     val rounded = (value * 10).toLong()
 
@@ -471,34 +554,44 @@ private fun ReputationContentScreenPreview() {
         ReputationContentScreen(
             uiState = ReputationUiState(
                 isLoading = false,
+                profile = UserProfile(
+                    nickname = "준영",
+                    email = "junyoung@example.com",
+                    joinedAt = "2026.06.01",
+                    avatarId = 6,
+                    level = HostLevel.GROWING,
+                    coins = 1200,
+                    joinedRoomCount = 18,
+                    hostedRoomCount = 12
+                ),
                 grade = MyGrade(
-    level = HostLevel.VERIFIED,
-    achievedAt = "2026.08.12",
-    stats = GradeStats(
-        participationCount = 48,
-        avgAccuracyPercent = 74,
-        roomCount = 12,
-        totalStudents = 186,
-        avgStars = 4.6,
-        ratingCount = 32
-    ),
-    next = NextGrade(
-        level = HostLevel.POPULAR,
-        progressPercent = 62,
-        criteria = listOf(
-            GradeCriterion(label = "방 운영 횟수", current = 12.0, target = 20.0, met = false),
-            GradeCriterion(label = "누적 학생 수", current = 186.0, target = 150.0, met = true),
-            GradeCriterion(label = "평균 별점", current = 4.6, target = 4.5, met = true)
-        )
-    )
-),
+                    level = HostLevel.GROWING,
+                    achievedAt = "2026.08.12",
+                    stats = GradeStats(
+                        participationCount = 18,
+                        avgAccuracyPercent = 72,
+                        roomCount = 12,
+                        totalStudents = 96,
+                        avgStars = 4.7,
+                        ratingCount = 32
+                    ),
+                    next = NextGrade(
+                        level = HostLevel.VERIFIED,
+                        progressPercent = 60,
+                        criteria = listOf(
+                            GradeCriterion(label = "방 운영 20회 이상", current = 12.0, target = 20.0, met = false),
+                            GradeCriterion(label = "평균 별점 4.0 이상", current = 4.7, target = 4.0, met = true),
+                            GradeCriterion(label = "총 학생 150명 이상", current = 96.0, target = 150.0, met = false)
+                        )
+                    )
+                ),
                 badges = listOf(
                     Badge(type = BadgeType.FIRST_ROOM, earned = true, earnedAt = "2026.06.02", progressCurrent = null, progressTarget = null),
-                    Badge(type = BadgeType.ROOMS_10, earned = true, earnedAt = "2026.08.12", progressCurrent = null, progressTarget = null),
-                    Badge(type = BadgeType.STUDENTS_100, earned = true, earnedAt = "2026.08.20", progressCurrent = null, progressTarget = null),
+                    Badge(type = BadgeType.ROOMS_10, earned = false, earnedAt = null, progressCurrent = 8, progressTarget = 10),
+                    Badge(type = BadgeType.STUDENTS_100, earned = false, earnedAt = null, progressCurrent = 96, progressTarget = 100),
                     Badge(type = BadgeType.RATING_45, earned = true, earnedAt = "2026.08.25", progressCurrent = null, progressTarget = null),
                     Badge(type = BadgeType.RATINGS_50, earned = false, earnedAt = null, progressCurrent = 32, progressTarget = 50),
-                    Badge(type = BadgeType.STREAK_30, earned = false, earnedAt = null, progressCurrent = 12, progressTarget = 30),
+                    Badge(type = BadgeType.STREAK_30, earned = true, earnedAt = "2026.08.30", progressCurrent = null, progressTarget = null),
                     Badge(type = BadgeType.FIRST_PAID_ROOM, earned = false, earnedAt = null, progressCurrent = 0, progressTarget = 1),
                     Badge(type = BadgeType.AI_SETS_50, earned = false, earnedAt = null, progressCurrent = 8, progressTarget = 50)
                 )
