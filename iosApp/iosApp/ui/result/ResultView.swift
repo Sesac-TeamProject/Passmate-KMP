@@ -21,10 +21,14 @@ struct ResultView: View {
 
     @State private var shareText: String?
 
+    @State private var noticeMessage: String?
+
     var body: some View {
         ResultContentView(
             uiState: viewModel.uiState,
-            onAction: { viewModel.action($0) }
+            onAction: { viewModel.action($0) },
+            // Result의 뒤로가기는 세션 플로우 엔트리를 지나 탭 루트로 돌아간다 (규칙 §2-1-2)
+            onBack: onClickHome
         )
         .onAppear {
             viewModel.action(.enter(roomId: roomId))
@@ -40,8 +44,18 @@ struct ResultView: View {
                 onNavigateToSignup()
             case .ratingSubmitted:
                 break
-            case .showNotice:
-                break
+            case let .showNotice(message):
+                noticeMessage = message
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if let noticeMessage {
+                ResultNoticeToast(message: noticeMessage)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                            self.noticeMessage = nil
+                        }
+                    }
             }
         }
         // 평가 시트는 컨테이너가 소유 (규칙 §11-1)
@@ -68,6 +82,8 @@ private struct ResultContentView: View {
 
     let onAction: (ResultAction) -> Void
 
+    let onBack: () -> Void
+
     var body: some View {
         Group {
             if uiState.isLoading {
@@ -84,22 +100,105 @@ private struct ResultContentView: View {
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
+    // 시안 M-05e 최종 결과 불러오기 실패 — 상단 경고 바·헤더·알림 아이콘·안내 문구·재시도/홈으로 버튼
     private var errorView: some View {
-        VStack(spacing: 12) {
-            Text("리포트를 불러오지 못했어요")
-                .font(.system(size: 16, weight: .medium))
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(PassmateColors.wrongPink)
+                .frame(height: 3)
+            errorHeader
+            VStack(spacing: 0) {
+                alertCircleIcon
+                Text("결과를 불러오지 못했어요")
+                    .font(.system(size: 22, weight: .bold))
+                    .kerning(-0.22)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(PassmateColors.textPrimary)
+                    .padding(.top, 20)
+                Text("잠시 후 다시 시도해 주세요.\n제출한 답안은 이미 저장돼 사라지지 않아요.")
+                    .font(.system(size: 15))
+                    .lineSpacing(15 * 0.65)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(PassmateColors.textSecondary)
+                    .padding(.top, 10)
+                Text("결과는 마이 › 참여한 방에서도\n나중에 다시 볼 수 있어요")
+                    .font(.system(size: 14))
+                    .lineSpacing(14 * 0.65)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(PassmateColors.textTertiary)
+                    .padding(.top, 16)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.horizontal, 20)
+            retryButton
+            goHomeButton
+                .padding(.top, 10)
+                .padding(.bottom, 24)
+        }
+    }
+
+    private var errorHeader: some View {
+        HStack(spacing: 12) {
+            Button(action: onBack) {
+                Text("←")
+                    .font(.system(size: 20))
+                    .foregroundColor(PassmateColors.textPrimary)
+            }
+            Text("최종 결과")
+                .font(.system(size: 15, weight: .bold))
+                .kerning(-0.3)
+                .foregroundColor(PassmateColors.textPrimary)
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+    }
+
+    // alert-circle — 원형 배경 위 외곽선 원 + 느낌표 (아이콘 에셋 없이 기본 도형으로 구성)
+    private var alertCircleIcon: some View {
+        ZStack {
+            Circle()
+                .fill(PassmateColors.errorIconBg)
+            Circle()
+                .stroke(PassmateColors.wrongPinkText, lineWidth: 2)
+                .frame(width: 28, height: 28)
+            Text("!")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(PassmateColors.wrongPinkText)
+        }
+        .frame(width: 64, height: 64)
+    }
+
+    private var retryButton: some View {
+        Button {
+            onAction(.retry)
+        } label: {
+            Text("다시 시도")
+                .font(.system(size: 16, weight: .bold))
+                .kerning(-0.32)
+                .foregroundColor(PassmateColors.surface)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(PassmateColors.primary)
+                .cornerRadius(14)
+        }
+        .padding(.horizontal, 20)
+    }
+
+    // 시안 M-05e — 두 번째 버튼은 홈으로. onBack은 ResultView에서 onClickHome으로 배선된다
+    private var goHomeButton: some View {
+        Button(action: onBack) {
+            Text("홈으로")
+                .font(.system(size: 16, weight: .bold))
                 .kerning(-0.32)
                 .foregroundColor(PassmateColors.textPrimary)
-            Button {
-                onAction(.retry)
-            } label: {
-                Text("다시 시도")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.primaryDeep)
-            }
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(PassmateColors.surface)
+                .overlay(RoundedRectangle(cornerRadius: 14).stroke(PassmateColors.border, lineWidth: 1.5))
+                .cornerRadius(14)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, 20)
     }
 
     private func loadedView(result: SessionResult) -> some View {
@@ -116,21 +215,6 @@ private struct ResultContentView: View {
                     if let selected = result.questions.first(where: { Int($0.questionNo) == uiState.selectedQuestionNo }),
                        selected.aiFeedback != nil || selected.hostReview != nil {
                         FeedbackSectionView(question: selected)
-                    }
-                    if result.canRate, !uiState.hasRated {
-                        Button {
-                            onAction(.openRatingSheet)
-                        } label: {
-                            Text("★ 선생님 평가하기")
-                                .font(.system(size: 14, weight: .medium))
-                                .kerning(-0.28)
-                                .foregroundColor(PassmateColors.primaryDeep)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(PassmateColors.backgroundMint)
-                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.primary, lineWidth: 1))
-                                .cornerRadius(16)
-                        }
                     }
                     if result.isGuest {
                         SignupPromptSectionView(onClickSignup: { onAction(.clickSignup) })
@@ -303,6 +387,22 @@ private struct VerdictChip: View {
     }
 }
 
+// 단발 안내 토스트 — Compose ResultScreen의 SnackbarHost 미러
+private struct ResultNoticeToast: View {
+    let message: String
+
+    var body: some View {
+        Text(message)
+            .font(.system(size: 13))
+            .foregroundColor(PassmateColors.surface)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(PassmateColors.textPrimary.opacity(0.9))
+            .cornerRadius(10)
+            .padding(.bottom, 16)
+    }
+}
+
 // UIActivityViewController 래퍼 — 리포트 요약 텍스트 공유
 private struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
@@ -384,20 +484,23 @@ private struct ShareSheet: UIViewControllerRepresentable {
             ),
             selectedQuestionNo: 3
         ),
-        onAction: { _ in }
+        onAction: { _ in },
+        onBack: {}
     )
 }
 
 #Preview("로딩 중") {
     ResultContentView(
         uiState: ResultUiState(isLoading: true),
-        onAction: { _ in }
+        onAction: { _ in },
+        onBack: {}
     )
 }
 
 #Preview("불러오기 실패") {
     ResultContentView(
         uiState: ResultUiState(isLoading: false, loadFailed: true),
-        onAction: { _ in }
+        onAction: { _ in },
+        onBack: {}
     )
 }
