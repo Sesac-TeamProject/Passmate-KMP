@@ -257,6 +257,20 @@ private struct WaitingRoomContentView: View {
 - 서드파티 브랜드 색상(Google/Kakao 로그인 버튼 등)만 hex 직접 사용을 허용한다.
 - 상세 토큰 표는 디자인 시스템 문서(`docs/Passmate_디자인_시스템.md`, 추후 작성)에서 관리한다.
 
+## 11-3. 아이콘 리소스 규칙
+
+- 아이콘을 화면 코드에 벡터로 그리지 않는다(`ImageVector.Builder`·SwiftUI `Path`). 리소스 파일로 두고 화면은 이름만 참조한다.
+- Compose는 공통 컴포넌트 `PassmateIcon(icon = PassmateIcons.X, …)`으로 그린다. 키는 `component/PassmateIcons.kt`의 enum이다.
+- 파일 위치는 3곳이다. Compose 사본 2개는 **텍스트가 동일**해야 하며 `PassmateIconResourceTest`가 이를 강제한다.
+  - Android: `composeApp/src/androidMain/res/drawable/ic_<snake_case>.xml` (VectorDrawable)
+  - Desktop: `composeApp/src/jvmMain/resources/drawable/ic_<snake_case>.xml` (같은 파일의 사본)
+  - iOS: `iosApp/iosApp/Assets.xcassets/<PascalCase>.imageset/` (SVG + `Contents.json`, 벡터 보존·템플릿 렌더링)
+- **Android는 반드시 `R.drawable` 경로로 읽는다.** 클래스패스에서 읽는 방식은 안드로이드 스튜디오 프리뷰 렌더러가 찾지 못한다(compose-multiplatform #4476, wontfix). 이 리포는 프리뷰로 시안을 대조하므로 프리뷰에서 그려져야 한다.
+- 리소스에는 **중립색만** 넣는다(`#FF000000` 스트로크·`#00000000` 채움). 표시 색은 호출부에서 `PassmateColors` 토큰으로 준다(§11-2). 테마 속성(`?attr/…`)·`@color/…` 참조는 Desktop 파서가 해석하지 못하므로 금지한다.
+- 외부 아이콘 세트를 쓰면 **출처·버전·라이선스**를 파일 머리 주석에 남기고 버전을 고정한다(최신판이 시안과 방향이 다를 수 있다).
+- 새 아이콘 추가는 파일 3개 + `PassmateIcons` 항목 1줄 + Android `drawableId()` 분기 1줄이면 끝난다. 테스트는 enum을 순회하므로 따로 추가하지 않는다.
+- 미전환 잔재(후속 대상): `AlertCircleIcon`(Result·MyInfo)·`EmptyIcon`·`ErrorIcon`(CoinHistory)·`HintIcon`(VoiceHintBanner)·`PassyMascot`·`StudentAvatar`·jvm `GoogleSignInIcon`.
+
 ## 12. 테스트 규칙
 
 - UseCase 단위 테스트를 우선 작성한다 (`shared/src/commonTest`).
@@ -267,6 +281,7 @@ private struct WaitingRoomContentView: View {
 ## 13. 금지 규칙
 
 - ViewModel 또는 UI에서 Ktor/STOMP 직접 호출 금지 (항상 UseCase→Repository→DataSource)
+- 화면 코드에 아이콘 벡터 지오메트리를 직접 기술하는 구현 금지 (리소스 파일 + `PassmateIcon`, §11-3)
 - UI에서 권한/입장 자격 판단 하드코딩 금지 (서버 코드 + 라우트 가드로 처리)
 - 클라이언트에서 점수 계산·타이머 만료 판정·정오 판정 금지 (서버 권위 — 렌더링만)
 - 정답을 클라이언트에 캐시하거나 `QUESTION_STARTED` 페이로드에 정답이 있다고 가정하는 구현 금지 (정답은 `QUESTION_ENDED`에서만 온다)
