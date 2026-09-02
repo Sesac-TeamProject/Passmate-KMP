@@ -74,6 +74,12 @@ enum PassmateColors {
 
     static let ratingTagSelectedText = Color(hex: 0x0B6B4C)
 
+    // 목록 필터 칩 선택 배경 (v6 M-12-9 코인 내역 전체/충전/사용)
+    static let filterChipSelectedBg = Color(hex: 0xD6F3E6)
+
+    // 목록 불러오기 실패 아이콘 틴트 (v6 E-List 공통 패턴)
+    static let errorIconTint = Color(hex: 0x7C1F26)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     static let brandGoogleBlue = Color(hex: 0x4285F4)
 

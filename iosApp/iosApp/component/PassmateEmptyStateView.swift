@@ -40,7 +40,7 @@ private enum PassmateEmptyStateSpec {
 // 치수·타이포는 여기서 고정한다 (규칙 §11 공통 컴포넌트 승격).
 // Compose component/PassmateEmptyState.kt 미러
 struct PassmateEmptyStateView: View {
-    let iconAsset: String
+    let icon: PassmateIcons
 
     let iconTint: Color
 
@@ -58,7 +58,7 @@ struct PassmateEmptyStateView: View {
                 Circle()
                     .fill(PassmateColors.emptyIconBg)
                 PassmateIconView(
-                    asset: iconAsset,
+                    icon: icon,
                     tint: iconTint,
                     size: PassmateEmptyStateSpec.iconSize
                 )

@@ -117,7 +117,7 @@ private struct EarningsContentView: View {
                 ZStack {
                     Circle().fill(PassmateColors.errorIconBg)
                     PassmateIconView(
-                        asset: LoadFailedText.iconAsset,
+                        icon: LoadFailedText.icon,
                         tint: PassmateColors.wrongPinkText,
                         size: LoadFailedSpec.iconSize
                     )
@@ -212,7 +212,7 @@ private struct EarningsContentView: View {
                     // 계좌가 있으면 "정산 내역이 없어요" + 유료 방 개설 유도 (v6 M-T4 빈 상태 2종)
                     if earnings.account == nil {
                         PassmateEmptyStateView(
-                            iconAsset: EmptyStateText.accountIconAsset,
+                            icon: EmptyStateText.accountIcon,
                             iconTint: PassmateColors.wrongPinkText,
                             title: EmptyStateText.accountTitle,
                             guide: EmptyStateText.accountGuide,
@@ -221,7 +221,7 @@ private struct EarningsContentView: View {
                         )
                     } else {
                         PassmateEmptyStateView(
-                            iconAsset: EmptyStateText.settlementsIconAsset,
+                            icon: EmptyStateText.settlementsIcon,
                             iconTint: PassmateColors.primaryDeep,
                             title: EmptyStateText.settlementsTitle,
                             guide: EmptyStateText.settlementsGuide,
@@ -433,8 +433,7 @@ private enum EmptyStateText {
 
     static let settlementsCta = "유료 방 만들기"
 
-    // Assets 이름 = Compose PassmateIcons.Bookmark의 iOS 사본
-    static let settlementsIconAsset = "Bookmark"
+    static let settlementsIcon = PassmateIcons.bookmark
 
     static let accountTitle = "정산 계좌를 등록해 주세요"
 
@@ -442,8 +441,7 @@ private enum EmptyStateText {
 
     static let accountCta = "계좌 등록하기"
 
-    // Assets 이름 = Compose PassmateIcons.AlertCircle의 iOS 사본
-    static let accountIconAsset = "AlertCircle"
+    static let accountIcon = PassmateIcons.alertCircle
 }
 
 // 목록 불러오기 실패 문구 (v6 E-List) — Compose EarningsScreen.kt의 LoadFailedText 미러
@@ -461,8 +459,7 @@ private enum LoadFailedText {
     // 정산은 마이 탭에서 push된 화면이라 뒤로가기가 곧 마이다
     static let backLink = "계좌 정보는 마이에서 확인"
 
-    // Assets 이름 = Compose PassmateIcons.AlertCircle의 iOS 사본
-    static let iconAsset = "AlertCircle"
+    static let icon = PassmateIcons.alertCircle
 }
 
 // 목록 불러오기 실패 치수·타이포 (v6 E-List) — Compose LoadFailedSpec 미러.

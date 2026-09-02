@@ -1,17 +1,16 @@
 import SwiftUI
 
-// 아이콘 리소스 로더 (규칙 §11-3) — Compose PassmateIcon의 iOS 미러.
-// 에셋 이름은 Compose PassmateIcons 항목의 iOS 사본 이름과 1:1이다
-// (DoorOpen · Bookmark · AlertCircle). 색은 템플릿 렌더링으로 준다 (규칙 §11-2)
+// 공통 아이콘 — Compose PassmateIcon(expect/actual)의 iOS 미러다.
+// 에셋은 벡터를 보존한 템플릿이라 색은 리소스가 아니라 호출부 토큰으로 준다 (규칙 §11-2)
 struct PassmateIconView: View {
-    let asset: String
+    let icon: PassmateIcons
 
     let tint: Color
 
     let size: CGFloat
 
     var body: some View {
-        Image(asset)
+        Image(icon.rawValue)
             .renderingMode(.template)
             .resizable()
             .scaledToFit()

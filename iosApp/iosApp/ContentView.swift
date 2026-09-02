@@ -155,7 +155,10 @@ struct ContentView: View {
                 onBack: { popOnce(path) }
             )
         case .coinHistory:
-            CoinHistoryView(onBack: { popOnce(path) })
+            CoinHistoryView(
+                onBack: { popOnce(path) },
+                onOpenCoinCharge: { path.wrappedValue.append(.coinCharge) }
+            )
         case .coinCharge:
             CoinChargeView(onBack: { popOnce(path) })
         case let .waiting(pin):

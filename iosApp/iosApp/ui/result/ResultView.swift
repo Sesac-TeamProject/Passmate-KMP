@@ -160,7 +160,7 @@ private struct ResultContentView: View {
             Circle()
                 .fill(PassmateColors.errorIconBg)
             PassmateIconView(
-                asset: "AlertCircle",
+                icon: .alertCircle,
                 tint: PassmateColors.wrongPinkText,
                 size: 30
             )

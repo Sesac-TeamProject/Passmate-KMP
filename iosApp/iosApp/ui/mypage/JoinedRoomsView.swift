@@ -155,8 +155,7 @@ private enum EmptyStateText {
 
     static let cta = "PIN으로 입장"
 
-    // Assets 이름 = Compose PassmateIcons.DoorOpen의 iOS 사본
-    static let iconAsset = "DoorOpen"
+    static let icon = PassmateIcons.doorOpen
 }
 
 // 빈 상태 (v6 M-08) 미러 — 문구·아이콘만 넘기고 배치는 공통 컴포넌트가 그린다
@@ -165,7 +164,7 @@ private struct JoinedRoomsEmptyView: View {
 
     var body: some View {
         PassmateEmptyStateView(
-            iconAsset: EmptyStateText.iconAsset,
+            icon: EmptyStateText.icon,
             iconTint: PassmateColors.textSecondary,
             title: EmptyStateText.title,
             guide: EmptyStateText.guide,
