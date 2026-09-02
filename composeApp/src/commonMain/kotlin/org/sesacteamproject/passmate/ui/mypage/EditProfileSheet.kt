@@ -33,7 +33,7 @@ import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.theme.PassmateColors
 
 // Figma "UI 디자인 v6" M-12-1(437:5424)+M-12-7(450:5938) — 계정 정보(닉네임)·내 캐릭터 변경 통합 시트.
-// 시트 표시 여부는 호스팅 화면(SettingsScreen)이 소유한다 (규칙 §11-1)
+// 시트 표시 여부는 호스팅 화면(MyInfoScreen)이 소유한다 (규칙 §11-1)
 @Composable
 fun EditProfileSheet(
     initialNickname: String,

@@ -55,7 +55,7 @@ struct ContentView: View {
                     onOpenCoinHistory: { path.append(.coinHistory) },
                     onOpenCharge: { path.append(.coinCharge) },
                     onOpenEarnings: { path.append(.earnings) },
-                    onOpenSettings: { path.append(.settings) },
+                    onOpenDeleteAccount: { path.append(.deleteAccount) },
                     onSignedOut: {
                         path = []
                         selectedTab = .home
@@ -204,12 +204,6 @@ struct ContentView: View {
             RoomReportView(
                 roomId: roomId,
                 onRequireSignIn: { pushSignIn(pendingRoute: .roomReport(roomId: roomId), path: path) },
-                onBack: { popOnce(path) }
-            )
-        case .settings:
-            SettingsView(
-                onRequireSignIn: { pushSignIn(pendingRoute: .settings, path: path) },
-                onOpenDeleteAccount: { path.wrappedValue.append(.deleteAccount) },
                 onBack: { popOnce(path) }
             )
         case .deleteAccount:

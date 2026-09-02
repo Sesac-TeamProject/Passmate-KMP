@@ -32,12 +32,12 @@
 
 ### 2-1-1. 공통 라우트 규격
 
-- 루트 라우트: `Home`, `SignIn`, `Join`, `Waiting`, `Play`, `Result`, `MyInfo`, `Payment`, `Settings`
+- 루트 라우트: `Home`, `SignIn`, `Join`, `Waiting`, `Play`, `Result`, `MyInfo`, `Payment`
 - 하단 탭 루트(피그마 v6, 2026-08-30): `Home`(홈=입장 폼 인라인) · `HostedRooms`(내가 만든 방) · `JoinedRooms`(참여한 방) · `MyInfo`(마이). 탭 바는 이 4개 루트에서만 표시하고 push된 화면에서는 숨긴다. 게스트가 로그인 필수 탭(`HostedRooms`·`JoinedRooms`·`MyInfo`)을 누르면 화면을 열지 않고 `SignIn`으로 보낸다(판단은 셸 `AppShellViewModel`).
 - `Join`은 `join?pin=`(QR·딥링크·방 목록 참여)일 때만 push 라우트로 쓴다. pin 없는 입장은 `Home` 탭이 담당한다.
 - 라우트 인자: `join?pin=`, `waiting/{pin}`, `play/{pin}`, `result/{participationId}`, `payment/{pin}`
 - `Home` = 입장 폼(인라인 PIN·QR·닉네임·캐릭터). 앱 시작 기본 진입은 항상 `Home`(게스트 포함).
-- `Settings`는 `MyInfo`에서 진입하는 상세 push 라우트로 취급한다.
+- 별도 `Settings` 라우트를 두지 않는다(시안 v6에 설정 화면이 없다, 2026-09-01 팀 결정). 계정·알림·회원 탈퇴 같은 항목은 `MyInfo`에서 각 상세 화면으로 직접 push한다.
 
 ### 2-1-2. 세션 플로우 네비게이션 규칙
 

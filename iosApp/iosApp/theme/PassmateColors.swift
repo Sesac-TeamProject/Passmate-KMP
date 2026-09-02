@@ -53,6 +53,9 @@ enum PassmateColors {
 
     static let weakTopicText = Color(hex: 0xBF3F0C)
 
+    // 파괴적 동작(로그아웃·회원 탈퇴) — 시안 M-12 card/기타
+    static let destructive = Color(hex: 0xD9534F)
+
     // 별점 전용 골드 (디자인 시스템 §StarRating)
     static let starGold = Color(hex: 0xF2C94C)
 
