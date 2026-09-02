@@ -17,6 +17,9 @@ enum PassmateIcons: String {
     // 목록 아이콘 (v6 M-12-9 코인 내역 빈 상태)
     case list = "List"
 
+    // 북마크 (v6 M-T4 정산 빈 상태)
+    case bookmark = "Bookmark"
+
     // 경고 원 (목록 불러오기 실패 E-List 공통 패턴)
     case alertCircle = "AlertCircle"
 }

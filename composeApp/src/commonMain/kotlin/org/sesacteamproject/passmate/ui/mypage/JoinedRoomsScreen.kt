@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,10 +33,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sesacteamproject.passmate.component.PassmateIcon
+import org.sesacteamproject.passmate.component.PassmateEmptyState
 import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.AppTab
@@ -436,7 +434,8 @@ private fun LoadMoreRow(
     }
 }
 
-// 빈 상태 문구 (v6 M-08) — iOS JoinedRoomsView.swift의 EmptyStateText와 1:1
+// 빈 상태 문구 (v6 M-08) — iOS JoinedRoomsView.swift의 EmptyStateText와 1:1.
+// 치수·타이포는 공통 컴포넌트 PassmateEmptyState가 갖는다
 private object EmptyStateText {
 
     const val TITLE = "아직 참여한 방이 없어요"
@@ -446,95 +445,17 @@ private object EmptyStateText {
     const val CTA = "PIN으로 입장"
 }
 
-// 빈 상태 치수·타이포 (v6 M-08) — iOS EmptyStateSpec과 1:1 (iOS는 파생값 guideLineSpacing 1개가 더 있다)
-private object EmptyStateSpec {
-
-    val SectionPaddingVertical = 40.dp
-
-    val IconCircleSize = 64.dp
-
-    val IconSize = 28.dp
-
-    val TitleTopPadding = 16.dp
-
-    val TitleFontSize = 19.sp
-
-    val TitleLetterSpacing = (-0.19).sp
-
-    val GuideTopPadding = 8.dp
-
-    val GuideFontSize = 14.sp
-
-    val GuideLineHeight = 23.1.sp
-
-    val CtaTopPadding = 24.dp
-
-    val CtaWidth = 200.dp
-
-    val CtaHeight = 52.dp
-
-    val CtaCornerRadius = 14.dp
-
-    val CtaFontSize = 16.sp
-}
-
-// 빈 상태 (v6 M-08) — 아이콘 원형 · 제목 · 안내 문구 · PIN 입장 CTA. 값은 EmptyStateSpec/EmptyStateText
+// 빈 상태 (v6 M-08) — 문구·아이콘만 넘기고 배치는 공통 컴포넌트가 그린다
 @Composable
 private fun EmptyRooms(onClickEnterPin: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = EmptyStateSpec.SectionPaddingVertical),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .size(EmptyStateSpec.IconCircleSize)
-                .background(PassmateColors.EmptyIconBg, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            PassmateIcon(
-                icon = PassmateIcons.DoorOpen,
-                contentDescription = null,
-                tint = PassmateColors.TextSecondary,
-                modifier = Modifier.size(EmptyStateSpec.IconSize)
-            )
-        }
-        Text(
-            text = EmptyStateText.TITLE,
-            color = PassmateColors.TextPrimary,
-            fontSize = EmptyStateSpec.TitleFontSize,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = EmptyStateSpec.TitleLetterSpacing,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = EmptyStateSpec.TitleTopPadding)
-        )
-        Text(
-            text = EmptyStateText.GUIDE,
-            color = PassmateColors.TextSecondary,
-            fontSize = EmptyStateSpec.GuideFontSize,
-            lineHeight = EmptyStateSpec.GuideLineHeight,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = EmptyStateSpec.GuideTopPadding)
-        )
-        Row(
-            modifier = Modifier
-                .padding(top = EmptyStateSpec.CtaTopPadding)
-                .width(EmptyStateSpec.CtaWidth)
-                .height(EmptyStateSpec.CtaHeight)
-                .background(PassmateColors.Primary, RoundedCornerShape(EmptyStateSpec.CtaCornerRadius))
-                .clickable(onClick = onClickEnterPin),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = EmptyStateText.CTA,
-                color = PassmateColors.Surface,
-                fontSize = EmptyStateSpec.CtaFontSize,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
+    PassmateEmptyState(
+        icon = PassmateIcons.DoorOpen,
+        iconTint = PassmateColors.TextSecondary,
+        title = EmptyStateText.TITLE,
+        guide = EmptyStateText.GUIDE,
+        ctaLabel = EmptyStateText.CTA,
+        onClickCta = onClickEnterPin
+    )
 }
 
 @Composable

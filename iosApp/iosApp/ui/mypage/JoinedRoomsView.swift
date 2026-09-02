@@ -188,45 +188,16 @@ private struct JoinedRoomsContentView: View {
     }
 }
 
-// 빈 상태 문구 (v6 M-08) — Compose JoinedRoomsScreen.kt의 EmptyStateText 미러
+// 빈 상태 문구 (v6 M-08) — Compose JoinedRoomsScreen.kt의 EmptyStateText 미러.
+// 치수·타이포는 공통 컴포넌트 PassmateEmptyStateView가 갖는다
 private enum EmptyStateText {
     static let title = "아직 참여한 방이 없어요"
 
     static let guide = "선생님에게 받은 PIN 6자리를\n홈에서 입력해 보세요."
 
     static let cta = "PIN으로 입장"
-}
 
-// 빈 상태 치수·타이포 (v6 M-08) — Compose EmptyStateSpec 미러
-private enum EmptyStateSpec {
-    static let sectionPaddingVertical: CGFloat = 40
-
-    static let iconCircleSize: CGFloat = 64
-
-    static let iconSize: CGFloat = 28
-
-    static let titleTopPadding: CGFloat = 16
-
-    static let titleFontSize: CGFloat = 19
-
-    static let titleKerning: CGFloat = -0.19
-
-    static let guideTopPadding: CGFloat = 8
-
-    static let guideFontSize: CGFloat = 14
-
-    // Compose lineHeight 23.1(14 x 1.65) - SF 14pt 기본 행높이
-    static let guideLineSpacing: CGFloat = 6.4
-
-    static let ctaTopPadding: CGFloat = 24
-
-    static let ctaWidth: CGFloat = 200
-
-    static let ctaHeight: CGFloat = 52
-
-    static let ctaCornerRadius: CGFloat = 14
-
-    static let ctaFontSize: CGFloat = 16
+    static let icon = PassmateIcons.doorOpen
 }
 
 // 실패 아이콘 치수 (시안 icon/alert-circle 30x30) — Compose FailureIconSize와 1:1
@@ -239,37 +210,14 @@ private struct JoinedRoomsEmptyView: View {
     let onClickEnterPin: () -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                Circle()
-                    .fill(PassmateColors.emptyIconBg)
-                PassmateIconView(icon: .doorOpen, tint: PassmateColors.textSecondary, size: EmptyStateSpec.iconSize)
-            }
-            .frame(width: EmptyStateSpec.iconCircleSize, height: EmptyStateSpec.iconCircleSize)
-            Text(EmptyStateText.title)
-                .font(.system(size: EmptyStateSpec.titleFontSize, weight: .bold))
-                .kerning(EmptyStateSpec.titleKerning)
-                .foregroundColor(PassmateColors.textPrimary)
-                .multilineTextAlignment(.center)
-                .padding(.top, EmptyStateSpec.titleTopPadding)
-            Text(EmptyStateText.guide)
-                .font(.system(size: EmptyStateSpec.guideFontSize))
-                .lineSpacing(EmptyStateSpec.guideLineSpacing)
-                .foregroundColor(PassmateColors.textSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.top, EmptyStateSpec.guideTopPadding)
-            Button(action: onClickEnterPin) {
-                Text(EmptyStateText.cta)
-                    .font(.system(size: EmptyStateSpec.ctaFontSize, weight: .bold))
-                    .foregroundColor(PassmateColors.surface)
-                    .frame(width: EmptyStateSpec.ctaWidth, height: EmptyStateSpec.ctaHeight)
-                    .background(PassmateColors.primary)
-                    .cornerRadius(EmptyStateSpec.ctaCornerRadius)
-            }
-            .padding(.top, EmptyStateSpec.ctaTopPadding)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, EmptyStateSpec.sectionPaddingVertical)
+        PassmateEmptyStateView(
+            icon: EmptyStateText.icon,
+            iconTint: PassmateColors.textSecondary,
+            title: EmptyStateText.title,
+            guide: EmptyStateText.guide,
+            ctaLabel: EmptyStateText.cta,
+            onClickCta: onClickEnterPin
+        )
     }
 }
 

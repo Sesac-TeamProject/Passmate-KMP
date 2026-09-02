@@ -40,6 +40,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateCard
+import org.sesacteamproject.passmate.component.PassmateIcon
+import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -232,7 +234,7 @@ private fun ErrorHeader(onBack: () -> Unit) {
     }
 }
 
-// alert-circle — 원형 배경 위 외곽선 원 + 느낌표 (아이콘 에셋 없이 기본 도형으로 구성)
+// alert-circle (v6 E-List) — 정산 실패 화면과 같은 리소스를 쓴다 (규칙 §11-3)
 @Composable
 private fun AlertCircleIcon() {
     Box(
@@ -241,19 +243,12 @@ private fun AlertCircleIcon() {
             .background(PassmateColors.ErrorIconBg, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .size(28.dp)
-                .border(2.dp, PassmateColors.WrongPinkText, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "!",
-                color = PassmateColors.WrongPinkText,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        PassmateIcon(
+            icon = PassmateIcons.AlertCircle,
+            contentDescription = null,
+            tint = PassmateColors.WrongPinkText,
+            modifier = Modifier.size(30.dp)
+        )
     }
 }
 
