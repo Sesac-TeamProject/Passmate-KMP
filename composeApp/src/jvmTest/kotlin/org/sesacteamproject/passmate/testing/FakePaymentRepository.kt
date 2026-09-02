@@ -1,5 +1,6 @@
 package org.sesacteamproject.passmate.testing
 
+import kotlinx.coroutines.CompletableDeferred
 import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.AppResult
 import org.sesacteamproject.passmate.core.model.PagedResult
@@ -23,6 +24,9 @@ class FakePaymentRepository(
     var confirmResult: AppResult<ChargeConfirm> = AppResult.Failure(AppError.Unknown())
 ) : PaymentRepository {
 
+    // 응답을 붙잡아 두는 게이트 — in-flight 가드 테스트용. null이면 즉시 반환한다
+    var coinsGate: CompletableDeferred<Unit>? = null
+
     var coinsCalls: Int = 0
 
     var earningsCalls: Int = 0
@@ -35,6 +39,7 @@ class FakePaymentRepository(
 
     override suspend fun getMyCoins(): AppResult<CoinBalance> {
         coinsCalls += 1
+        coinsGate?.await()
         return coinsResult
     }
 

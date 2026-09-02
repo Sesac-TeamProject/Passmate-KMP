@@ -165,6 +165,11 @@ private struct MyInfoNoticeToast: View {
     }
 }
 
+// in-flight 스피너 치수 — 행(로그아웃)과 실패 카드(다시 시도)가 같은 크기를 쓴다. Compose RowSpec 미러
+private enum RowSpec {
+    static let spinnerScale: CGFloat = 0.8
+}
+
 // 부분 실패 문구 (시안 M-12e) — Compose MyInfoScreen.kt의 FailureText 미러
 private enum FailureText {
     static let banner = "일부 정보를 불러오지 못했어요 · 아래에서 다시 시도"
@@ -178,8 +183,6 @@ private enum FailureText {
 
 // 부분 실패 치수·타이포 (시안 M-12e) — Compose FailureSpec 미러
 private enum FailureSpec {
-    static let iconAsset = "AlertCircle"
-
     static let bannerHeight: CGFloat = 44
 
     static let bannerCornerRadius: CGFloat = 12
@@ -274,7 +277,7 @@ private struct MyInfoContentView: View {
                     }
                     // 코인·정산은 카드 단위로만 실패시킨다 — 프로필이 정상이면 화면 전체를 덮지 않는다 (규칙 §9)
                     if uiState.isCoinInfoFailed {
-                        failureCard(message: FailureText.coinCard) { onAction(.retryCoinInfo) }
+                        failureCard(message: FailureText.coinCard, isRetrying: uiState.isCoinInfoLoading) { onAction(.retryCoinInfo) }
                     } else {
                         sectionCard {
                             coinRow(coins: profile.coins?.int64Value ?? 0) { onAction(.clickCharge) }
@@ -285,7 +288,7 @@ private struct MyInfoContentView: View {
                         }
                     }
                     if uiState.isEarningsFailed {
-                        failureCard(message: FailureText.earningsCard) { onAction(.retryEarnings) }
+                        failureCard(message: FailureText.earningsCard, isRetrying: uiState.isEarningsLoading) { onAction(.retryEarnings) }
                     } else {
                         sectionCard {
                             infoRow(title: "정산 계좌", subtitle: settlementAccountSubtitle, actionLabel: "변경") { onAction(.clickSettlementAccount) }
@@ -297,10 +300,14 @@ private struct MyInfoContentView: View {
                         infoRow(title: "알림 설정", subtitle: "세션 시작 · 별점 요청 · 정산", actionLabel: "변경") { onAction(.clickNotifications) }
                         rowDivider
                         // 확인 알림을 거쳐야 실제 로그아웃 — 알림 소유는 상위 View (규칙 §11-1)
-                        infoRow(title: "로그아웃", subtitle: nil, actionLabel: "", actionColor: PassmateColors.destructive) {
-                            if !uiState.isProcessing {
-                                onClickSignOut()
-                            }
+                        infoRow(
+                            title: "로그아웃",
+                            subtitle: nil,
+                            actionLabel: "",
+                            actionColor: PassmateColors.destructive,
+                            isProcessing: uiState.isProcessing
+                        ) {
+                            onClickSignOut()
                         }
                         rowDivider
                         infoRow(title: "회원 탈퇴", subtitle: nil, actionLabel: "", actionColor: PassmateColors.destructive) {
@@ -336,22 +343,30 @@ private struct MyInfoContentView: View {
     }
 
     // 카드 단위 실패 자리표시자 (시안 M-12e card/실패) — 해당 섹션만 다시 불러온다
-    private func failureCard(message: String, onRetry: @escaping () -> Void) -> some View {
+    private func failureCard(message: String, isRetrying: Bool, onRetry: @escaping () -> Void) -> some View {
         VStack(spacing: 0) {
-            AlertCircleIcon(tint: PassmateColors.textTertiary, size: FailureSpec.iconSize)
+            PassmateIcon(icon: PassmateIcons.alertCircle, tint: PassmateColors.textTertiary, size: FailureSpec.iconSize)
             Text(message)
                 .font(.system(size: FailureSpec.messageFontSize, weight: .medium))
                 .kerning(FailureSpec.messageKerning)
                 .foregroundColor(PassmateColors.textPrimary)
                 .padding(.top, FailureSpec.messageTopPadding)
-            Button(action: onRetry) {
-                Text(FailureText.retry)
-                    .font(.system(size: FailureSpec.retryFontSize, weight: .bold))
-                    .kerning(FailureSpec.retryKerning)
-                    .foregroundColor(PassmateColors.primaryDeep)
+            if isRetrying {
+                ProgressView()
+                    .scaleEffect(RowSpec.spinnerScale)
+                    .tint(PassmateColors.primary)
                     .padding(FailureSpec.retryTouchPadding)
+                    .padding(.top, FailureSpec.retryTopPadding)
+            } else {
+                Button(action: onRetry) {
+                    Text(FailureText.retry)
+                        .font(.system(size: FailureSpec.retryFontSize, weight: .bold))
+                        .kerning(FailureSpec.retryKerning)
+                        .foregroundColor(PassmateColors.primaryDeep)
+                        .padding(FailureSpec.retryTouchPadding)
+                }
+                .padding(.top, FailureSpec.retryTopPadding)
             }
-            .padding(.top, FailureSpec.retryTopPadding)
         }
         .frame(maxWidth: .infinity)
         .frame(height: FailureSpec.cardHeight)
@@ -414,6 +429,7 @@ private struct MyInfoContentView: View {
         subtitle: String?,
         actionLabel: String,
         actionColor: Color = PassmateColors.primaryDeep,
+        isProcessing: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
@@ -431,13 +447,20 @@ private struct MyInfoContentView: View {
                     }
                 }
                 Spacer()
-                Text(actionLabel.isEmpty ? "›" : "\(actionLabel) ›")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(actionColor)
+                if isProcessing {
+                    ProgressView()
+                        .scaleEffect(RowSpec.spinnerScale)
+                        .tint(PassmateColors.primary)
+                } else {
+                    Text(actionLabel.isEmpty ? "›" : "\(actionLabel) ›")
+                        .font(.system(size: 14, weight: .medium))
+                        .kerning(-0.28)
+                        .foregroundColor(actionColor)
+                }
             }
             .padding(.vertical, 14)
         }
+        .disabled(isProcessing)
     }
 
     private func coinRow(coins: Int64, onClickCharge: @escaping () -> Void) -> some View {
@@ -491,23 +514,6 @@ private struct MyInfoContentView: View {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
-    }
-}
-
-// 경고 원 아이콘 (시안 icon/alert-circle) — Compose PassmateIcon(PassmateIcons.AlertCircle) 미러.
-// 지오메트리는 Assets.xcassets/AlertCircle.imageset, 색은 호출부 토큰 (규칙 §11-2·§11-3)
-private struct AlertCircleIcon: View {
-    let tint: Color
-
-    let size: CGFloat
-
-    var body: some View {
-        Image(FailureSpec.iconAsset)
-            .renderingMode(.template)
-            .resizable()
-            .scaledToFit()
-            .foregroundColor(tint)
-            .frame(width: size, height: size)
     }
 }
 

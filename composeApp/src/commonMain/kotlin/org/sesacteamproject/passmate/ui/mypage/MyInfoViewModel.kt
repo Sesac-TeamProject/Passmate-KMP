@@ -58,7 +58,12 @@ class MyInfoViewModel(
         }
     }
 
+    // 진행 중 재시도가 있으면 새로 던지지 않는다 — onEnter와 같은 in-flight 가드 (규칙 §9)
     private fun loadCoinInfo() {
+        if (_uiState.value.isCoinInfoLoading) {
+            return
+        }
+        _uiState.update { it.copy(isCoinInfoLoading = true) }
         viewModelScope.launch {
             getMyCoinsUseCase.invoke()
                 .onSuccess { coins ->
@@ -66,17 +71,22 @@ class MyInfoViewModel(
                         it.copy(
                             defaultMethod = coins.defaultMethod,
                             recentTransaction = coins.recent,
-                            isCoinInfoFailed = false
+                            isCoinInfoFailed = false,
+                            isCoinInfoLoading = false
                         )
                     }
                 }
                 .onFailure {
-                    _uiState.update { it.copy(isCoinInfoFailed = true) }
+                    _uiState.update { it.copy(isCoinInfoFailed = true, isCoinInfoLoading = false) }
                 }
         }
     }
 
     private fun loadEarnings() {
+        if (_uiState.value.isEarningsLoading) {
+            return
+        }
+        _uiState.update { it.copy(isEarningsLoading = true) }
         viewModelScope.launch {
             getEarningsUseCase.invoke(null)
                 .onSuccess { earnings ->
@@ -84,12 +94,13 @@ class MyInfoViewModel(
                         it.copy(
                             settlementAccount = earnings.account,
                             nextPayout = earnings.nextPayout,
-                            isEarningsFailed = false
+                            isEarningsFailed = false,
+                            isEarningsLoading = false
                         )
                     }
                 }
                 .onFailure {
-                    _uiState.update { it.copy(isEarningsFailed = true) }
+                    _uiState.update { it.copy(isEarningsFailed = true, isEarningsLoading = false) }
                 }
         }
     }

@@ -140,6 +140,7 @@
 		A1010000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */; };
 		A1010000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift */; };
 		A1010000168AABBCCDDEEFF0168 /* DeleteAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEEFF0168 /* DeleteAccountView.swift */; };
+		A1010000169AABBCCDDEEFF0169 /* PassmateIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000169AABBCCDDEEFF0169 /* PassmateIcon.swift */; };
 		A1010001155AABBCCDDEEFF0155 /* RouteStackLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001155AABBCCDDEEFF0155 /* RouteStackLevel.swift */; };
 		A1010001156AABBCCDDEEFF0156 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */; };
 		A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */; };
@@ -287,6 +288,7 @@
 		A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountEvent.swift; sourceTree = "<group>"; };
 		A1011000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountViewModel.swift; sourceTree = "<group>"; };
 		A1011000168AABBCCDDEEFF0168 /* DeleteAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountView.swift; sourceTree = "<group>"; };
+		A1011000169AABBCCDDEEFF0169 /* PassmateIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateIcon.swift; sourceTree = "<group>"; };
 		A1011001155AABBCCDDEEFF0155 /* RouteStackLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteStackLevel.swift; sourceTree = "<group>"; };
 		A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakTopicsRow.swift; sourceTree = "<group>"; };
@@ -598,6 +600,7 @@
 				A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */,
 				A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */,
 				A1011001158AABBCCDDEEFF0158 /* SheetDetents.swift */,
+				A1011000169AABBCCDDEEFF0169 /* PassmateIcon.swift */,
 			);
 			path = component;
 			sourceTree = "<group>";
@@ -831,6 +834,7 @@
 				A1010000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift in Sources */,
 				A1010000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift in Sources */,
 				A1010000168AABBCCDDEEFF0168 /* DeleteAccountView.swift in Sources */,
+				A1010000169AABBCCDDEEFF0169 /* PassmateIcon.swift in Sources */,
 				A1010001155AABBCCDDEEFF0155 /* RouteStackLevel.swift in Sources */,
 				A1010001156AABBCCDDEEFF0156 /* FlowLayout.swift in Sources */,
 				A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */,

@@ -270,6 +270,7 @@ private fun LoadedMyInfo(
             if (uiState.isCoinInfoFailed) {
                 FailureCard(
                     message = FailureText.COIN_CARD,
+                    isRetrying = uiState.isCoinInfoLoading,
                     onRetry = { onAction(MyInfoAction.RetryCoinInfo) }
                 )
             } else {
@@ -297,6 +298,7 @@ private fun LoadedMyInfo(
             if (uiState.isEarningsFailed) {
                 FailureCard(
                     message = FailureText.EARNINGS_CARD,
+                    isRetrying = uiState.isEarningsLoading,
                     onRetry = { onAction(MyInfoAction.RetryEarnings) }
                 )
             } else {
@@ -330,11 +332,8 @@ private fun LoadedMyInfo(
                     subtitle = null,
                     actionLabel = "",
                     actionColor = PassmateColors.Destructive,
-                    onClick = {
-                        if (!uiState.isProcessing) {
-                            onClickSignOut()
-                        }
-                    }
+                    isProcessing = uiState.isProcessing,
+                    onClick = onClickSignOut
                 )
                 RowDivider()
                 InfoRow(
@@ -428,12 +427,13 @@ private fun InfoRow(
     subtitle: String?,
     actionLabel: String,
     actionColor: Color = PassmateColors.PrimaryDeep,
+    isProcessing: Boolean = false,
     onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(enabled = !isProcessing, onClick = onClick)
             .padding(vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -457,13 +457,21 @@ private fun InfoRow(
                 )
             }
         }
-        Text(
-            text = if (actionLabel.isEmpty()) "›" else "$actionLabel ›",
-            color = actionColor,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp
-        )
+        if (isProcessing) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(RowSpec.SpinnerSize),
+                color = PassmateColors.Primary,
+                strokeWidth = RowSpec.SpinnerStrokeWidth
+            )
+        } else {
+            Text(
+                text = if (actionLabel.isEmpty()) "›" else "$actionLabel ›",
+                color = actionColor,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = (-0.28).sp
+            )
+        }
     }
 }
 
@@ -507,6 +515,14 @@ private fun CoinRow(
                 .padding(horizontal = 14.dp, vertical = 10.dp)
         )
     }
+}
+
+// in-flight 스피너 치수 — 행(로그아웃)과 실패 카드(다시 시도)가 같은 크기를 쓴다. iOS RowSpec과 1:1
+private object RowSpec {
+
+    val SpinnerSize = 20.dp
+
+    val SpinnerStrokeWidth = 2.dp
 }
 
 // 부분 실패 문구 (시안 M-12e) — iOS MyInfoView.swift의 FailureText와 1:1
@@ -579,6 +595,7 @@ private fun PartialFailureBanner() {
 @Composable
 private fun FailureCard(
     message: String,
+    isRetrying: Boolean,
     onRetry: () -> Unit
 ) {
     Column(
@@ -608,17 +625,27 @@ private fun FailureCard(
             letterSpacing = FailureSpec.MessageLetterSpacing,
             modifier = Modifier.padding(top = FailureSpec.MessageTopPadding)
         )
-        Text(
-            text = FailureText.RETRY,
-            color = PassmateColors.PrimaryDeep,
-            fontSize = FailureSpec.RetryFontSize,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = FailureSpec.RetryLetterSpacing,
-            modifier = Modifier
-                .padding(top = FailureSpec.RetryTopPadding)
-                .clickable(onClick = onRetry)
-                .padding(FailureSpec.RetryTouchPadding)
-        )
+        if (isRetrying) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .padding(top = FailureSpec.RetryTopPadding + FailureSpec.RetryTouchPadding)
+                    .size(RowSpec.SpinnerSize),
+                color = PassmateColors.Primary,
+                strokeWidth = RowSpec.SpinnerStrokeWidth
+            )
+        } else {
+            Text(
+                text = FailureText.RETRY,
+                color = PassmateColors.PrimaryDeep,
+                fontSize = FailureSpec.RetryFontSize,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = FailureSpec.RetryLetterSpacing,
+                modifier = Modifier
+                    .padding(top = FailureSpec.RetryTopPadding)
+                    .clickable(onClick = onRetry)
+                    .padding(FailureSpec.RetryTouchPadding)
+            )
+        }
     }
 }
 

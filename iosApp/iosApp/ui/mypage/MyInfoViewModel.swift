@@ -60,11 +60,17 @@ final class MyInfoViewModel: ObservableObject {
         }
     }
 
+    // 진행 중 재시도가 있으면 새로 던지지 않는다 — onEnter와 같은 in-flight 가드 (규칙 §9)
     private func loadCoinInfo() {
+        if uiState.isCoinInfoLoading {
+            return
+        }
+        uiState.isCoinInfoLoading = true
         getMyCoinsUseCase.invoke { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
                 let coins = (result as? AppResultSuccess<AnyObject>)?.value as? CoinBalance
+                self.uiState.isCoinInfoLoading = false
                 if error == nil, let coins {
                     self.uiState.defaultMethod = coins.defaultMethod
                     self.uiState.recentTransaction = coins.recent
@@ -77,10 +83,15 @@ final class MyInfoViewModel: ObservableObject {
     }
 
     private func loadEarnings() {
+        if uiState.isEarningsLoading {
+            return
+        }
+        uiState.isEarningsLoading = true
         getEarningsUseCase.invoke(cursor: nil) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
                 let earnings = (result as? AppResultSuccess<AnyObject>)?.value as? Earnings
+                self.uiState.isEarningsLoading = false
                 if error == nil, let earnings {
                     self.uiState.settlementAccount = earnings.account
                     self.uiState.nextPayout = earnings.nextPayout

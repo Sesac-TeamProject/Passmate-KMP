@@ -14,9 +14,13 @@ data class MyInfoUiState(
     val defaultMethod: PaymentMethod? = null,
     val recentTransaction: CoinTransaction? = null,
     val isCoinInfoFailed: Boolean = false,
+    // 코인 카드 재시도 in-flight — 중복 요청 방지 (규칙 §9)
+    val isCoinInfoLoading: Boolean = false,
     val settlementAccount: SettlementAccountSummary? = null,
     val nextPayout: NextPayout? = null,
     val isEarningsFailed: Boolean = false,
+    // 정산 카드 재시도 in-flight — 중복 요청 방지 (규칙 §9)
+    val isEarningsLoading: Boolean = false,
     // 로그아웃 요청 in-flight — 중복 호출 방지 (규칙 §9)
     val isProcessing: Boolean = false
 ) {

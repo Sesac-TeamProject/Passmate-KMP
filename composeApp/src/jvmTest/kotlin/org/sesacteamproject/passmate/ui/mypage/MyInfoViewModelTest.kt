@@ -4,6 +4,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -174,6 +175,28 @@ class MyInfoViewModelTest {
         assertEquals(1, paymentRepository.earningsCalls)
         assertEquals(false, state.isCoinInfoFailed)
         assertEquals(false, state.hasPartialFailure)
+    }
+
+    // 진행 중 재시도가 끝나기 전에 또 눌러도 요청이 늘지 않는다 (규칙 §9)
+    @Test
+    fun retryIsIgnoredWhileTheSameCardIsStillLoading() = runTest {
+        val gate = CompletableDeferred<Unit>()
+        paymentRepository.coinsResult = AppResult.Failure(AppError.NetworkError())
+        val viewModel = viewModel()
+
+        viewModel.onAction(MyInfoAction.Enter)
+        paymentRepository.coinsGate = gate
+        viewModel.onAction(MyInfoAction.RetryCoinInfo)
+        val callsWhileLoading = paymentRepository.coinsCalls
+
+        viewModel.onAction(MyInfoAction.RetryCoinInfo)
+
+        assertEquals(true, viewModel.uiState.value.isCoinInfoLoading)
+        assertEquals(callsWhileLoading, paymentRepository.coinsCalls)
+
+        gate.complete(Unit)
+
+        assertEquals(false, viewModel.uiState.value.isCoinInfoLoading)
     }
 
     @Test
