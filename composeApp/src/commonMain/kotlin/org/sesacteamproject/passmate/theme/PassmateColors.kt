@@ -16,6 +16,9 @@ object PassmateColors {
     // 입력 필드·비활성 칩 배경 (v6 M-01 PIN 박스·닉네임 필드)
     val FieldGray = Color(0xFFF3F4F6)
 
+    // 빈 상태 일러스트 원형 배경 (v6 M-08 참여한 방 빈 상태) — FieldGray보다 한 톤 밝다
+    val EmptyIconBg = Color(0xFFF6F6F7)
+
     val TextPrimary = Color(0xFF1B1F24)
 
     val TextSecondary = Color(0xFF6B7280)
