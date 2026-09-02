@@ -77,9 +77,7 @@ private struct CoinChargeContentView: View {
 
     private var topBar: some View {
         HStack(spacing: 12) {
-            Button(action: onBack) {
-                Text("←").font(.system(size: 22)).foregroundColor(PassmateColors.textPrimary)
-            }
+            PassmateBackButton(onClick: onBack)
             Text("코인 충전")
                 .font(.system(size: 20, weight: .bold))
                 .kerning(-0.4)

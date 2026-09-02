@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.LevelEmblem
+import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.ReputationBadge
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
@@ -106,18 +107,7 @@ private fun ReputationHeader(onClickBack: () -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .clickable(onClick = onClickBack),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "←",
-                color = PassmateColors.TextPrimary,
-                fontSize = 22.sp
-            )
-        }
+        PassmateBackButton(onClick = onClickBack)
         Text(
             text = "명성 · 뱃지",
             color = PassmateColors.TextPrimary,

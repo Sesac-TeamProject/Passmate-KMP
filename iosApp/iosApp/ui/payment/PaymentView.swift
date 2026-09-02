@@ -121,14 +121,9 @@ private struct PaymentContentView: View {
 
     private var header: some View {
         ZStack(alignment: .topLeading) {
-            Button(action: onBack) {
-                Text("←")
-                    .font(.system(size: 22))
-                    .foregroundColor(PassmateColors.textPrimary)
-                    .frame(width: 24, height: 24)
-            }
-            .padding(.leading, 20)
-            .padding(.top, 14)
+            PassmateBackButton(onClick: onBack)
+                .padding(.leading, 20)
+                .padding(.top, 14)
             HStack {
                 Spacer()
                 PassyMascotView()

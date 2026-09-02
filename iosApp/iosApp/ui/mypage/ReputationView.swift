@@ -61,12 +61,7 @@ private struct ReputationContentView: View {
 
     private var header: some View {
         HStack(spacing: 12) {
-            Button(action: onClickBack) {
-                Text("←")
-                    .font(.system(size: 22))
-                    .foregroundColor(PassmateColors.textPrimary)
-                    .frame(width: 24, height: 24)
-            }
+            PassmateBackButton(onClick: onClickBack)
             Text("명성 · 뱃지")
                 .font(.system(size: 24, weight: .bold))
                 .kerning(-0.48)

@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.preview.PassmatePreview
@@ -116,14 +117,7 @@ private fun LoadedReport(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "←",
-                color = PassmateColors.TextPrimary,
-                fontSize = 20.sp,
-                modifier = Modifier
-                    .clickable(onClick = onClickBack)
-                    .padding(4.dp)
-            )
+            PassmateBackButton(onClick = onClickBack)
             Text(
                 text = "방 리포트",
                 color = PassmateColors.TextPrimary,
@@ -132,7 +126,7 @@ private fun LoadedReport(
                 letterSpacing = (-0.36).sp,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 8.dp)
+                    .padding(start = 12.dp)
             )
             Text(
                 text = "내보내기",

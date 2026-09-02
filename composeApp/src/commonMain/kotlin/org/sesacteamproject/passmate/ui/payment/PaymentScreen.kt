@@ -36,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.component.PortOnePaymentView
@@ -140,19 +141,10 @@ private fun PaymentContentScreen(
 @Composable
 private fun PaymentHeader(onBack: () -> Unit) {
     Box(modifier = Modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .padding(start = 20.dp, top = 58.dp)
-                .size(24.dp)
-                .clickable(onClick = onBack),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "←",
-                color = PassmateColors.TextPrimary,
-                fontSize = 22.sp
-            )
-        }
+        PassmateBackButton(
+            onClick = onBack,
+            modifier = Modifier.padding(start = 20.dp, top = 58.dp)
+        )
         PassyMascot(
             modifier = Modifier
                 .align(Alignment.TopEnd)
