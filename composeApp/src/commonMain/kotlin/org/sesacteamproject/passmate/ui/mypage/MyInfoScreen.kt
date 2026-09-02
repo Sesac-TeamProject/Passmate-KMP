@@ -1,6 +1,5 @@
 package org.sesacteamproject.passmate.ui.mypage
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,13 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateIcon
+import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.component.ReputationBadge
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.component.StudentAvatars
@@ -271,7 +269,7 @@ private fun LoadedMyInfo(
             // 코인·정산은 카드 단위로만 실패시킨다 — 프로필이 정상이면 화면 전체를 덮지 않는다 (규칙 §9)
             if (uiState.isCoinInfoFailed) {
                 FailureCard(
-                    message = "코인 정보를 불러오지 못했어요",
+                    message = FailureText.COIN_CARD,
                     onRetry = { onAction(MyInfoAction.RetryCoinInfo) }
                 )
             } else {
@@ -298,7 +296,7 @@ private fun LoadedMyInfo(
             }
             if (uiState.isEarningsFailed) {
                 FailureCard(
-                    message = "정산 정보를 불러오지 못했어요",
+                    message = FailureText.EARNINGS_CARD,
                     onRetry = { onAction(MyInfoAction.RetryEarnings) }
                 )
             } else {
@@ -511,22 +509,68 @@ private fun CoinRow(
     }
 }
 
-// 카드 하나라도 실패했을 때의 상단 안내 (시안 M-12e banner/부분 실패)
+// 부분 실패 문구 (시안 M-12e) — iOS MyInfoView.swift의 FailureText와 1:1
+private object FailureText {
+
+    const val BANNER = "일부 정보를 불러오지 못했어요 · 아래에서 다시 시도"
+
+    const val COIN_CARD = "코인 정보를 불러오지 못했어요"
+
+    const val EARNINGS_CARD = "정산 정보를 불러오지 못했어요"
+
+    const val RETRY = "다시 시도"
+}
+
+// 부분 실패 치수·타이포 (시안 M-12e) — iOS FailureSpec과 1:1
+private object FailureSpec {
+
+    val BannerHeight = 44.dp
+
+    val BannerCornerRadius = 12.dp
+
+    val BannerFontSize = 13.sp
+
+    val BannerLetterSpacing = (-0.13).sp
+
+    val CardHeight = 150.dp
+
+    val CardCornerRadius = 16.dp
+
+    val CardBorderWidth = 1.dp
+
+    val IconSize = 22.dp
+
+    val MessageTopPadding = 10.dp
+
+    val MessageFontSize = 14.sp
+
+    val MessageLetterSpacing = (-0.14).sp
+
+    val RetryTopPadding = 2.dp
+
+    val RetryFontSize = 13.sp
+
+    val RetryLetterSpacing = (-0.13).sp
+
+    val RetryTouchPadding = 8.dp
+}
+
+// 카드 하나라도 실패했을 때의 상단 안내 (시안 M-12e banner/부분 실패). 값은 FailureSpec/FailureText
 @Composable
 private fun PartialFailureBanner() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(44.dp)
-            .background(PassmateColors.ErrorIconBg, RoundedCornerShape(12.dp)),
+            .height(FailureSpec.BannerHeight)
+            .background(PassmateColors.ErrorIconBg, RoundedCornerShape(FailureSpec.BannerCornerRadius)),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "일부 정보를 불러오지 못했어요 · 아래에서 다시 시도",
+            text = FailureText.BANNER,
             color = PassmateColors.WrongPinkText,
-            fontSize = 13.sp,
+            fontSize = FailureSpec.BannerFontSize,
             fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.13).sp
+            letterSpacing = FailureSpec.BannerLetterSpacing
         )
     }
 }
@@ -540,61 +584,40 @@ private fun FailureCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp)
-            .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
-            .background(PassmateColors.Surface, RoundedCornerShape(16.dp)),
+            .height(FailureSpec.CardHeight)
+            .border(
+                FailureSpec.CardBorderWidth,
+                PassmateColors.Border,
+                RoundedCornerShape(FailureSpec.CardCornerRadius)
+            )
+            .background(PassmateColors.Surface, RoundedCornerShape(FailureSpec.CardCornerRadius)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        AlertCircleIcon()
+        PassmateIcon(
+            icon = PassmateIcons.AlertCircle,
+            contentDescription = null,
+            tint = PassmateColors.TextTertiary,
+            modifier = Modifier.size(FailureSpec.IconSize)
+        )
         Text(
             text = message,
             color = PassmateColors.TextPrimary,
-            fontSize = 14.sp,
+            fontSize = FailureSpec.MessageFontSize,
             fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.14).sp,
-            modifier = Modifier.padding(top = 10.dp)
+            letterSpacing = FailureSpec.MessageLetterSpacing,
+            modifier = Modifier.padding(top = FailureSpec.MessageTopPadding)
         )
         Text(
-            text = "다시 시도",
+            text = FailureText.RETRY,
             color = PassmateColors.PrimaryDeep,
-            fontSize = 13.sp,
+            fontSize = FailureSpec.RetryFontSize,
             fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.13).sp,
+            letterSpacing = FailureSpec.RetryLetterSpacing,
             modifier = Modifier
-                .padding(top = 2.dp)
+                .padding(top = FailureSpec.RetryTopPadding)
                 .clickable(onClick = onRetry)
-                .padding(8.dp)
-        )
-    }
-}
-
-// 시안 icon/alert-circle — 원 테두리 + 느낌표 (아이콘 세트 의존 없이 직접 그린다)
-@Composable
-private fun AlertCircleIcon() {
-    Canvas(modifier = Modifier.size(22.dp)) {
-        val strokeWidth = 2.dp.toPx()
-        val radius = (size.minDimension - strokeWidth) / 2f
-        val center = Offset(size.width / 2f, size.height / 2f)
-        val iconColor = PassmateColors.TextTertiary
-
-        drawCircle(
-            color = iconColor,
-            radius = radius,
-            center = center,
-            style = Stroke(width = strokeWidth)
-        )
-        drawLine(
-            color = iconColor,
-            start = Offset(center.x, center.y - radius * 0.45f),
-            end = Offset(center.x, center.y + radius * 0.1f),
-            strokeWidth = strokeWidth,
-            cap = StrokeCap.Round
-        )
-        drawCircle(
-            color = iconColor,
-            radius = strokeWidth / 2f,
-            center = Offset(center.x, center.y + radius * 0.45f)
+                .padding(FailureSpec.RetryTouchPadding)
         )
     }
 }

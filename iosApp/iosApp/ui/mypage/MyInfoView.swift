@@ -165,6 +165,52 @@ private struct MyInfoNoticeToast: View {
     }
 }
 
+// 부분 실패 문구 (시안 M-12e) — Compose MyInfoScreen.kt의 FailureText 미러
+private enum FailureText {
+    static let banner = "일부 정보를 불러오지 못했어요 · 아래에서 다시 시도"
+
+    static let coinCard = "코인 정보를 불러오지 못했어요"
+
+    static let earningsCard = "정산 정보를 불러오지 못했어요"
+
+    static let retry = "다시 시도"
+}
+
+// 부분 실패 치수·타이포 (시안 M-12e) — Compose FailureSpec 미러
+private enum FailureSpec {
+    static let iconAsset = "AlertCircle"
+
+    static let bannerHeight: CGFloat = 44
+
+    static let bannerCornerRadius: CGFloat = 12
+
+    static let bannerFontSize: CGFloat = 13
+
+    static let bannerKerning: CGFloat = -0.13
+
+    static let cardHeight: CGFloat = 150
+
+    static let cardCornerRadius: CGFloat = 16
+
+    static let cardBorderWidth: CGFloat = 1
+
+    static let iconSize: CGFloat = 22
+
+    static let messageTopPadding: CGFloat = 10
+
+    static let messageFontSize: CGFloat = 14
+
+    static let messageKerning: CGFloat = -0.14
+
+    static let retryTopPadding: CGFloat = 2
+
+    static let retryFontSize: CGFloat = 13
+
+    static let retryKerning: CGFloat = -0.13
+
+    static let retryTouchPadding: CGFloat = 8
+}
+
 private struct MyInfoContentView: View {
     let uiState: MyInfoUiState
 
@@ -228,7 +274,7 @@ private struct MyInfoContentView: View {
                     }
                     // 코인·정산은 카드 단위로만 실패시킨다 — 프로필이 정상이면 화면 전체를 덮지 않는다 (규칙 §9)
                     if uiState.isCoinInfoFailed {
-                        failureCard(message: "코인 정보를 불러오지 못했어요") { onAction(.retryCoinInfo) }
+                        failureCard(message: FailureText.coinCard) { onAction(.retryCoinInfo) }
                     } else {
                         sectionCard {
                             coinRow(coins: profile.coins?.int64Value ?? 0) { onAction(.clickCharge) }
@@ -239,7 +285,7 @@ private struct MyInfoContentView: View {
                         }
                     }
                     if uiState.isEarningsFailed {
-                        failureCard(message: "정산 정보를 불러오지 못했어요") { onAction(.retryEarnings) }
+                        failureCard(message: FailureText.earningsCard) { onAction(.retryEarnings) }
                     } else {
                         sectionCard {
                             infoRow(title: "정산 계좌", subtitle: settlementAccountSubtitle, actionLabel: "변경") { onAction(.clickSettlementAccount) }
@@ -279,40 +325,41 @@ private struct MyInfoContentView: View {
 
     // 카드 하나라도 실패했을 때의 상단 안내 (시안 M-12e banner/부분 실패)
     private var partialFailureBanner: some View {
-        Text("일부 정보를 불러오지 못했어요 · 아래에서 다시 시도")
-            .font(.system(size: 13, weight: .medium))
-            .kerning(-0.13)
+        Text(FailureText.banner)
+            .font(.system(size: FailureSpec.bannerFontSize, weight: .medium))
+            .kerning(FailureSpec.bannerKerning)
             .foregroundColor(PassmateColors.wrongPinkText)
             .frame(maxWidth: .infinity)
-            .frame(height: 44)
+            .frame(height: FailureSpec.bannerHeight)
             .background(PassmateColors.errorIconBg)
-            .cornerRadius(12)
+            .cornerRadius(FailureSpec.bannerCornerRadius)
     }
 
     // 카드 단위 실패 자리표시자 (시안 M-12e card/실패) — 해당 섹션만 다시 불러온다
     private func failureCard(message: String, onRetry: @escaping () -> Void) -> some View {
         VStack(spacing: 0) {
-            Image(systemName: "exclamationmark.circle")
-                .font(.system(size: 20, weight: .regular))
-                .foregroundColor(PassmateColors.textTertiary)
+            AlertCircleIcon(tint: PassmateColors.textTertiary, size: FailureSpec.iconSize)
             Text(message)
-                .font(.system(size: 14, weight: .medium))
-                .kerning(-0.14)
+                .font(.system(size: FailureSpec.messageFontSize, weight: .medium))
+                .kerning(FailureSpec.messageKerning)
                 .foregroundColor(PassmateColors.textPrimary)
-                .padding(.top, 10)
+                .padding(.top, FailureSpec.messageTopPadding)
             Button(action: onRetry) {
-                Text("다시 시도")
-                    .font(.system(size: 13, weight: .bold))
-                    .kerning(-0.13)
+                Text(FailureText.retry)
+                    .font(.system(size: FailureSpec.retryFontSize, weight: .bold))
+                    .kerning(FailureSpec.retryKerning)
                     .foregroundColor(PassmateColors.primaryDeep)
-                    .padding(8)
+                    .padding(FailureSpec.retryTouchPadding)
             }
-            .padding(.top, 2)
+            .padding(.top, FailureSpec.retryTopPadding)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 150)
+        .frame(height: FailureSpec.cardHeight)
         .background(PassmateColors.surface)
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
+        .overlay(
+            RoundedRectangle(cornerRadius: FailureSpec.cardCornerRadius)
+                .stroke(PassmateColors.border, lineWidth: FailureSpec.cardBorderWidth)
+        )
     }
 
     // 실패는 카드 자체가 failureCard로 대체되므로 여기서는 성공·빈 값만 다룬다
@@ -444,6 +491,23 @@ private struct MyInfoContentView: View {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
+}
+
+// 경고 원 아이콘 (시안 icon/alert-circle) — Compose PassmateIcon(PassmateIcons.AlertCircle) 미러.
+// 지오메트리는 Assets.xcassets/AlertCircle.imageset, 색은 호출부 토큰 (규칙 §11-2·§11-3)
+private struct AlertCircleIcon: View {
+    let tint: Color
+
+    let size: CGFloat
+
+    var body: some View {
+        Image(FailureSpec.iconAsset)
+            .renderingMode(.template)
+            .resizable()
+            .scaledToFit()
+            .foregroundColor(tint)
+            .frame(width: size, height: size)
     }
 }
 

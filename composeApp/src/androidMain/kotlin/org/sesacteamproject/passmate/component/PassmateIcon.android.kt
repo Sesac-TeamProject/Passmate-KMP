@@ -12,6 +12,7 @@ import org.sesacteamproject.passmate.R
 private fun PassmateIcons.drawableId(): Int {
     return when (this) {
         PassmateIcons.DoorOpen -> R.drawable.ic_door_open
+        PassmateIcons.AlertCircle -> R.drawable.ic_alert_circle
     }
 }
 
