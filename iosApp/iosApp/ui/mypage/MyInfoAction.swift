@@ -17,7 +17,6 @@ enum MyInfoAction {
     case clickSettlementAccount
     case clickEarnings
     case clickNotifications
-    case clickSettings
     // card/기타 회원 탈퇴 행 → 전용 화면 push (M-12-12)
     case clickDeleteAccount
     // card/기타 약관 · 개인정보 처리방침 행 — 전용 화면이 아직 없어 안내만 한다

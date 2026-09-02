@@ -100,7 +100,6 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
                 is MyInfoEvent.OpenSettlementAccount -> activeSheet = MyInfoSheet.SETTLEMENT_ACCOUNT
                 is MyInfoEvent.OpenEarnings -> onNavigate(NavigationAction.NavigateToEarnings)
                 is MyInfoEvent.OpenNotifications -> activeSheet = MyInfoSheet.NOTIFICATIONS
-                is MyInfoEvent.OpenSettings -> onNavigate(NavigationAction.NavigateToSettings)
                 is MyInfoEvent.OpenDeleteAccount -> onNavigate(NavigationAction.NavigateToDeleteAccount)
                 is MyInfoEvent.SignedOut -> onNavigate(NavigationAction.NavigateToHome)
                 is MyInfoEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
@@ -244,16 +243,6 @@ private fun LoadedMyInfo(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.48).sp
-            )
-            Text(
-                text = "설정",
-                color = PassmateColors.TextSecondary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp,
-                modifier = Modifier
-                    .clickable { onAction(MyInfoAction.ClickSettings) }
-                    .padding(4.dp)
             )
         }
         if (uiState.hasPartialFailure) {

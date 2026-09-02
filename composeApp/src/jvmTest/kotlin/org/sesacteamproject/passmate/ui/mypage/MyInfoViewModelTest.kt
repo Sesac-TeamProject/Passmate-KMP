@@ -218,7 +218,6 @@ class MyInfoViewModelTest {
         viewModel.onAction(MyInfoAction.ClickEditProfile)
         viewModel.onAction(MyInfoAction.ClickCharge)
         viewModel.onAction(MyInfoAction.ClickSettlementAccount)
-        viewModel.onAction(MyInfoAction.ClickSettings)
         viewModel.onAction(MyInfoAction.ClickDeleteAccount)
 
         assertEquals(
@@ -227,7 +226,6 @@ class MyInfoViewModelTest {
                 MyInfoEvent.OpenEditProfile(nickname = "준영", avatarId = 3),
                 MyInfoEvent.OpenCharge,
                 MyInfoEvent.OpenSettlementAccount,
-                MyInfoEvent.OpenSettings,
                 MyInfoEvent.OpenDeleteAccount
             ),
             events

@@ -150,7 +150,6 @@ class MyInfoViewModel(
             is MyInfoAction.ClickSettlementAccount -> emit(MyInfoEvent.OpenSettlementAccount)
             is MyInfoAction.ClickEarnings -> emit(MyInfoEvent.OpenEarnings)
             is MyInfoAction.ClickNotifications -> emit(MyInfoEvent.OpenNotifications)
-            is MyInfoAction.ClickSettings -> emit(MyInfoEvent.OpenSettings)
             is MyInfoAction.ClickDeleteAccount -> emit(MyInfoEvent.OpenDeleteAccount)
             is MyInfoAction.ClickTerms -> emit(MyInfoEvent.ShowNotice(TERMS_NOTICE))
             is MyInfoAction.ConfirmSignOut -> onConfirmSignOut()

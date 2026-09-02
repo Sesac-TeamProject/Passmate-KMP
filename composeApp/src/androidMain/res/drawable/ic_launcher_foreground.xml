@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 자동 생성 — tools/brand/BrandAssets.java (adaptive foreground). 직접 고치지 말 것 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:translateX="36.5625"
+        android:translateY="31.6800"
+        android:scaleX="0.9300000"
+        android:scaleY="0.9300000">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M3 0l17 0c4.64129 0 9.09248 1.84374 12.37437 5.12563 3.28189 3.28189 5.12563 7.73308 5.12563 12.37437 0 4.64129-1.84375 9.09248-5.12563 12.37437-3.28189 3.28189-7.73308 5.12563-12.37437 5.12563l-7 0 0 10c0 0.79565-0.31607 1.55871-0.87868 2.12132-0.56261 0.56261-1.32567 0.87868-2.12132 0.87868l-7 0c-0.79565 0-1.55871-0.31607-2.12132-0.87868-0.56261-0.56261-0.87868-1.32567-0.87868-2.12132l0-42c0-0.79565 0.31607-1.55871 0.87868-2.12132 0.56261-0.56261 1.32567-0.87868 2.12132-0.87868z" />
+    </group>
+    <group
+        android:translateX="48.7641"
+        android:translateY="42.0960"
+        android:scaleX="0.9300000"
+        android:scaleY="0.9300000">
+        <path
+            android:fillColor="#17B884"
+            android:strokeColor="#17B884"
+            android:strokeWidth="2.500000153846154"
+            android:strokeLineJoin="round"
+            android:pathData="M0 0l13.77 0-9.18 6.8 9.18 6.8-13.77 0 0-13.6z" />
+    </group>
+</vector>

@@ -29,8 +29,6 @@ sealed interface MyInfoAction {
 
     data object ClickNotifications : MyInfoAction
 
-    data object ClickSettings : MyInfoAction
-
     // card/기타 회원 탈퇴 행 → 전용 화면 push (M-12-12)
     data object ClickDeleteAccount : MyInfoAction
 

@@ -44,7 +44,9 @@ struct ContentView: View {
                 JoinedRoomsView(
                     onRequireSignIn: { pushSignIn(pendingRoute: .joinedRooms, path: $path) },
                     onOpenReport: { roomId in path.append(.result(roomId: roomId)) },
-                    onRejoin: { pin in path.append(.waiting(pin: pin)) }
+                    onRejoin: { pin in path.append(.waiting(pin: pin)) },
+                    // 빈 상태 CTA — 홈 탭이 곧 PIN 입장 폼. 탭 전환은 셸 가드를 거친다 (규칙 §2-1-1)
+                    onOpenPinEntry: { shellViewModel.action(.selectTab(.home)) }
                 )
                 .tabItem { Label(AppTab.joinedRooms.label, systemImage: AppTab.joinedRooms.systemImage) }
                 .tag(AppTab.joinedRooms)
@@ -55,7 +57,6 @@ struct ContentView: View {
                     onOpenCoinHistory: { path.append(.coinHistory) },
                     onOpenCharge: { path.append(.coinCharge) },
                     onOpenEarnings: { path.append(.earnings) },
-                    onOpenSettings: { path.append(.settings) },
                     onOpenDeleteAccount: { path.append(.deleteAccount) },
                     onSignedOut: {
                         path = []
@@ -191,6 +192,7 @@ struct ContentView: View {
         case .earnings:
             EarningsView(
                 onRequireSignIn: { pushSignIn(pendingRoute: .earnings, path: path) },
+                onOpenCoinHistory: { path.wrappedValue.append(.coinHistory) },
                 onBack: { popOnce(path) }
             )
         case let .sessionControl(roomId, pin):
@@ -205,12 +207,6 @@ struct ContentView: View {
             RoomReportView(
                 roomId: roomId,
                 onRequireSignIn: { pushSignIn(pendingRoute: .roomReport(roomId: roomId), path: path) },
-                onBack: { popOnce(path) }
-            )
-        case .settings:
-            SettingsView(
-                onRequireSignIn: { pushSignIn(pendingRoute: .settings, path: path) },
-                onOpenDeleteAccount: { path.wrappedValue.append(.deleteAccount) },
                 onBack: { popOnce(path) }
             )
         case .deleteAccount:

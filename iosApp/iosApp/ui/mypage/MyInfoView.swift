@@ -30,8 +30,6 @@ struct MyInfoView: View {
 
     var onOpenEarnings: () -> Void = {}
 
-    var onOpenSettings: () -> Void = {}
-
     var onOpenDeleteAccount: () -> Void = {}
 
     var onSignedOut: () -> Void = {}
@@ -79,8 +77,6 @@ struct MyInfoView: View {
                 onOpenEarnings()
             case .openNotifications:
                 activeSheet = .notifications
-            case .openSettings:
-                onOpenSettings()
             case .openDeleteAccount:
                 onOpenDeleteAccount()
             case .signedOut:
@@ -219,12 +215,6 @@ private struct MyInfoContentView: View {
                         .kerning(-0.48)
                         .foregroundColor(PassmateColors.textPrimary)
                     Spacer()
-                    Button(action: { onAction(.clickSettings) }) {
-                        Text("설정")
-                            .font(.system(size: 14, weight: .medium))
-                            .kerning(-0.28)
-                            .foregroundColor(PassmateColors.textSecondary)
-                    }
                 }
                 if uiState.hasPartialFailure {
                     partialFailureBanner

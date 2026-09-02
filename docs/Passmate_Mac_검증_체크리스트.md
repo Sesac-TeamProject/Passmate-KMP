@@ -156,3 +156,16 @@
 - [ ] `[백엔드]` Play 화면 가입 유도 → 로그인 → **홈으로**(스펙 §8-1대로 복귀하지 않는 것이 정상)
 - [ ] `[백엔드]` push 라우트로 복귀한 뒤 뒤로 나오면 아래 탭 루트가 로그인 이전 UI로 보일 수 있다(스펙 §5 알려진 한계 — 결함 아님, `observeCurrentUser()` 후속 과제)
 - [ ] `[실기기 iOS 15]` 위 복귀 경로에서 push/pop이 조용히 실패하지 않는지(빈 화면·상단 빈 띠 없음)
+
+## 12. 빈 상태 아이콘 리소스 전환 (feature/joined-rooms-empty, 2026-09-02 — 파트2)
+
+`0e2108c`가 코드로 그렸던 door-open 아이콘을 리소스 파일로 옮기고, 빈 상태 문구·치수를 상수로 분리했다(규칙 §11-3).
+
+- [x] 3타깃 빌드: `sh gradlew :composeApp:compileDebugKotlinAndroid :composeApp:compileKotlinJvm :composeApp:jvmTest` BUILD SUCCESSFUL · `xcodebuild … build` BUILD SUCCEEDED(오류 0) — 2026-09-02 확인
+- [x] 리소스 회귀 가드: `PassmateIconResourceTest` 4건 통과(classpath 존재·android/jvm 사본 동일·중립색만·`loadXmlImageVector` 파싱). jvm 사본을 치우면 4건 전부 실패하는 것까지 확인 — 2026-09-02
+- [x] 패키징: APK에 `res/drawable/ic_door_open.xml`(aapt2 리소스 테이블 `drawable/ic_door_open`, pathData 5개 온전) · jvm `build/processedResources/jvm/main/drawable/ic_door_open.xml` — 2026-09-02
+- [x] iOS 번들: `Assets.car`에 `DoorOpen`(Vector 렌디션 + 1x/2x/3x, Template Mode=template) — 2026-09-02
+- [x] 지오메트리 동등성: 전환 전 코드 벡터와 전환 후 리소스를 같은 조건(28dp·스트로크 2·round cap)으로 래스터화해 비교 — 열린 문 형태 동일, 차이는 lucide 원본의 모서리 라운드 복원과 손잡이 점 크기(28px 기준 784px 중 85px, 육안 무차이) — 2026-09-02
+- [ ] **육안(안드로이드 스튜디오 프리뷰)**: `JoinedRoomsContentScreenEmptyPreview`에서 아이콘이 원형 배경 위에 회색으로 렌더 — 이 프리뷰는 develop(#24)에만 있고 develop은 #30 병합 전까지 컴파일되지 않는다. **#30 병합 후 develop을 병합하고 확인할 것**
+- [ ] **육안(Xcode 캔버스)**: `JoinedRoomsView.swift`의 `#Preview("참여한 방 없음")`에서 아이콘이 `textSecondary`로 28pt 렌더(검정으로 보이면 템플릿 렌더링 누락)
+- [ ] `[백엔드]` 참여 이력 0건 계정으로 로그인 → 「참여한 방」 탭에서 빈 상태 육안 확인(Android·iOS)
