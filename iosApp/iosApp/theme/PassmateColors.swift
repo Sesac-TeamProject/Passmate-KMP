@@ -74,6 +74,11 @@ enum PassmateColors {
 
     static let ratingTagSelectedText = Color(hex: 0x0B6B4C)
 
+    // 목록 필터 칩 선택 배경 (v6 M-12-9 코인 내역 전체/충전/사용)
+    static let filterChipSelectedBg = Color(hex: 0xD6F3E6)
+
+    // 목록 불러오기 실패 아이콘 틴트 (v6 E-List 공통 패턴)
+    static let errorIconTint = Color(hex: 0x7C1F26)
     // 업적 뱃지 타일 테두리 (v6 M-09 명성 · 뱃지 컬렉션)
     static let achievementBadgeBorder = Color(hex: 0xBFEBD8)
 

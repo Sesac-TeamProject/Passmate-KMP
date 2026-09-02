@@ -21,6 +21,7 @@ sealed interface MyInfoEvent {
 
     data object OpenNotifications : MyInfoEvent
 
+    // card/기타 회원 탈퇴 행 → 전용 화면 push (M-12-12)
     data object OpenDeleteAccount : MyInfoEvent
 
     // 로그아웃 완료 → 홈 탭으로 (세션 정리는 shared가 수행)

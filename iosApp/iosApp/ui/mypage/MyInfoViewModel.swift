@@ -2,6 +2,9 @@ import Combine
 import Foundation
 import Shared
 
+// 약관 전용 화면·계약이 아직 없다 — 라우트가 생기기 전까지는 안내 문구만 노출한다
+private let termsNotice = "약관 · 개인정보 처리방침은 준비 중이에요"
+
 // Compose MyInfoViewModel.kt 미러 — 마이 탭 루트 (M-12): 프로필·코인·정산 3섹션 독립 로드
 final class MyInfoViewModel: ObservableObject {
     private let getMyProfileUseCase: GetMyProfileUseCase
@@ -57,11 +60,17 @@ final class MyInfoViewModel: ObservableObject {
         }
     }
 
+    // 진행 중 재시도가 있으면 새로 던지지 않는다 — onEnter와 같은 in-flight 가드 (규칙 §9)
     private func loadCoinInfo() {
+        if uiState.isCoinInfoLoading {
+            return
+        }
+        uiState.isCoinInfoLoading = true
         getMyCoinsUseCase.invoke { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
                 let coins = (result as? AppResultSuccess<AnyObject>)?.value as? CoinBalance
+                self.uiState.isCoinInfoLoading = false
                 if error == nil, let coins {
                     self.uiState.defaultMethod = coins.defaultMethod
                     self.uiState.recentTransaction = coins.recent
@@ -74,10 +83,15 @@ final class MyInfoViewModel: ObservableObject {
     }
 
     private func loadEarnings() {
+        if uiState.isEarningsLoading {
+            return
+        }
+        uiState.isEarningsLoading = true
         getEarningsUseCase.invoke(cursor: nil) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
                 let earnings = (result as? AppResultSuccess<AnyObject>)?.value as? Earnings
+                self.uiState.isEarningsLoading = false
                 if error == nil, let earnings {
                     self.uiState.settlementAccount = earnings.account
                     self.uiState.nextPayout = earnings.nextPayout
@@ -119,6 +133,10 @@ final class MyInfoViewModel: ObservableObject {
             onEnter()
         case .retry:
             loadAll()
+        case .retryCoinInfo:
+            loadCoinInfo()
+        case .retryEarnings:
+            loadEarnings()
         case .clickProfile:
             event.send(.openReputation)
         case .clickEditProfile:
@@ -137,6 +155,8 @@ final class MyInfoViewModel: ObservableObject {
             event.send(.openNotifications)
         case .clickDeleteAccount:
             event.send(.openDeleteAccount)
+        case .clickTerms:
+            event.send(.showNotice(message: termsNotice))
         case .confirmSignOut:
             onConfirmSignOut()
         case .profileUpdated:
