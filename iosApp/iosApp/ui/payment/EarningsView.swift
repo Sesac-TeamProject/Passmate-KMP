@@ -171,6 +171,7 @@ private struct EarningsContentView: View {
                 Text(LoadFailedText.back)
                     .font(.system(size: LoadFailedSpec.backFontSize))
                     .foregroundColor(PassmateColors.textPrimary)
+                    .padding(.vertical, LoadFailedSpec.backVerticalPadding)
             }
             Text(LoadFailedText.headerTitle)
                 .font(.system(size: LoadFailedSpec.headerTitleFontSize, weight: .bold))
@@ -464,7 +465,8 @@ private enum LoadFailedText {
     static let iconAsset = "AlertCircle"
 }
 
-// 목록 불러오기 실패 치수·타이포 (v6 E-List) — Compose LoadFailedSpec 미러
+// 목록 불러오기 실패 치수·타이포 (v6 E-List) — Compose LoadFailedSpec 미러.
+// 상단 여백은 Compose가 60dp를 직접 두는 것과 달리 세이프에어리어가 처리하므로 항목이 없다.
 // (SwiftUI에는 lineHeight가 없어 파생값 guideLineSpacing 1개가 더 있다)
 private enum LoadFailedSpec {
     static let headerPaddingHorizontal: CGFloat = 20
@@ -474,6 +476,9 @@ private enum LoadFailedSpec {
     static let backFontSize: CGFloat = 20
 
     static let backEndPadding: CGFloat = 12
+
+    // Compose BackVerticalPadding 4dp와 같은 탭 영역 확장
+    static let backVerticalPadding: CGFloat = 4
 
     static let headerTitleFontSize: CGFloat = 15
 

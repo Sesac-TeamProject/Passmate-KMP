@@ -514,13 +514,18 @@ private object LoadFailedText {
     const val BACK_LINK = "계좌 정보는 마이에서 확인"
 }
 
-// 목록 불러오기 실패 치수·타이포 (v6 E-List) — iOS LoadFailedSpec과 1:1
+// 목록 불러오기 실패 치수·타이포 (v6 E-List) — iOS LoadFailedSpec과 1:1.
+// 다만 상단 여백은 플랫폼이 다르다: Android는 엣지투엣지 + Scaffold 인셋 0이라 화면이 직접
+// 60dp를 두고(다른 8개 화면과 동일), iOS는 SwiftUI 세이프에어리어가 처리한다.
 // (iOS는 lineHeight가 없어 파생값 guideLineSpacing 1개가 더 있다)
 private object LoadFailedSpec {
 
     val HeaderPaddingHorizontal = 20.dp
 
-    val HeaderPaddingVertical = 14.dp
+    // 상태바 아래로 들어가지 않게 다른 화면과 같은 60dp — 아래 여백만 14dp
+    val HeaderPaddingTop = 60.dp
+
+    val HeaderPaddingBottom = 14.dp
 
     val BackFontSize = 20.sp
 
@@ -664,8 +669,10 @@ private fun LoadFailedHeader(onClickBack: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                horizontal = LoadFailedSpec.HeaderPaddingHorizontal,
-                vertical = LoadFailedSpec.HeaderPaddingVertical
+                start = LoadFailedSpec.HeaderPaddingHorizontal,
+                top = LoadFailedSpec.HeaderPaddingTop,
+                end = LoadFailedSpec.HeaderPaddingHorizontal,
+                bottom = LoadFailedSpec.HeaderPaddingBottom
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -757,6 +764,36 @@ private fun EarningsContentScreenEmptyPreview() {
                     nextCursor = null,
                     hasNext = false,
                     account = null
+                ),
+                items = emptyList()
+            ),
+            onAction = {},
+            onClickBack = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun EarningsContentScreenNoSettlementsPreview() {
+    PassmateTheme {
+        EarningsContentScreen(
+            uiState = EarningsUiState(
+                isLoading = false,
+                earnings = Earnings(
+                    monthlyTotal = 0L,
+                    hostSharePercent = 80,
+                    nextPayout = null,
+                    paidRoomCount = 0,
+                    studentCount = 0,
+                    items = emptyList(),
+                    nextCursor = null,
+                    hasNext = false,
+                    account = SettlementAccountSummary(
+                        bankName = "국민",
+                        maskedNumber = "***-***-4821",
+                        payoutNote = "매월 5일 지급"
+                    )
                 ),
                 items = emptyList()
             ),

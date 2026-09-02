@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,9 @@ import org.sesacteamproject.passmate.theme.PassmateColors
 
 // 빈 상태 블록 치수·타이포 — iOS PassmateEmptyStateView.swift의 PassmateEmptyStateSpec과 1:1
 // (iOS는 lineHeight가 없어 파생값 guideLineSpacing 1개가 더 있다).
-// 자간은 이 리포 관례대로 폰트 크기의 -1%다 (19→-0.19 · 14→-0.14 · 16→-0.16)
+// 값은 0e2108c(참여한 방 빈 상태)가 시안 대조한 것을 그대로 옮긴 것이다.
+// TODO 제목 자간 -0.19는 폰트 크기의 -1%로, 이 리포 나머지 텍스트의 관례(-2%, 짝지어진 247곳 중 246곳)와
+// 어긋난다. 빈 상태 블록에만 있는 예외라 시안 확인 전까지 기존 값을 유지한다
 private object PassmateEmptyStateSpec {
 
     val SectionPaddingVertical = 40.dp
@@ -47,8 +50,6 @@ private object PassmateEmptyStateSpec {
 
     val GuideLineHeight = 23.1.sp
 
-    val GuideLetterSpacing = (-0.14).sp
-
     val CtaTopPadding = 24.dp
 
     val CtaWidth = 200.dp
@@ -58,8 +59,6 @@ private object PassmateEmptyStateSpec {
     val CtaCornerRadius = 14.dp
 
     val CtaFontSize = 16.sp
-
-    val CtaLetterSpacing = (-0.16).sp
 }
 
 // 목록 빈 상태 블록 (v6) — 아이콘 원형 · 제목 · 안내 문구 · CTA.
@@ -72,11 +71,10 @@ fun PassmateEmptyState(
     title: String,
     guide: String,
     ctaLabel: String,
-    onClickCta: () -> Unit,
-    modifier: Modifier = Modifier
+    onClickCta: () -> Unit
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = PassmateEmptyStateSpec.SectionPaddingVertical),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -108,7 +106,6 @@ fun PassmateEmptyState(
             color = PassmateColors.TextSecondary,
             fontSize = PassmateEmptyStateSpec.GuideFontSize,
             lineHeight = PassmateEmptyStateSpec.GuideLineHeight,
-            letterSpacing = PassmateEmptyStateSpec.GuideLetterSpacing,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = PassmateEmptyStateSpec.GuideTopPadding)
         )
@@ -121,7 +118,7 @@ fun PassmateEmptyState(
                     PassmateColors.Primary,
                     RoundedCornerShape(PassmateEmptyStateSpec.CtaCornerRadius)
                 )
-                .clickable(onClick = onClickCta),
+                .clickable(role = Role.Button, onClick = onClickCta),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -129,8 +126,7 @@ fun PassmateEmptyState(
                 text = ctaLabel,
                 color = PassmateColors.Surface,
                 fontSize = PassmateEmptyStateSpec.CtaFontSize,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = PassmateEmptyStateSpec.CtaLetterSpacing
+                fontWeight = FontWeight.Bold
             )
         }
     }

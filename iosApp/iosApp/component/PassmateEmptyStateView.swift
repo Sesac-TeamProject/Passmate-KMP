@@ -2,7 +2,8 @@ import SwiftUI
 
 // 빈 상태 블록 치수·타이포 — Compose PassmateEmptyState.kt의 PassmateEmptyStateSpec과 1:1
 // (SwiftUI에는 lineHeight가 없어 파생값 guideLineSpacing 1개가 더 있다).
-// 자간은 이 리포 관례대로 폰트 크기의 -1%다 (19→-0.19 · 14→-0.14 · 16→-0.16)
+// 값은 0e2108c(참여한 방 빈 상태)가 시안 대조한 것을 그대로 옮긴 것이다.
+// TODO 제목 자간 -0.19는 폰트 크기의 -1%로 리포 관례(-2%)와 어긋난다 — Compose 쪽 TODO 참조
 private enum PassmateEmptyStateSpec {
     static let sectionPaddingVertical: CGFloat = 40
 
@@ -23,8 +24,6 @@ private enum PassmateEmptyStateSpec {
     // Compose lineHeight 23.1(14 x 1.65) - SF 14pt 기본 행높이
     static let guideLineSpacing: CGFloat = 6.4
 
-    static let guideKerning: CGFloat = -0.14
-
     static let ctaTopPadding: CGFloat = 24
 
     static let ctaWidth: CGFloat = 200
@@ -34,8 +33,6 @@ private enum PassmateEmptyStateSpec {
     static let ctaCornerRadius: CGFloat = 14
 
     static let ctaFontSize: CGFloat = 16
-
-    static let ctaKerning: CGFloat = -0.16
 }
 
 // 목록 빈 상태 블록 (v6) — 아이콘 원형 · 제목 · 안내 문구 · CTA.
@@ -78,7 +75,6 @@ struct PassmateEmptyStateView: View {
                 .padding(.top, PassmateEmptyStateSpec.titleTopPadding)
             Text(guide)
                 .font(.system(size: PassmateEmptyStateSpec.guideFontSize))
-                .kerning(PassmateEmptyStateSpec.guideKerning)
                 .lineSpacing(PassmateEmptyStateSpec.guideLineSpacing)
                 .foregroundColor(PassmateColors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -86,7 +82,6 @@ struct PassmateEmptyStateView: View {
             Button(action: onClickCta) {
                 Text(ctaLabel)
                     .font(.system(size: PassmateEmptyStateSpec.ctaFontSize, weight: .bold))
-                    .kerning(PassmateEmptyStateSpec.ctaKerning)
                     .foregroundColor(PassmateColors.surface)
                     .frame(
                         width: PassmateEmptyStateSpec.ctaWidth,
