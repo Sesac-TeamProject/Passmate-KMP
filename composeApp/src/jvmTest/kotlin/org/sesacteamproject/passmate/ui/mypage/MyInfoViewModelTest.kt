@@ -4,6 +4,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -157,6 +158,45 @@ class MyInfoViewModelTest {
         assertEquals(profile, state.profile)
         assertEquals(true, state.isCoinInfoFailed)
         assertEquals(false, state.isEarningsFailed)
+        assertEquals(true, state.hasPartialFailure)
+    }
+
+    @Test
+    fun cardRetryReloadsOnlyThatCard() = runTest {
+        paymentRepository.coinsResult = AppResult.Failure(AppError.NetworkError())
+        val viewModel = viewModel()
+
+        viewModel.onAction(MyInfoAction.Enter)
+        paymentRepository.coinsResult = AppResult.Success(coins)
+        viewModel.onAction(MyInfoAction.RetryCoinInfo)
+
+        val state = viewModel.uiState.value
+        assertEquals(2, paymentRepository.coinsCalls)
+        assertEquals(1, paymentRepository.earningsCalls)
+        assertEquals(false, state.isCoinInfoFailed)
+        assertEquals(false, state.hasPartialFailure)
+    }
+
+    // 진행 중 재시도가 끝나기 전에 또 눌러도 요청이 늘지 않는다 (규칙 §9)
+    @Test
+    fun retryIsIgnoredWhileTheSameCardIsStillLoading() = runTest {
+        val gate = CompletableDeferred<Unit>()
+        paymentRepository.coinsResult = AppResult.Failure(AppError.NetworkError())
+        val viewModel = viewModel()
+
+        viewModel.onAction(MyInfoAction.Enter)
+        paymentRepository.coinsGate = gate
+        viewModel.onAction(MyInfoAction.RetryCoinInfo)
+        val callsWhileLoading = paymentRepository.coinsCalls
+
+        viewModel.onAction(MyInfoAction.RetryCoinInfo)
+
+        assertEquals(true, viewModel.uiState.value.isCoinInfoLoading)
+        assertEquals(callsWhileLoading, paymentRepository.coinsCalls)
+
+        gate.complete(Unit)
+
+        assertEquals(false, viewModel.uiState.value.isCoinInfoLoading)
     }
 
     @Test
@@ -213,6 +253,22 @@ class MyInfoViewModelTest {
             ),
             events
         )
+    }
+
+    // 약관 전용 화면이 없어 안내 문구만 내보낸다 (card/기타 4행)
+    @Test
+    fun clickTermsShowsPreparingNotice() = runTest {
+        val viewModel = viewModel()
+        val events = mutableListOf<MyInfoEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(MyInfoAction.Enter)
+        viewModel.onAction(MyInfoAction.ClickTerms)
+
+        assertEquals(1, events.size)
+        assertEquals(true, events.first() is MyInfoEvent.ShowNotice)
     }
 
     @Test
