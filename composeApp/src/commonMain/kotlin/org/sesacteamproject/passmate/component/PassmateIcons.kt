@@ -6,5 +6,8 @@ package org.sesacteamproject.passmate.component
 enum class PassmateIcons(val resourceName: String) {
 
     // 문이 열린 아이콘 (v6 M-08 참여한 방 빈 상태) — iOS 에셋 이름은 "DoorOpen"
-    DoorOpen("ic_door_open")
+    DoorOpen("ic_door_open"),
+
+    // 경고 원 아이콘 (v6 E-List 목록 불러오기 실패) — iOS 에셋 이름은 "AlertCircle"
+    AlertCircle("ic_alert_circle")
 }

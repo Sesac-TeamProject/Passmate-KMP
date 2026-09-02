@@ -231,6 +231,13 @@ private enum EmptyStateSpec {
     static let ctaFontSize: CGFloat = 16
 }
 
+// 실패 아이콘 치수 (시안 icon/alert-circle 30x30) — Compose FailureIconSize와 1:1
+private enum FailureStateSpec {
+    static let iconAsset = "AlertCircle"
+
+    static let iconSize: CGFloat = 30
+}
+
 // 빈 상태 (v6 M-08) 미러 — 아이콘 원형 · 제목 · 안내 문구 · PIN 입장 CTA. 값은 EmptyStateSpec/EmptyStateText
 private struct JoinedRoomsEmptyView: View {
     let onClickEnterPin: () -> Void
@@ -442,24 +449,17 @@ private struct JoinedRoomRow: View {
     }
 }
 
-// 실패 아이콘 (원 + 느낌표) — 시안 icon/alert-circle 30x30
+// 실패 아이콘 — Compose PassmateIcons.AlertCircle과 같은 원본을 쓰고,
+// 색은 템플릿 렌더링으로 준다 (규칙 §11-2·§11-3)
 private struct AlertCircleIcon: View {
     var body: some View {
-        ZStack {
-            Circle()
-                .stroke(PassmateColors.wrongPinkText, lineWidth: 2)
-                .frame(width: 22.5, height: 22.5)
-            VStack(spacing: 3) {
-                Capsule()
-                    .fill(PassmateColors.wrongPinkText)
-                    .frame(width: 2, height: 6.25)
-                Circle()
-                    .fill(PassmateColors.wrongPinkText)
-                    .frame(width: 2, height: 2)
-            }
-        }
-        .frame(width: 30, height: 30)
-        .accessibilityHidden(true)
+        Image(FailureStateSpec.iconAsset)
+            .renderingMode(.template)
+            .resizable()
+            .scaledToFit()
+            .foregroundColor(PassmateColors.wrongPinkText)
+            .frame(width: FailureStateSpec.iconSize, height: FailureStateSpec.iconSize)
+            .accessibilityHidden(true)
     }
 }
 

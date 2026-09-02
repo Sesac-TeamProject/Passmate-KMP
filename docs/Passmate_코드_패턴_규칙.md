@@ -269,7 +269,7 @@ private struct WaitingRoomContentView: View {
 - 리소스에는 **중립색만** 넣는다(`#FF000000` 스트로크·`#00000000` 채움). 표시 색은 호출부에서 `PassmateColors` 토큰으로 준다(§11-2). 테마 속성(`?attr/…`)·`@color/…` 참조는 Desktop 파서가 해석하지 못하므로 금지한다.
 - 외부 아이콘 세트를 쓰면 **출처·버전·라이선스**를 파일 머리 주석에 남기고 버전을 고정한다(최신판이 시안과 방향이 다를 수 있다).
 - 새 아이콘 추가는 파일 3개 + `PassmateIcons` 항목 1줄 + Android `drawableId()` 분기 1줄이면 끝난다. 테스트는 enum을 순회하므로 따로 추가하지 않는다.
-- 미전환 잔재(후속 대상): `AlertCircleIcon`(Result·MyInfo)·`EmptyIcon`·`ErrorIcon`(CoinHistory)·`HintIcon`(VoiceHintBanner)·`PassyMascot`·`StudentAvatar`·jvm `GoogleSignInIcon`.
+- 미전환 잔재(후속 대상): `AlertCircleIcon`(Result)·`EmptyIcon`·`ErrorIcon`(CoinHistory)·`HintIcon`(VoiceHintBanner)·`PassyMascot`·`StudentAvatar`·jvm `GoogleSignInIcon`.
 
 ## 12. 테스트 규칙
 

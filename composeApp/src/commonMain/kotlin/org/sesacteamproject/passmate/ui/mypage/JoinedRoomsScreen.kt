@@ -1,6 +1,5 @@
 package org.sesacteamproject.passmate.ui.mypage
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,10 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -551,6 +547,9 @@ private fun LoadingBox() {
     }
 }
 
+// 실패 아이콘 크기 (시안 icon/alert-circle 30x30) — iOS FailureIconSize와 1:1
+private val FailureIconSize = 30.dp
+
 // 목록 불러오기 실패 — v6 "E-List 목록 불러오기 실패 — 공통 패턴"(코인 내역·정산·마이와 동일 레이아웃, 공통화 대상)
 @Composable
 private fun LoadFailureBox(
@@ -580,7 +579,12 @@ private fun LoadFailureBox(
                     .background(PassmateColors.ErrorIconBg, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                AlertCircleIcon()
+                PassmateIcon(
+                    icon = PassmateIcons.AlertCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(FailureIconSize),
+                    tint = PassmateColors.WrongPinkText
+                )
             }
             Text(
                 text = "목록을 불러오지 못했어요",
@@ -630,36 +634,6 @@ private fun LoadFailureBox(
                 .fillMaxWidth()
                 .clickable(onClick = onClickContactSupport)
                 .padding(vertical = 8.dp)
-        )
-    }
-}
-
-// 실패 아이콘 (원 + 느낌표) — 시안 icon/alert-circle 30x30
-@Composable
-private fun AlertCircleIcon() {
-    val tint = PassmateColors.WrongPinkText
-
-    Canvas(modifier = Modifier.size(30.dp)) {
-        val strokeWidth = 2.dp.toPx()
-
-        drawCircle(
-            color = tint,
-            radius = 11.25.dp.toPx(),
-            style = Stroke(width = strokeWidth)
-        )
-        drawLine(
-            color = tint,
-            start = Offset(center.x, 10.dp.toPx()),
-            end = Offset(center.x, 16.25.dp.toPx()),
-            strokeWidth = strokeWidth,
-            cap = StrokeCap.Round
-        )
-        drawLine(
-            color = tint,
-            start = Offset(center.x, 20.dp.toPx()),
-            end = Offset(center.x, 20.5.dp.toPx()),
-            strokeWidth = strokeWidth,
-            cap = StrokeCap.Round
         )
     }
 }

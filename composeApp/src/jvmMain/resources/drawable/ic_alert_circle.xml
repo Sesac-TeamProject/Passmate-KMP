@@ -1,0 +1,31 @@
+<!-- alert-circle — 시안 v6 icon/alert-circle(30x30)의 지오메트리를 24 뷰포트로 옮긴 것.
+     30dp로 그리면 시안 치수와 같다: 원 지름 22.5dp(r=9) · 느낌표 6.25dp(8→13) · 점 20dp · 스트로크 2dp(1.6).
+     색은 중립 검정 스트로크뿐이다. 표시 색은 호출부에서 PassmateColors 토큰으로 준다 (규칙 §11-2).
+     Desktop 사본: composeApp/src/jvmMain/resources/drawable/ic_alert_circle.xml (텍스트 동일, PassmateIconResourceTest가 강제) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M12,3a9,9 0,1 0,0,18a9,9 0,1 0,0,-18Z"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M12,8v5"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M12,16v0.4"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
