@@ -37,7 +37,9 @@ import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 import org.sesacteamproject.passmate.user.domain.model.JoinedRoom
 import org.sesacteamproject.passmate.user.domain.model.MyPageSummary
 import org.sesacteamproject.passmate.user.domain.model.OngoingRoom
@@ -523,4 +525,61 @@ private fun formatScore(score: Double): String {
     val digits = score.toLong().toString()
 
     return digits.reversed().chunked(3).joinToString(",").reversed()
+}
+
+// --- Preview ---
+
+@PassmatePreview
+@Composable
+private fun JoinedRoomsContentScreenPreview() {
+    PassmateTheme {
+        JoinedRoomsContentScreen(
+            uiState = JoinedRoomsUiState(
+                isLoading = false,
+                summary = MyPageSummary(
+                    participationCount = 12,
+                    accuracyPercent = 78,
+                    avgRank = 2.4,
+                    trendText = "지난주보다 +5%",
+                    weakTopics = listOf("이차함수", "확률과 통계")
+                ),
+                ongoing = OngoingRoom(
+                    roomId = 501,
+                    pin = "482913",
+                    title = "8월 4주차 Spring 스터디",
+                    hostNickname = "김선생",
+                    progressLabel = "5 / 8 문항 진행 중"
+                ),
+                rooms = listOf(
+                    JoinedRoom(roomId = 401, title = "7월 3주차 미적분 특강", dateLabel = "2026.07.18", questionCount = 10, myScore = 890.0, myRank = 2, hasReport = true),
+                    JoinedRoom(roomId = 402, title = "확률과 통계 총정리", dateLabel = "2026.07.10", questionCount = 8, myScore = 720.0, myRank = 5, hasReport = true),
+                    JoinedRoom(roomId = 403, title = "함수의 극한 퀴즈", dateLabel = "2026.06.28", questionCount = 6, myScore = null, myRank = null, hasReport = false)
+                )
+            ),
+            onAction = {}
+        )
+    }
+}
+
+// 참여한 방 없음 — 빈 상태
+@PassmatePreview
+@Composable
+private fun JoinedRoomsContentScreenEmptyPreview() {
+    PassmateTheme {
+        JoinedRoomsContentScreen(
+            uiState = JoinedRoomsUiState(isLoading = false, rooms = emptyList()),
+            onAction = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun JoinedRoomsContentScreenFailedPreview() {
+    PassmateTheme {
+        JoinedRoomsContentScreen(
+            uiState = JoinedRoomsUiState(isLoading = false, loadFailed = true),
+            onAction = {}
+        )
+    }
 }

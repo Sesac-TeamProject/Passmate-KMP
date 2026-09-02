@@ -32,12 +32,16 @@ import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.LevelEmblem
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.room.domain.model.HostLevel
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 import org.sesacteamproject.passmate.user.domain.model.Badge
 import org.sesacteamproject.passmate.user.domain.model.BadgeType
 import org.sesacteamproject.passmate.user.domain.model.GradeCriterion
+import org.sesacteamproject.passmate.user.domain.model.GradeStats
 import org.sesacteamproject.passmate.user.domain.model.MyGrade
+import org.sesacteamproject.passmate.user.domain.model.NextGrade
 
 // Figma "UI 디자인 v6" M-09(349:9770) — 내 명성·뱃지 상세: 등급 카드(승급 진행도·조건)+뱃지 컬렉션
 @Composable
@@ -455,5 +459,64 @@ private fun formatNumber(value: Double): String {
         (rounded / 10).toString()
     } else {
         "${rounded / 10}.${rounded % 10}"
+    }
+}
+
+// --- Preview ---
+
+@PassmatePreview
+@Composable
+private fun ReputationContentScreenPreview() {
+    PassmateTheme {
+        ReputationContentScreen(
+            uiState = ReputationUiState(
+                isLoading = false,
+                grade = MyGrade(
+    level = HostLevel.VERIFIED,
+    achievedAt = "2026.08.12",
+    stats = GradeStats(
+        participationCount = 48,
+        avgAccuracyPercent = 74,
+        roomCount = 12,
+        totalStudents = 186,
+        avgStars = 4.6,
+        ratingCount = 32
+    ),
+    next = NextGrade(
+        level = HostLevel.POPULAR,
+        progressPercent = 62,
+        criteria = listOf(
+            GradeCriterion(label = "방 운영 횟수", current = 12.0, target = 20.0, met = false),
+            GradeCriterion(label = "누적 학생 수", current = 186.0, target = 150.0, met = true),
+            GradeCriterion(label = "평균 별점", current = 4.6, target = 4.5, met = true)
+        )
+    )
+),
+                badges = listOf(
+                    Badge(type = BadgeType.FIRST_ROOM, earned = true, earnedAt = "2026.06.02", progressCurrent = null, progressTarget = null),
+                    Badge(type = BadgeType.ROOMS_10, earned = true, earnedAt = "2026.08.12", progressCurrent = null, progressTarget = null),
+                    Badge(type = BadgeType.STUDENTS_100, earned = true, earnedAt = "2026.08.20", progressCurrent = null, progressTarget = null),
+                    Badge(type = BadgeType.RATING_45, earned = true, earnedAt = "2026.08.25", progressCurrent = null, progressTarget = null),
+                    Badge(type = BadgeType.RATINGS_50, earned = false, earnedAt = null, progressCurrent = 32, progressTarget = 50),
+                    Badge(type = BadgeType.STREAK_30, earned = false, earnedAt = null, progressCurrent = 12, progressTarget = 30),
+                    Badge(type = BadgeType.FIRST_PAID_ROOM, earned = false, earnedAt = null, progressCurrent = 0, progressTarget = 1),
+                    Badge(type = BadgeType.AI_SETS_50, earned = false, earnedAt = null, progressCurrent = 8, progressTarget = 50)
+                )
+            ),
+            onAction = {},
+            onClickBack = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun ReputationContentScreenFailedPreview() {
+    PassmateTheme {
+        ReputationContentScreen(
+            uiState = ReputationUiState(isLoading = false, loadFailed = true),
+            onAction = {},
+            onClickBack = {}
+        )
     }
 }

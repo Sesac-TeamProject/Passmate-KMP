@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -41,10 +41,16 @@ import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
+import org.sesacteamproject.passmate.report.domain.model.AiFeedback
+import org.sesacteamproject.passmate.report.domain.model.AiFeedbackStatus
 import org.sesacteamproject.passmate.report.domain.model.AnswerVerdict
+import org.sesacteamproject.passmate.report.domain.model.LearningReport
 import org.sesacteamproject.passmate.report.domain.model.QuestionResult
 import org.sesacteamproject.passmate.report.domain.model.SessionResult
+import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // Figma "UI 디자인 v6" M-06(349:9395) — 정답 링·보완 주제·문항 리스트·AI 분석 카드 + 내보내기·평가 (T062·T056·T080)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -455,4 +461,125 @@ private fun headerSubtitle(result: SessionResult): String {
     val rankPart = result.rank?.let { "${it}위 · " } ?: ""
 
     return "${result.roomTitle} · $rankPart${result.totalScore.toLong()}점"
+}
+
+// --- Preview ---
+
+private val previewSessionResult = SessionResult(
+    roomTitle = "8월 4주차 Spring 스터디",
+    rank = 3,
+    totalScore = 990.0,
+    correctCount = 6,
+    questionCount = 8,
+    questions = listOf(
+        QuestionResult(
+            questionId = 1,
+            questionNo = 1,
+            title = "등차수열의 공차",
+            type = QuestionType.MULTIPLE_CHOICE,
+            verdict = AnswerVerdict.CORRECT,
+            myAnswer = "3",
+            correctAnswer = "3",
+            explanation = "이웃한 항의 차가 3으로 일정해요.",
+            earnedScore = 120.0,
+            aiFeedback = null,
+            hostReview = null
+        ),
+        QuestionResult(
+            questionId = 2,
+            questionNo = 2,
+            title = "이차함수의 최댓값 OX",
+            type = QuestionType.OX,
+            verdict = AnswerVerdict.WRONG,
+            myAnswer = "O",
+            correctAnswer = "X",
+            explanation = "아래로 볼록한 이차함수는 최댓값이 없어요.",
+            earnedScore = 0.0,
+            aiFeedback = null,
+            hostReview = null
+        ),
+        QuestionResult(
+            questionId = 3,
+            questionNo = 3,
+            title = "이차방정식의 판별식 활용 서술형",
+            type = QuestionType.ESSAY,
+            verdict = AnswerVerdict.AI_ANALYZED,
+            myAnswer = "판별식 D = b^2 - 4ac를 이용해 근의 개수를 구했습니다.",
+            correctAnswer = null,
+            explanation = null,
+            earnedScore = 85.0,
+            aiFeedback = AiFeedback(
+                status = AiFeedbackStatus.DONE,
+                coveredConcepts = listOf("판별식 공식", "근의 개수 판정"),
+                missingConcepts = listOf("중근 조건 설명"),
+                weaknesses = null,
+                improvement = "부호 판정 과정을 한 단계 더 풀어써 주면 좋아요",
+                suggestedScore = 85.0
+            ),
+            hostReview = null
+        )
+    ),
+    canRate = true,
+    isGuest = false
+)
+
+@PassmatePreview
+@Composable
+private fun ResultContentScreenPreview() {
+    PassmateTheme {
+        ResultContentScreen(
+            uiState = ResultUiState(
+                isLoading = false,
+                result = previewSessionResult,
+                report = LearningReport(
+                    accuracyPercent = 75,
+                    weakTopics = listOf("이차함수", "확률과 통계"),
+                    improvementPoints = listOf("판별식 부호 판정 연습이 필요해요")
+                ),
+                selectedQuestionNo = 3
+            ),
+            onAction = {},
+            onClickHome = {}
+        )
+    }
+}
+
+// 게스트 열람 — 기록 연동(가입 유도) 섹션이 붙는다 (규칙 §8)
+@PassmatePreview
+@Composable
+private fun ResultContentScreenGuestPreview() {
+    PassmateTheme {
+        ResultContentScreen(
+            uiState = ResultUiState(
+                isLoading = false,
+                result = previewSessionResult.copy(isGuest = true, canRate = false)
+            ),
+            onAction = {},
+            onClickHome = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun ResultContentScreenLoadingPreview() {
+    PassmateTheme {
+        ResultContentScreen(
+            uiState = ResultUiState(isLoading = true),
+            onAction = {},
+            onClickHome = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun ResultContentScreenFailedPreview() {
+    PassmateTheme {
+        ResultContentScreen(
+            uiState = ResultUiState(isLoading = false, loadFailed = true),
+            onAction = {},
+            onClickHome = {}
+        )
+    }
 }

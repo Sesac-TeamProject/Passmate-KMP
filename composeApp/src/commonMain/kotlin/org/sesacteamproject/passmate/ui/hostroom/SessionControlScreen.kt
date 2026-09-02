@@ -44,10 +44,15 @@ import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
+import org.sesacteamproject.passmate.session.domain.model.ChoiceCount
 import org.sesacteamproject.passmate.session.domain.model.QuestionType
+import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
+import org.sesacteamproject.passmate.session.domain.model.SubmissionParticipant
 import org.sesacteamproject.passmate.session.domain.model.SubmissionStatus
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // Figma "UI 디자인 v6" M-T2(349:10123) — 진행 리모컨: 프로젝터는 벽, 폰은 조작.
 // 문항·제출 현황은 서버 이벤트·재조회로만 갱신되고, 화면 전환(SESSION_ENDED→리포트)도 서버 이벤트로만 일어난다 (규칙 §2-1-2)
@@ -748,4 +753,126 @@ private fun choiceColor(index: Int): Color {
 
 private fun formatPin(pin: String): String {
     return pin.chunked(3).joinToString(" ")
+}
+
+// --- Preview ---
+
+// 대기실 — 아직 세션을 시작하지 않은 상태
+@PassmatePreview
+@Composable
+private fun SessionControlContentScreenWaitingPreview() {
+    PassmateTheme {
+        SessionControlContentScreen(
+            uiState = SessionControlUiState(
+                isLoading = false,
+                roomTitle = "8월 4주차 Spring 스터디",
+                pin = "482913",
+                status = RoomStatus.WAITING,
+                participantCount = 12,
+                questionCount = 8
+            ),
+            onAction = {},
+            onClickBack = {},
+            onClickEndSession = {}
+        )
+    }
+}
+
+// 문항 진행 중 — 남은 시간은 서버 endsAt 기준 렌더링만 한다 (규칙 §5)
+@PassmatePreview
+@Composable
+private fun SessionControlContentScreenRunningPreview() {
+    PassmateTheme {
+        SessionControlContentScreen(
+            uiState = SessionControlUiState(
+                isLoading = false,
+                roomTitle = "8월 4주차 Spring 스터디",
+                pin = "482913",
+                status = RoomStatus.RUNNING,
+                participantCount = 12,
+                questionCount = 8,
+                question = SessionQuestion(
+                    questionId = 501,
+                    questionNo = 3,
+                    type = QuestionType.MULTIPLE_CHOICE,
+                    body = "등차수열 2, 5, 8, 11, ...의 공차를 구하세요.",
+                    choices = listOf("1", "2", "3", "4"),
+                    points = 100,
+                    timeLimitSec = 30,
+                    endsAt = "2026-08-28T10:15:30Z",
+                    isClosed = false
+                ),
+                remainingSec = 18,
+                submissions = SubmissionStatus(
+                    questionNo = 3,
+                    submittedCount = 9,
+                    totalCount = 12,
+                    accuracyPercent = 67,
+                    choices = listOf(
+                        ChoiceCount(label = "1", count = 1),
+                        ChoiceCount(label = "2", count = 2),
+                        ChoiceCount(label = "3", count = 6),
+                        ChoiceCount(label = "4", count = 0)
+                    ),
+                    participants = listOf(
+                        SubmissionParticipant(participantId = 9001, nickname = "민지", avatarId = 1, submitted = true),
+                        SubmissionParticipant(participantId = 9002, nickname = "준영", avatarId = 2, submitted = true),
+                        SubmissionParticipant(participantId = 9003, nickname = "혜림", avatarId = 5, submitted = false)
+                    )
+                ),
+                isProjectorConnected = true
+            ),
+            onAction = {},
+            onClickBack = {},
+            onClickEndSession = {}
+        )
+    }
+}
+
+// 문항 마감 — 정답 공개 후 다음 문항 대기
+@PassmatePreview
+@Composable
+private fun SessionControlContentScreenClosedPreview() {
+    PassmateTheme {
+        SessionControlContentScreen(
+            uiState = SessionControlUiState(
+                isLoading = false,
+                roomTitle = "8월 4주차 Spring 스터디",
+                pin = "482913",
+                status = RoomStatus.RUNNING,
+                participantCount = 12,
+                questionCount = 8,
+                question = SessionQuestion(
+                    questionId = 501,
+                    questionNo = 3,
+                    type = QuestionType.MULTIPLE_CHOICE,
+                    body = "등차수열 2, 5, 8, 11, ...의 공차를 구하세요.",
+                    choices = listOf("1", "2", "3", "4"),
+                    points = 100,
+                    timeLimitSec = 30,
+                    endsAt = "2026-08-28T10:15:30Z",
+                    isClosed = true
+                ),
+                remainingSec = 0,
+                isQuestionClosed = true,
+                isLocked = true
+            ),
+            onAction = {},
+            onClickBack = {},
+            onClickEndSession = {}
+        )
+    }
+}
+
+@PassmatePreview
+@Composable
+private fun SessionControlContentScreenFailedPreview() {
+    PassmateTheme {
+        SessionControlContentScreen(
+            uiState = SessionControlUiState(isLoading = false, loadFailed = true),
+            onAction = {},
+            onClickBack = {},
+            onClickEndSession = {}
+        )
+    }
 }

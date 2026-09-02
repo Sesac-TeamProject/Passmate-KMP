@@ -37,10 +37,12 @@ import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.component.StudentAvatar
-import org.sesacteamproject.passmate.navigation.NavigationAction
-import org.sesacteamproject.passmate.room.domain.model.Participant
 import org.sesacteamproject.passmate.di.koinScreenViewModel
+import org.sesacteamproject.passmate.navigation.NavigationAction
+import org.sesacteamproject.passmate.preview.PassmatePreview
+import org.sesacteamproject.passmate.room.domain.model.Participant
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // Figma "UI 디자인 v6" M-02(349:9252) 기준 — 입장 완료 카드 + 참가자 실시간 표시
 @Composable
@@ -287,3 +289,48 @@ private fun waitingMessage(nickname: String?): String {
 private const val MAX_VISIBLE_AVATARS = 4
 
 private const val DOT_COUNT = 3
+
+// --- Preview ---
+
+@PassmatePreview
+@Composable
+private fun WaitingContentScreenPreview() {
+    PassmateTheme {
+        WaitingContentScreen(
+            uiState = WaitingUiState(
+                isLoading = false,
+                roomTitle = "8월 4주차 Spring 스터디",
+                pin = "482913",
+                myParticipantId = 9001,
+                myNickname = "민지",
+                participants = listOf(
+                    Participant(participantId = 9001, nickname = "민지", avatarId = 1, isGuest = false, isConnected = true),
+                    Participant(participantId = 9002, nickname = "준영", avatarId = 2, isGuest = false, isConnected = true),
+                    Participant(participantId = 9003, nickname = "혜림", avatarId = 5, isGuest = true, isConnected = false)
+                ),
+                totalCount = 3
+            ),
+            onAction = {}
+        )
+    }
+}
+
+// 아직 아무도 안 들어온 대기실 — 빈 상태
+@PassmatePreview
+@Composable
+private fun WaitingContentScreenEmptyPreview() {
+    PassmateTheme {
+        WaitingContentScreen(
+            uiState = WaitingUiState(
+                isLoading = false,
+                roomTitle = "8월 4주차 Spring 스터디",
+                pin = "482913",
+                myParticipantId = 9001,
+                myNickname = "민지",
+                participants = emptyList(),
+                totalCount = 0
+            ),
+            onAction = {}
+        )
+    }
+}

@@ -35,7 +35,9 @@ import org.sesacteamproject.passmate.component.PortOnePaymentView
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // 코인 충전 (M-12-4 금액 선택 · M-12-6 완료). 완료는 별도 라우트가 아니라 isCompleted 전환으로 그린다.
 // 결제창 UI는 포트원 SDK가 그리므로(M-12-5는 그 목업) 여기서는 PortOnePaymentView만 덮어씌운다
@@ -422,4 +424,55 @@ private fun RetryState(onRetry: () -> Unit) {
 
 private fun formatNumber(value: Int): String {
     return value.toString().reversed().chunked(3).joinToString(",").reversed()
+}
+
+// --- Preview ---
+
+// M-12-4 금액 선택
+@PassmatePreview
+@Composable
+private fun CoinChargeContentScreenPreview() {
+    PassmateTheme {
+        CoinChargeContentScreen(
+            uiState = CoinChargeUiState(
+                isLoading = false,
+                balance = 1200,
+                presets = listOf(5_000, 10_000, 30_000, 50_000),
+                selectedAmount = 10_000
+            ),
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+// M-12-6 충전 완료 — 별도 라우트가 아니라 isCompleted 전환으로 같은 라우트에서 그린다
+@PassmatePreview
+@Composable
+private fun CoinChargeContentScreenCompletedPreview() {
+    PassmateTheme {
+        CoinChargeContentScreen(
+            uiState = CoinChargeUiState(
+                isLoading = false,
+                balance = 11_200,
+                isCompleted = true,
+                chargedAmount = 10_000
+            ),
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+// 잔액·프리셋 로드 실패 (규칙 §11)
+@PassmatePreview
+@Composable
+private fun CoinChargeContentScreenFailedPreview() {
+    PassmateTheme {
+        CoinChargeContentScreen(
+            uiState = CoinChargeUiState(isLoading = false, hasLoadError = true),
+            onAction = {},
+            onBack = {}
+        )
+    }
 }
