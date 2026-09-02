@@ -157,8 +157,6 @@ private enum EmptyStateText {
 
 // 빈 상태 치수·타이포 (v6 M-08) — Compose EmptyStateSpec 미러
 private enum EmptyStateSpec {
-    static let iconAsset = "DoorOpen"
-
     static let sectionPaddingVertical: CGFloat = 40
 
     static let iconCircleSize: CGFloat = 64
@@ -198,7 +196,7 @@ private struct JoinedRoomsEmptyView: View {
             ZStack {
                 Circle()
                     .fill(PassmateColors.emptyIconBg)
-                DoorOpenIcon(tint: PassmateColors.textSecondary, size: EmptyStateSpec.iconSize)
+                PassmateIconView(icon: .doorOpen, tint: PassmateColors.textSecondary, size: EmptyStateSpec.iconSize)
             }
             .frame(width: EmptyStateSpec.iconCircleSize, height: EmptyStateSpec.iconCircleSize)
             Text(EmptyStateText.title)
@@ -225,24 +223,6 @@ private struct JoinedRoomsEmptyView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, EmptyStateSpec.sectionPaddingVertical)
-    }
-}
-
-// door-open 아이콘 — Assets의 DoorOpen(lucide v0.300.0 door-open, ISC).
-// SF Symbol door.left.hand.open은 iOS 16+라 쓸 수 없다 (배포 타깃 15.0, 규칙 §2-1).
-// Compose PassmateIcons.DoorOpen과 같은 원본을 쓰고, 색은 템플릿 렌더링으로 준다 (규칙 §11-2)
-private struct DoorOpenIcon: View {
-    let tint: Color
-
-    let size: CGFloat
-
-    var body: some View {
-        Image(EmptyStateSpec.iconAsset)
-            .renderingMode(.template)
-            .resizable()
-            .scaledToFit()
-            .foregroundColor(tint)
-            .frame(width: size, height: size)
     }
 }
 
