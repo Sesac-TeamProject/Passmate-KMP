@@ -91,6 +91,12 @@ class JoinedRoomsViewModel(
         }
     }
 
+    private fun onClickEnterPin() {
+        viewModelScope.launch {
+            _event.emit(JoinedRoomsEvent.OpenPinEntry)
+        }
+    }
+
     override fun onAction(action: JoinedRoomsAction) {
         when (action) {
             is JoinedRoomsAction.Enter -> onEnter()
@@ -98,6 +104,7 @@ class JoinedRoomsViewModel(
             is JoinedRoomsAction.LoadMore -> onLoadMore()
             is JoinedRoomsAction.ClickRoomReport -> onClickRoomReport(action.roomId)
             is JoinedRoomsAction.ClickRejoin -> onClickRejoin(action.pin)
+            is JoinedRoomsAction.ClickEnterPin -> onClickEnterPin()
         }
     }
 }

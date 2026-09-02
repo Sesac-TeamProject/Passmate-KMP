@@ -21,7 +21,6 @@ import org.sesacteamproject.passmate.ui.payment.SettlementAccountViewModel
 import org.sesacteamproject.passmate.ui.mypage.EditProfileViewModel
 import org.sesacteamproject.passmate.ui.mypage.NotificationSettingsViewModel
 import org.sesacteamproject.passmate.ui.mypage.ReputationViewModel
-import org.sesacteamproject.passmate.ui.mypage.SettingsViewModel
 import org.sesacteamproject.passmate.ui.play.PlayViewModel
 import org.sesacteamproject.passmate.ui.profile.HostProfileViewModel
 import org.sesacteamproject.passmate.ui.result.ResultViewModel
@@ -40,7 +39,6 @@ val viewModelModule = module {
     factory { ResultViewModel(get(), get(), get(), get(), get(), get(), get()) }
     factory { JoinedRoomsViewModel(get(), get()) }
     factory { MyInfoViewModel(get(), get(), get(), get(), get()) }
-    factory { SettingsViewModel(get()) }
     factory { DeleteAccountViewModel(get(), get()) }
     factory { ReputationViewModel(get(), get(), get()) }
     factory { HostProfileViewModel(get(), get(), get(), get()) }

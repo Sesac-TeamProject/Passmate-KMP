@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -94,7 +95,7 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
                 is MyInfoEvent.OpenSettlementAccount -> activeSheet = MyInfoSheet.SETTLEMENT_ACCOUNT
                 is MyInfoEvent.OpenEarnings -> onNavigate(NavigationAction.NavigateToEarnings)
                 is MyInfoEvent.OpenNotifications -> activeSheet = MyInfoSheet.NOTIFICATIONS
-                is MyInfoEvent.OpenSettings -> onNavigate(NavigationAction.NavigateToSettings)
+                is MyInfoEvent.OpenDeleteAccount -> onNavigate(NavigationAction.NavigateToDeleteAccount)
                 is MyInfoEvent.SignedOut -> onNavigate(NavigationAction.NavigateToHome)
                 is MyInfoEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
@@ -238,16 +239,6 @@ private fun LoadedMyInfo(
                 fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.48).sp
             )
-            Text(
-                text = "설정",
-                color = PassmateColors.TextSecondary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp,
-                modifier = Modifier
-                    .clickable { onAction(MyInfoAction.ClickSettings) }
-                    .padding(4.dp)
-            )
         }
         uiState.profile?.let { profile ->
             ProfileCard(
@@ -310,6 +301,14 @@ private fun LoadedMyInfo(
                     subtitle = "세션 시작 · 별점 요청 · 정산",
                     actionLabel = "설정",
                     onClick = { onAction(MyInfoAction.ClickNotifications) }
+                )
+                RowDivider()
+                InfoRow(
+                    title = "회원 탈퇴",
+                    subtitle = null,
+                    actionLabel = "",
+                    actionColor = PassmateColors.Destructive,
+                    onClick = { onAction(MyInfoAction.ClickDeleteAccount) }
                 )
             }
         }
@@ -389,8 +388,9 @@ private fun RowDivider() {
 @Composable
 private fun InfoRow(
     title: String,
-    subtitle: String,
+    subtitle: String?,
     actionLabel: String,
+    actionColor: Color = PassmateColors.PrimaryDeep,
     onClick: () -> Unit
 ) {
     Row(
@@ -411,16 +411,18 @@ private fun InfoRow(
                 fontWeight = FontWeight.Medium,
                 letterSpacing = (-0.3).sp
             )
-            Text(
-                text = subtitle,
-                color = PassmateColors.TextSecondary,
-                fontSize = 13.sp,
-                letterSpacing = (-0.26).sp
-            )
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    color = PassmateColors.TextSecondary,
+                    fontSize = 13.sp,
+                    letterSpacing = (-0.26).sp
+                )
+            }
         }
         Text(
-            text = "$actionLabel ›",
-            color = PassmateColors.PrimaryDeep,
+            text = if (actionLabel.isEmpty()) "›" else "$actionLabel ›",
+            color = actionColor,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             letterSpacing = (-0.28).sp

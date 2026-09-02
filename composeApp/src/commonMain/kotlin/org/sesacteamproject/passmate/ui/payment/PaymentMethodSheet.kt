@@ -29,7 +29,7 @@ import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
 import org.sesacteamproject.passmate.theme.PassmateColors
 
 // Figma "UI 디자인 v6" M-12-8(450:6184) — 결제 수단 관리: 기본 수단 5종 선택(카드 정보는 포트원 처리).
-// 시트 표시 여부는 호스팅 화면(SettingsScreen)이 소유한다 (규칙 §11-1)
+// 시트 표시 여부는 호스팅 화면(MyInfoScreen)이 소유한다 (규칙 §11-1)
 @Composable
 fun PaymentMethodSheet(
     onSaved: () -> Unit,

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 시안 M-00 스플래시 배경 — 다크 모드에서도 같은 민트 단색 (PassmateColors.Primary와 동일 값) -->
+    <color name="passmate_splash_background">#17B884</color>
+</resources>

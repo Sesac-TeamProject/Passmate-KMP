@@ -5,6 +5,8 @@ import Shared
 struct EarningsView: View {
     var onRequireSignIn: () -> Void = {}
 
+    var onOpenCoinHistory: () -> Void = {}
+
     var onBack: () -> Void = {}
 
     @StateObject private var viewModel = EarningsViewModel(
@@ -31,6 +33,8 @@ struct EarningsView: View {
                 onRequireSignIn()
             case .openAccountSheet:
                 isAccountSheetVisible = true
+            case .openCoinHistory:
+                onOpenCoinHistory()
             case let .showNotice(message):
                 noticeMessage = message
             }
@@ -140,10 +144,7 @@ private struct EarningsContentView: View {
                     }
                 }
                 summaryCard(earnings)
-                Text("결제 · 정산 내역")
-                    .font(.system(size: 18, weight: .bold))
-                    .kerning(-0.36)
-                    .foregroundColor(PassmateColors.textPrimary)
+                historySectionHeader
                 if uiState.items.isEmpty {
                     Text("아직 정산 내역이 없어요 · 유료 방을 열면 여기에 쌓여요")
                         .font(.system(size: 14))
@@ -164,6 +165,23 @@ private struct EarningsContentView: View {
             .padding(.horizontal, 20)
             .padding(.top, 32)
             .padding(.bottom, 24)
+        }
+    }
+
+    // 시안 M-T4 — 섹션 제목과 "전체 보기 ›" 링크를 좌우 양끝 정렬한다
+    private var historySectionHeader: some View {
+        HStack {
+            Text("결제 · 정산 내역")
+                .font(.system(size: 18, weight: .bold))
+                .kerning(-0.36)
+                .foregroundColor(PassmateColors.textPrimary)
+            Spacer()
+            Button(action: { onAction(.clickViewAllHistory) }) {
+                Text("전체 보기 ›")
+                    .font(.system(size: 14, weight: .medium))
+                    .kerning(-0.28)
+                    .foregroundColor(PassmateColors.primaryDeep)
+            }
         }
     }
 
@@ -226,7 +244,7 @@ private struct EarningsContentView: View {
                 if uiState.isLoadingMore {
                     ProgressView().tint(PassmateColors.primary)
                 } else {
-                    Text("전체 보기")
+                    Text("더 보기")
                         .font(.system(size: 14, weight: .medium))
                         .kerning(-0.28)
                         .foregroundColor(PassmateColors.primaryDeep)

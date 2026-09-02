@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateCard
@@ -119,7 +121,12 @@ private fun ResultContentScreen(
     ) {
         when {
             uiState.isLoading -> LoadingBox()
-            uiState.loadFailed || uiState.result == null -> ErrorBox(onRetry = { onAction(ResultAction.Retry) })
+            uiState.loadFailed || uiState.result == null -> ErrorContent(
+                onRetry = { onAction(ResultAction.Retry) },
+                onGoHome = onClickHome,
+                // Result의 뒤로가기는 세션 플로우 엔트리를 지나 탭 루트로 돌아간다 (규칙 §2-1-2)
+                onBack = onClickHome
+            )
             else -> LoadedResult(
                 uiState = uiState,
                 result = uiState.result,
@@ -140,30 +147,157 @@ private fun LoadingBox() {
     }
 }
 
+// 시안 M-05e 최종 결과 불러오기 실패 — 상단 경고 바·헤더·알림 아이콘·안내 문구·재시도/홈으로 버튼
 @Composable
-private fun ErrorBox(onRetry: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+private fun ErrorContent(
+    onRetry: () -> Unit,
+    onGoHome: () -> Unit,
+    onBack: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(3.dp)
+                .background(PassmateColors.WrongPink)
+        )
+        ErrorHeader(onBack = onBack)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            AlertCircleIcon()
+            Text(
+                text = "결과를 불러오지 못했어요",
+                color = PassmateColors.TextPrimary,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.22).sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 20.dp)
+            )
+            Text(
+                text = "잠시 후 다시 시도해 주세요.\n제출한 답안은 이미 저장돼 사라지지 않아요.",
+                color = PassmateColors.TextSecondary,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal,
+                lineHeight = 24.75.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 10.dp)
+            )
+            Text(
+                text = "결과는 마이 › 참여한 방에서도\n나중에 다시 볼 수 있어요",
+                color = PassmateColors.TextTertiary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                lineHeight = 23.1.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
+        RetryButton(onClick = onRetry)
+        Spacer(modifier = Modifier.height(10.dp))
+        GoHomeButton(onClick = onGoHome)
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun ErrorHeader(onBack: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "리포트를 불러오지 못했어요",
+            text = "←",
             color = PassmateColors.TextPrimary,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.32).sp
+            fontSize = 20.sp,
+            modifier = Modifier
+                .clickable(onClick = onBack)
+                .padding(end = 12.dp, top = 4.dp, bottom = 4.dp)
         )
         Text(
-            text = "다시 시도",
-            color = PassmateColors.PrimaryDeep,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp,
+            text = "최종 결과",
+            color = PassmateColors.TextPrimary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.3).sp
+        )
+    }
+}
+
+// alert-circle — 원형 배경 위 외곽선 원 + 느낌표 (아이콘 에셋 없이 기본 도형으로 구성)
+@Composable
+private fun AlertCircleIcon() {
+    Box(
+        modifier = Modifier
+            .size(64.dp)
+            .background(PassmateColors.ErrorIconBg, CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
             modifier = Modifier
-                .padding(top = 12.dp)
-                .clickable(onClick = onRetry)
-                .padding(8.dp)
+                .size(28.dp)
+                .border(2.dp, PassmateColors.WrongPinkText, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "!",
+                color = PassmateColors.WrongPinkText,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun RetryButton(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .height(52.dp)
+            .background(PassmateColors.Primary, RoundedCornerShape(14.dp))
+            .clickable(onClick = onClick),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "다시 시도",
+            color = PassmateColors.Surface,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.32).sp
+        )
+    }
+}
+
+@Composable
+private fun GoHomeButton(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .height(52.dp)
+            .background(PassmateColors.Surface, RoundedCornerShape(14.dp))
+            .border(1.5.dp, PassmateColors.Border, RoundedCornerShape(14.dp))
+            .clickable(onClick = onClick),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "홈으로",
+            color = PassmateColors.TextPrimary,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.32).sp
         )
     }
 }
@@ -194,10 +328,6 @@ private fun ColumnScope.LoadedResult(
 
         if (selected != null && (selected.aiFeedback != null || selected.hostReview != null)) {
             FeedbackSection(question = selected)
-        }
-        // 선생님 평가 진입 (T080) — 평가 자격이 있고 아직 안 했을 때만
-        if (result.canRate && !uiState.hasRated) {
-            RateEntryButton(onClick = { onAction(ResultAction.OpenRatingSheet) })
         }
         // 게스트 가입 유도 (T075) — 회원에게는 표시하지 않는다
         if (result.isGuest) {
@@ -409,28 +539,6 @@ private fun verdictStyle(verdict: AnswerVerdict): Triple<Color, Color, String> {
         AnswerVerdict.AI_ANALYZED -> Triple(PassmateColors.ChipGold, PassmateColors.ChipGoldText, "AI 분석")
         AnswerVerdict.AI_PENDING -> Triple(PassmateColors.ChipGold, PassmateColors.ChipGoldText, "분석 중")
         AnswerVerdict.UNGRADED -> Triple(PassmateColors.FieldGray, PassmateColors.TextSecondary, "미채점")
-    }
-}
-
-@Composable
-private fun RateEntryButton(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .background(PassmateColors.BackgroundMint, RoundedCornerShape(16.dp))
-            .border(1.dp, PassmateColors.Primary, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "★ 선생님 평가하기",
-            color = PassmateColors.PrimaryDeep,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp
-        )
     }
 }
 

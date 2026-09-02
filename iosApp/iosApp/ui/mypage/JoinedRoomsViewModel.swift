@@ -81,6 +81,8 @@ final class JoinedRoomsViewModel: ObservableObject {
             event.send(.openReport(roomId: roomId))
         case let .clickRejoin(pin):
             event.send(.rejoin(pin: pin))
+        case .clickEnterPin:
+            event.send(.openPinEntry)
         }
     }
 

@@ -13,6 +13,9 @@ enum PassmateColors {
     // 입력 필드·비활성 칩 배경 (v6 M-01 PIN 박스·닉네임 필드)
     static let fieldGray = Color(hex: 0xF3F4F6)
 
+    // 빈 상태 일러스트 원형 배경 (v6 M-08 참여한 방 빈 상태) — fieldGray보다 한 톤 밝다
+    static let emptyIconBg = Color(hex: 0xF6F6F7)
+
     static let textPrimary = Color(hex: 0x1B1F24)
 
     static let textSecondary = Color(hex: 0x6B7280)
@@ -49,9 +52,15 @@ enum PassmateColors {
 
     static let wrongPinkText = Color(hex: 0x7C1F26)
 
+    // 오류 아이콘 원형 배경 — wrongPink 계열 연한 톤 (v6 M-05e 리포트 불러오기 실패)
+    static let errorIconBg = Color(hex: 0xFDEEEF)
+
     static let weakTopicBg = Color(hex: 0xFDEFDE)
 
     static let weakTopicText = Color(hex: 0xBF3F0C)
+
+    // 파괴적 동작(로그아웃·회원 탈퇴) — 시안 M-12 card/기타
+    static let destructive = Color(hex: 0xD9534F)
 
     // 별점 전용 골드 (디자인 시스템 §StarRating)
     static let starGold = Color(hex: 0xF2C94C)
@@ -68,12 +77,7 @@ enum PassmateColors {
     // 목록 필터 칩 선택 배경 (v6 M-12-9 코인 내역 전체/충전/사용)
     static let filterChipSelectedBg = Color(hex: 0xD6F3E6)
 
-    // 빈 상태 원형 아이콘 배경 (v6 빈 상태 공통)
-    static let emptyIconBg = Color(hex: 0xF6F6F7)
-
-    // 목록 불러오기 실패 원형 아이콘 (v6 E-List 공통 패턴)
-    static let errorIconBg = Color(hex: 0xFDEEEF)
-
+    // 목록 불러오기 실패 아이콘 틴트 (v6 E-List 공통 패턴)
     static let errorIconTint = Color(hex: 0x7C1F26)
 
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)

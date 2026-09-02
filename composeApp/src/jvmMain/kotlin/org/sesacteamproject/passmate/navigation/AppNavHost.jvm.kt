@@ -21,7 +21,6 @@ import org.sesacteamproject.passmate.ui.mypage.DeleteAccountScreen
 import org.sesacteamproject.passmate.ui.mypage.JoinedRoomsScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
-import org.sesacteamproject.passmate.ui.mypage.SettingsScreen
 import org.sesacteamproject.passmate.ui.payment.CoinChargeScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
 import org.sesacteamproject.passmate.ui.payment.EarningsScreen
@@ -49,7 +48,6 @@ private sealed interface JvmDestination {
     data class RoomReport(val roomId: Long) : JvmDestination
     data class SessionControl(val roomId: Long, val pin: String) : JvmDestination
     data object Earnings : JvmDestination
-    data object Settings : JvmDestination
     data object DeleteAccount : JvmDestination
 }
 
@@ -126,7 +124,6 @@ actual fun AppNavHost() {
             is NavigationAction.NavigateToCoinHistory -> routeStack.add(JvmDestination.CoinHistory)
             is NavigationAction.NavigateToCoinCharge -> routeStack.add(JvmDestination.CoinCharge)
             is NavigationAction.NavigateToEarnings -> routeStack.add(JvmDestination.Earnings)
-            is NavigationAction.NavigateToSettings -> routeStack.add(JvmDestination.Settings)
             is NavigationAction.NavigateToDeleteAccount -> routeStack.add(JvmDestination.DeleteAccount)
             is NavigationAction.NavigateBack -> {
                 if (routeStack.size > 1) {
@@ -170,7 +167,6 @@ actual fun AppNavHost() {
                 is JvmDestination.CoinHistory -> CoinHistoryScreen(onNavigate = onNavigate)
                 is JvmDestination.CoinCharge -> CoinChargeScreen(onNavigate = onNavigate)
                 is JvmDestination.Earnings -> EarningsScreen(onNavigate = onNavigate)
-                is JvmDestination.Settings -> SettingsScreen(onNavigate = onNavigate)
                 is JvmDestination.DeleteAccount -> DeleteAccountScreen(onNavigate = onNavigate)
                 is JvmDestination.Waiting -> WaitingScreen(
                     pin = currentDestination.pin,

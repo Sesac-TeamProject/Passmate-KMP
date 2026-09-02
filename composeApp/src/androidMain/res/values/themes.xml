@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 앱 본 테마 — 스플래시가 걷힌 뒤 적용된다 -->
+    <style name="Theme.Passmate" parent="@android:style/Theme.Material.Light.NoActionBar" />
+
+    <!-- 시안 M-00. SplashScreen API는 배경색 + 아이콘만 지원하므로 워드마크·태그라인은 넣지 않는다 -->
+    <style name="Theme.Passmate.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/passmate_splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.Passmate</item>
+    </style>
+
+</resources>

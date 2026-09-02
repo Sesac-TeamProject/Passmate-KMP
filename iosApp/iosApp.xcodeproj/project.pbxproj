@@ -135,11 +135,6 @@
 		A1010001147AABBCCDDEEFF0147 /* AppShellAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */; };
 		A1010001148AABBCCDDEEFF0148 /* AppShellEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001148AABBCCDDEEFF0148 /* AppShellEvent.swift */; };
 		A1010001149AABBCCDDEEFF0149 /* AppShellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001149AABBCCDDEEFF0149 /* AppShellViewModel.swift */; };
-		A1010001150AABBCCDDEEFF0150 /* SettingsUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001150AABBCCDDEEFF0150 /* SettingsUiState.swift */; };
-		A1010001151AABBCCDDEEFF0151 /* SettingsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001151AABBCCDDEEFF0151 /* SettingsAction.swift */; };
-		A1010001152AABBCCDDEEFF0152 /* SettingsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001152AABBCCDDEEFF0152 /* SettingsEvent.swift */; };
-		A1010001153AABBCCDDEEFF0153 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001153AABBCCDDEEFF0153 /* SettingsViewModel.swift */; };
-		A1010001154AABBCCDDEEFF0154 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001154AABBCCDDEEFF0154 /* SettingsView.swift */; };
 		A1010000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift */; };
 		A1010000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift */; };
 		A1010000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */; };
@@ -289,11 +284,6 @@
 		A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellAction.swift; sourceTree = "<group>"; };
 		A1011001148AABBCCDDEEFF0148 /* AppShellEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellEvent.swift; sourceTree = "<group>"; };
 		A1011001149AABBCCDDEEFF0149 /* AppShellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellViewModel.swift; sourceTree = "<group>"; };
-		A1011001150AABBCCDDEEFF0150 /* SettingsUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsUiState.swift; sourceTree = "<group>"; };
-		A1011001151AABBCCDDEEFF0151 /* SettingsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAction.swift; sourceTree = "<group>"; };
-		A1011001152AABBCCDDEEFF0152 /* SettingsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsEvent.swift; sourceTree = "<group>"; };
-		A1011001153AABBCCDDEEFF0153 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
-		A1011001154AABBCCDDEEFF0154 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A1011000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountUiState.swift; sourceTree = "<group>"; };
 		A1011000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountAction.swift; sourceTree = "<group>"; };
 		A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountEvent.swift; sourceTree = "<group>"; };
@@ -493,11 +483,6 @@
 				A1011001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift */,
 				A1011001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift */,
 				A1011001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift */,
-				A1011001150AABBCCDDEEFF0150 /* SettingsUiState.swift */,
-				A1011001151AABBCCDDEEFF0151 /* SettingsAction.swift */,
-				A1011001152AABBCCDDEEFF0152 /* SettingsEvent.swift */,
-				A1011001153AABBCCDDEEFF0153 /* SettingsViewModel.swift */,
-				A1011001154AABBCCDDEEFF0154 /* SettingsView.swift */,
 				A1011000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift */,
 				A1011000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift */,
 				A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */,
@@ -847,11 +832,6 @@
 				A1010001147AABBCCDDEEFF0147 /* AppShellAction.swift in Sources */,
 				A1010001148AABBCCDDEEFF0148 /* AppShellEvent.swift in Sources */,
 				A1010001149AABBCCDDEEFF0149 /* AppShellViewModel.swift in Sources */,
-				A1010001150AABBCCDDEEFF0150 /* SettingsUiState.swift in Sources */,
-				A1010001151AABBCCDDEEFF0151 /* SettingsAction.swift in Sources */,
-				A1010001152AABBCCDDEEFF0152 /* SettingsEvent.swift in Sources */,
-				A1010001153AABBCCDDEEFF0153 /* SettingsViewModel.swift in Sources */,
-				A1010001154AABBCCDDEEFF0154 /* SettingsView.swift in Sources */,
 				A1010000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift in Sources */,
 				A1010000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift in Sources */,
 				A1010000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift in Sources */,
@@ -1010,7 +990,7 @@
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1047,7 +1027,7 @@
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (

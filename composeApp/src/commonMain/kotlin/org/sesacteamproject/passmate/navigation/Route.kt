@@ -48,8 +48,6 @@ sealed class Route(val route: String) {
     // 코인 충전 (M-12-4·M-12-6) — 마이 탭 보유 코인 행에서 진입
     data object CoinCharge : Route("coinCharge")
 
-    data object Settings : Route("settings")
-
-    // 회원 탈퇴 (M-12-12) — 설정에서 진입
+    // 회원 탈퇴 (M-12-12) — 마이 › 회원 탈퇴 행에서 진입
     data object DeleteAccount : Route("deleteAccount")
 }
