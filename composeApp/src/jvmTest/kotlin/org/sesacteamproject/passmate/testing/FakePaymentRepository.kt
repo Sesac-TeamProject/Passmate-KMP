@@ -20,10 +20,13 @@ class FakePaymentRepository(
     var coinsResult: AppResult<CoinBalance> = AppResult.Failure(AppError.Unknown()),
     var earningsResult: AppResult<Earnings> = AppResult.Failure(AppError.Unknown()),
     var chargeResult: AppResult<CoinCheckout> = AppResult.Failure(AppError.Unknown()),
-    var confirmResult: AppResult<ChargeConfirm> = AppResult.Failure(AppError.Unknown())
+    var confirmResult: AppResult<ChargeConfirm> = AppResult.Failure(AppError.Unknown()),
+    var transactionsResult: AppResult<PagedResult<CoinTransaction>> = AppResult.Failure(AppError.Unknown())
 ) : PaymentRepository {
 
     var coinsCalls: Int = 0
+
+    var transactionsCalls: Int = 0
 
     var earningsCalls: Int = 0
 
@@ -39,7 +42,8 @@ class FakePaymentRepository(
     }
 
     override suspend fun getCoinTransactions(cursor: String?): AppResult<PagedResult<CoinTransaction>> {
-        return AppResult.Failure(AppError.Unknown())
+        transactionsCalls += 1
+        return transactionsResult
     }
 
     override suspend fun requestCharge(amount: Int, method: PaymentMethod, roomId: Long?): AppResult<CoinCheckout> {
