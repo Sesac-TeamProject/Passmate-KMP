@@ -2,8 +2,10 @@ import Combine
 import Foundation
 import Shared
 
-// Compose CoinHistoryViewModel.kt 미러 — 코인 내역 페이징 로드
+// Compose CoinHistoryViewModel.kt 미러 — 보유 코인 + 코인 내역 페이징 로드
 final class CoinHistoryViewModel: ObservableObject {
+    private let getMyCoinsUseCase: GetMyCoinsUseCase
+
     private let getCoinTransactionsUseCase: GetCoinTransactionsUseCase
 
     @Published private(set) var uiState = CoinHistoryUiState()
@@ -20,9 +22,21 @@ final class CoinHistoryViewModel: ObservableObject {
         load()
     }
 
-    private func load() {
-        uiState.isLoading = true
-        uiState.hasError = false
+    // 보유 코인은 실패해도 화면을 덮지 않는다 — 실패 화면은 "목록" 로드 실패일 때만이다 (E-List)
+    private func loadBalance() {
+        getMyCoinsUseCase.invoke { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if let coins = (result as? AppResultSuccess<AnyObject>)?.value as? CoinBalance {
+                    self.uiState.balance = Int(coins.balance)
+                } else {
+                    self.uiState.balance = nil
+                }
+            }
+        }
+    }
+
+    private func loadTransactions() {
         getCoinTransactionsUseCase.invoke(cursor: nil) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
@@ -37,6 +51,13 @@ final class CoinHistoryViewModel: ObservableObject {
                 }
             }
         }
+    }
+
+    private func load() {
+        uiState.isLoading = true
+        uiState.hasError = false
+        loadBalance()
+        loadTransactions()
     }
 
     private func onLoadMore() {
@@ -59,6 +80,14 @@ final class CoinHistoryViewModel: ObservableObject {
         }
     }
 
+    private func onSelectFilter(_ filter: CoinHistoryFilter) {
+        uiState.filter = filter
+    }
+
+    private func onClickCharge() {
+        event.send(.openCoinCharge)
+    }
+
     private func transactions(_ page: PagedResult<AnyObject>) -> [CoinTransaction] {
         page.items.compactMap { $0 as? CoinTransaction }
     }
@@ -71,10 +100,15 @@ final class CoinHistoryViewModel: ObservableObject {
             load()
         case .loadMore:
             onLoadMore()
+        case let .selectFilter(filter):
+            onSelectFilter(filter)
+        case .clickCharge:
+            onClickCharge()
         }
     }
 
-    init(getCoinTransactionsUseCase: GetCoinTransactionsUseCase) {
+    init(getMyCoinsUseCase: GetMyCoinsUseCase, getCoinTransactionsUseCase: GetCoinTransactionsUseCase) {
+        self.getMyCoinsUseCase = getMyCoinsUseCase
         self.getCoinTransactionsUseCase = getCoinTransactionsUseCase
     }
 }

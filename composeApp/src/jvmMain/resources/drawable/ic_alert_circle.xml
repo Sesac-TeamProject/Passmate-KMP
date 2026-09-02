@@ -1,5 +1,4 @@
 <!-- alert-circle — lucide v0.300.0 alert-circle (ISC License, https://github.com/lucide-icons/lucide/blob/0.300.0/icons/alert-circle.svg)
-     원본의 <circle cx="12" cy="12" r="10">은 표준 베지어 근사(kappa 0.5523)로 옮겼다 — VectorDrawable은 <path>만 받는다.
      색은 중립 검정 스트로크뿐이다. 표시 색은 호출부에서 PassmateColors 토큰으로 준다 (규칙 §11-2).
      Desktop 사본: composeApp/src/jvmMain/resources/drawable/ic_alert_circle.xml (텍스트 동일, PassmateIconResourceTest가 강제) -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -8,7 +7,7 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:pathData="M12,2C17.523,2 22,6.477 22,12C22,17.523 17.523,22 12,22C6.477,22 2,17.523 2,12C2,6.477 6.477,2 12,2Z"
+        android:pathData="M22,12a10,10 0,1 1,-20,0a10,10 0,1 1,20,0"
         android:fillColor="#00000000"
         android:strokeColor="#FF000000"
         android:strokeWidth="2"
@@ -22,7 +21,7 @@
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
-        android:pathData="M12,16h0.01"
+        android:pathData="M12,16v0.01"
         android:fillColor="#00000000"
         android:strokeColor="#FF000000"
         android:strokeWidth="2"

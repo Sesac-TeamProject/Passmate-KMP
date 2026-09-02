@@ -32,7 +32,7 @@ val viewModelModule = module {
     factory { RoomListViewModel(get()) }
     factory { JoinViewModel(get(), get(), get(), get()) }
     factory { PaymentViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory { CoinHistoryViewModel(get()) }
+    factory { CoinHistoryViewModel(get(), get()) }
     factory { CoinChargeViewModel(get(), get(), get(), get()) }
     factory { WaitingViewModel(get(), get(), get(), get(), get()) }
     factory { PlayViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
