@@ -273,7 +273,6 @@ private struct JoinedRoomsEmptyView: View {
     }
 }
 
-
 private struct OngoingCard: View {
     let ongoing: OngoingRoom
 

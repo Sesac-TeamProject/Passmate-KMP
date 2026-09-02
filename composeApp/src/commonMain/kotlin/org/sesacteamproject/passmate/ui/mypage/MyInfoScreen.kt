@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -37,6 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateIcon
+import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.component.ReputationBadge
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.component.StudentAvatars
@@ -240,6 +243,9 @@ private fun LoadedMyInfo(
                 letterSpacing = (-0.48).sp
             )
         }
+        if (uiState.hasPartialFailure) {
+            PartialFailureBanner()
+        }
         uiState.profile?.let { profile ->
             ProfileCard(
                 profile = profile,
@@ -260,47 +266,74 @@ private fun LoadedMyInfo(
                     onClick = { onAction(MyInfoAction.ClickEditProfile) }
                 )
             }
-            SectionCard {
-                CoinRow(
-                    coins = profile.coins,
-                    onClickCharge = { onAction(MyInfoAction.ClickCharge) }
+            // 코인·정산은 카드 단위로만 실패시킨다 — 프로필이 정상이면 화면 전체를 덮지 않는다 (규칙 §9)
+            if (uiState.isCoinInfoFailed) {
+                FailureCard(
+                    message = FailureText.COIN_CARD,
+                    isRetrying = uiState.isCoinInfoLoading,
+                    onRetry = { onAction(MyInfoAction.RetryCoinInfo) }
                 )
-                RowDivider()
-                InfoRow(
-                    title = "결제 수단",
-                    subtitle = paymentMethodSubtitle(uiState),
-                    actionLabel = "관리",
-                    onClick = { onAction(MyInfoAction.ClickPaymentMethod) }
+            } else {
+                SectionCard {
+                    CoinRow(
+                        coins = profile.coins,
+                        onClickCharge = { onAction(MyInfoAction.ClickCharge) }
+                    )
+                    RowDivider()
+                    InfoRow(
+                        title = "결제 수단",
+                        subtitle = paymentMethodSubtitle(uiState),
+                        actionLabel = "관리",
+                        onClick = { onAction(MyInfoAction.ClickPaymentMethod) }
+                    )
+                    RowDivider()
+                    InfoRow(
+                        title = "코인 내역",
+                        subtitle = recentTransactionSubtitle(uiState),
+                        actionLabel = "보기",
+                        onClick = { onAction(MyInfoAction.ClickCoinHistory) }
+                    )
+                }
+            }
+            if (uiState.isEarningsFailed) {
+                FailureCard(
+                    message = FailureText.EARNINGS_CARD,
+                    isRetrying = uiState.isEarningsLoading,
+                    onRetry = { onAction(MyInfoAction.RetryEarnings) }
                 )
-                RowDivider()
-                InfoRow(
-                    title = "코인 내역",
-                    subtitle = recentTransactionSubtitle(uiState),
-                    actionLabel = "보기",
-                    onClick = { onAction(MyInfoAction.ClickCoinHistory) }
-                )
+            } else {
+                SectionCard {
+                    InfoRow(
+                        title = "정산 계좌",
+                        subtitle = settlementAccountSubtitle(uiState),
+                        actionLabel = "변경",
+                        onClick = { onAction(MyInfoAction.ClickSettlementAccount) }
+                    )
+                    RowDivider()
+                    InfoRow(
+                        title = "이번 달 정산 예정",
+                        subtitle = nextPayoutSubtitle(uiState),
+                        actionLabel = "내역",
+                        onClick = { onAction(MyInfoAction.ClickEarnings) }
+                    )
+                }
             }
             SectionCard {
                 InfoRow(
-                    title = "정산 계좌",
-                    subtitle = settlementAccountSubtitle(uiState),
-                    actionLabel = "변경",
-                    onClick = { onAction(MyInfoAction.ClickSettlementAccount) }
-                )
-                RowDivider()
-                InfoRow(
-                    title = "이번 달 정산 예정",
-                    subtitle = nextPayoutSubtitle(uiState),
-                    actionLabel = "내역",
-                    onClick = { onAction(MyInfoAction.ClickEarnings) }
-                )
-            }
-            SectionCard {
-                InfoRow(
-                    title = "알림",
+                    title = "알림 설정",
                     subtitle = "세션 시작 · 별점 요청 · 정산",
-                    actionLabel = "설정",
+                    actionLabel = "변경",
                     onClick = { onAction(MyInfoAction.ClickNotifications) }
+                )
+                RowDivider()
+                // 확인 다이얼로그를 거쳐야 실제 로그아웃 — 다이얼로그 소유는 상위 Screen (규칙 §11-1)
+                InfoRow(
+                    title = "로그아웃",
+                    subtitle = null,
+                    actionLabel = "",
+                    actionColor = PassmateColors.Destructive,
+                    isProcessing = uiState.isProcessing,
+                    onClick = onClickSignOut
                 )
                 RowDivider()
                 InfoRow(
@@ -310,12 +343,15 @@ private fun LoadedMyInfo(
                     actionColor = PassmateColors.Destructive,
                     onClick = { onAction(MyInfoAction.ClickDeleteAccount) }
                 )
+                RowDivider()
+                InfoRow(
+                    title = "약관 · 개인정보 처리방침",
+                    subtitle = "버전 1.0.0",
+                    actionLabel = "보기",
+                    onClick = { onAction(MyInfoAction.ClickTerms) }
+                )
             }
         }
-        SignOutButton(
-            isProcessing = uiState.isProcessing,
-            onClick = onClickSignOut
-        )
     }
 }
 
@@ -391,12 +427,13 @@ private fun InfoRow(
     subtitle: String?,
     actionLabel: String,
     actionColor: Color = PassmateColors.PrimaryDeep,
+    isProcessing: Boolean = false,
     onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(enabled = !isProcessing, onClick = onClick)
             .padding(vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -420,13 +457,21 @@ private fun InfoRow(
                 )
             }
         }
-        Text(
-            text = if (actionLabel.isEmpty()) "›" else "$actionLabel ›",
-            color = actionColor,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp
-        )
+        if (isProcessing) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(RowSpec.SpinnerSize),
+                color = PassmateColors.Primary,
+                strokeWidth = RowSpec.SpinnerStrokeWidth
+            )
+        } else {
+            Text(
+                text = if (actionLabel.isEmpty()) "›" else "$actionLabel ›",
+                color = actionColor,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = (-0.28).sp
+            )
+        }
     }
 }
 
@@ -472,32 +517,133 @@ private fun CoinRow(
     }
 }
 
+// in-flight 스피너 치수 — 행(로그아웃)과 실패 카드(다시 시도)가 같은 크기를 쓴다. iOS RowSpec과 1:1
+private object RowSpec {
+
+    val SpinnerSize = 20.dp
+
+    val SpinnerStrokeWidth = 2.dp
+}
+
+// 부분 실패 문구 (시안 M-12e) — iOS MyInfoView.swift의 FailureText와 1:1
+private object FailureText {
+
+    const val BANNER = "일부 정보를 불러오지 못했어요 · 아래에서 다시 시도"
+
+    const val COIN_CARD = "코인 정보를 불러오지 못했어요"
+
+    const val EARNINGS_CARD = "정산 정보를 불러오지 못했어요"
+
+    const val RETRY = "다시 시도"
+}
+
+// 부분 실패 치수·타이포 (시안 M-12e) — iOS FailureSpec과 1:1
+private object FailureSpec {
+
+    val BannerHeight = 44.dp
+
+    val BannerCornerRadius = 12.dp
+
+    val BannerFontSize = 13.sp
+
+    val BannerLetterSpacing = (-0.13).sp
+
+    val CardHeight = 150.dp
+
+    val CardCornerRadius = 16.dp
+
+    val CardBorderWidth = 1.dp
+
+    val IconSize = 22.dp
+
+    val MessageTopPadding = 10.dp
+
+    val MessageFontSize = 14.sp
+
+    val MessageLetterSpacing = (-0.14).sp
+
+    val RetryTopPadding = 2.dp
+
+    val RetryFontSize = 13.sp
+
+    val RetryLetterSpacing = (-0.13).sp
+
+    val RetryTouchPadding = 8.dp
+}
+
+// 카드 하나라도 실패했을 때의 상단 안내 (시안 M-12e banner/부분 실패). 값은 FailureSpec/FailureText
 @Composable
-private fun SignOutButton(
-    isProcessing: Boolean,
-    onClick: () -> Unit
-) {
+private fun PartialFailureBanner() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp)
-            .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
-            .clickable(enabled = !isProcessing, onClick = onClick)
-            .padding(vertical = 16.dp),
+            .height(FailureSpec.BannerHeight)
+            .background(PassmateColors.ErrorIconBg, RoundedCornerShape(FailureSpec.BannerCornerRadius)),
         contentAlignment = Alignment.Center
     ) {
-        if (isProcessing) {
+        Text(
+            text = FailureText.BANNER,
+            color = PassmateColors.WrongPinkText,
+            fontSize = FailureSpec.BannerFontSize,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = FailureSpec.BannerLetterSpacing
+        )
+    }
+}
+
+// 카드 단위 실패 자리표시자 (시안 M-12e card/실패) — 해당 섹션만 다시 불러온다
+@Composable
+private fun FailureCard(
+    message: String,
+    isRetrying: Boolean,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(FailureSpec.CardHeight)
+            .border(
+                FailureSpec.CardBorderWidth,
+                PassmateColors.Border,
+                RoundedCornerShape(FailureSpec.CardCornerRadius)
+            )
+            .background(PassmateColors.Surface, RoundedCornerShape(FailureSpec.CardCornerRadius)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        PassmateIcon(
+            icon = PassmateIcons.AlertCircle,
+            contentDescription = null,
+            tint = PassmateColors.TextTertiary,
+            modifier = Modifier.size(FailureSpec.IconSize)
+        )
+        Text(
+            text = message,
+            color = PassmateColors.TextPrimary,
+            fontSize = FailureSpec.MessageFontSize,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = FailureSpec.MessageLetterSpacing,
+            modifier = Modifier.padding(top = FailureSpec.MessageTopPadding)
+        )
+        if (isRetrying) {
             CircularProgressIndicator(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier
+                    .padding(top = FailureSpec.RetryTopPadding + FailureSpec.RetryTouchPadding)
+                    .size(RowSpec.SpinnerSize),
                 color = PassmateColors.Primary,
-                strokeWidth = 2.dp
+                strokeWidth = RowSpec.SpinnerStrokeWidth
             )
         } else {
             Text(
-                text = "로그아웃",
-                color = PassmateColors.TextSecondary,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium
+                text = FailureText.RETRY,
+                color = PassmateColors.PrimaryDeep,
+                fontSize = FailureSpec.RetryFontSize,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = FailureSpec.RetryLetterSpacing,
+                modifier = Modifier
+                    .padding(top = FailureSpec.RetryTopPadding)
+                    .clickable(onClick = onRetry)
+                    .padding(FailureSpec.RetryTouchPadding)
             )
         }
     }
@@ -541,12 +687,11 @@ private fun ErrorBox(onRetry: () -> Unit) {
     }
 }
 
+// 실패는 카드 자체가 FailureCard로 대체되므로 여기서는 성공·빈 값만 다룬다
 private fun paymentMethodSubtitle(uiState: MyInfoUiState): String {
     val method = uiState.defaultMethod
 
-    return if (uiState.isCoinInfoFailed) {
-        "불러오지 못했어요"
-    } else if (method != null) {
+    return if (method != null) {
         "${method.label} · 포트원 안전결제"
     } else {
         "기본 결제 수단을 설정해 주세요"
@@ -556,9 +701,7 @@ private fun paymentMethodSubtitle(uiState: MyInfoUiState): String {
 private fun recentTransactionSubtitle(uiState: MyInfoUiState): String {
     val recent = uiState.recentTransaction
 
-    return if (uiState.isCoinInfoFailed) {
-        "불러오지 못했어요"
-    } else if (recent != null) {
+    return if (recent != null) {
         "최근 ${shortDate(recent)} ${signedCoins(recent.amount)} C"
     } else {
         "아직 내역이 없어요"
@@ -568,9 +711,7 @@ private fun recentTransactionSubtitle(uiState: MyInfoUiState): String {
 private fun settlementAccountSubtitle(uiState: MyInfoUiState): String {
     val account = uiState.settlementAccount
 
-    return if (uiState.isEarningsFailed) {
-        "불러오지 못했어요"
-    } else if (account != null) {
+    return if (account != null) {
         "${account.bankName} ${account.maskedNumber}"
     } else {
         "계좌를 등록해 주세요"
@@ -580,9 +721,7 @@ private fun settlementAccountSubtitle(uiState: MyInfoUiState): String {
 private fun nextPayoutSubtitle(uiState: MyInfoUiState): String {
     val payout = uiState.nextPayout
 
-    return if (uiState.isEarningsFailed) {
-        "불러오지 못했어요"
-    } else if (payout != null) {
+    return if (payout != null) {
         "₩${formatNumber(payout.amount)} · ${payout.dateLabel} 지급"
     } else {
         "정산 예정 없음"

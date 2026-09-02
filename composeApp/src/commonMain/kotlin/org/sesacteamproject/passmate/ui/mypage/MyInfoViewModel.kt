@@ -12,6 +12,9 @@ import org.sesacteamproject.passmate.payment.domain.usecase.GetEarningsUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.GetMyCoinsUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
 
+// 약관 전용 화면·계약이 아직 없다 — 라우트가 생기기 전까지는 안내 문구만 노출한다
+private const val TERMS_NOTICE = "약관 · 개인정보 처리방침은 준비 중이에요"
+
 // 마이 탭 루트 (M-12) — 프로필·코인·정산 3섹션을 독립 로드한다. 금액·등급 계산은 전부 서버 값 렌더 (규칙 §1)
 class MyInfoViewModel(
     private val getMyProfileUseCase: GetMyProfileUseCase,
@@ -55,7 +58,12 @@ class MyInfoViewModel(
         }
     }
 
+    // 진행 중 재시도가 있으면 새로 던지지 않는다 — onEnter와 같은 in-flight 가드 (규칙 §9)
     private fun loadCoinInfo() {
+        if (_uiState.value.isCoinInfoLoading) {
+            return
+        }
+        _uiState.update { it.copy(isCoinInfoLoading = true) }
         viewModelScope.launch {
             getMyCoinsUseCase.invoke()
                 .onSuccess { coins ->
@@ -63,17 +71,22 @@ class MyInfoViewModel(
                         it.copy(
                             defaultMethod = coins.defaultMethod,
                             recentTransaction = coins.recent,
-                            isCoinInfoFailed = false
+                            isCoinInfoFailed = false,
+                            isCoinInfoLoading = false
                         )
                     }
                 }
                 .onFailure {
-                    _uiState.update { it.copy(isCoinInfoFailed = true) }
+                    _uiState.update { it.copy(isCoinInfoFailed = true, isCoinInfoLoading = false) }
                 }
         }
     }
 
     private fun loadEarnings() {
+        if (_uiState.value.isEarningsLoading) {
+            return
+        }
+        _uiState.update { it.copy(isEarningsLoading = true) }
         viewModelScope.launch {
             getEarningsUseCase.invoke(null)
                 .onSuccess { earnings ->
@@ -81,12 +94,13 @@ class MyInfoViewModel(
                         it.copy(
                             settlementAccount = earnings.account,
                             nextPayout = earnings.nextPayout,
-                            isEarningsFailed = false
+                            isEarningsFailed = false,
+                            isEarningsLoading = false
                         )
                     }
                 }
                 .onFailure {
-                    _uiState.update { it.copy(isEarningsFailed = true) }
+                    _uiState.update { it.copy(isEarningsFailed = true, isEarningsLoading = false) }
                 }
         }
     }
@@ -137,6 +151,8 @@ class MyInfoViewModel(
         when (action) {
             is MyInfoAction.Enter -> onEnter()
             is MyInfoAction.Retry -> loadAll()
+            is MyInfoAction.RetryCoinInfo -> loadCoinInfo()
+            is MyInfoAction.RetryEarnings -> loadEarnings()
             is MyInfoAction.ClickProfile -> emit(MyInfoEvent.OpenReputation)
             is MyInfoAction.ClickEditProfile -> onClickEditProfile()
             is MyInfoAction.ClickCharge -> emit(MyInfoEvent.OpenCharge)
@@ -146,6 +162,7 @@ class MyInfoViewModel(
             is MyInfoAction.ClickEarnings -> emit(MyInfoEvent.OpenEarnings)
             is MyInfoAction.ClickNotifications -> emit(MyInfoEvent.OpenNotifications)
             is MyInfoAction.ClickDeleteAccount -> emit(MyInfoEvent.OpenDeleteAccount)
+            is MyInfoAction.ClickTerms -> emit(MyInfoEvent.ShowNotice(TERMS_NOTICE))
             is MyInfoAction.ConfirmSignOut -> onConfirmSignOut()
             is MyInfoAction.ProfileUpdated -> onProfileUpdated()
             is MyInfoAction.PaymentMethodUpdated -> onPaymentMethodUpdated()
