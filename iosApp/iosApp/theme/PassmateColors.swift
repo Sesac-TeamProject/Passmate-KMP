@@ -52,12 +52,15 @@ enum PassmateColors {
 
     static let wrongPinkText = Color(hex: 0x7C1F26)
 
-    // 오류 아이콘 원형 배경 — wrongPink 계열 연한 톤 (v6 M-05e 리포트 불러오기 실패)
+    // 오류 아이콘 원형 배경 — wrongPink 계열 연한 톤 (v6 M-05e 리포트 불러오기 실패·E-List 목록 실패·M-14 미제출 카드). 대응 텍스트는 wrongPinkText
     static let errorIconBg = Color(hex: 0xFDEEEF)
 
     static let weakTopicBg = Color(hex: 0xFDEFDE)
 
     static let weakTopicText = Color(hex: 0xBF3F0C)
+
+    // 정답률 분포 41~60% 구간 막대 (v6 M-14 개요) — 0~40% wrongPink · 61~80% ratingTagSelectedBg · 81~100% primary
+    static let accuracyBandMid = Color(hex: 0xFFD79A)
 
     // 파괴적 동작(로그아웃·회원 탈퇴) — 시안 M-12 card/기타
     static let destructive = Color(hex: 0xD9534F)

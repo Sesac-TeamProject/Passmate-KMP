@@ -65,6 +65,8 @@ final class RoomReportViewModel: ObservableObject {
             load(roomId: roomId)
         case let .selectTab(tab):
             uiState.selectedTab = tab
+        case let .selectStudentSort(sort):
+            uiState.studentSort = sort
         case .clickExport:
             onClickExport()
         }

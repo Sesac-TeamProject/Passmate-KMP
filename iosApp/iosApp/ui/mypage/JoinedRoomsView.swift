@@ -66,7 +66,7 @@ private struct JoinedRoomsContentView: View {
                     .tint(PassmateColors.primary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if uiState.loadFailed {
-                errorView
+                loadFailureView
             } else {
                 loadedView
             }
@@ -75,21 +75,63 @@ private struct JoinedRoomsContentView: View {
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
-    private var errorView: some View {
-        VStack(spacing: 12) {
-            Text("기록을 불러오지 못했어요")
-                .font(.system(size: 16, weight: .medium))
-                .kerning(-0.32)
+    // 목록 불러오기 실패 — v6 "E-List 목록 불러오기 실패 — 공통 패턴"(코인 내역·정산·마이와 동일 레이아웃, 공통화 대상)
+    private var loadFailureView: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("참여한 방")
+                .font(.system(size: 15, weight: .bold))
+                .kerning(-0.15)
                 .foregroundColor(PassmateColors.textPrimary)
+            Spacer(minLength: 0)
+            VStack(spacing: 0) {
+                ZStack {
+                    Circle().fill(PassmateColors.errorIconBg)
+                    PassmateIconView(icon: .alertCircle, tint: PassmateColors.wrongPinkText, size: FailureStateSpec.iconSize)
+                }
+                .frame(width: 64, height: 64)
+                Text("목록을 불러오지 못했어요")
+                    .font(.system(size: 19, weight: .bold))
+                    .kerning(-0.19)
+                    .foregroundColor(PassmateColors.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 24)
+                Text("연결이 잠시 끊겼어요.\n다시 시도해 주세요.")
+                    .font(.system(size: 14))
+                    .kerning(-0.14)
+                    .lineSpacing(23 - 14)
+                    .foregroundColor(PassmateColors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 9)
+            }
+            .frame(maxWidth: .infinity)
+            Spacer(minLength: 0)
             Button {
                 onAction(.retry)
             } label: {
                 Text("다시 시도")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.primaryDeep)
+                    .font(.system(size: 15, weight: .bold))
+                    .kerning(-0.15)
+                    .foregroundColor(PassmateColors.surface)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(PassmateColors.primary)
+                    .cornerRadius(14)
             }
+            Button {
+                onAction(.clickContactSupport)
+            } label: {
+                Text("계속 안 되면 문의하기")
+                    .font(.system(size: 13, weight: .medium))
+                    .kerning(-0.13)
+                    .foregroundColor(PassmateColors.primaryDeep)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+            }
+            .padding(.top, 10)
         }
+        .padding(.horizontal, 20)
+        .padding(.top, 32)
+        .padding(.bottom, 24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
@@ -158,7 +200,12 @@ private enum EmptyStateText {
     static let icon = PassmateIcons.doorOpen
 }
 
-// 빈 상태 (v6 M-08) 미러 — 문구·아이콘만 넘기고 배치는 공통 컴포넌트가 그린다
+// 실패 아이콘 치수 (시안 icon/alert-circle 30x30) — Compose FailureIconSize와 1:1
+private enum FailureStateSpec {
+    static let iconSize: CGFloat = 30
+}
+
+// 빈 상태 (v6 M-08) 미러 — 아이콘 원형 · 제목 · 안내 문구 · PIN 입장 CTA. 값은 EmptyStateSpec/EmptyStateText
 private struct JoinedRoomsEmptyView: View {
     let onClickEnterPin: () -> Void
 
@@ -327,6 +374,7 @@ private struct JoinedRoomRow: View {
         .cornerRadius(16)
     }
 }
+
 
 private struct JoinedRoomsNoticeToast: View {
     let message: String
