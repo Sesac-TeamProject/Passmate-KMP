@@ -86,7 +86,7 @@ private struct JoinedRoomsContentView: View {
             VStack(spacing: 0) {
                 ZStack {
                     Circle().fill(PassmateColors.errorIconBg)
-                    AlertCircleIcon()
+                    PassmateIconView(icon: .alertCircle, tint: PassmateColors.wrongPinkText, size: FailureStateSpec.iconSize)
                 }
                 .frame(width: 64, height: 64)
                 Text("목록을 불러오지 못했어요")
@@ -199,8 +199,6 @@ private enum EmptyStateText {
 
 // 빈 상태 치수·타이포 (v6 M-08) — Compose EmptyStateSpec 미러
 private enum EmptyStateSpec {
-    static let iconAsset = "DoorOpen"
-
     static let sectionPaddingVertical: CGFloat = 40
 
     static let iconCircleSize: CGFloat = 64
@@ -233,8 +231,6 @@ private enum EmptyStateSpec {
 
 // 실패 아이콘 치수 (시안 icon/alert-circle 30x30) — Compose FailureIconSize와 1:1
 private enum FailureStateSpec {
-    static let iconAsset = "AlertCircle"
-
     static let iconSize: CGFloat = 30
 }
 
@@ -247,7 +243,7 @@ private struct JoinedRoomsEmptyView: View {
             ZStack {
                 Circle()
                     .fill(PassmateColors.emptyIconBg)
-                DoorOpenIcon(tint: PassmateColors.textSecondary, size: EmptyStateSpec.iconSize)
+                PassmateIconView(icon: .doorOpen, tint: PassmateColors.textSecondary, size: EmptyStateSpec.iconSize)
             }
             .frame(width: EmptyStateSpec.iconCircleSize, height: EmptyStateSpec.iconCircleSize)
             Text(EmptyStateText.title)
@@ -277,23 +273,6 @@ private struct JoinedRoomsEmptyView: View {
     }
 }
 
-// door-open 아이콘 — Assets의 DoorOpen(lucide v0.300.0 door-open, ISC).
-// SF Symbol door.left.hand.open은 iOS 16+라 쓸 수 없다 (배포 타깃 15.0, 규칙 §2-1).
-// Compose PassmateIcons.DoorOpen과 같은 원본을 쓰고, 색은 템플릿 렌더링으로 준다 (규칙 §11-2)
-private struct DoorOpenIcon: View {
-    let tint: Color
-
-    let size: CGFloat
-
-    var body: some View {
-        Image(EmptyStateSpec.iconAsset)
-            .renderingMode(.template)
-            .resizable()
-            .scaledToFit()
-            .foregroundColor(tint)
-            .frame(width: size, height: size)
-    }
-}
 
 private struct OngoingCard: View {
     let ongoing: OngoingRoom
@@ -449,19 +428,6 @@ private struct JoinedRoomRow: View {
     }
 }
 
-// 실패 아이콘 — Compose PassmateIcons.AlertCircle과 같은 원본을 쓰고,
-// 색은 템플릿 렌더링으로 준다 (규칙 §11-2·§11-3)
-private struct AlertCircleIcon: View {
-    var body: some View {
-        Image(FailureStateSpec.iconAsset)
-            .renderingMode(.template)
-            .resizable()
-            .scaledToFit()
-            .foregroundColor(PassmateColors.wrongPinkText)
-            .frame(width: FailureStateSpec.iconSize, height: FailureStateSpec.iconSize)
-            .accessibilityHidden(true)
-    }
-}
 
 private struct JoinedRoomsNoticeToast: View {
     let message: String

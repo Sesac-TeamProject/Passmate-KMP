@@ -80,6 +80,12 @@ object PassmateColors {
 
     val RatingTagSelectedText = Color(0xFF0B6B4C)
 
+    // 목록 필터 칩 선택 배경 (v6 M-12-9 코인 내역 전체/충전/사용)
+    val FilterChipSelectedBg = Color(0xFFD6F3E6)
+
+    // 목록 불러오기 실패 아이콘 틴트 (v6 E-List 공통 패턴)
+    val ErrorIconTint = Color(0xFF7C1F26)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     val BrandGoogleBlue = Color(0xFF4285F4)
 
