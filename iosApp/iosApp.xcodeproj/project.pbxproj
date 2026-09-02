@@ -143,6 +143,8 @@
 		A1010001155AABBCCDDEEFF0155 /* RouteStackLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001155AABBCCDDEEFF0155 /* RouteStackLevel.swift */; };
 		A1010001156AABBCCDDEEFF0156 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */; };
 		A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */; };
+		A1010001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */; };
+		A1010001159AABBCCDDEEFF0159 /* PassmateIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */; };
 		A1010001158AABBCCDDEEFF0158 /* SheetDetents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001158AABBCCDDEEFF0158 /* SheetDetents.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
@@ -290,6 +292,8 @@
 		A1011001155AABBCCDDEEFF0155 /* RouteStackLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteStackLevel.swift; sourceTree = "<group>"; };
 		A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakTopicsRow.swift; sourceTree = "<group>"; };
+		A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateEmptyStateView.swift; sourceTree = "<group>"; };
+		A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateIconView.swift; sourceTree = "<group>"; };
 		A1011001158AABBCCDDEEFF0158 /* SheetDetents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetDetents.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
@@ -597,6 +601,8 @@
 				A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */,
 				A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */,
 				A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */,
+				A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */,
+				A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */,
 				A1011001158AABBCCDDEEFF0158 /* SheetDetents.swift */,
 			);
 			path = component;
@@ -834,6 +840,8 @@
 				A1010001155AABBCCDDEEFF0155 /* RouteStackLevel.swift in Sources */,
 				A1010001156AABBCCDDEEFF0156 /* FlowLayout.swift in Sources */,
 				A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */,
+				A1010001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift in Sources */,
+				A1010001159AABBCCDDEEFF0159 /* PassmateIconView.swift in Sources */,
 				A1010001158AABBCCDDEEFF0158 /* SheetDetents.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);

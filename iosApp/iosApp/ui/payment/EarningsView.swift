@@ -116,68 +116,70 @@ private struct EarningsContentView: View {
             VStack(spacing: 0) {
                 ZStack {
                     Circle().fill(PassmateColors.errorIconBg)
-                    AlertCircleIcon(tint: PassmateColors.wrongPinkText, size: 30)
+                    PassmateIconView(
+                        asset: LoadFailedText.iconAsset,
+                        tint: PassmateColors.wrongPinkText,
+                        size: LoadFailedSpec.iconSize
+                    )
                 }
-                .frame(width: 64, height: 64)
-                Text("목록을 불러오지 못했어요")
-                    .font(.system(size: 19, weight: .bold))
-                    .kerning(-0.19)
+                .frame(width: LoadFailedSpec.iconCircleSize, height: LoadFailedSpec.iconCircleSize)
+                Text(LoadFailedText.title)
+                    .font(.system(size: LoadFailedSpec.titleFontSize, weight: .bold))
+                    .kerning(LoadFailedSpec.titleKerning)
                     .foregroundColor(PassmateColors.textPrimary)
                     .multilineTextAlignment(.center)
-                    .padding(.top, 24)
-                // lineSpacing 6.3 = Compose lineHeight 23 - 기본 행높이
-                Text("연결이 잠시 끊겼어요.\n정산 금액은 사라지지 않아요.")
-                    .font(.system(size: 14))
-                    .kerning(-0.14)
-                    .lineSpacing(6.3)
+                    .padding(.top, LoadFailedSpec.titleTopPadding)
+                Text(LoadFailedText.guide)
+                    .font(.system(size: LoadFailedSpec.guideFontSize))
+                    .kerning(LoadFailedSpec.guideKerning)
+                    .lineSpacing(LoadFailedSpec.guideLineSpacing)
                     .foregroundColor(PassmateColors.textSecondary)
                     .multilineTextAlignment(.center)
-                    .padding(.top, 8)
+                    .padding(.top, LoadFailedSpec.guideTopPadding)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, LoadFailedSpec.contentPaddingHorizontal)
             Button {
                 onAction(.retry)
             } label: {
-                Text("다시 시도")
-                    .font(.system(size: 15, weight: .bold))
-                    .kerning(-0.15)
+                Text(LoadFailedText.retry)
+                    .font(.system(size: LoadFailedSpec.retryFontSize, weight: .bold))
+                    .kerning(LoadFailedSpec.retryKerning)
                     .foregroundColor(PassmateColors.surface)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 52)
+                    .frame(height: LoadFailedSpec.retryHeight)
                     .background(PassmateColors.primary)
-                    .cornerRadius(14)
+                    .cornerRadius(LoadFailedSpec.retryCornerRadius)
             }
-            .padding(.horizontal, 20)
-            // 정산은 마이 탭에서 push된 화면이라 뒤로가기가 곧 마이다
+            .padding(.horizontal, LoadFailedSpec.contentPaddingHorizontal)
             Button(action: onClickBack) {
-                Text("계좌 정보는 마이에서 확인")
-                    .font(.system(size: 13, weight: .medium))
-                    .kerning(-0.13)
+                Text(LoadFailedText.backLink)
+                    .font(.system(size: LoadFailedSpec.backLinkFontSize, weight: .medium))
+                    .kerning(LoadFailedSpec.backLinkKerning)
                     .foregroundColor(PassmateColors.primaryDeep)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, LoadFailedSpec.backLinkVerticalPadding)
             }
-            .padding(.top, 8)
-            .padding(.bottom, 24)
+            .padding(.top, LoadFailedSpec.backLinkTopPadding)
+            .padding(.bottom, LoadFailedSpec.bottomSpacing)
         }
     }
 
     private var loadFailedHeader: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: LoadFailedSpec.backEndPadding) {
             Button(action: onClickBack) {
-                Text("←")
-                    .font(.system(size: 20))
+                Text(LoadFailedText.back)
+                    .font(.system(size: LoadFailedSpec.backFontSize))
                     .foregroundColor(PassmateColors.textPrimary)
             }
-            Text("정산")
-                .font(.system(size: 15, weight: .bold))
-                .kerning(-0.15)
+            Text(LoadFailedText.headerTitle)
+                .font(.system(size: LoadFailedSpec.headerTitleFontSize, weight: .bold))
+                .kerning(LoadFailedSpec.headerTitleKerning)
                 .foregroundColor(PassmateColors.textPrimary)
             Spacer()
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 14)
+        .padding(.horizontal, LoadFailedSpec.headerPaddingHorizontal)
+        .padding(.vertical, LoadFailedSpec.headerPaddingVertical)
     }
 
     private func loadedView(_ earnings: Earnings) -> some View {
@@ -208,23 +210,23 @@ private struct EarningsContentView: View {
                     // 빈 상태는 두 갈래다 — 계좌가 없으면 계좌 등록이 먼저다(정산 금액이 쌓여도 지급되지 않는다).
                     // 계좌가 있으면 "정산 내역이 없어요" + 유료 방 개설 유도 (v6 M-T4 빈 상태 2종)
                     if earnings.account == nil {
-                        EmptyStateBlockView(
-                            title: "정산 계좌를 등록해 주세요",
-                            description: "계좌가 없으면 정산 금액이 쌓여도\n지급되지 않아요.",
-                            buttonLabel: "계좌 등록하기",
-                            onClickButton: { onAction(.clickManageAccount) }
-                        ) {
-                            AlertCircleIcon(tint: PassmateColors.wrongPinkText, size: 28)
-                        }
+                        PassmateEmptyStateView(
+                            iconAsset: EmptyStateText.accountIconAsset,
+                            iconTint: PassmateColors.wrongPinkText,
+                            title: EmptyStateText.accountTitle,
+                            guide: EmptyStateText.accountGuide,
+                            ctaLabel: EmptyStateText.accountCta,
+                            onClickCta: { onAction(.clickManageAccount) }
+                        )
                     } else {
-                        EmptyStateBlockView(
-                            title: "아직 정산 내역이 없어요",
-                            description: "유료 방을 열고 참가비가 모이면\n매월 5일에 정산해 드려요.",
-                            buttonLabel: "유료 방 만들기",
-                            onClickButton: { onAction(.clickCreatePaidRoom) }
-                        ) {
-                            BookmarkIcon(tint: PassmateColors.primaryDeep, size: 28)
-                        }
+                        PassmateEmptyStateView(
+                            iconAsset: EmptyStateText.settlementsIconAsset,
+                            iconTint: PassmateColors.primaryDeep,
+                            title: EmptyStateText.settlementsTitle,
+                            guide: EmptyStateText.settlementsGuide,
+                            ctaLabel: EmptyStateText.settlementsCta,
+                            onClickCta: { onAction(.clickCreatePaidRoom) }
+                        )
                     }
                 }
                 ForEach(uiState.items, id: \.settlementId) { item in
@@ -421,138 +423,98 @@ private struct SettlementRowView: View {
     }
 }
 
-// 빈 상태 블록 (v6 M-T4 빈 상태 2종) — 아이콘 원형 64 · 제목 19/Bold · 안내 2줄 · CTA 200x52.
-// Compose EarningsScreen.kt의 EmptyStateBlock 미러
-private struct EmptyStateBlockView<Icon: View>: View {
-    let title: String
+// 빈 상태 문구 (v6 M-T4 2종) — Compose EarningsScreen.kt의 EmptyStateText 미러.
+// 치수·타이포는 공통 컴포넌트 PassmateEmptyStateView가 갖는다
+private enum EmptyStateText {
+    static let settlementsTitle = "아직 정산 내역이 없어요"
 
-    let description: String
+    static let settlementsGuide = "유료 방을 열고 참가비가 모이면\n매월 5일에 정산해 드려요."
 
-    let buttonLabel: String
+    static let settlementsCta = "유료 방 만들기"
 
-    let onClickButton: () -> Void
+    // Assets 이름 = Compose PassmateIcons.Bookmark의 iOS 사본
+    static let settlementsIconAsset = "Bookmark"
 
-    let icon: Icon
+    static let accountTitle = "정산 계좌를 등록해 주세요"
 
-    var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                Circle().fill(PassmateColors.emptyIconBg)
-                icon
-            }
-            .frame(width: 64, height: 64)
-            Text(title)
-                .font(.system(size: 19, weight: .bold))
-                .kerning(-0.19)
-                .foregroundColor(PassmateColors.textPrimary)
-                .multilineTextAlignment(.center)
-                .padding(.top, 24)
-            // lineSpacing 6.3 = Compose lineHeight 23 - 기본 행높이
-            Text(description)
-                .font(.system(size: 14))
-                .kerning(-0.14)
-                .lineSpacing(6.3)
-                .foregroundColor(PassmateColors.textSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.top, 8)
-            Button(action: onClickButton) {
-                Text(buttonLabel)
-                    .font(.system(size: 15, weight: .bold))
-                    .kerning(-0.15)
-                    .foregroundColor(PassmateColors.surface)
-                    .frame(width: 200, height: 52)
-                    .background(PassmateColors.primary)
-                    .cornerRadius(14)
-            }
-            .padding(.top, 20)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
-    }
+    static let accountGuide = "계좌가 없으면 정산 금액이 쌓여도\n지급되지 않아요."
 
-    init(
-        title: String,
-        description: String,
-        buttonLabel: String,
-        onClickButton: @escaping () -> Void,
-        @ViewBuilder icon: () -> Icon
-    ) {
-        self.title = title
-        self.description = description
-        self.buttonLabel = buttonLabel
-        self.onClickButton = onClickButton
-        self.icon = icon()
-    }
+    static let accountCta = "계좌 등록하기"
+
+    // Assets 이름 = Compose PassmateIcons.AlertCircle의 iOS 사본
+    static let accountIconAsset = "AlertCircle"
 }
 
-// alert-circle — 원형 외곽선 + 느낌표. 아이콘 에셋이 없어 기본 도형으로 구성한다 (Compose AlertCircleIcon 미러)
-private struct AlertCircleIcon: View {
-    let tint: Color
+// 목록 불러오기 실패 문구 (v6 E-List) — Compose EarningsScreen.kt의 LoadFailedText 미러
+private enum LoadFailedText {
+    static let headerTitle = "정산"
 
-    let size: CGFloat
+    static let back = "\u{2190}"
 
-    var body: some View {
-        ZStack {
-            Circle().strokeBorder(tint, lineWidth: 2)
-            Text("!")
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(tint)
-        }
-        .frame(width: size, height: size)
-    }
+    static let title = "목록을 불러오지 못했어요"
+
+    static let guide = "연결이 잠시 끊겼어요.\n정산 금액은 사라지지 않아요."
+
+    static let retry = "다시 시도"
+
+    // 정산은 마이 탭에서 push된 화면이라 뒤로가기가 곧 마이다
+    static let backLink = "계좌 정보는 마이에서 확인"
+
+    // Assets 이름 = Compose PassmateIcons.AlertCircle의 iOS 사본
+    static let iconAsset = "AlertCircle"
 }
 
-// bookmark 아이콘 — 아이콘 에셋이 없어 시안 벡터(24 뷰포트)를 직접 그린다.
-// Compose EarningsScreen.kt의 bookmarkVector와 좌표가 1:1이다
-private struct BookmarkIcon: View {
-    let tint: Color
+// 목록 불러오기 실패 치수·타이포 (v6 E-List) — Compose LoadFailedSpec 미러
+// (SwiftUI에는 lineHeight가 없어 파생값 guideLineSpacing 1개가 더 있다)
+private enum LoadFailedSpec {
+    static let headerPaddingHorizontal: CGFloat = 20
 
-    let size: CGFloat
+    static let headerPaddingVertical: CGFloat = 14
 
-    private var scale: CGFloat {
-        return size / 24
-    }
+    static let backFontSize: CGFloat = 20
 
-    private var strokeStyle: StrokeStyle {
-        return StrokeStyle(lineWidth: 2 * scale, lineCap: .round, lineJoin: .round)
-    }
+    static let backEndPadding: CGFloat = 12
 
-    private func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
-        return CGPoint(x: x * scale, y: y * scale)
-    }
+    static let headerTitleFontSize: CGFloat = 15
 
-    private var ribbon: Path {
-        var path = Path()
+    static let headerTitleKerning: CGFloat = -0.15
 
-        path.move(to: point(6, 3))
-        path.addLine(to: point(18, 3))
-        path.addQuadCurve(to: point(19, 4), control: point(19, 3))
-        path.addLine(to: point(19, 21))
-        path.addLine(to: point(12, 17))
-        path.addLine(to: point(5, 21))
-        path.addLine(to: point(5, 4))
-        path.addQuadCurve(to: point(6, 3), control: point(5, 3))
-        path.closeSubpath()
+    static let contentPaddingHorizontal: CGFloat = 20
 
-        return path
-    }
+    static let iconCircleSize: CGFloat = 64
 
-    private var innerLines: Path {
-        var path = Path()
+    static let iconSize: CGFloat = 30
 
-        path.move(to: point(9, 8))
-        path.addLine(to: point(15, 8))
-        path.move(to: point(9, 12))
-        path.addLine(to: point(15, 12))
+    static let titleTopPadding: CGFloat = 24
 
-        return path
-    }
+    static let titleFontSize: CGFloat = 19
 
-    var body: some View {
-        ZStack(alignment: .topLeading) {
-            ribbon.stroke(tint, style: strokeStyle)
-            innerLines.stroke(tint, style: strokeStyle)
-        }
-        .frame(width: size, height: size)
-    }
+    static let titleKerning: CGFloat = -0.19
+
+    static let guideTopPadding: CGFloat = 8
+
+    static let guideFontSize: CGFloat = 14
+
+    // Compose lineHeight 23.1(14 x 1.65) - SF 14pt 기본 행높이
+    static let guideLineSpacing: CGFloat = 6.4
+
+    static let guideKerning: CGFloat = -0.14
+
+    static let retryHeight: CGFloat = 52
+
+    static let retryCornerRadius: CGFloat = 14
+
+    static let retryFontSize: CGFloat = 15
+
+    static let retryKerning: CGFloat = -0.15
+
+    static let backLinkTopPadding: CGFloat = 8
+
+    static let backLinkVerticalPadding: CGFloat = 10
+
+    static let backLinkFontSize: CGFloat = 13
+
+    static let backLinkKerning: CGFloat = -0.13
+
+    static let bottomSpacing: CGFloat = 24
 }
