@@ -154,17 +154,16 @@ private struct ResultContentView: View {
         .padding(.vertical, 14)
     }
 
-    // alert-circle — 원형 배경 위 외곽선 원 + 느낌표 (아이콘 에셋 없이 기본 도형으로 구성)
+    // alert-circle (v6 E-List) — 정산 실패 화면과 같은 에셋을 쓴다 (규칙 §11-3)
     private var alertCircleIcon: some View {
         ZStack {
             Circle()
                 .fill(PassmateColors.errorIconBg)
-            Circle()
-                .stroke(PassmateColors.wrongPinkText, lineWidth: 2)
-                .frame(width: 28, height: 28)
-            Text("!")
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(PassmateColors.wrongPinkText)
+            PassmateIconView(
+                icon: .alertCircle,
+                tint: PassmateColors.wrongPinkText,
+                size: 30
+            )
         }
         .frame(width: 64, height: 64)
     }

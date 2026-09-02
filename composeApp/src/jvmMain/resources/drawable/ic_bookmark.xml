@@ -1,0 +1,31 @@
+<!-- bookmark — v6 M-T4 시안 벡터(외부 아이콘 세트 아님, 24 뷰포트 좌표 그대로).
+     dcc3513이 Compose ImageVector·SwiftUI Path에 직접 기술하던 좌표를 옮긴 것이라 렌더 결과가 같다.
+     색은 중립 검정 스트로크뿐이다. 표시 색은 호출부에서 PassmateColors 토큰으로 준다 (규칙 §11-2).
+     Desktop 사본: composeApp/src/jvmMain/resources/drawable/ic_bookmark.xml (텍스트 동일, PassmateIconResourceTest가 강제) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M6,3L18,3Q19,3 19,4L19,21L12,17L5,21L5,4Q5,3 6,3Z"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M9,8L15,8"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M9,12L15,12"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

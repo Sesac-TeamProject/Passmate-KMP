@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,8 +26,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateBackButton
@@ -42,6 +45,19 @@ import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.theme.PassmateColors
 import org.sesacteamproject.passmate.theme.PassmateTheme
 import org.sesacteamproject.passmate.ui.result.rememberReportSharer
+
+private const val MOST_MISSED_LIMIT = 3
+
+private const val TOP_RANK_LIMIT = 3
+
+private val ACCURACY_BAND_LABELS = listOf("0~40%", "41~60%", "61~80%", "81~100%")
+
+private val ACCURACY_BAND_COLORS = listOf(
+    PassmateColors.WrongPink,
+    PassmateColors.AccuracyBandMid,
+    PassmateColors.RatingTagSelectedBg,
+    PassmateColors.Primary
+)
 
 // Figma "UI 디자인 v6" M-14(432:5366) — 방 리포트: 요약 카드+개요/문항별/학생별 탭+내보내기(텍스트 공유)
 @Composable
@@ -92,6 +108,7 @@ private fun RoomReportContentScreen(
             else -> LoadedReport(
                 report = uiState.report,
                 selectedTab = uiState.selectedTab,
+                studentSort = uiState.studentSort,
                 onAction = onAction,
                 onClickBack = onClickBack
             )
@@ -103,6 +120,7 @@ private fun RoomReportContentScreen(
 private fun LoadedReport(
     report: RoomReport,
     selectedTab: ReportTab,
+    studentSort: StudentSort,
     onAction: (RoomReportAction) -> Unit,
     onClickBack: () -> Unit
 ) {
@@ -160,9 +178,16 @@ private fun LoadedReport(
             onSelect = { onAction(RoomReportAction.SelectTab(it)) }
         )
         when (selectedTab) {
-            ReportTab.OVERVIEW -> OverviewTab(report = report)
+            ReportTab.OVERVIEW -> OverviewTab(
+                report = report,
+                onClickQuestionsLink = { onAction(RoomReportAction.SelectTab(ReportTab.QUESTIONS)) }
+            )
             ReportTab.QUESTIONS -> QuestionsTab(questions = report.questions)
-            ReportTab.STUDENTS -> StudentsTab(students = report.students)
+            ReportTab.STUDENTS -> StudentsTab(
+                report = report,
+                studentSort = studentSort,
+                onSelectSort = { onAction(RoomReportAction.SelectStudentSort(it)) }
+            )
         }
     }
 }
@@ -254,8 +279,183 @@ private fun TabChips(
     }
 }
 
+// 개요 탭 — 정답률 분포 · 많이 틀린 문항 TOP 3 · 요약 (v6 M-14 개요)
+// 시안의 "AI 총평" 카드는 계약(RoomReportResponse)에 총평 텍스트 필드가 없어 제외하고, 같은 자리에 요약 카드를 둔다
 @Composable
-private fun OverviewTab(report: RoomReport) {
+private fun OverviewTab(
+    report: RoomReport,
+    onClickQuestionsLink: () -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        AccuracyDistributionCard(report = report)
+        MostMissedQuestionsCard(
+            questions = report.questions,
+            onClickQuestionsLink = onClickQuestionsLink
+        )
+        OverviewSummaryCard(report = report)
+    }
+}
+
+// 정답률 분포 — 서버가 준 학생별 정답 수를 4구간으로 묶어 보여준다 (점수·정오 판정은 하지 않는다)
+@Composable
+private fun AccuracyDistributionCard(report: RoomReport) {
+    val bands = accuracyBands(students = report.students, questionCount = report.summary.questionCount)
+    val bandTotal = bands.sumOf { it.count }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
+            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        CardHeaderRow(title = "정답률 분포") {
+            Text(
+                text = "학생 ${report.summary.studentCount}명",
+                color = PassmateColors.TextTertiary,
+                fontSize = 12.sp,
+                letterSpacing = (-0.12).sp
+            )
+        }
+        if (bandTotal == 0) {
+            EmptyTabText(text = "정답률 분포를 계산할 수 없어요")
+        } else {
+            bands.forEach { band ->
+                AccuracyBandRow(band = band, total = bandTotal)
+            }
+        }
+    }
+}
+
+@Composable
+private fun AccuracyBandRow(band: AccuracyBand, total: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = band.label,
+            color = PassmateColors.TextSecondary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.12).sp,
+            modifier = Modifier.width(60.dp)
+        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(10.dp)
+                .background(PassmateColors.FieldGray, CircleShape)
+        ) {
+            val fraction = band.count.toFloat() / total.toFloat()
+
+            if (fraction > 0f) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction)
+                        .height(10.dp)
+                        .background(band.color, CircleShape)
+                )
+            }
+        }
+        Text(
+            text = "${band.count}명",
+            color = PassmateColors.TextPrimary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.12).sp,
+            textAlign = TextAlign.End,
+            modifier = Modifier.width(40.dp)
+        )
+    }
+}
+
+// 많이 틀린 문항 TOP 3 — 서버가 준 정답률의 여집합을 오답률로 표시한다 (미채점 서술형은 제외)
+@Composable
+private fun MostMissedQuestionsCard(
+    questions: List<ReportQuestion>,
+    onClickQuestionsLink: () -> Unit
+) {
+    val mostMissed = questions
+        .filter { it.accuracyPercent != null }
+        .sortedBy { it.accuracyPercent }
+        .take(MOST_MISSED_LIMIT)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
+            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        CardHeaderRow(title = "많이 틀린 문항 TOP $MOST_MISSED_LIMIT") {
+            Text(
+                text = "문항별 ›",
+                color = PassmateColors.PrimaryDeep,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.12).sp,
+                modifier = Modifier.clickable(onClick = onClickQuestionsLink)
+            )
+        }
+        if (mostMissed.isEmpty()) {
+            EmptyTabText(text = "채점된 문항이 아직 없어요")
+        } else {
+            mostMissed.forEach { question ->
+                MostMissedRow(question = question)
+            }
+        }
+    }
+}
+
+@Composable
+private fun MostMissedRow(question: ReportQuestion) {
+    val accuracyPercent = question.accuracyPercent ?: 0
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(width = 30.dp, height = 22.dp)
+                .background(PassmateColors.FieldGray, RoundedCornerShape(6.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Q${question.questionNo}",
+                color = PassmateColors.TextSecondary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.12).sp
+            )
+        }
+        Text(
+            text = question.title,
+            color = PassmateColors.TextPrimary,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.13).sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = "오답 ${100 - accuracyPercent}%",
+            color = PassmateColors.WrongPinkText,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.12).sp
+        )
+    }
+}
+
+@Composable
+private fun OverviewSummaryCard(report: RoomReport) {
     val summary = report.summary
     val choiceCount = report.questions.count { it.type == QuestionType.MULTIPLE_CHOICE }
     val oxCount = report.questions.count { it.type == QuestionType.OX }
@@ -269,10 +469,31 @@ private fun OverviewTab(report: RoomReport) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        OverviewRow(label = "평균 점수", value = summary.avgScore?.let { "${it.toLong()}점" } ?: "—")
-        OverviewRow(label = "최고 점수", value = summary.topScore?.let { "${it.toLong()}점" } ?: "—")
+        OverviewRow(label = "평균 점수", value = summary.avgScore?.let { "${formatScore(it)}점" } ?: "—")
+        OverviewRow(label = "최고 점수", value = summary.topScore?.let { "${formatScore(it)}점" } ?: "—")
         OverviewRow(label = "문항 구성", value = "객관식 $choiceCount · OX $oxCount · 서술형 $essayCount")
         OverviewRow(label = "AI 분석", value = "${summary.aiAnalysisCount}건")
+    }
+}
+
+@Composable
+private fun CardHeaderRow(
+    title: String,
+    trailing: @Composable () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            color = PassmateColors.TextPrimary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.15).sp
+        )
+        trailing()
     }
 }
 
@@ -402,79 +623,158 @@ private fun AccuracyBar(percent: Int?) {
     }
 }
 
+// 학생별 탭 — 학생 수·정렬 칩 + 순위/정답 수/점수 목록 (v6 M-14 학생별)
+// 시안의 "제출 N" · "미제출 N명" 카드는 계약에 제출 여부 필드가 없어 제외한다
 @Composable
-private fun StudentsTab(students: List<ReportStudent>) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
-            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
-    ) {
-        students.forEachIndexed { index, student ->
-            if (index > 0) {
-                Divider(color = PassmateColors.Border, thickness = 1.dp)
+private fun StudentsTab(
+    report: RoomReport,
+    studentSort: StudentSort,
+    onSelectSort: (StudentSort) -> Unit
+) {
+    val students = sortedStudents(students = report.students, sort = studentSort)
+
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "학생 ${report.summary.studentCount}명",
+                color = PassmateColors.TextPrimary,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.13).sp
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                StudentSort.entries.forEach { sort ->
+                    StudentSortChip(
+                        sort = sort,
+                        isSelected = sort == studentSort,
+                        onClick = { onSelectSort(sort) }
+                    )
+                }
             }
-            StudentRow(student = student)
         }
-        if (students.isEmpty()) {
-            EmptyTabText(text = "참가 학생이 없어요")
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
+                .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
+        ) {
+            students.forEachIndexed { index, student ->
+                if (index > 0) {
+                    Divider(color = PassmateColors.Border, thickness = 1.dp)
+                }
+                StudentRow(student = student, questionCount = report.summary.questionCount)
+            }
+            if (students.isEmpty()) {
+                EmptyTabText(text = "참가 학생이 없어요")
+            }
         }
     }
 }
 
 @Composable
-private fun StudentRow(student: ReportStudent) {
+private fun StudentSortChip(
+    sort: StudentSort,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val background = if (isSelected) PassmateColors.FieldGray else PassmateColors.Surface
+    val textColor = if (isSelected) PassmateColors.TextSecondary else PassmateColors.TextTertiary
+    val borderColor = if (isSelected) PassmateColors.FieldGray else PassmateColors.Border
+
+    Box(
+        modifier = Modifier
+            .size(width = 66.dp, height = 30.dp)
+            .border(1.dp, borderColor, CircleShape)
+            .background(background, CircleShape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = sort.label,
+            color = textColor,
+            fontSize = 12.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            letterSpacing = (-0.12).sp
+        )
+    }
+}
+
+@Composable
+private fun StudentRow(
+    student: ReportStudent,
+    questionCount: Int
+) {
+    val rank = student.rank
+    val isTopRank = rank != null && rank <= TOP_RANK_LIMIT
+    val rankBackground = if (isTopRank) PassmateColors.BackgroundMint else PassmateColors.FieldGray
+    val rankTextColor = if (isTopRank) PassmateColors.PrimaryDeep else PassmateColors.TextTertiary
+    val scoreColor = if (isTopRank) PassmateColors.Primary else PassmateColors.TextSecondary
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
                 .size(26.dp)
-                .background(PassmateColors.FieldGray, CircleShape),
+                .background(rankBackground, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = student.rank?.toString() ?: "-",
-                color = PassmateColors.TextSecondary,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium
+                text = rank?.toString() ?: "-",
+                color = rankTextColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.12).sp
             )
         }
-        Text(
-            text = student.nickname,
-            color = PassmateColors.TextPrimary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp,
-            modifier = Modifier.weight(1f)
-        )
-        if (student.isGuest) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(3.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = student.nickname,
+                    color = PassmateColors.TextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.14).sp
+                )
+                if (student.isGuest) {
+                    Text(
+                        text = "게스트",
+                        color = PassmateColors.TextTertiary,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .background(PassmateColors.FieldGray, CircleShape)
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    )
+                }
+            }
             Text(
-                text = "게스트",
-                color = PassmateColors.TextTertiary,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier
-                    .background(PassmateColors.FieldGray, CircleShape)
-                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                text = "정답 ${student.correctCount}/$questionCount",
+                color = PassmateColors.TextSecondary,
+                fontSize = 12.sp,
+                letterSpacing = (-0.12).sp
             )
         }
         Text(
-            text = "정답 ${student.correctCount}",
-            color = PassmateColors.TextSecondary,
+            text = "${formatScore(student.totalScore)}점",
+            color = scoreColor,
             fontSize = 13.sp,
-            letterSpacing = (-0.26).sp
-        )
-        Text(
-            text = "${student.totalScore.toLong()}점",
-            color = PassmateColors.TextPrimary,
-            fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.28).sp
+            letterSpacing = (-0.13).sp
         )
     }
 }
@@ -529,6 +829,51 @@ private fun ErrorBox(onRetry: () -> Unit) {
                 .padding(8.dp)
         )
     }
+}
+
+// 정답률 구간 1칸 — 라벨·인원·막대 색 (v6 M-14 개요 "정답률 분포")
+private data class AccuracyBand(
+    val label: String,
+    val count: Int,
+    val color: Color
+)
+
+private fun accuracyBands(students: List<ReportStudent>, questionCount: Int): List<AccuracyBand> {
+    val counts = IntArray(ACCURACY_BAND_LABELS.size)
+
+    if (questionCount > 0) {
+        students.forEach { student ->
+            val percent = student.correctCount * 100 / questionCount
+            val index = when {
+                percent <= 40 -> 0
+                percent <= 60 -> 1
+                percent <= 80 -> 2
+                else -> 3
+            }
+
+            counts[index] = counts[index] + 1
+        }
+    }
+
+    return ACCURACY_BAND_LABELS.mapIndexed { index, label ->
+        AccuracyBand(label = label, count = counts[index], color = ACCURACY_BAND_COLORS[index])
+    }
+}
+
+private fun sortedStudents(students: List<ReportStudent>, sort: StudentSort): List<ReportStudent> {
+    return when (sort) {
+        // 순위는 서버 값 — 점수순은 서버 순위를 그대로 따르고, 순위가 없는 학생만 점수 내림차순으로 뒤에 둔다
+        StudentSort.SCORE -> students.sortedWith(
+            compareBy<ReportStudent> { it.rank ?: Int.MAX_VALUE }.thenByDescending { it.totalScore }
+        )
+        StudentSort.NAME -> students.sortedBy { it.nickname }
+    }
+}
+
+private fun formatScore(score: Double): String {
+    val digits = score.toLong().toString()
+
+    return digits.reversed().chunked(3).joinToString(",").reversed()
 }
 
 private fun reportSubtitle(report: RoomReport): String {

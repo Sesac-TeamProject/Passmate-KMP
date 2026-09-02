@@ -195,6 +195,11 @@ struct ContentView: View {
         case .earnings:
             EarningsView(
                 onRequireSignIn: { pushSignIn(pendingRoute: .earnings, path: path) },
+                // 빈 상태 CTA — 방 개설 진입점인 「내가 만든 방」 탭으로. 탭 전환은 셸 가드를 거친다 (규칙 §2-1-1)
+                onOpenHostedRooms: {
+                    path.wrappedValue = []
+                    shellViewModel.action(.selectTab(.hostedRooms))
+                },
                 onOpenCoinHistory: { path.wrappedValue.append(.coinHistory) },
                 onBack: { popOnce(path) }
             )

@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,10 +33,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sesacteamproject.passmate.component.PassmateIcon
+import org.sesacteamproject.passmate.component.PassmateEmptyState
 import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.AppTab
@@ -98,7 +97,10 @@ private fun JoinedRoomsContentScreen(
     ) {
         when {
             uiState.isLoading -> LoadingBox()
-            uiState.loadFailed -> ErrorBox(onRetry = { onAction(JoinedRoomsAction.Retry) })
+            uiState.loadFailed -> LoadFailureBox(
+                onRetry = { onAction(JoinedRoomsAction.Retry) },
+                onClickContactSupport = { onAction(JoinedRoomsAction.ClickContactSupport) }
+            )
             else -> LoadedJoinedRooms(
                 uiState = uiState,
                 onAction = onAction
@@ -432,7 +434,8 @@ private fun LoadMoreRow(
     }
 }
 
-// 빈 상태 문구 (v6 M-08) — iOS JoinedRoomsView.swift의 EmptyStateText와 1:1
+// 빈 상태 문구 (v6 M-08) — iOS JoinedRoomsView.swift의 EmptyStateText와 1:1.
+// 치수·타이포는 공통 컴포넌트 PassmateEmptyState가 갖는다
 private object EmptyStateText {
 
     const val TITLE = "아직 참여한 방이 없어요"
@@ -442,95 +445,17 @@ private object EmptyStateText {
     const val CTA = "PIN으로 입장"
 }
 
-// 빈 상태 치수·타이포 (v6 M-08) — iOS EmptyStateSpec과 1:1 (iOS는 파생값 guideLineSpacing 1개가 더 있다)
-private object EmptyStateSpec {
-
-    val SectionPaddingVertical = 40.dp
-
-    val IconCircleSize = 64.dp
-
-    val IconSize = 28.dp
-
-    val TitleTopPadding = 16.dp
-
-    val TitleFontSize = 19.sp
-
-    val TitleLetterSpacing = (-0.19).sp
-
-    val GuideTopPadding = 8.dp
-
-    val GuideFontSize = 14.sp
-
-    val GuideLineHeight = 23.1.sp
-
-    val CtaTopPadding = 24.dp
-
-    val CtaWidth = 200.dp
-
-    val CtaHeight = 52.dp
-
-    val CtaCornerRadius = 14.dp
-
-    val CtaFontSize = 16.sp
-}
-
-// 빈 상태 (v6 M-08) — 아이콘 원형 · 제목 · 안내 문구 · PIN 입장 CTA. 값은 EmptyStateSpec/EmptyStateText
+// 빈 상태 (v6 M-08) — 문구·아이콘만 넘기고 배치는 공통 컴포넌트가 그린다
 @Composable
 private fun EmptyRooms(onClickEnterPin: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = EmptyStateSpec.SectionPaddingVertical),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .size(EmptyStateSpec.IconCircleSize)
-                .background(PassmateColors.EmptyIconBg, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            PassmateIcon(
-                icon = PassmateIcons.DoorOpen,
-                contentDescription = null,
-                tint = PassmateColors.TextSecondary,
-                modifier = Modifier.size(EmptyStateSpec.IconSize)
-            )
-        }
-        Text(
-            text = EmptyStateText.TITLE,
-            color = PassmateColors.TextPrimary,
-            fontSize = EmptyStateSpec.TitleFontSize,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = EmptyStateSpec.TitleLetterSpacing,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = EmptyStateSpec.TitleTopPadding)
-        )
-        Text(
-            text = EmptyStateText.GUIDE,
-            color = PassmateColors.TextSecondary,
-            fontSize = EmptyStateSpec.GuideFontSize,
-            lineHeight = EmptyStateSpec.GuideLineHeight,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = EmptyStateSpec.GuideTopPadding)
-        )
-        Row(
-            modifier = Modifier
-                .padding(top = EmptyStateSpec.CtaTopPadding)
-                .width(EmptyStateSpec.CtaWidth)
-                .height(EmptyStateSpec.CtaHeight)
-                .background(PassmateColors.Primary, RoundedCornerShape(EmptyStateSpec.CtaCornerRadius))
-                .clickable(onClick = onClickEnterPin),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = EmptyStateText.CTA,
-                color = PassmateColors.Surface,
-                fontSize = EmptyStateSpec.CtaFontSize,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
+    PassmateEmptyState(
+        icon = PassmateIcons.DoorOpen,
+        iconTint = PassmateColors.TextSecondary,
+        title = EmptyStateText.TITLE,
+        guide = EmptyStateText.GUIDE,
+        ctaLabel = EmptyStateText.CTA,
+        onClickCta = onClickEnterPin
+    )
 }
 
 @Composable
@@ -543,30 +468,93 @@ private fun LoadingBox() {
     }
 }
 
+// 실패 아이콘 크기 (시안 icon/alert-circle 30x30) — iOS FailureIconSize와 1:1
+private val FailureIconSize = 30.dp
+
+// 목록 불러오기 실패 — v6 "E-List 목록 불러오기 실패 — 공통 패턴"(코인 내역·정산·마이와 동일 레이아웃, 공통화 대상)
 @Composable
-private fun ErrorBox(onRetry: () -> Unit) {
+private fun LoadFailureBox(
+    onRetry: () -> Unit,
+    onClickContactSupport: () -> Unit
+) {
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 24.dp)
     ) {
         Text(
-            text = "기록을 불러오지 못했어요",
+            text = "참여한 방",
             color = PassmateColors.TextPrimary,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.32).sp
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.15).sp
         )
-        Text(
-            text = "다시 시도",
-            color = PassmateColors.PrimaryDeep,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp,
+        Spacer(modifier = Modifier.weight(1f))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(PassmateColors.ErrorIconBg, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                PassmateIcon(
+                    icon = PassmateIcons.AlertCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(FailureIconSize),
+                    tint = PassmateColors.WrongPinkText
+                )
+            }
+            Text(
+                text = "목록을 불러오지 못했어요",
+                color = PassmateColors.TextPrimary,
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.19).sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 24.dp)
+            )
+            Text(
+                text = "연결이 잠시 끊겼어요.\n다시 시도해 주세요.",
+                color = PassmateColors.TextSecondary,
+                fontSize = 14.sp,
+                lineHeight = 23.sp,
+                letterSpacing = (-0.14).sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 9.dp)
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Box(
             modifier = Modifier
-                .padding(top = 12.dp)
-                .clickable(onClick = onRetry)
-                .padding(8.dp)
+                .fillMaxWidth()
+                .height(52.dp)
+                .background(PassmateColors.Primary, RoundedCornerShape(14.dp))
+                .clickable(onClick = onRetry),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "다시 시도",
+                color = PassmateColors.Surface,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.15).sp
+            )
+        }
+        Text(
+            text = "계속 안 되면 문의하기",
+            color = PassmateColors.PrimaryDeep,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.13).sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .fillMaxWidth()
+                .clickable(onClick = onClickContactSupport)
+                .padding(vertical = 8.dp)
         )
     }
 }

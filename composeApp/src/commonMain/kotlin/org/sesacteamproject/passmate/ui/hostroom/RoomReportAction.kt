@@ -8,6 +8,8 @@ sealed interface RoomReportAction {
 
     data class SelectTab(val tab: ReportTab) : RoomReportAction
 
+    data class SelectStudentSort(val sort: StudentSort) : RoomReportAction
+
     // 내보내기 — 텍스트 요약 네이티브 공유 (FR-063 모바일 경로)
     data object ClickExport : RoomReportAction
 }

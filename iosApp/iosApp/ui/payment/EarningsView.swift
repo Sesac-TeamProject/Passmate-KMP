@@ -5,6 +5,9 @@ import Shared
 struct EarningsView: View {
     var onRequireSignIn: () -> Void = {}
 
+    // 빈 상태 「유료 방 만들기」 CTA — 방 개설 진입점인 「내가 만든 방」 탭으로 보낸다
+    var onOpenHostedRooms: () -> Void = {}
+
     var onOpenCoinHistory: () -> Void = {}
 
     var onBack: () -> Void = {}
@@ -33,6 +36,8 @@ struct EarningsView: View {
                 onRequireSignIn()
             case .openAccountSheet:
                 isAccountSheetVisible = true
+            case .openHostedRooms:
+                onOpenHostedRooms()
             case .openCoinHistory:
                 onOpenCoinHistory()
             case let .showNotice(message):
@@ -94,7 +99,7 @@ private struct EarningsContentView: View {
                     .tint(PassmateColors.primary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if uiState.loadFailed || uiState.earnings == nil {
-                errorView
+                loadFailedView
             } else if let earnings = uiState.earnings {
                 loadedView(earnings)
             }
@@ -103,22 +108,79 @@ private struct EarningsContentView: View {
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
-    private var errorView: some View {
-        VStack(spacing: 12) {
-            Text("정산 정보를 불러오지 못했어요")
-                .font(.system(size: 16, weight: .medium))
-                .kerning(-0.32)
-                .foregroundColor(PassmateColors.textPrimary)
+    // 목록 불러오기 실패 (v6 E-List 공통 패턴) — Compose EarningsScreen.kt의 LoadFailedContent 미러.
+    // TODO 공통화 대상: 코인 내역·참여한 방·마이가 같은 패턴을 쓴다. 화면별 적용이 끝나면 공통 컴포넌트로 승격한다
+    private var loadFailedView: some View {
+        VStack(spacing: 0) {
+            loadFailedHeader
+            VStack(spacing: 0) {
+                ZStack {
+                    Circle().fill(PassmateColors.errorIconBg)
+                    PassmateIconView(
+                        icon: LoadFailedText.icon,
+                        tint: PassmateColors.wrongPinkText,
+                        size: LoadFailedSpec.iconSize
+                    )
+                }
+                .frame(width: LoadFailedSpec.iconCircleSize, height: LoadFailedSpec.iconCircleSize)
+                Text(LoadFailedText.title)
+                    .font(.system(size: LoadFailedSpec.titleFontSize, weight: .bold))
+                    .kerning(LoadFailedSpec.titleKerning)
+                    .foregroundColor(PassmateColors.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, LoadFailedSpec.titleTopPadding)
+                Text(LoadFailedText.guide)
+                    .font(.system(size: LoadFailedSpec.guideFontSize))
+                    .kerning(LoadFailedSpec.guideKerning)
+                    .lineSpacing(LoadFailedSpec.guideLineSpacing)
+                    .foregroundColor(PassmateColors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, LoadFailedSpec.guideTopPadding)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.horizontal, LoadFailedSpec.contentPaddingHorizontal)
             Button {
                 onAction(.retry)
             } label: {
-                Text("다시 시도")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.primaryDeep)
+                Text(LoadFailedText.retry)
+                    .font(.system(size: LoadFailedSpec.retryFontSize, weight: .bold))
+                    .kerning(LoadFailedSpec.retryKerning)
+                    .foregroundColor(PassmateColors.surface)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: LoadFailedSpec.retryHeight)
+                    .background(PassmateColors.primary)
+                    .cornerRadius(LoadFailedSpec.retryCornerRadius)
             }
+            .padding(.horizontal, LoadFailedSpec.contentPaddingHorizontal)
+            Button(action: onClickBack) {
+                Text(LoadFailedText.backLink)
+                    .font(.system(size: LoadFailedSpec.backLinkFontSize, weight: .medium))
+                    .kerning(LoadFailedSpec.backLinkKerning)
+                    .foregroundColor(PassmateColors.primaryDeep)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, LoadFailedSpec.backLinkVerticalPadding)
+            }
+            .padding(.top, LoadFailedSpec.backLinkTopPadding)
+            .padding(.bottom, LoadFailedSpec.bottomSpacing)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var loadFailedHeader: some View {
+        HStack(spacing: LoadFailedSpec.backEndPadding) {
+            Button(action: onClickBack) {
+                Text(LoadFailedText.back)
+                    .font(.system(size: LoadFailedSpec.backFontSize))
+                    .foregroundColor(PassmateColors.textPrimary)
+                    .padding(.vertical, LoadFailedSpec.backVerticalPadding)
+            }
+            Text(LoadFailedText.headerTitle)
+                .font(.system(size: LoadFailedSpec.headerTitleFontSize, weight: .bold))
+                .kerning(LoadFailedSpec.headerTitleKerning)
+                .foregroundColor(PassmateColors.textPrimary)
+            Spacer()
+        }
+        .padding(.horizontal, LoadFailedSpec.headerPaddingHorizontal)
+        .padding(.vertical, LoadFailedSpec.headerPaddingVertical)
     }
 
     private func loadedView(_ earnings: Earnings) -> some View {
@@ -141,11 +203,27 @@ private struct EarningsContentView: View {
                 summaryCard(earnings)
                 historySectionHeader
                 if uiState.items.isEmpty {
-                    Text("아직 정산 내역이 없어요 · 유료 방을 열면 여기에 쌓여요")
-                        .font(.system(size: 14))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.textSecondary)
-                        .padding(.vertical, 24)
+                    // 빈 상태는 두 갈래다 — 계좌가 없으면 계좌 등록이 먼저다(정산 금액이 쌓여도 지급되지 않는다).
+                    // 계좌가 있으면 "정산 내역이 없어요" + 유료 방 개설 유도 (v6 M-T4 빈 상태 2종)
+                    if earnings.account == nil {
+                        PassmateEmptyStateView(
+                            icon: EmptyStateText.accountIcon,
+                            iconTint: PassmateColors.wrongPinkText,
+                            title: EmptyStateText.accountTitle,
+                            guide: EmptyStateText.accountGuide,
+                            ctaLabel: EmptyStateText.accountCta,
+                            onClickCta: { onAction(.clickManageAccount) }
+                        )
+                    } else {
+                        PassmateEmptyStateView(
+                            icon: EmptyStateText.settlementsIcon,
+                            iconTint: PassmateColors.primaryDeep,
+                            title: EmptyStateText.settlementsTitle,
+                            guide: EmptyStateText.settlementsGuide,
+                            ctaLabel: EmptyStateText.settlementsCta,
+                            onClickCta: { onAction(.clickCreatePaidRoom) }
+                        )
+                    }
                 }
                 ForEach(uiState.items, id: \.settlementId) { item in
                     SettlementRowView(item: item)
@@ -339,4 +417,101 @@ private struct SettlementRowView: View {
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: amount)) ?? "\(amount)"
     }
+}
+
+// 빈 상태 문구 (v6 M-T4 2종) — Compose EarningsScreen.kt의 EmptyStateText 미러.
+// 치수·타이포는 공통 컴포넌트 PassmateEmptyStateView가 갖는다
+private enum EmptyStateText {
+    static let settlementsTitle = "아직 정산 내역이 없어요"
+
+    static let settlementsGuide = "유료 방을 열고 참가비가 모이면\n매월 5일에 정산해 드려요."
+
+    static let settlementsCta = "유료 방 만들기"
+
+    static let settlementsIcon = PassmateIcons.bookmark
+
+    static let accountTitle = "정산 계좌를 등록해 주세요"
+
+    static let accountGuide = "계좌가 없으면 정산 금액이 쌓여도\n지급되지 않아요."
+
+    static let accountCta = "계좌 등록하기"
+
+    static let accountIcon = PassmateIcons.alertCircle
+}
+
+// 목록 불러오기 실패 문구 (v6 E-List) — Compose EarningsScreen.kt의 LoadFailedText 미러
+private enum LoadFailedText {
+    static let headerTitle = "정산"
+
+    static let back = "\u{2190}"
+
+    static let title = "목록을 불러오지 못했어요"
+
+    static let guide = "연결이 잠시 끊겼어요.\n정산 금액은 사라지지 않아요."
+
+    static let retry = "다시 시도"
+
+    // 정산은 마이 탭에서 push된 화면이라 뒤로가기가 곧 마이다
+    static let backLink = "계좌 정보는 마이에서 확인"
+
+    static let icon = PassmateIcons.alertCircle
+}
+
+// 목록 불러오기 실패 치수·타이포 (v6 E-List) — Compose LoadFailedSpec 미러.
+// 상단 여백은 Compose가 60dp를 직접 두는 것과 달리 세이프에어리어가 처리하므로 항목이 없다.
+// (SwiftUI에는 lineHeight가 없어 파생값 guideLineSpacing 1개가 더 있다)
+private enum LoadFailedSpec {
+    static let headerPaddingHorizontal: CGFloat = 20
+
+    static let headerPaddingVertical: CGFloat = 14
+
+    static let backFontSize: CGFloat = 20
+
+    static let backEndPadding: CGFloat = 12
+
+    // Compose BackVerticalPadding 4dp와 같은 탭 영역 확장
+    static let backVerticalPadding: CGFloat = 4
+
+    static let headerTitleFontSize: CGFloat = 15
+
+    static let headerTitleKerning: CGFloat = -0.15
+
+    static let contentPaddingHorizontal: CGFloat = 20
+
+    static let iconCircleSize: CGFloat = 64
+
+    static let iconSize: CGFloat = 30
+
+    static let titleTopPadding: CGFloat = 24
+
+    static let titleFontSize: CGFloat = 19
+
+    static let titleKerning: CGFloat = -0.19
+
+    static let guideTopPadding: CGFloat = 8
+
+    static let guideFontSize: CGFloat = 14
+
+    // Compose lineHeight 23.1(14 x 1.65) - SF 14pt 기본 행높이
+    static let guideLineSpacing: CGFloat = 6.4
+
+    static let guideKerning: CGFloat = -0.14
+
+    static let retryHeight: CGFloat = 52
+
+    static let retryCornerRadius: CGFloat = 14
+
+    static let retryFontSize: CGFloat = 15
+
+    static let retryKerning: CGFloat = -0.15
+
+    static let backLinkTopPadding: CGFloat = 8
+
+    static let backLinkVerticalPadding: CGFloat = 10
+
+    static let backLinkFontSize: CGFloat = 13
+
+    static let backLinkKerning: CGFloat = -0.13
+
+    static let bottomSpacing: CGFloat = 24
 }

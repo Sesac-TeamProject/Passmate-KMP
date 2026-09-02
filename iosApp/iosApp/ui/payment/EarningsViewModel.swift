@@ -87,6 +87,8 @@ final class EarningsViewModel: ObservableObject {
             event.send(.openCoinHistory)
         case .clickManageAccount:
             event.send(.openAccountSheet)
+        case .clickCreatePaidRoom:
+            event.send(.openHostedRooms)
         case .accountSaved:
             onAccountSaved()
         case let .notice(message):

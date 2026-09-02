@@ -17,6 +17,9 @@ enum class PassmateIcons(val resourceName: String) {
     // 목록 아이콘 (v6 M-12-9 코인 내역 빈 상태) — iOS 에셋 이름은 "List"
     List("ic_list"),
 
+    // 북마크 아이콘 (v6 M-T4 정산 빈 상태) — iOS 에셋 이름은 "Bookmark"
+    Bookmark("ic_bookmark"),
+
     // 경고 원 (목록 불러오기 실패 E-List 공통 패턴 · v6 M-12e 마이 부분 실패) — iOS 에셋 이름은 "AlertCircle"
     AlertCircle("ic_alert_circle")
 }
