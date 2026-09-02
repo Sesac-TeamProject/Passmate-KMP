@@ -69,8 +69,9 @@ private struct CoinHistoryContentView: View {
     private var topBar: some View {
         HStack(spacing: 12) {
             Button(action: onBack) {
-                Text("←").font(.system(size: 22)).foregroundColor(PassmateColors.textPrimary)
+                PassmateIconView(icon: .arrowLeft, tint: PassmateColors.textPrimary, size: 22)
             }
+            .accessibilityLabel("뒤로 가기")
             Text("코인 내역")
                 .font(.system(size: 20, weight: .bold))
                 .kerning(-0.4)
@@ -133,11 +134,7 @@ private struct CoinHistoryContentView: View {
     }
 
     private var coinMark: some View {
-        Text("C")
-            .font(.system(size: 12, weight: .bold))
-            .foregroundColor(PassmateColors.textPrimary)
-            .frame(width: 24, height: 24)
-            .overlay(Circle().stroke(PassmateColors.textPrimary, lineWidth: 2))
+        PassmateIconView(icon: .coin, tint: PassmateColors.textPrimary, size: 24)
     }
 
     private var filterChipRow: some View {
@@ -251,20 +248,14 @@ private struct CoinHistoryContentView: View {
     }
 
     private var emptyIcon: some View {
-        Image(systemName: "list.bullet")
-            .font(.system(size: 22, weight: .regular))
-            .foregroundColor(PassmateColors.primaryDeep)
+        PassmateIconView(icon: .list, tint: PassmateColors.primaryDeep, size: 28)
             .frame(width: 64, height: 64)
             .background(PassmateColors.emptyIconBg)
             .clipShape(Circle())
     }
 
     private var errorIcon: some View {
-        Text("!")
-            .font(.system(size: 15, weight: .bold))
-            .foregroundColor(PassmateColors.errorIconTint)
-            .frame(width: 30, height: 30)
-            .overlay(Circle().stroke(PassmateColors.errorIconTint, lineWidth: 2))
+        PassmateIconView(icon: .alertCircle, tint: PassmateColors.errorIconTint, size: 30)
             .frame(width: 64, height: 64)
             .background(PassmateColors.errorIconBg)
             .clipShape(Circle())

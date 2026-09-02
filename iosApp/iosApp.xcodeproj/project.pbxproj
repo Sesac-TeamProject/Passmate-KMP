@@ -149,6 +149,8 @@
 		A1010001156AABBCCDDEEFF0156 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */; };
 		A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */; };
 		A1010001158AABBCCDDEEFF0158 /* SheetDetents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001158AABBCCDDEEFF0158 /* SheetDetents.swift */; };
+		A1010000169AABBCCDDEEFF0169 /* PassmateIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000169AABBCCDDEEFF0169 /* PassmateIcons.swift */; };
+		A1010000170AABBCCDDEEFF0170 /* PassmateIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000170AABBCCDDEEFF0170 /* PassmateIconView.swift */; };
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
@@ -301,6 +303,8 @@
 		A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakTopicsRow.swift; sourceTree = "<group>"; };
 		A1011001158AABBCCDDEEFF0158 /* SheetDetents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetDetents.swift; sourceTree = "<group>"; };
+		A1011000169AABBCCDDEEFF0169 /* PassmateIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateIcons.swift; sourceTree = "<group>"; };
+		A1011000170AABBCCDDEEFF0170 /* PassmateIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateIconView.swift; sourceTree = "<group>"; };
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
@@ -613,6 +617,8 @@
 				A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */,
 				A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */,
 				A1011001158AABBCCDDEEFF0158 /* SheetDetents.swift */,
+				A1011000169AABBCCDDEEFF0169 /* PassmateIcons.swift */,
+				A1011000170AABBCCDDEEFF0170 /* PassmateIconView.swift */,
 			);
 			path = component;
 			sourceTree = "<group>";
@@ -855,6 +861,8 @@
 				A1010001156AABBCCDDEEFF0156 /* FlowLayout.swift in Sources */,
 				A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */,
 				A1010001158AABBCCDDEEFF0158 /* SheetDetents.swift in Sources */,
+				A1010000169AABBCCDDEEFF0169 /* PassmateIcons.swift in Sources */,
+				A1010000170AABBCCDDEEFF0170 /* PassmateIconView.swift in Sources */,
 				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

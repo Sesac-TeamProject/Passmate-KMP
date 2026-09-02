@@ -18,10 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -37,6 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateIcon
+import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.payment.domain.model.CoinTransaction
@@ -105,11 +104,14 @@ private fun TopBar(onBack: () -> Unit) {
         modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "←",
-            color = PassmateColors.TextPrimary,
-            fontSize = 22.sp,
-            modifier = Modifier.clickable { onBack() }.padding(end = 12.dp, top = 4.dp, bottom = 4.dp)
+        PassmateIcon(
+            icon = PassmateIcons.ArrowLeft,
+            contentDescription = "뒤로 가기",
+            tint = PassmateColors.TextPrimary,
+            modifier = Modifier
+                .clickable { onBack() }
+                .padding(end = 12.dp, top = 4.dp, bottom = 4.dp)
+                .size(22.dp)
         )
         Text(
             text = "코인 내역",
@@ -192,14 +194,12 @@ private fun BalanceCard(balance: Int?) {
 
 @Composable
 private fun CoinMark() {
-    Box(
-        modifier = Modifier
-            .size(24.dp)
-            .border(2.dp, PassmateColors.TextPrimary, CircleShape),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("C", color = PassmateColors.TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-    }
+    PassmateIcon(
+        icon = PassmateIcons.Coin,
+        contentDescription = null,
+        tint = PassmateColors.TextPrimary,
+        modifier = Modifier.size(24.dp)
+    )
 }
 
 @Composable
@@ -403,8 +403,8 @@ private fun EmptyIcon() {
         modifier = Modifier.size(64.dp).background(PassmateColors.EmptyIconBg, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = Icons.Filled.List,
+        PassmateIcon(
+            icon = PassmateIcons.List,
             contentDescription = null,
             tint = PassmateColors.PrimaryDeep,
             modifier = Modifier.size(28.dp)
@@ -418,17 +418,12 @@ private fun ErrorIcon() {
         modifier = Modifier.size(64.dp).background(PassmateColors.ErrorIconBg, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier.size(30.dp).border(2.dp, PassmateColors.ErrorIconTint, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "!",
-                color = PassmateColors.ErrorIconTint,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        PassmateIcon(
+            icon = PassmateIcons.AlertCircle,
+            contentDescription = null,
+            tint = PassmateColors.ErrorIconTint,
+            modifier = Modifier.size(30.dp)
+        )
     }
 }
 
