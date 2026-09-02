@@ -146,7 +146,50 @@ private struct JoinedRoomsContentView: View {
     }
 }
 
-// 빈 상태 (v6 M-08) 미러 — 아이콘 원형 64 · 제목 19/Bold · 안내 문구 · PIN 입장 CTA 200x52
+// 빈 상태 문구 (v6 M-08) — Compose JoinedRoomsScreen.kt의 EmptyStateText 미러
+private enum EmptyStateText {
+    static let title = "아직 참여한 방이 없어요"
+
+    static let guide = "선생님에게 받은 PIN 6자리를\n홈에서 입력해 보세요."
+
+    static let cta = "PIN으로 입장"
+}
+
+// 빈 상태 치수·타이포 (v6 M-08) — Compose EmptyStateSpec 미러
+private enum EmptyStateSpec {
+    static let iconAsset = "DoorOpen"
+
+    static let sectionPaddingVertical: CGFloat = 40
+
+    static let iconCircleSize: CGFloat = 64
+
+    static let iconSize: CGFloat = 28
+
+    static let titleTopPadding: CGFloat = 16
+
+    static let titleFontSize: CGFloat = 19
+
+    static let titleKerning: CGFloat = -0.19
+
+    static let guideTopPadding: CGFloat = 8
+
+    static let guideFontSize: CGFloat = 14
+
+    // Compose lineHeight 23.1(14 x 1.65) - SF 14pt 기본 행높이
+    static let guideLineSpacing: CGFloat = 6.4
+
+    static let ctaTopPadding: CGFloat = 24
+
+    static let ctaWidth: CGFloat = 200
+
+    static let ctaHeight: CGFloat = 52
+
+    static let ctaCornerRadius: CGFloat = 14
+
+    static let ctaFontSize: CGFloat = 16
+}
+
+// 빈 상태 (v6 M-08) 미러 — 아이콘 원형 · 제목 · 안내 문구 · PIN 입장 CTA. 값은 EmptyStateSpec/EmptyStateText
 private struct JoinedRoomsEmptyView: View {
     let onClickEnterPin: () -> Void
 
@@ -155,103 +198,51 @@ private struct JoinedRoomsEmptyView: View {
             ZStack {
                 Circle()
                     .fill(PassmateColors.emptyIconBg)
-                DoorOpenIcon(tint: PassmateColors.textSecondary, size: 28)
+                DoorOpenIcon(tint: PassmateColors.textSecondary, size: EmptyStateSpec.iconSize)
             }
-            .frame(width: 64, height: 64)
-            Text("아직 참여한 방이 없어요")
-                .font(.system(size: 19, weight: .bold))
-                .kerning(-0.19)
+            .frame(width: EmptyStateSpec.iconCircleSize, height: EmptyStateSpec.iconCircleSize)
+            Text(EmptyStateText.title)
+                .font(.system(size: EmptyStateSpec.titleFontSize, weight: .bold))
+                .kerning(EmptyStateSpec.titleKerning)
                 .foregroundColor(PassmateColors.textPrimary)
                 .multilineTextAlignment(.center)
-                .padding(.top, 16)
-            // lineSpacing 6.4 = Compose lineHeight 23.1(14 x 1.65) - 기본 행높이
-            Text("선생님에게 받은 PIN 6자리를\n홈에서 입력해 보세요.")
-                .font(.system(size: 14))
-                .lineSpacing(6.4)
+                .padding(.top, EmptyStateSpec.titleTopPadding)
+            Text(EmptyStateText.guide)
+                .font(.system(size: EmptyStateSpec.guideFontSize))
+                .lineSpacing(EmptyStateSpec.guideLineSpacing)
                 .foregroundColor(PassmateColors.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.top, 8)
+                .padding(.top, EmptyStateSpec.guideTopPadding)
             Button(action: onClickEnterPin) {
-                Text("PIN으로 입장")
-                    .font(.system(size: 16, weight: .bold))
+                Text(EmptyStateText.cta)
+                    .font(.system(size: EmptyStateSpec.ctaFontSize, weight: .bold))
                     .foregroundColor(PassmateColors.surface)
-                    .frame(width: 200, height: 52)
+                    .frame(width: EmptyStateSpec.ctaWidth, height: EmptyStateSpec.ctaHeight)
                     .background(PassmateColors.primary)
-                    .cornerRadius(14)
+                    .cornerRadius(EmptyStateSpec.ctaCornerRadius)
             }
-            .padding(.top, 24)
+            .padding(.top, EmptyStateSpec.ctaTopPadding)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
+        .padding(.vertical, EmptyStateSpec.sectionPaddingVertical)
     }
 }
 
-// door-open 아이콘 — SF Symbol door.left.hand.open은 iOS 16+라 직접 그린다 (규칙 §2-1).
-// lucide "door-open"(24 뷰포트) 지오메트리로, Compose JoinedRoomsScreen.kt의 doorOpenVector와 좌표가 1:1이다
+// door-open 아이콘 — Assets의 DoorOpen(lucide v0.300.0 door-open, ISC).
+// SF Symbol door.left.hand.open은 iOS 16+라 쓸 수 없다 (배포 타깃 15.0, 규칙 §2-1).
+// Compose PassmateIcons.DoorOpen과 같은 원본을 쓰고, 색은 템플릿 렌더링으로 준다 (규칙 §11-2)
 private struct DoorOpenIcon: View {
     let tint: Color
 
     let size: CGFloat
 
-    private var scale: CGFloat {
-        return size / 24
-    }
-
-    private func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
-        return CGPoint(x: x * scale, y: y * scale)
-    }
-
-    private var frameAndFloor: Path {
-        var path = Path()
-
-        path.move(to: point(13, 4))
-        path.addLine(to: point(16, 4))
-        path.addQuadCurve(to: point(18, 6), control: point(18, 4))
-        path.addLine(to: point(18, 20))
-        path.move(to: point(2, 20))
-        path.addLine(to: point(5, 20))
-        path.move(to: point(13, 20))
-        path.addLine(to: point(22, 20))
-
-        return path
-    }
-
-    private var panel: Path {
-        var path = Path()
-
-        path.move(to: point(13, 4.56))
-        path.addLine(to: point(13, 20.72))
-        path.addLine(to: point(5, 20))
-        path.addLine(to: point(5, 5.56))
-        path.closeSubpath()
-
-        return path
-    }
-
-    private var handle: Path {
-        let radius: CGFloat = 0.9 * scale
-        let center = point(10, 12)
-
-        return Path(
-            ellipseIn: CGRect(
-                x: center.x - radius,
-                y: center.y - radius,
-                width: radius * 2,
-                height: radius * 2
-            )
-        )
-    }
-
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            frameAndFloor
-                .stroke(tint, style: StrokeStyle(lineWidth: 2 * scale, lineCap: .round, lineJoin: .round))
-            panel
-                .stroke(tint, style: StrokeStyle(lineWidth: 2 * scale, lineCap: .round, lineJoin: .round))
-            handle
-                .fill(tint)
-        }
-        .frame(width: size, height: size)
+        Image(EmptyStateSpec.iconAsset)
+            .renderingMode(.template)
+            .resizable()
+            .scaledToFit()
+            .foregroundColor(tint)
+            .frame(width: size, height: size)
     }
 }
 

@@ -1,6 +1,5 @@
 package org.sesacteamproject.passmate.ui.mypage
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,15 +32,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateIcon
+import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -434,127 +430,105 @@ private fun LoadMoreRow(
     }
 }
 
-// 빈 상태 (v6 M-08) — 아이콘 원형 64 · 제목 19/Bold · 안내 문구 · PIN 입장 CTA 200x52
+// 빈 상태 문구 (v6 M-08) — iOS JoinedRoomsView.swift의 EmptyStateText와 1:1
+private object EmptyStateText {
+
+    const val TITLE = "아직 참여한 방이 없어요"
+
+    const val GUIDE = "선생님에게 받은 PIN 6자리를\n홈에서 입력해 보세요."
+
+    const val CTA = "PIN으로 입장"
+}
+
+// 빈 상태 치수·타이포 (v6 M-08) — iOS EmptyStateSpec과 1:1 (iOS는 파생값 guideLineSpacing 1개가 더 있다)
+private object EmptyStateSpec {
+
+    val SectionPaddingVertical = 40.dp
+
+    val IconCircleSize = 64.dp
+
+    val IconSize = 28.dp
+
+    val TitleTopPadding = 16.dp
+
+    val TitleFontSize = 19.sp
+
+    val TitleLetterSpacing = (-0.19).sp
+
+    val GuideTopPadding = 8.dp
+
+    val GuideFontSize = 14.sp
+
+    val GuideLineHeight = 23.1.sp
+
+    val CtaTopPadding = 24.dp
+
+    val CtaWidth = 200.dp
+
+    val CtaHeight = 52.dp
+
+    val CtaCornerRadius = 14.dp
+
+    val CtaFontSize = 16.sp
+}
+
+// 빈 상태 (v6 M-08) — 아이콘 원형 · 제목 · 안내 문구 · PIN 입장 CTA. 값은 EmptyStateSpec/EmptyStateText
 @Composable
 private fun EmptyRooms(onClickEnterPin: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 40.dp),
+            .padding(vertical = EmptyStateSpec.SectionPaddingVertical),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
-                .size(64.dp)
+                .size(EmptyStateSpec.IconCircleSize)
                 .background(PassmateColors.EmptyIconBg, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            DoorOpenIcon(
+            PassmateIcon(
+                icon = PassmateIcons.DoorOpen,
+                contentDescription = null,
                 tint = PassmateColors.TextSecondary,
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(EmptyStateSpec.IconSize)
             )
         }
         Text(
-            text = "아직 참여한 방이 없어요",
+            text = EmptyStateText.TITLE,
             color = PassmateColors.TextPrimary,
-            fontSize = 19.sp,
+            fontSize = EmptyStateSpec.TitleFontSize,
             fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.19).sp,
+            letterSpacing = EmptyStateSpec.TitleLetterSpacing,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = EmptyStateSpec.TitleTopPadding)
         )
         Text(
-            text = "선생님에게 받은 PIN 6자리를\n홈에서 입력해 보세요.",
+            text = EmptyStateText.GUIDE,
             color = PassmateColors.TextSecondary,
-            fontSize = 14.sp,
-            lineHeight = 23.1.sp,
+            fontSize = EmptyStateSpec.GuideFontSize,
+            lineHeight = EmptyStateSpec.GuideLineHeight,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = EmptyStateSpec.GuideTopPadding)
         )
         Row(
             modifier = Modifier
-                .padding(top = 24.dp)
-                .width(200.dp)
-                .height(52.dp)
-                .background(PassmateColors.Primary, RoundedCornerShape(14.dp))
+                .padding(top = EmptyStateSpec.CtaTopPadding)
+                .width(EmptyStateSpec.CtaWidth)
+                .height(EmptyStateSpec.CtaHeight)
+                .background(PassmateColors.Primary, RoundedCornerShape(EmptyStateSpec.CtaCornerRadius))
                 .clickable(onClick = onClickEnterPin),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "PIN으로 입장",
+                text = EmptyStateText.CTA,
                 color = PassmateColors.Surface,
-                fontSize = 16.sp,
+                fontSize = EmptyStateSpec.CtaFontSize,
                 fontWeight = FontWeight.Bold
             )
         }
     }
-}
-
-// door-open 아이콘 — 프로젝트에 도어 리소스가 없어 lucide "door-open"(24 뷰포트) 지오메트리를 벡터로 옮김.
-// iOS JoinedRoomsView.swift의 DoorOpenIcon과 좌표가 1:1이다
-@Composable
-private fun DoorOpenIcon(
-    tint: Color,
-    modifier: Modifier = Modifier
-) {
-    val vector = remember(tint) { doorOpenVector(tint) }
-
-    Image(
-        imageVector = vector,
-        contentDescription = null,
-        modifier = modifier
-    )
-}
-
-private fun doorOpenVector(tint: Color): ImageVector {
-    val brush = SolidColor(tint)
-    val builder = ImageVector.Builder(
-        name = "DoorOpen",
-        defaultWidth = 28.dp,
-        defaultHeight = 28.dp,
-        viewportWidth = 24f,
-        viewportHeight = 24f
-    )
-
-    // 문틀 + 바닥선
-    builder.path(
-        stroke = brush,
-        strokeLineWidth = 2f,
-        strokeLineCap = StrokeCap.Round,
-        strokeLineJoin = StrokeJoin.Round
-    ) {
-        moveTo(13f, 4f)
-        lineTo(16f, 4f)
-        quadTo(18f, 4f, 18f, 6f)
-        lineTo(18f, 20f)
-        moveTo(2f, 20f)
-        lineTo(5f, 20f)
-        moveTo(13f, 20f)
-        lineTo(22f, 20f)
-    }
-    // 열린 문짝
-    builder.path(
-        stroke = brush,
-        strokeLineWidth = 2f,
-        strokeLineCap = StrokeCap.Round,
-        strokeLineJoin = StrokeJoin.Round
-    ) {
-        moveTo(13f, 4.56f)
-        lineTo(13f, 20.72f)
-        lineTo(5f, 20f)
-        lineTo(5f, 5.56f)
-        close()
-    }
-    // 손잡이
-    builder.path(fill = brush) {
-        moveTo(9.1f, 12f)
-        arcTo(0.9f, 0.9f, 0f, isMoreThanHalf = false, isPositiveArc = true, x1 = 10.9f, y1 = 12f)
-        arcTo(0.9f, 0.9f, 0f, isMoreThanHalf = false, isPositiveArc = true, x1 = 9.1f, y1 = 12f)
-        close()
-    }
-
-    return builder.build()
 }
 
 @Composable
