@@ -9,6 +9,9 @@ struct JoinedRoomsView: View {
 
     var onRejoin: (String) -> Void = { _ in }
 
+    // 홈 탭이 곧 PIN 입장 폼 (규칙 §2-1-1) — Compose는 NavigationAction.NavigateToHome
+    var onOpenPinEntry: () -> Void = {}
+
     @StateObject private var viewModel = JoinedRoomsViewModel(
         getMyPageUseCase: KoinHelper.shared.getMyPageUseCase(),
         isSignedInUseCase: KoinHelper.shared.isSignedInUseCase()
@@ -32,6 +35,8 @@ struct JoinedRoomsView: View {
                 onOpenReport(roomId)
             case let .rejoin(pin):
                 onRejoin(pin)
+            case .openPinEntry:
+                onOpenPinEntry()
             case let .showNotice(message):
                 noticeMessage = message
             }
@@ -145,12 +150,7 @@ private struct JoinedRoomsContentView: View {
                     WeakTopicsRow(topics: summary.weakTopics)
                 }
                 if uiState.rooms.isEmpty, uiState.ongoing == nil {
-                    Text("아직 참여한 방이 없어요")
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.textSecondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
+                    JoinedRoomsEmptyView(onClickEnterPin: { onAction(.clickEnterPin) })
                 } else {
                     ForEach(uiState.rooms, id: \.roomId) { room in
                         JoinedRoomRow(room: room, onClickReport: { onAction(.clickRoomReport(roomId: room.roomId)) })
@@ -185,6 +185,106 @@ private struct JoinedRoomsContentView: View {
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(PassmateColors.border, lineWidth: 1))
         }
         .disabled(uiState.isLoadingMore)
+    }
+}
+
+// 빈 상태 문구 (v6 M-08) — Compose JoinedRoomsScreen.kt의 EmptyStateText 미러
+private enum EmptyStateText {
+    static let title = "아직 참여한 방이 없어요"
+
+    static let guide = "선생님에게 받은 PIN 6자리를\n홈에서 입력해 보세요."
+
+    static let cta = "PIN으로 입장"
+}
+
+// 빈 상태 치수·타이포 (v6 M-08) — Compose EmptyStateSpec 미러
+private enum EmptyStateSpec {
+    static let iconAsset = "DoorOpen"
+
+    static let sectionPaddingVertical: CGFloat = 40
+
+    static let iconCircleSize: CGFloat = 64
+
+    static let iconSize: CGFloat = 28
+
+    static let titleTopPadding: CGFloat = 16
+
+    static let titleFontSize: CGFloat = 19
+
+    static let titleKerning: CGFloat = -0.19
+
+    static let guideTopPadding: CGFloat = 8
+
+    static let guideFontSize: CGFloat = 14
+
+    // Compose lineHeight 23.1(14 x 1.65) - SF 14pt 기본 행높이
+    static let guideLineSpacing: CGFloat = 6.4
+
+    static let ctaTopPadding: CGFloat = 24
+
+    static let ctaWidth: CGFloat = 200
+
+    static let ctaHeight: CGFloat = 52
+
+    static let ctaCornerRadius: CGFloat = 14
+
+    static let ctaFontSize: CGFloat = 16
+}
+
+// 빈 상태 (v6 M-08) 미러 — 아이콘 원형 · 제목 · 안내 문구 · PIN 입장 CTA. 값은 EmptyStateSpec/EmptyStateText
+private struct JoinedRoomsEmptyView: View {
+    let onClickEnterPin: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ZStack {
+                Circle()
+                    .fill(PassmateColors.emptyIconBg)
+                DoorOpenIcon(tint: PassmateColors.textSecondary, size: EmptyStateSpec.iconSize)
+            }
+            .frame(width: EmptyStateSpec.iconCircleSize, height: EmptyStateSpec.iconCircleSize)
+            Text(EmptyStateText.title)
+                .font(.system(size: EmptyStateSpec.titleFontSize, weight: .bold))
+                .kerning(EmptyStateSpec.titleKerning)
+                .foregroundColor(PassmateColors.textPrimary)
+                .multilineTextAlignment(.center)
+                .padding(.top, EmptyStateSpec.titleTopPadding)
+            Text(EmptyStateText.guide)
+                .font(.system(size: EmptyStateSpec.guideFontSize))
+                .lineSpacing(EmptyStateSpec.guideLineSpacing)
+                .foregroundColor(PassmateColors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.top, EmptyStateSpec.guideTopPadding)
+            Button(action: onClickEnterPin) {
+                Text(EmptyStateText.cta)
+                    .font(.system(size: EmptyStateSpec.ctaFontSize, weight: .bold))
+                    .foregroundColor(PassmateColors.surface)
+                    .frame(width: EmptyStateSpec.ctaWidth, height: EmptyStateSpec.ctaHeight)
+                    .background(PassmateColors.primary)
+                    .cornerRadius(EmptyStateSpec.ctaCornerRadius)
+            }
+            .padding(.top, EmptyStateSpec.ctaTopPadding)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, EmptyStateSpec.sectionPaddingVertical)
+    }
+}
+
+// door-open 아이콘 — Assets의 DoorOpen(lucide v0.300.0 door-open, ISC).
+// SF Symbol door.left.hand.open은 iOS 16+라 쓸 수 없다 (배포 타깃 15.0, 규칙 §2-1).
+// Compose PassmateIcons.DoorOpen과 같은 원본을 쓰고, 색은 템플릿 렌더링으로 준다 (규칙 §11-2)
+private struct DoorOpenIcon: View {
+    let tint: Color
+
+    let size: CGFloat
+
+    var body: some View {
+        Image(EmptyStateSpec.iconAsset)
+            .renderingMode(.template)
+            .resizable()
+            .scaledToFit()
+            .foregroundColor(tint)
+            .frame(width: size, height: size)
     }
 }
 

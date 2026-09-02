@@ -91,6 +91,12 @@ class JoinedRoomsViewModel(
         }
     }
 
+    private fun onClickEnterPin() {
+        viewModelScope.launch {
+            _event.emit(JoinedRoomsEvent.OpenPinEntry)
+        }
+    }
+
     private fun onClickContactSupport() {
         viewModelScope.launch {
             _event.emit(JoinedRoomsEvent.ShowNotice(CONTACT_SUPPORT_NOTICE))
@@ -104,6 +110,7 @@ class JoinedRoomsViewModel(
             is JoinedRoomsAction.LoadMore -> onLoadMore()
             is JoinedRoomsAction.ClickRoomReport -> onClickRoomReport(action.roomId)
             is JoinedRoomsAction.ClickRejoin -> onClickRejoin(action.pin)
+            is JoinedRoomsAction.ClickEnterPin -> onClickEnterPin()
             is JoinedRoomsAction.ClickContactSupport -> onClickContactSupport()
         }
     }

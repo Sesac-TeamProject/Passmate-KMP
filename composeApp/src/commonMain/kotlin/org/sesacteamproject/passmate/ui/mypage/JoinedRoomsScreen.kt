@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +41,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateIcon
+import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -70,6 +73,8 @@ fun JoinedRoomsScreen(
                 )
                 is JoinedRoomsEvent.OpenReport -> onNavigate(NavigationAction.NavigateToResult(event.roomId))
                 is JoinedRoomsEvent.Rejoin -> onNavigate(NavigationAction.NavigateToWaiting(event.pin))
+                // 홈 탭이 곧 PIN 입장 폼 (규칙 §2-1-1)
+                is JoinedRoomsEvent.OpenPinEntry -> onNavigate(NavigationAction.NavigateToHome)
                 is JoinedRoomsEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
@@ -144,7 +149,7 @@ private fun ColumnScope.LoadedJoinedRooms(
             WeakTopicsRow(topics = summary.weakTopics)
         }
         if (uiState.rooms.isEmpty() && ongoing == null) {
-            EmptyRooms()
+            EmptyRooms(onClickEnterPin = { onAction(JoinedRoomsAction.ClickEnterPin) })
         } else {
             uiState.rooms.forEach { room ->
                 JoinedRoomRow(
@@ -435,21 +440,104 @@ private fun LoadMoreRow(
     }
 }
 
+// 빈 상태 문구 (v6 M-08) — iOS JoinedRoomsView.swift의 EmptyStateText와 1:1
+private object EmptyStateText {
+
+    const val TITLE = "아직 참여한 방이 없어요"
+
+    const val GUIDE = "선생님에게 받은 PIN 6자리를\n홈에서 입력해 보세요."
+
+    const val CTA = "PIN으로 입장"
+}
+
+// 빈 상태 치수·타이포 (v6 M-08) — iOS EmptyStateSpec과 1:1 (iOS는 파생값 guideLineSpacing 1개가 더 있다)
+private object EmptyStateSpec {
+
+    val SectionPaddingVertical = 40.dp
+
+    val IconCircleSize = 64.dp
+
+    val IconSize = 28.dp
+
+    val TitleTopPadding = 16.dp
+
+    val TitleFontSize = 19.sp
+
+    val TitleLetterSpacing = (-0.19).sp
+
+    val GuideTopPadding = 8.dp
+
+    val GuideFontSize = 14.sp
+
+    val GuideLineHeight = 23.1.sp
+
+    val CtaTopPadding = 24.dp
+
+    val CtaWidth = 200.dp
+
+    val CtaHeight = 52.dp
+
+    val CtaCornerRadius = 14.dp
+
+    val CtaFontSize = 16.sp
+}
+
+// 빈 상태 (v6 M-08) — 아이콘 원형 · 제목 · 안내 문구 · PIN 입장 CTA. 값은 EmptyStateSpec/EmptyStateText
 @Composable
-private fun EmptyRooms() {
+private fun EmptyRooms(onClickEnterPin: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 40.dp),
+            .padding(vertical = EmptyStateSpec.SectionPaddingVertical),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Box(
+            modifier = Modifier
+                .size(EmptyStateSpec.IconCircleSize)
+                .background(PassmateColors.EmptyIconBg, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            PassmateIcon(
+                icon = PassmateIcons.DoorOpen,
+                contentDescription = null,
+                tint = PassmateColors.TextSecondary,
+                modifier = Modifier.size(EmptyStateSpec.IconSize)
+            )
+        }
         Text(
-            text = "아직 참여한 방이 없어요",
-            color = PassmateColors.TextSecondary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp
+            text = EmptyStateText.TITLE,
+            color = PassmateColors.TextPrimary,
+            fontSize = EmptyStateSpec.TitleFontSize,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = EmptyStateSpec.TitleLetterSpacing,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = EmptyStateSpec.TitleTopPadding)
         )
+        Text(
+            text = EmptyStateText.GUIDE,
+            color = PassmateColors.TextSecondary,
+            fontSize = EmptyStateSpec.GuideFontSize,
+            lineHeight = EmptyStateSpec.GuideLineHeight,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = EmptyStateSpec.GuideTopPadding)
+        )
+        Row(
+            modifier = Modifier
+                .padding(top = EmptyStateSpec.CtaTopPadding)
+                .width(EmptyStateSpec.CtaWidth)
+                .height(EmptyStateSpec.CtaHeight)
+                .background(PassmateColors.Primary, RoundedCornerShape(EmptyStateSpec.CtaCornerRadius))
+                .clickable(onClick = onClickEnterPin),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = EmptyStateText.CTA,
+                color = PassmateColors.Surface,
+                fontSize = EmptyStateSpec.CtaFontSize,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
