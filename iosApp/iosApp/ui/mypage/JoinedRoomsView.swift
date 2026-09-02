@@ -196,7 +196,7 @@ private struct JoinedRoomsEmptyView: View {
             ZStack {
                 Circle()
                     .fill(PassmateColors.emptyIconBg)
-                PassmateIcon(icon: PassmateIcons.doorOpen, tint: PassmateColors.textSecondary, size: EmptyStateSpec.iconSize)
+                PassmateIconView(icon: .doorOpen, tint: PassmateColors.textSecondary, size: EmptyStateSpec.iconSize)
             }
             .frame(width: EmptyStateSpec.iconCircleSize, height: EmptyStateSpec.iconCircleSize)
             Text(EmptyStateText.title)

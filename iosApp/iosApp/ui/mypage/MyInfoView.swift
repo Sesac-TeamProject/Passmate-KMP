@@ -345,7 +345,7 @@ private struct MyInfoContentView: View {
     // 카드 단위 실패 자리표시자 (시안 M-12e card/실패) — 해당 섹션만 다시 불러온다
     private func failureCard(message: String, isRetrying: Bool, onRetry: @escaping () -> Void) -> some View {
         VStack(spacing: 0) {
-            PassmateIcon(icon: PassmateIcons.alertCircle, tint: PassmateColors.textTertiary, size: FailureSpec.iconSize)
+            PassmateIconView(icon: .alertCircle, tint: PassmateColors.textTertiary, size: FailureSpec.iconSize)
             Text(message)
                 .font(.system(size: FailureSpec.messageFontSize, weight: .medium))
                 .kerning(FailureSpec.messageKerning)
