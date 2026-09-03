@@ -10,7 +10,8 @@ enum class QuestionType {
 
         fun from(raw: String?): QuestionType {
             return when (raw?.uppercase()) {
-                "MULTIPLE_CHOICE" -> MULTIPLE_CHOICE
+                // 서버 enum은 MCQ다 (계약 `QuestionRequest.type`: MCQ·OX·ESSAY)
+                "MCQ", "MULTIPLE_CHOICE" -> MULTIPLE_CHOICE
                 "OX" -> OX
                 "ESSAY" -> ESSAY
                 else -> UNKNOWN

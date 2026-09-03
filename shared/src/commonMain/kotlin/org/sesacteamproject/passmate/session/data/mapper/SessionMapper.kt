@@ -86,15 +86,17 @@ fun SubmissionsResponse.toDomain(): SubmissionStatus {
     )
 }
 
+// 누적 점수·순위는 응답에 없다 — RANKING_UPDATED 이벤트가 갱신한다.
+// 서술형은 isCorrect가 null로 와서 잠정 채점으로 표시한다.
 fun SubmitAnswerResponse.toDomain(): AnswerResult {
     return AnswerResult(
-        correct = correct,
-        baseScore = baseScore,
-        speedBonus = speedBonus,
-        earnedScore = earnedScore,
-        totalScore = totalScore,
-        rank = rank,
-        rankDelta = rankDelta,
-        isProvisional = isProvisional
+        correct = isCorrect,
+        baseScore = baseScore.toDouble(),
+        speedBonus = speedBonus.toDouble(),
+        earnedScore = score.toDouble(),
+        totalScore = 0.0,
+        rank = null,
+        rankDelta = null,
+        isProvisional = isCorrect == null
     )
 }

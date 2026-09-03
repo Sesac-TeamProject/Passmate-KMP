@@ -13,7 +13,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import org.sesacteamproject.passmate.core.network.ApiClient
 import org.sesacteamproject.passmate.session.data.dto.ScreenLockRequest
-import org.sesacteamproject.passmate.core.model.HttpDate
+import org.sesacteamproject.passmate.core.model.ServerClock
 import org.sesacteamproject.passmate.session.data.dto.SessionSnapshotResponse
 import org.sesacteamproject.passmate.session.data.dto.StartSessionResponse
 import org.sesacteamproject.passmate.session.data.dto.SubmissionsResponse
@@ -31,7 +31,7 @@ class SessionRemoteDataSource(
 
         return SnapshotWithServerTime(
             snapshot = response.body(),
-            serverTime = HttpDate.toIsoOrNull(response.headers[HttpHeaders.Date])
+            serverTime = ServerClock.toServerLocalIso(response.headers[HttpHeaders.Date])
         )
     }
 

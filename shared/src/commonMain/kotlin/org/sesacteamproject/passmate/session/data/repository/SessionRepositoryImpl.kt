@@ -24,7 +24,7 @@ class SessionRepositoryImpl(
     }
 
     override suspend fun submitAnswer(roomId: Long, questionId: Long, content: String): AppResult<AnswerResult> {
-        val request = SubmitAnswerRequest(content = content)
+        val request = SubmitAnswerRequest(submitted = content)
 
         return apiCall { remoteDataSource.submitAnswer(roomId, questionId, request) }.map { it.toDomain() }
     }
