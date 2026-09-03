@@ -1,10 +1,11 @@
 package org.sesacteamproject.passmate.payment.data.mapper
 
+import org.sesacteamproject.passmate.core.model.DisplayDate
 import org.sesacteamproject.passmate.core.model.PagedResult
 import org.sesacteamproject.passmate.payment.data.dto.ChargeCheckoutResponse
 import org.sesacteamproject.passmate.payment.data.dto.CoinBalanceResponse
 import org.sesacteamproject.passmate.payment.data.dto.EarningsResponse
-import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
+import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountResponse
 import org.sesacteamproject.passmate.payment.data.dto.CoinTransactionDto
 import org.sesacteamproject.passmate.payment.data.dto.CoinTransactionPageResponse
 import org.sesacteamproject.passmate.payment.data.dto.ConfirmChargeResponse
@@ -85,68 +86,86 @@ fun ConfirmChargeResponse.toDomain(): ChargeConfirm {
 
 fun PublicRoomDto.toDomain(): PublicRoom {
     return PublicRoom(
-        roomId = roomId,
-        pin = pin,
+        roomId = id,
         title = title,
         topic = topic,
-        hostId = hostId,
-        hostName = hostName,
-        hostLevel = hostLevel,
-        hostRating = hostRating,
+        hostId = host?.userId,
+        hostName = host?.nickname ?: "",
+        // 서버가 등급·별점을 주지 않는다 (계약 `PublicRoomHostResponse` 참고)
+        hostLevel = null,
+        hostRating = null,
         status = RoomStatus.from(status),
         participantCount = participantCount,
         maxParticipants = maxParticipants,
-        isPaid = isPaid,
-        entryFee = entryFee,
+        isPaid = type.equals("PAID", ignoreCase = true),
+        entryFee = fee,
         scheduledAt = scheduledAt
     )
 }
 
+// 서버는 page/size 기반이라 커서가 없다. 다음 페이지 번호를 커서 자리에 실어
+// 도메인 `PagedResult` 계약(§6)을 그대로 유지한다.
 fun PublicRoomPageResponse.toDomain(): PagedResult<PublicRoom> {
     return PagedResult(
-        items = items.map { it.toDomain() },
-        nextCursor = nextCursor,
+        items = content.map { it.toDomain() },
+        nextCursor = if (hasNext) (page + 1).toString() else null,
         hasNext = hasNext
     )
 }
 
-fun EarningsResponse.toDomain(): Earnings {
+// 서버는 hostSharePercent를 주지 않는다 — 8:2 정산(FR-056)은 도메인 상수로 둔다.
+// earnings가 페이징 없이 전량 오므로 방 수·학생 수 집계는 정확하다.
+fun EarningsResponse.toDomain(account: SettlementAccountSummary?): Earnings {
     return Earnings(
-        monthlyTotal = monthlyTotal,
-        hostSharePercent = hostSharePercent,
-        nextPayout = nextPayout?.let { NextPayout(dateLabel = it.dateLabel, amount = it.amount) },
-        paidRoomCount = paidRoomCount,
-        studentCount = studentCount,
-        items = items.map { it.toDomain() },
-        nextCursor = nextCursor,
-        hasNext = hasNext,
-        account = account?.let {
-            SettlementAccountSummary(
-                bankName = it.bankName,
-                maskedNumber = it.maskedNumber,
-                payoutNote = it.payoutNote
-            )
-        }
+        monthlyTotal = thisMonthNet,
+        hostSharePercent = HOST_SHARE_PERCENT,
+        nextPayout = nextPayoutDate?.let { NextPayout(dateLabel = DisplayDate.format(it) ?: it, amount = pendingNet) },
+        paidRoomCount = earnings.size,
+        studentCount = earnings.sumOf { it.participantCount },
+        items = earnings.map { it.toDomain() },
+        nextCursor = null,
+        hasNext = false,
+        account = account
     )
 }
 
-fun EarningsResponse.SettlementItemDto.toDomain(): SettlementItem {
+fun EarningsResponse.EarningRowDto.toDomain(): SettlementItem {
     return SettlementItem(
-        settlementId = settlementId,
-        dateLabel = dateLabel,
+        settlementId = roomId,
+        dateLabel = DisplayDate.format(earnedAt) ?: "",
         roomTitle = roomTitle,
         participantCount = participantCount,
-        entryFeeTotal = entryFeeTotal,
-        feeAmount = feeAmount,
-        payoutAmount = payoutAmount,
+        entryFeeTotal = gross,
+        feeAmount = platformFee,
+        payoutAmount = net,
         status = SettlementStatus.from(status)
     )
 }
 
-fun SettlementAccountDto.toDomain(): SettlementAccount {
+// 계좌 미등록이면 null — 정산 화면의 "계좌 등록 먼저" 빈 상태(M-T4)가 이 값으로 갈린다
+fun SettlementAccountResponse.toSummary(): SettlementAccountSummary? {
+    val view = account
+
+    return if (registered && view != null) {
+        SettlementAccountSummary(
+            bankName = view.bankName,
+            maskedNumber = view.accountNoMasked,
+            payoutNote = null
+        )
+    } else {
+        null
+    }
+}
+
+fun SettlementAccountResponse.toDomain(): SettlementAccount {
+    val view = account
+
     return SettlementAccount(
-        bankName = bankName,
-        accountNumber = accountNumber,
-        holderName = holderName
+        bankName = view?.bankName ?: "",
+        maskedAccountNumber = view?.accountNoMasked ?: "",
+        holderName = view?.holderName ?: ""
     )
 }
+
+private const val HOST_SHARE_PERCENT = 80
+

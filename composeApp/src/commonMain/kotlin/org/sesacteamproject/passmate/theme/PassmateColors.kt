@@ -13,6 +13,11 @@ object PassmateColors {
 
     val Surface = Color(0xFFFFFFFF)
 
+    // 스플래시(M-00) 브랜드 배경 위 텍스트 — 흰색 80% / 50%
+    val SplashSubtleText = Color(0xCCFFFFFF)
+
+    val SplashFaintText = Color(0x80FFFFFF)
+
     // 입력 필드·비활성 칩 배경 (v6 M-01 PIN 박스·닉네임 필드)
     val FieldGray = Color(0xFFF3F4F6)
 

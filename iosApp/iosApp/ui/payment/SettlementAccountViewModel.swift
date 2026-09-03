@@ -32,7 +32,10 @@ final class SettlementAccountViewModel: ObservableObject {
                 self.uiState.isLoading = false
                 if error == nil, let account {
                     self.uiState.bankName = account.bankName
-                    self.uiState.accountNumber = account.accountNumber
+                    // 조회는 마스킹된 번호만 준다 — 그대로 저장하면 실제 번호가 덮인다.
+                    // 편집 필드는 비우고 마스킹 값은 안내로만 보여준다.
+                    self.uiState.accountNumber = ""
+                    self.uiState.maskedAccountNumber = account.maskedAccountNumber
                     self.uiState.holderName = account.holderName
                 } else if let appError = (result as? AppResultFailure)?.error, !(appError is AppError.NotFound) {
                     // 미등록(404)은 빈 폼으로 시작한다 (M-12-3)
@@ -52,7 +55,7 @@ final class SettlementAccountViewModel: ObservableObject {
 
         let account = SettlementAccount(
             bankName: state.bankName,
-            accountNumber: state.accountNumber,
+            maskedAccountNumber: state.accountNumber,
             holderName: state.holderName
         )
 

@@ -35,6 +35,7 @@ class JoinViewModelTest {
             maxParticipants = 30,
             isPaid = true,
             entryFee = 100,
+            isGuestAllowed = true,
             host = null
         )
     }

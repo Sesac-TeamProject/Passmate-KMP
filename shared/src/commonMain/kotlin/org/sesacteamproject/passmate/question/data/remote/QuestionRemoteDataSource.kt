@@ -16,7 +16,8 @@ class QuestionRemoteDataSource(
                 parameter("status", status)
             }
             if (cursor != null) {
-                parameter("cursor", cursor)
+                // 서버는 page/size 기반이다 — 매퍼가 다음 페이지 번호를 커서 자리에 싣는다
+                parameter("page", cursor)
             }
         }.body()
     }

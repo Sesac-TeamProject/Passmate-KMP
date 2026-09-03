@@ -232,7 +232,7 @@ private fun TypeFilterRow(selected: RoomTypeFilter, onSelect: (RoomTypeFilter) -
 @Composable
 private fun RoomList(
     uiState: RoomListUiState,
-    onClickRoom: (String) -> Unit,
+    onClickRoom: (Long) -> Unit,
     onClickHost: (Long) -> Unit,
     onLoadMore: () -> Unit
 ) {
@@ -240,7 +240,7 @@ private fun RoomList(
         items(uiState.rooms, key = { it.roomId }) { room ->
             RoomCard(
                 room = room,
-                onClick = { onClickRoom(room.pin) },
+                onClick = { onClickRoom(room.roomId) },
                 onClickHost = onClickHost
             )
         }
@@ -389,7 +389,6 @@ private fun RetryState(onRetry: () -> Unit) {
 private val previewPublicRooms = listOf(
     PublicRoom(
         roomId = 701,
-        pin = "482913",
         title = "8월 4주차 Spring 스터디",
         topic = "이차함수 심화",
         hostId = 11,
@@ -405,7 +404,6 @@ private val previewPublicRooms = listOf(
     ),
     PublicRoom(
         roomId = 702,
-        pin = "115820",
         title = "확률과 통계 총정리",
         topic = "조건부확률",
         hostId = 11,
@@ -421,7 +419,6 @@ private val previewPublicRooms = listOf(
     ),
     PublicRoom(
         roomId = 703,
-        pin = "930447",
         title = "함수의 극한 무료 특강",
         topic = null,
         hostId = 11,

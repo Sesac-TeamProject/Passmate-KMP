@@ -131,7 +131,7 @@ private fun HostProfileContentView(
 private fun LoadedProfile(
     profile: HostProfile,
     isReported: Boolean,
-    onClickRoom: (String) -> Unit,
+    onClickRoom: (Long) -> Unit,
     onClickReport: () -> Unit,
     onClickBlock: () -> Unit
 ) {
@@ -191,7 +191,7 @@ private fun LoadedProfile(
             profile.rooms.forEach { room ->
                 HostRoomRow(
                     room = room,
-                    onClickJoin = { onClickRoom(room.pin) }
+                    onClickJoin = { onClickRoom(room.roomId) }
                 )
             }
         }

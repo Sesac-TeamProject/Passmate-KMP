@@ -35,7 +35,10 @@ class SettlementAccountViewModel(
                         it.copy(
                             isLoading = false,
                             bankName = account.bankName,
-                            accountNumber = account.accountNumber,
+                            // 조회는 마스킹된 번호만 준다 — 그대로 저장하면 실제 번호가 덮인다.
+                            // 편집 필드는 비우고 마스킹 값은 안내로만 보여준다.
+                            accountNumber = "",
+                            maskedAccountNumber = account.maskedAccountNumber,
                             holderName = account.holderName
                         )
                     }
@@ -60,7 +63,7 @@ class SettlementAccountViewModel(
         viewModelScope.launch {
             val account = SettlementAccount(
                 bankName = state.bankName,
-                accountNumber = state.accountNumber,
+                maskedAccountNumber = state.accountNumber,
                 holderName = state.holderName
             )
 

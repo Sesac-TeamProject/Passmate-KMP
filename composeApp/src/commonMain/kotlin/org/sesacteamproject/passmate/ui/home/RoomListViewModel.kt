@@ -10,9 +10,11 @@ import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.payment.domain.model.RoomSort
 import org.sesacteamproject.passmate.payment.domain.model.RoomTypeFilter
 import org.sesacteamproject.passmate.payment.domain.usecase.GetPublicRoomsUseCase
+import org.sesacteamproject.passmate.room.domain.usecase.GetRoomPinUseCase
 
 class RoomListViewModel(
-    private val getPublicRoomsUseCase: GetPublicRoomsUseCase
+    private val getPublicRoomsUseCase: GetPublicRoomsUseCase,
+    private val getRoomPinUseCase: GetRoomPinUseCase
 ) : MviViewModel<RoomListUiState, RoomListAction, RoomListEvent>(RoomListUiState()) {
 
     private var loadJob: Job? = null
@@ -92,9 +94,12 @@ class RoomListViewModel(
         }
     }
 
-    private fun onClickRoom(pin: String) {
+    // 목록 응답에 pin이 없어 roomId로 한 번 더 조회한다 (계약 `PublicRoomResponse`)
+    private fun onClickRoom(roomId: Long) {
         viewModelScope.launch {
-            _event.emit(RoomListEvent.OpenRoom(pin))
+            getRoomPinUseCase.invoke(roomId)
+                .onSuccess { pin -> _event.emit(RoomListEvent.OpenRoom(pin)) }
+                .onFailure { _event.emit(RoomListEvent.ShowNotice("방 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요")) }
         }
     }
 
@@ -121,7 +126,7 @@ class RoomListViewModel(
             is RoomListAction.ChangeQuery -> onChangeQuery(action.query)
             is RoomListAction.SubmitSearch -> onSubmitSearch()
             is RoomListAction.SelectType -> onSelectType(action.type)
-            is RoomListAction.ClickRoom -> onClickRoom(action.pin)
+            is RoomListAction.ClickRoom -> onClickRoom(action.roomId)
             is RoomListAction.ClickHost -> onClickHost(action.hostId)
             is RoomListAction.LoadMore -> onLoadMore()
             is RoomListAction.Retry -> reload()

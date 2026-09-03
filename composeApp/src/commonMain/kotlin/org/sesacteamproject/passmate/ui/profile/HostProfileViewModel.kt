@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
 import org.sesacteamproject.passmate.core.model.onFailure
+import org.sesacteamproject.passmate.room.domain.usecase.GetRoomPinUseCase
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.user.domain.model.ReportReason
@@ -16,7 +17,8 @@ class HostProfileViewModel(
     private val getHostProfileUseCase: GetHostProfileUseCase,
     private val blockHostUseCase: BlockHostUseCase,
     private val reportHostUseCase: ReportHostUseCase,
-    private val isSignedInUseCase: IsSignedInUseCase
+    private val isSignedInUseCase: IsSignedInUseCase,
+    private val getRoomPinUseCase: GetRoomPinUseCase
 ) : MviViewModel<HostProfileUiState, HostProfileAction, HostProfileEvent>(HostProfileUiState()) {
 
     private var loadedHostId: Long? = null
@@ -47,9 +49,12 @@ class HostProfileViewModel(
         }
     }
 
-    private fun onClickRoom(pin: String) {
+    // 목록에 pin이 없어 roomId로 조회해 Join 라우트로 넘긴다
+    private fun onClickRoom(roomId: Long) {
         viewModelScope.launch {
-            _event.emit(HostProfileEvent.JoinRoom(pin))
+            getRoomPinUseCase.invoke(roomId)
+                .onSuccess { pin -> _event.emit(HostProfileEvent.JoinRoom(pin)) }
+                .onFailure { _event.emit(HostProfileEvent.ShowNotice("방 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요")) }
         }
     }
 
@@ -103,7 +108,7 @@ class HostProfileViewModel(
         when (action) {
             is HostProfileAction.Enter -> onEnter(action.hostId)
             is HostProfileAction.Retry -> load(action.hostId)
-            is HostProfileAction.ClickRoom -> onClickRoom(action.pin)
+            is HostProfileAction.ClickRoom -> onClickRoom(action.roomId)
             is HostProfileAction.ClickBlock -> onClickBlock()
             is HostProfileAction.SubmitReport -> onSubmitReport(action.reason)
         }

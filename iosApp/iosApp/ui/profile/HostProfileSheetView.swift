@@ -18,7 +18,8 @@ struct HostProfileSheetView: View {
         getHostProfileUseCase: KoinHelper.shared.getHostProfileUseCase(),
         blockHostUseCase: KoinHelper.shared.blockHostUseCase(),
         reportHostUseCase: KoinHelper.shared.reportHostUseCase(),
-        isSignedInUseCase: KoinHelper.shared.isSignedInUseCase()
+        isSignedInUseCase: KoinHelper.shared.isSignedInUseCase(),
+        getRoomPinUseCase: KoinHelper.shared.getRoomPinUseCase()
     )
 
     @State private var showReportDialog = false
@@ -131,7 +132,7 @@ private struct HostProfileContentView: View {
                         .kerning(-0.32)
                         .foregroundColor(PassmateColors.textPrimary)
                     ForEach(hostRooms(profile), id: \.roomId) { room in
-                        HostRoomRowView(room: room, onClickJoin: { onAction(.clickRoom(pin: room.pin)) })
+                        HostRoomRowView(room: room, onClickJoin: { onAction(.clickRoom(roomId: room.roomId)) })
                     }
                 }
                 footerRow

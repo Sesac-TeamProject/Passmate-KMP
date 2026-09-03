@@ -18,6 +18,18 @@ class FakeRoomRepository(
 
     var joinCallCount: Int = 0
 
+    var pinByRoomId: Map<Long, String> = emptyMap()
+
+    override suspend fun getRoomPin(roomId: Long): AppResult<String> {
+        val pin = pinByRoomId[roomId]
+
+        return if (pin != null) {
+            AppResult.Success(pin)
+        } else {
+            AppResult.Failure(AppError.NotFound())
+        }
+    }
+
     override suspend fun getRoomInfo(pin: String): AppResult<RoomInfo> {
         val room = roomInfo
 

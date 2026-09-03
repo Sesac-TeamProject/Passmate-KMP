@@ -15,6 +15,7 @@ import org.sesacteamproject.passmate.room.domain.model.HostedRoom
 import org.sesacteamproject.passmate.room.domain.model.MyParticipation
 import org.sesacteamproject.passmate.room.domain.model.Participant
 import org.sesacteamproject.passmate.room.domain.model.RoomInfo
+import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
 import org.sesacteamproject.passmate.room.domain.repository.RoomRepository
 
 class RoomRepositoryImpl(
@@ -25,24 +26,30 @@ class RoomRepositoryImpl(
     private var myParticipation: MyParticipation? = null
 
     override suspend fun getRoomInfo(pin: String): AppResult<RoomInfo> {
-        return apiCall { remoteDataSource.fetchRoomByPin(pin) }.map { it.toDomain() }
+        return apiCall { remoteDataSource.fetchRoomByPin(pin) }.map { it.toDomain(pin) }
+    }
+
+    override suspend fun getRoomPin(roomId: Long): AppResult<String> {
+        return apiCall { remoteDataSource.fetchRoomById(roomId) }.map { it.pin }
     }
 
     override suspend fun joinRoom(room: RoomInfo, nickname: String, avatarId: Int?): AppResult<MyParticipation> {
-        val request = JoinRoomRequest(nickname = nickname, avatarId = avatarId)
+        val request = JoinRoomRequest(nickname = nickname, avatarId = StudentAvatarKeys.toKey(avatarId))
 
         return apiCall { remoteDataSource.join(room.roomId, request) }.map { response ->
+            val participant = response.participant
             val participation = MyParticipation(
-                participantId = response.participantId,
+                participantId = participant.id,
                 roomId = room.roomId,
                 pin = room.pin,
                 nickname = nickname,
-                avatarId = response.avatarId ?: avatarId,
-                isGuest = response.participantToken != null
+                avatarId = StudentAvatarKeys.toIndex(participant.avatarId) ?: avatarId,
+                isGuest = participant.isGuest
             )
 
-            if (response.participantToken != null) {
-                tokenStorage.guestToken = response.participantToken
+            // 게스트 입장이면 서버가 게스트 토큰을 함께 준다 (규칙 §8)
+            if (participant.isGuest && response.accessToken != null) {
+                tokenStorage.guestToken = response.accessToken
             }
             myParticipation = participation
             participation
@@ -51,7 +58,7 @@ class RoomRepositoryImpl(
 
     override suspend fun getParticipants(roomId: Long): AppResult<List<Participant>> {
         return apiCall { remoteDataSource.fetchParticipants(roomId) }
-            .map { response -> response.participants.map { it.toDomain() } }
+            .map { participants -> participants.map { it.toDomain() } }
     }
 
     override suspend fun leaveRoom(roomId: Long): AppResult<Unit> {

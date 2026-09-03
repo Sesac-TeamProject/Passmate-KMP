@@ -29,9 +29,10 @@ sealed interface ServerEvent {
     }
 
     @Serializable
+    // 서버는 이 이벤트에 페이로드를 싣지 않는다 (백엔드 SessionService)
     data class SessionStarted(
-        val sessionId: Long,
-        val questionCount: Int
+        val sessionId: Long = 0,
+        val questionCount: Int = 0
     ) : ServerEvent
 
     @Serializable
@@ -100,9 +101,10 @@ sealed interface ServerEvent {
     ) : ServerEvent
 
     @Serializable
+    // 서버는 최종 랭킹 배열만 보낸다
     data class SessionEnded(
-        val sessionId: Long,
-        val finalRanking: List<RankingEntry>,
+        val sessionId: Long = 0,
+        val finalRanking: List<RankingEntry> = emptyList(),
         val reportReady: Boolean = false
     ) : ServerEvent
 

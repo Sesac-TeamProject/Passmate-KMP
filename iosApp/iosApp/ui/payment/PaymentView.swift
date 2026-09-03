@@ -472,6 +472,7 @@ private let previewPaidRoom = RoomInfo(
     maxParticipants: KotlinInt(int: 30),
     isPaid: true,
     entryFee: KotlinInt(int: 500),
+    isGuestAllowed: true,
     host: RoomHost(userId: KotlinLong(value: 11), nickname: "김민지", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
 )
 

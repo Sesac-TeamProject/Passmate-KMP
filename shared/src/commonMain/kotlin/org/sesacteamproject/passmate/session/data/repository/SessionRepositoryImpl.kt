@@ -19,11 +19,12 @@ class SessionRepositoryImpl(
 ) : SessionRepository {
 
     override suspend fun getSnapshot(roomId: Long): AppResult<SessionSnapshot> {
-        return apiCall { remoteDataSource.fetchSnapshot(roomId) }.map { it.toDomain() }
+        return apiCall { remoteDataSource.fetchSnapshot(roomId) }
+            .map { it.snapshot.toDomain(it.serverTime ?: "") }
     }
 
     override suspend fun submitAnswer(roomId: Long, questionId: Long, content: String): AppResult<AnswerResult> {
-        val request = SubmitAnswerRequest(content = content)
+        val request = SubmitAnswerRequest(submitted = content)
 
         return apiCall { remoteDataSource.submitAnswer(roomId, questionId, request) }.map { it.toDomain() }
     }

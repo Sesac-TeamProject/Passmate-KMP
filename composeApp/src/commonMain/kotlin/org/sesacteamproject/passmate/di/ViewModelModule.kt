@@ -29,7 +29,7 @@ import org.sesacteamproject.passmate.ui.waiting.WaitingViewModel
 val viewModelModule = module {
     factory { AppShellViewModel(get()) }
     factory { SignInViewModel(get(), get(), get()) }
-    factory { RoomListViewModel(get()) }
+    factory { RoomListViewModel(get(), get()) }
     factory { JoinViewModel(get(), get(), get(), get()) }
     factory { PaymentViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory { CoinHistoryViewModel(get(), get()) }
@@ -41,7 +41,7 @@ val viewModelModule = module {
     factory { MyInfoViewModel(get(), get(), get(), get(), get()) }
     factory { DeleteAccountViewModel(get(), get()) }
     factory { ReputationViewModel(get(), get(), get(), get()) }
-    factory { HostProfileViewModel(get(), get(), get(), get()) }
+    factory { HostProfileViewModel(get(), get(), get(), get(), get()) }
     factory { HostedRoomsViewModel(get(), get(), get()) }
     factory { CreateRoomViewModel(get(), get()) }
     factory { RoomReportViewModel(get(), get(), get()) }

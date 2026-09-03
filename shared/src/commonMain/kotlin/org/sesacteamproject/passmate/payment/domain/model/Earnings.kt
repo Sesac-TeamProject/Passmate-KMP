@@ -56,9 +56,11 @@ data class SettlementAccountSummary(
     val payoutNote: String?
 )
 
-// 정산 계좌 (GET/PUT /users/me/settlement-account) — M-12-3
+// 정산 계좌 (GET/PUT /users/me/settlement-account) — M-12-3.
+// 조회는 마스킹된 번호만 준다(계약 `SettlementAccountView.accountNoMasked`) —
+// 그대로 다시 저장하면 실제 계좌번호가 마스킹 문자열로 덮인다. 저장은 별도 입력값으로 한다.
 data class SettlementAccount(
     val bankName: String,
-    val accountNumber: String,
+    val maskedAccountNumber: String,
     val holderName: String
 )

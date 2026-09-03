@@ -490,6 +490,7 @@ final class QrCameraViewController: UIViewController, AVCaptureMetadataOutputObj
                 maxParticipants: KotlinInt(int: 30),
                 isPaid: false,
                 entryFee: nil,
+                isGuestAllowed: true,
                 host: RoomHost(userId: KotlinLong(value: 11), nickname: "김선생", level: KotlinInt(int: 3), avgStars: KotlinDouble(double: 4.8), ratingCount: KotlinInt(int: 32))
             )
         ),
