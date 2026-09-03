@@ -1,6 +1,6 @@
 package org.sesacteamproject.passmate.room.data.mapper
 
-import org.sesacteamproject.passmate.room.data.dto.ParticipantsResponse
+import org.sesacteamproject.passmate.room.data.dto.ParticipantDto
 import kotlin.math.roundToInt
 import org.sesacteamproject.passmate.core.model.PagedResult
 import org.sesacteamproject.passmate.room.data.dto.CreateRoomResponse
@@ -11,6 +11,7 @@ import org.sesacteamproject.passmate.room.domain.model.HostedRoom
 import org.sesacteamproject.passmate.room.domain.model.Participant
 import org.sesacteamproject.passmate.room.domain.model.RoomInfo
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
+import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
 
 // 서버 `RoomSummaryResponse`에는 pin이 없다 — 조회 키로 쓴 pin을 그대로 채운다.
 // questionCount·estimatedMinutes·scheduledAt·host도 주지 않아 null로 내려간다 (계약 갱신 대상).
@@ -32,13 +33,15 @@ fun RoomInfoResponse.toDomain(pin: String): RoomInfo {
     )
 }
 
-fun ParticipantsResponse.Entry.toDomain(): Participant {
+// 서버 avatarId는 문자열 키다 — 화면이 쓰는 1..12 인덱스로 바꾼다.
+// 접속 여부는 이 응답에 없고 WS 이벤트로 갱신되므로 초기값은 접속 중으로 둔다.
+fun ParticipantDto.toDomain(): Participant {
     return Participant(
-        participantId = participantId,
+        participantId = id,
         nickname = nickname,
-        avatarId = avatarId,
+        avatarId = StudentAvatarKeys.toIndex(avatarId),
         isGuest = isGuest,
-        isConnected = isConnected
+        isConnected = true
     )
 }
 

@@ -14,7 +14,7 @@ import org.sesacteamproject.passmate.room.data.dto.CreateRoomResponse
 import org.sesacteamproject.passmate.room.data.dto.HostedRoomsResponse
 import org.sesacteamproject.passmate.room.data.dto.JoinRoomRequest
 import org.sesacteamproject.passmate.room.data.dto.JoinRoomResponse
-import org.sesacteamproject.passmate.room.data.dto.ParticipantsResponse
+import org.sesacteamproject.passmate.room.data.dto.ParticipantDto
 import org.sesacteamproject.passmate.room.data.dto.RoomDetailResponse
 import org.sesacteamproject.passmate.room.data.dto.RoomInfoResponse
 
@@ -38,7 +38,8 @@ class RoomRemoteDataSource(
         }.body()
     }
 
-    suspend fun fetchParticipants(roomId: Long): ParticipantsResponse {
+    // 서버는 참가자 배열을 그대로 준다 (계약 `ParticipantResponse[]`)
+    suspend fun fetchParticipants(roomId: Long): List<ParticipantDto> {
         return apiClient.http.get("${apiClient.baseUrl}/rooms/$roomId/participants").body()
     }
 
