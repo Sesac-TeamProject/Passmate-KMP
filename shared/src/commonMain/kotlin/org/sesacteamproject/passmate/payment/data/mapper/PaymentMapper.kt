@@ -4,7 +4,7 @@ import org.sesacteamproject.passmate.core.model.PagedResult
 import org.sesacteamproject.passmate.payment.data.dto.ChargeCheckoutResponse
 import org.sesacteamproject.passmate.payment.data.dto.CoinBalanceResponse
 import org.sesacteamproject.passmate.payment.data.dto.EarningsResponse
-import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
+import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountResponse
 import org.sesacteamproject.passmate.payment.data.dto.CoinTransactionDto
 import org.sesacteamproject.passmate.payment.data.dto.CoinTransactionPageResponse
 import org.sesacteamproject.passmate.payment.data.dto.ConfirmChargeResponse
@@ -112,43 +112,70 @@ fun PublicRoomPageResponse.toDomain(): PagedResult<PublicRoom> {
     )
 }
 
-fun EarningsResponse.toDomain(): Earnings {
+// 서버는 hostSharePercent를 주지 않는다 — 8:2 정산(FR-056)은 도메인 상수로 둔다.
+// earnings가 페이징 없이 전량 오므로 방 수·학생 수 집계는 정확하다.
+fun EarningsResponse.toDomain(account: SettlementAccountSummary?): Earnings {
     return Earnings(
-        monthlyTotal = monthlyTotal,
-        hostSharePercent = hostSharePercent,
-        nextPayout = nextPayout?.let { NextPayout(dateLabel = it.dateLabel, amount = it.amount) },
-        paidRoomCount = paidRoomCount,
-        studentCount = studentCount,
-        items = items.map { it.toDomain() },
-        nextCursor = nextCursor,
-        hasNext = hasNext,
-        account = account?.let {
-            SettlementAccountSummary(
-                bankName = it.bankName,
-                maskedNumber = it.maskedNumber,
-                payoutNote = it.payoutNote
-            )
-        }
+        monthlyTotal = thisMonthNet,
+        hostSharePercent = HOST_SHARE_PERCENT,
+        nextPayout = nextPayoutDate?.let { NextPayout(dateLabel = it, amount = pendingNet) },
+        paidRoomCount = earnings.size,
+        studentCount = earnings.sumOf { it.participantCount },
+        items = earnings.map { it.toDomain() },
+        nextCursor = null,
+        hasNext = false,
+        account = account
     )
 }
 
-fun EarningsResponse.SettlementItemDto.toDomain(): SettlementItem {
+fun EarningsResponse.EarningRowDto.toDomain(): SettlementItem {
     return SettlementItem(
-        settlementId = settlementId,
-        dateLabel = dateLabel,
+        settlementId = roomId,
+        dateLabel = displaySettlementDate(earnedAt),
         roomTitle = roomTitle,
         participantCount = participantCount,
-        entryFeeTotal = entryFeeTotal,
-        feeAmount = feeAmount,
-        payoutAmount = payoutAmount,
+        entryFeeTotal = gross,
+        feeAmount = platformFee,
+        payoutAmount = net,
         status = SettlementStatus.from(status)
     )
 }
 
-fun SettlementAccountDto.toDomain(): SettlementAccount {
+// 계좌 미등록이면 null — 정산 화면의 "계좌 등록 먼저" 빈 상태(M-T4)가 이 값으로 갈린다
+fun SettlementAccountResponse.toSummary(): SettlementAccountSummary? {
+    val view = account
+
+    return if (registered && view != null) {
+        SettlementAccountSummary(
+            bankName = view.bankName,
+            maskedNumber = view.accountNoMasked,
+            payoutNote = null
+        )
+    } else {
+        null
+    }
+}
+
+fun SettlementAccountResponse.toDomain(): SettlementAccount {
+    val view = account
+
     return SettlementAccount(
-        bankName = bankName,
-        accountNumber = accountNumber,
-        holderName = holderName
+        bankName = view?.bankName ?: "",
+        accountNumber = view?.accountNoMasked ?: "",
+        holderName = view?.holderName ?: ""
     )
 }
+
+// LocalDateTime 문자열의 날짜 부분을 화면 표기(YYYY.MM.DD)로 바꾼다
+private fun displaySettlementDate(isoDateTime: String?): String {
+    val date = isoDateTime?.substringBefore("T")
+
+    return if (date != null && date.length == 10) {
+        date.replace("-", ".")
+    } else {
+        ""
+    }
+}
+
+private const val HOST_SHARE_PERCENT = 80
+

@@ -19,6 +19,7 @@ import org.sesacteamproject.passmate.payment.data.dto.CreateEntryPaymentRequest
 import org.sesacteamproject.passmate.payment.data.dto.EarningsResponse
 import org.sesacteamproject.passmate.payment.data.dto.PaymentMethodRequest
 import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
+import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountResponse
 import org.sesacteamproject.passmate.payment.data.dto.EntryPaymentResponse
 import org.sesacteamproject.passmate.payment.data.dto.PublicRoomPageResponse
 
@@ -81,15 +82,12 @@ class PaymentRemoteDataSource(
         }.body()
     }
 
-    suspend fun fetchEarnings(cursor: String?): EarningsResponse {
-        return apiClient.http.get("${apiClient.baseUrl}/users/me/earnings") {
-            if (cursor != null) {
-                parameter("cursor", cursor)
-            }
-        }.body()
+    // 서버는 정산 내역을 페이징하지 않고 전량 반환한다
+    suspend fun fetchEarnings(): EarningsResponse {
+        return apiClient.http.get("${apiClient.baseUrl}/users/me/earnings").body()
     }
 
-    suspend fun fetchSettlementAccount(): SettlementAccountDto {
+    suspend fun fetchSettlementAccount(): SettlementAccountResponse {
         return apiClient.http.get("${apiClient.baseUrl}/users/me/settlement-account").body()
     }
 

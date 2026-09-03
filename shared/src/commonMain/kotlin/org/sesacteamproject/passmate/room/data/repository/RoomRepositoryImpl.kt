@@ -25,7 +25,7 @@ class RoomRepositoryImpl(
     private var myParticipation: MyParticipation? = null
 
     override suspend fun getRoomInfo(pin: String): AppResult<RoomInfo> {
-        return apiCall { remoteDataSource.fetchRoomByPin(pin) }.map { it.toDomain() }
+        return apiCall { remoteDataSource.fetchRoomByPin(pin) }.map { it.toDomain(pin) }
     }
 
     override suspend fun getRoomPin(roomId: Long): AppResult<String> {

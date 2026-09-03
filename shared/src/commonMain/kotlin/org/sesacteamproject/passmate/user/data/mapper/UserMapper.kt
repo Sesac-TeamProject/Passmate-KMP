@@ -6,6 +6,7 @@ import org.sesacteamproject.passmate.user.data.dto.BadgesResponse
 import org.sesacteamproject.passmate.user.data.dto.GradeResponse
 import org.sesacteamproject.passmate.user.data.dto.HostProfileResponse
 import org.sesacteamproject.passmate.user.data.dto.UserProfileResponse
+import kotlin.math.roundToInt
 import org.sesacteamproject.passmate.user.data.dto.MyPageResponse
 import org.sesacteamproject.passmate.user.data.dto.NotificationSettingsDto
 import org.sesacteamproject.passmate.user.domain.model.Badge
@@ -19,35 +20,26 @@ import org.sesacteamproject.passmate.user.domain.model.MyPage
 import org.sesacteamproject.passmate.user.domain.model.MyPageSummary
 import org.sesacteamproject.passmate.user.domain.model.NotificationSettings
 import org.sesacteamproject.passmate.user.domain.model.NextGrade
-import org.sesacteamproject.passmate.user.domain.model.OngoingRoom
 import org.sesacteamproject.passmate.user.domain.model.UserProfile
 
+// 서버는 진행 중 방(ongoing)·추이 문구(trendText)를 주지 않는다 — 계약 갱신 대상.
 fun MyPageResponse.toDomain(): MyPage {
     return MyPage(
         summary = summary.toDomain(),
-        ongoing = ongoing?.toDomain(),
-        rooms = rooms.map { it.toDomain() },
-        nextCursor = nextCursor
+        ongoing = null,
+        rooms = rooms.content.map { it.toDomain() },
+        nextCursor = if (rooms.hasNext) (rooms.page + 1).toString() else null
     )
 }
 
 fun MyPageResponse.SummaryDto.toDomain(): MyPageSummary {
     return MyPageSummary(
-        participationCount = participationCount,
-        accuracyPercent = accuracyPercent,
-        avgRank = avgRank,
-        trendText = trendText,
+        participationCount = completedSessionCount,
+        // 서버가 이미 0~100 퍼센트로 준다 (ParticipantReport.accuracyOf)
+        accuracyPercent = averageAccuracy.roundToInt(),
+        avgRank = averageRank,
+        trendText = null,
         weakTopics = weakTopics
-    )
-}
-
-fun MyPageResponse.OngoingDto.toDomain(): OngoingRoom {
-    return OngoingRoom(
-        roomId = roomId,
-        pin = pin,
-        title = title,
-        hostNickname = hostNickname,
-        progressLabel = progressLabel
     )
 }
 
@@ -55,12 +47,24 @@ fun MyPageResponse.RoomDto.toDomain(): JoinedRoom {
     return JoinedRoom(
         roomId = roomId,
         title = title,
-        dateLabel = dateLabel,
+        dateLabel = displayDate(endedAt ?: startedAt),
         questionCount = questionCount,
-        myScore = myScore,
+        myScore = myScore?.toDouble(),
         myRank = myRank,
         hasReport = hasReport
     )
+}
+
+// LocalDateTime 문자열("2026-07-18T21:10:00")의 날짜 부분을 화면 표기로 바꾼다.
+// 시간대 변환이 필요 없는 표시용이라 문자열 처리로 충분하다.
+private fun displayDate(isoDateTime: String?): String {
+    val date = isoDateTime?.substringBefore("T")
+
+    return if (date != null && date.length == 10) {
+        date.replace("-", ".")
+    } else {
+        ""
+    }
 }
 
 fun GradeResponse.toDomain(): MyGrade {

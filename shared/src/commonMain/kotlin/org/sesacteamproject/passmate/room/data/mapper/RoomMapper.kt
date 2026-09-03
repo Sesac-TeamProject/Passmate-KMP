@@ -8,35 +8,26 @@ import org.sesacteamproject.passmate.room.data.dto.RoomInfoResponse
 import org.sesacteamproject.passmate.room.domain.model.CreatedRoom
 import org.sesacteamproject.passmate.room.domain.model.HostedRoom
 import org.sesacteamproject.passmate.room.domain.model.Participant
-import org.sesacteamproject.passmate.room.domain.model.RoomHost
 import org.sesacteamproject.passmate.room.domain.model.RoomInfo
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 
-fun RoomInfoResponse.toDomain(): RoomInfo {
+// 서버 `RoomSummaryResponse`에는 pin이 없다 — 조회 키로 쓴 pin을 그대로 채운다.
+// questionCount·estimatedMinutes·scheduledAt·host도 주지 않아 null로 내려간다 (계약 갱신 대상).
+fun RoomInfoResponse.toDomain(pin: String): RoomInfo {
     return RoomInfo(
-        roomId = roomId,
+        roomId = id,
         pin = pin,
         title = title,
         topic = topic,
         status = RoomStatus.from(status),
-        questionCount = questionCount,
-        estimatedMinutes = estimatedMinutes,
-        scheduledAt = scheduledAt,
+        questionCount = null,
+        estimatedMinutes = null,
+        scheduledAt = null,
         participantCount = participantCount,
         maxParticipants = maxParticipants,
-        isPaid = isPaid,
-        entryFee = entryFee,
-        host = host?.toDomain()
-    )
-}
-
-fun RoomInfoResponse.Host.toDomain(): RoomHost {
-    return RoomHost(
-        userId = userId,
-        nickname = nickname,
-        level = level,
-        avgStars = avgStars,
-        ratingCount = ratingCount
+        isPaid = type.equals("PAID", ignoreCase = true),
+        entryFee = fee,
+        host = null
     )
 }
 

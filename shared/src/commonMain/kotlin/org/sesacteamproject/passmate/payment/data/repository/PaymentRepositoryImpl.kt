@@ -10,6 +10,7 @@ import org.sesacteamproject.passmate.payment.data.dto.CreateEntryPaymentRequest
 import org.sesacteamproject.passmate.payment.data.dto.PaymentMethodRequest
 import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
 import org.sesacteamproject.passmate.payment.data.mapper.toDomain
+import org.sesacteamproject.passmate.payment.data.mapper.toSummary
 import org.sesacteamproject.passmate.payment.data.remote.PaymentRemoteDataSource
 import org.sesacteamproject.passmate.payment.domain.model.ChargeConfirm
 import org.sesacteamproject.passmate.payment.domain.model.CoinBalance
@@ -65,8 +66,13 @@ class PaymentRepositoryImpl(
         }.map { it.toDomain() }
     }
 
+    // 정산 화면은 금액과 계좌를 함께 그린다. 계좌 은행 정보가 earnings 응답에 없어
+    // 여기서 두 엔드포인트를 합성한다 (규칙 §6 — 화면 전용 집계는 Repository 책임).
     override suspend fun getEarnings(cursor: String?): AppResult<Earnings> {
-        return apiCall { remoteDataSource.fetchEarnings(cursor) }.map { it.toDomain() }
+        val accountResult = apiCall { remoteDataSource.fetchSettlementAccount() }
+        val account = (accountResult as? AppResult.Success)?.value?.toSummary()
+
+        return apiCall { remoteDataSource.fetchEarnings() }.map { it.toDomain(account) }
     }
 
     override suspend fun getSettlementAccount(): AppResult<SettlementAccount> {
@@ -76,7 +82,7 @@ class PaymentRepositoryImpl(
     override suspend fun saveSettlementAccount(account: SettlementAccount): AppResult<Unit> {
         val request = SettlementAccountDto(
             bankName = account.bankName.trim(),
-            accountNumber = account.accountNumber.trim(),
+            accountNo = account.accountNumber.trim(),
             holderName = account.holderName.trim()
         )
 
