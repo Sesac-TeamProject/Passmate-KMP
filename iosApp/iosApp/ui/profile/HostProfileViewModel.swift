@@ -6,6 +6,8 @@ import Shared
 final class HostProfileViewModel: ObservableObject {
     private let getHostProfileUseCase: GetHostProfileUseCase
 
+    private let getRoomPinUseCase: GetRoomPinUseCase
+
     private let blockHostUseCase: BlockHostUseCase
 
     private let reportHostUseCase: ReportHostUseCase
@@ -17,6 +19,22 @@ final class HostProfileViewModel: ObservableObject {
     let event = PassthroughSubject<HostProfileEvent, Never>()
 
     private var loadedHostId: Int64?
+
+    // 목록에 pin이 없어 roomId로 조회해 Join 라우트로 넘긴다
+    private func onClickRoom(roomId: Int64) {
+        getRoomPinUseCase.invoke(roomId: roomId) { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let pin = (result as? AppResultSuccess<AnyObject>)?.value as? String
+
+                if error == nil, let pin {
+                    self.event.send(.joinRoom(pin: pin))
+                } else {
+                    self.event.send(.showNotice(message: "방 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요"))
+                }
+            }
+        }
+    }
 
     private func onEnter(hostId: Int64) {
         if loadedHostId != hostId {
@@ -87,8 +105,8 @@ final class HostProfileViewModel: ObservableObject {
             onEnter(hostId: hostId)
         case let .retry(hostId):
             load(hostId: hostId)
-        case let .clickRoom(pin):
-            event.send(.joinRoom(pin: pin))
+        case let .clickRoom(roomId):
+            onClickRoom(roomId: roomId)
         case .clickBlock:
             onClickBlock()
         case let .submitReport(reason):
@@ -100,11 +118,13 @@ final class HostProfileViewModel: ObservableObject {
         getHostProfileUseCase: GetHostProfileUseCase,
         blockHostUseCase: BlockHostUseCase,
         reportHostUseCase: ReportHostUseCase,
-        isSignedInUseCase: IsSignedInUseCase
+        isSignedInUseCase: IsSignedInUseCase,
+        getRoomPinUseCase: GetRoomPinUseCase
     ) {
         self.getHostProfileUseCase = getHostProfileUseCase
         self.blockHostUseCase = blockHostUseCase
         self.reportHostUseCase = reportHostUseCase
         self.isSignedInUseCase = isSignedInUseCase
+        self.getRoomPinUseCase = getRoomPinUseCase
     }
 }

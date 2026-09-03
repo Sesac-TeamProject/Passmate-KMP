@@ -59,20 +59,24 @@ class PaymentRemoteDataSource(
         }.body()
     }
 
+    // 서버는 page/size 기반이다. cursor 자리에는 다음 페이지 번호가 실려 온다 (Mapper 참고).
+    // type=ALL은 서버 enum(FREE·PAID)에 없으므로 파라미터를 보내지 않는다.
     suspend fun fetchPublicRooms(
         sort: String,
         query: String?,
-        type: String,
+        type: String?,
         cursor: String?
     ): PublicRoomPageResponse {
         return apiClient.http.get("${apiClient.baseUrl}/rooms/public") {
             parameter("sort", sort)
-            parameter("type", type)
+            if (type != null) {
+                parameter("type", type)
+            }
             if (!query.isNullOrBlank()) {
                 parameter("q", query)
             }
             if (cursor != null) {
-                parameter("cursor", cursor)
+                parameter("page", cursor)
             }
         }.body()
     }

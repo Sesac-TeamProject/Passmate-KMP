@@ -4,7 +4,8 @@ enum RoomListAction {
     case changeQuery(query: String)
     case submitSearch
     case selectType(type: RoomTypeFilter)
-    case clickRoom(pin: String)
+    // 목록 응답에 pin이 없어 roomId로 받는다 — pin은 ViewModel이 조회한다
+    case clickRoom(roomId: Int64)
     // 선생님 이름 탭 → 프로필 시트 (M-10)
     case clickHost(hostId: Int64)
     case loadMore

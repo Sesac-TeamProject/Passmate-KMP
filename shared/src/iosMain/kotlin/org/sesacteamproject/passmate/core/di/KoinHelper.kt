@@ -30,6 +30,7 @@ import org.sesacteamproject.passmate.room.domain.usecase.GetHostedRoomsUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetMyParticipationUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetParticipantsUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetRoomInfoUseCase
+import org.sesacteamproject.passmate.room.domain.usecase.GetRoomPinUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.JoinRoomUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.LeaveRoomUseCase
 import org.sesacteamproject.passmate.session.domain.policy.SnapshotPolicy
@@ -73,6 +74,8 @@ object KoinHelper {
     fun joinInputPolicy(): JoinInputPolicy = KoinPlatform.getKoin().get()
 
     fun getRoomInfoUseCase(): GetRoomInfoUseCase = KoinPlatform.getKoin().get()
+
+    fun getRoomPinUseCase(): GetRoomPinUseCase = KoinPlatform.getKoin().get()
 
     fun joinRoomUseCase(): JoinRoomUseCase = KoinPlatform.getKoin().get()
 

@@ -6,9 +6,27 @@ import Shared
 final class RoomListViewModel: ObservableObject {
     private let getPublicRoomsUseCase: GetPublicRoomsUseCase
 
+    private let getRoomPinUseCase: GetRoomPinUseCase
+
     @Published private(set) var uiState = RoomListUiState()
 
     let event = PassthroughSubject<RoomListEvent, Never>()
+
+    // 목록 응답에 pin이 없어 roomId로 한 번 더 조회한다 (계약 `PublicRoomResponse`)
+    private func onClickRoom(roomId: Int64) {
+        getRoomPinUseCase.invoke(roomId: roomId) { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let pin = (result as? AppResultSuccess<AnyObject>)?.value as? String
+
+                if error == nil, let pin {
+                    self.event.send(.openRoom(pin: pin))
+                } else {
+                    self.event.send(.showNotice(message: "방 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요"))
+                }
+            }
+        }
+    }
 
     private func onChangeQuery(query: String) {
         uiState.query = query
@@ -91,8 +109,8 @@ final class RoomListViewModel: ObservableObject {
             reload()
         case let .selectType(type):
             onSelectType(type: type)
-        case let .clickRoom(pin):
-            event.send(.openRoom(pin: pin))
+        case let .clickRoom(roomId):
+            onClickRoom(roomId: roomId)
         case let .clickHost(hostId):
             event.send(.openHostProfile(hostId: hostId))
         case .loadMore:
@@ -106,8 +124,9 @@ final class RoomListViewModel: ObservableObject {
         }
     }
 
-    init(getPublicRoomsUseCase: GetPublicRoomsUseCase) {
+    init(getPublicRoomsUseCase: GetPublicRoomsUseCase, getRoomPinUseCase: GetRoomPinUseCase) {
         self.getPublicRoomsUseCase = getPublicRoomsUseCase
+        self.getRoomPinUseCase = getRoomPinUseCase
         reload()
     }
 }

@@ -141,13 +141,14 @@ class UserMapperTest {
             badges = listOf("FIRST_ROOM", "ROOMS_10", "UNKNOWN"),
             rooms = listOf(
                 org.sesacteamproject.passmate.payment.data.dto.PublicRoomDto(
-                    roomId = 1,
-                    pin = "482913",
+                    id = 1,
                     title = "백엔드 면접 스프린트",
-                    hostId = 7,
-                    hostName = "김민지",
-                    isPaid = true,
-                    entryFee = 10000
+                    host = org.sesacteamproject.passmate.payment.data.dto.PublicRoomHostDto(
+                        userId = 7,
+                        nickname = "김민지"
+                    ),
+                    type = "PAID",
+                    fee = 10000
                 )
             )
         )

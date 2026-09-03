@@ -13,6 +13,9 @@ interface RoomRepository {
     suspend fun getRoomInfo(pin: String): AppResult<RoomInfo>
 
     // 성공 시 게스트 토큰 보관 + MyParticipation 세션 스코프 기억
+    // 공개 방 카드 → Join 라우트 이동용. 목록 응답에 pin이 없어 roomId로 조회한다
+    suspend fun getRoomPin(roomId: Long): AppResult<String>
+
     suspend fun joinRoom(room: RoomInfo, nickname: String, avatarId: Int?): AppResult<MyParticipation>
 
     suspend fun getParticipants(roomId: Long): AppResult<List<Participant>>

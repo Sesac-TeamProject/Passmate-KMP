@@ -10,7 +10,8 @@ private struct ProfileHost: Identifiable {
 // 선생님 이름 탭 시 프로필 시트(M-10)를 연다
 struct RoomListView: View {
     @StateObject private var viewModel = RoomListViewModel(
-        getPublicRoomsUseCase: KoinHelper.shared.getPublicRoomsUseCase()
+        getPublicRoomsUseCase: KoinHelper.shared.getPublicRoomsUseCase(),
+        getRoomPinUseCase: KoinHelper.shared.getRoomPinUseCase()
     )
 
     var onOpenRoom: (String) -> Void = { _ in }
@@ -181,7 +182,7 @@ private struct RoomListContentView: View {
                         room: room,
                         onClickHost: { hostId in onAction(.clickHost(hostId: hostId)) }
                     )
-                    .onTapGesture { onAction(.clickRoom(pin: room.pin)) }
+                    .onTapGesture { onAction(.clickRoom(roomId: room.roomId)) }
                 }
                 if uiState.hasNext {
                     ProgressView()
@@ -319,9 +320,9 @@ private struct RoomCardView: View {
         uiState: RoomListUiState(
             isLoading: false,
             rooms: [
-                PublicRoom(roomId: 701, pin: "482913", title: "8월 4주차 Spring 스터디", topic: "이차함수 심화", hostId: KotlinLong(value: 11), hostName: "김선생", hostLevel: KotlinInt(int: 3), hostRating: KotlinDouble(double: 4.8), status: .waiting, participantCount: KotlinInt(int: 12), maxParticipants: KotlinInt(int: 30), isPaid: true, entryFee: KotlinInt(int: 500), scheduledAt: nil),
-                PublicRoom(roomId: 702, pin: "115820", title: "확률과 통계 총정리", topic: "조건부확률", hostId: KotlinLong(value: 11), hostName: "이선생", hostLevel: KotlinInt(int: 2), hostRating: KotlinDouble(double: 4.5), status: .waiting, participantCount: KotlinInt(int: 8), maxParticipants: nil, isPaid: false, entryFee: nil, scheduledAt: nil),
-                PublicRoom(roomId: 703, pin: "930447", title: "함수의 극한 무료 특강", topic: nil, hostId: KotlinLong(value: 11), hostName: "박선생", hostLevel: nil, hostRating: nil, status: .running, participantCount: KotlinInt(int: 20), maxParticipants: KotlinInt(int: 20), isPaid: false, entryFee: nil, scheduledAt: nil)
+                PublicRoom(roomId: 701, title: "8월 4주차 Spring 스터디", topic: "이차함수 심화", hostId: KotlinLong(value: 11), hostName: "김선생", hostLevel: KotlinInt(int: 3), hostRating: KotlinDouble(double: 4.8), status: .waiting, participantCount: KotlinInt(int: 12), maxParticipants: KotlinInt(int: 30), isPaid: true, entryFee: KotlinInt(int: 500), scheduledAt: nil),
+                PublicRoom(roomId: 702, title: "확률과 통계 총정리", topic: "조건부확률", hostId: KotlinLong(value: 11), hostName: "이선생", hostLevel: KotlinInt(int: 2), hostRating: KotlinDouble(double: 4.5), status: .waiting, participantCount: KotlinInt(int: 8), maxParticipants: nil, isPaid: false, entryFee: nil, scheduledAt: nil),
+                PublicRoom(roomId: 703, title: "함수의 극한 무료 특강", topic: nil, hostId: KotlinLong(value: 11), hostName: "박선생", hostLevel: nil, hostRating: nil, status: .running, participantCount: KotlinInt(int: 20), maxParticipants: KotlinInt(int: 20), isPaid: false, entryFee: nil, scheduledAt: nil)
             ]
         ),
         onAction: { _ in }

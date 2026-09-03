@@ -10,7 +10,8 @@ sealed interface RoomListAction {
 
     data class SelectType(val type: RoomTypeFilter) : RoomListAction
 
-    data class ClickRoom(val pin: String) : RoomListAction
+    // 목록 응답에 pin이 없어 roomId로 받는다 — pin은 ViewModel이 조회한다
+    data class ClickRoom(val roomId: Long) : RoomListAction
 
     // 선생님 이름 탭 → 프로필 시트 (M-10)
     data class ClickHost(val hostId: Long) : RoomListAction

@@ -85,27 +85,29 @@ fun ConfirmChargeResponse.toDomain(): ChargeConfirm {
 
 fun PublicRoomDto.toDomain(): PublicRoom {
     return PublicRoom(
-        roomId = roomId,
-        pin = pin,
+        roomId = id,
         title = title,
         topic = topic,
-        hostId = hostId,
-        hostName = hostName,
-        hostLevel = hostLevel,
-        hostRating = hostRating,
+        hostId = host?.userId,
+        hostName = host?.nickname ?: "",
+        // 서버가 등급·별점을 주지 않는다 (계약 `PublicRoomHostResponse` 참고)
+        hostLevel = null,
+        hostRating = null,
         status = RoomStatus.from(status),
         participantCount = participantCount,
         maxParticipants = maxParticipants,
-        isPaid = isPaid,
-        entryFee = entryFee,
+        isPaid = type.equals("PAID", ignoreCase = true),
+        entryFee = fee,
         scheduledAt = scheduledAt
     )
 }
 
+// 서버는 page/size 기반이라 커서가 없다. 다음 페이지 번호를 커서 자리에 실어
+// 도메인 `PagedResult` 계약(§6)을 그대로 유지한다.
 fun PublicRoomPageResponse.toDomain(): PagedResult<PublicRoom> {
     return PagedResult(
-        items = items.map { it.toDomain() },
-        nextCursor = nextCursor,
+        items = content.map { it.toDomain() },
+        nextCursor = if (hasNext) (page + 1).toString() else null,
         hasNext = hasNext
     )
 }
