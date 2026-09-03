@@ -38,8 +38,22 @@ object ServerEventDecoder {
 
     private fun decodeEvent(type: String, data: JsonElement): ServerEvent? {
         return when (type) {
-            "PARTICIPANT_JOINED" -> decodePayload<ServerEvent.ParticipantJoined>(data)
-            "PARTICIPANT_LEFT" -> decodePayload<ServerEvent.ParticipantLeft>(data)
+            "PARTICIPANT_JOINED" -> decodePayload<ServerEventPayloads.ParticipantJoined>(data).let {
+                ServerEvent.ParticipantJoined(
+                    participantId = it.participantId,
+                    nickname = it.nickname,
+                    isGuest = it.isGuest,
+                    avatarId = StudentAvatarKeys.toIndex(it.avatarId),
+                    count = it.count
+                )
+            }
+            "PARTICIPANT_LEFT" -> decodePayload<ServerEventPayloads.ParticipantLeft>(data).let {
+                ServerEvent.ParticipantLeft(
+                    participantId = it.participantId,
+                    count = it.count,
+                    reason = it.reason
+                )
+            }
             // 서버는 페이로드를 싣지 않는다 — 프레임을 버리면 Play로 넘어가지 못한다
             "SESSION_STARTED" -> ServerEvent.SessionStarted()
             "QUESTION_STARTED" -> decodePayload<ServerEventPayloads.QuestionStarted>(data).let {
@@ -69,7 +83,13 @@ object ServerEventDecoder {
             "SCREEN_LOCKED" -> decodePayload<ServerEventPayloads.ScreenLock>(data).let {
                 ServerEvent.ScreenLocked(locked = it.locked)
             }
-            "SUBMISSION_UPDATED" -> decodePayload<ServerEvent.SubmissionUpdated>(data)
+            "SUBMISSION_UPDATED" -> decodePayload<ServerEventPayloads.SubmissionStatus>(data).let {
+                ServerEvent.SubmissionUpdated(
+                    questionNo = 0,
+                    submittedCount = it.submitCount,
+                    totalCount = it.participantCount
+                )
+            }
             "HINT_PUBLISHED" -> decodePayload<ServerEvent.HintPublished>(data)
             // 아래는 계약에는 있으나 백엔드가 아직 발행하지 않는다 — 오면 그대로 받는다
             "ANSWER_SUBMITTED" -> decodePayload<ServerEvent.AnswerSubmitted>(data)

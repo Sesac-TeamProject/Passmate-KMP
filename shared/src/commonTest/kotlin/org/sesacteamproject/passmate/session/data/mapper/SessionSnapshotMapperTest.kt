@@ -95,7 +95,10 @@ class SessionSnapshotMapperTest {
         assertEquals(6, snapshot.ranking.first().avatarId)
         assertEquals(300.0, snapshot.ranking.first().total)
 
-        // 서버 스냅샷은 제출 여부(boolean)만 준다 — 문항별 답변 목록은 없다
-        assertEquals(0, snapshot.myAnswers.size)
+        // 서버는 제출 여부(boolean)만 준다 — 현재 문항 한 건으로 복원해
+        // 재접속 후에도 중복 제출을 막는다 (규칙 §9)
+        assertEquals(1, snapshot.myAnswers.size)
+        assertEquals(41L, snapshot.myAnswers.first().questionId)
+        assertEquals(true, snapshot.myAnswers.first().isProvisional)
     }
 }

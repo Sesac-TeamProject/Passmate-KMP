@@ -2,6 +2,7 @@ package org.sesacteamproject.passmate.room.data.mapper
 
 import org.sesacteamproject.passmate.room.data.dto.ParticipantDto
 import kotlin.math.roundToInt
+import org.sesacteamproject.passmate.core.model.DisplayDate
 import org.sesacteamproject.passmate.core.model.PagedResult
 import org.sesacteamproject.passmate.room.data.dto.CreateRoomResponse
 import org.sesacteamproject.passmate.room.data.dto.HostedRoomsResponse
@@ -29,6 +30,7 @@ fun RoomInfoResponse.toDomain(pin: String): RoomInfo {
         maxParticipants = maxParticipants,
         isPaid = type.equals("PAID", ignoreCase = true),
         entryFee = fee,
+        isGuestAllowed = guestAllowed,
         host = null
     )
 }
@@ -78,20 +80,9 @@ fun HostedRoomsResponse.EndedRoomDto.toDomain(): HostedRoom {
         status = RoomStatus.FINISHED,
         participantCount = studentCount,
         scheduledAt = null,
-        endedAtLabel = displayRoomDate(endedAt),
+        endedAtLabel = DisplayDate.format(endedAt),
         avgAccuracyPercent = correctRate?.roundToInt()
     )
-}
-
-// LocalDateTime 문자열의 날짜 부분을 화면 표기(YYYY.MM.DD)로 바꾼다
-private fun displayRoomDate(isoDateTime: String?): String? {
-    val date = isoDateTime?.substringBefore("T")
-
-    return if (date != null && date.length == 10) {
-        date.replace("-", ".")
-    } else {
-        null
-    }
 }
 
 fun CreateRoomResponse.toDomain(): CreatedRoom {

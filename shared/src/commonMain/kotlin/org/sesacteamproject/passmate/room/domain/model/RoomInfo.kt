@@ -14,5 +14,7 @@ data class RoomInfo(
     val maxParticipants: Int?,
     val isPaid: Boolean,
     val entryFee: Int?,
+    // 서버가 판정한 게스트 입장 허용 여부 — 로그인 가드의 근거 (규칙 §8)
+    val isGuestAllowed: Boolean,
     val host: RoomHost?
 )

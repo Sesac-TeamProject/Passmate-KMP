@@ -13,7 +13,7 @@ class ServerEventDecoderTest {
     fun decodeParticipantJoined() {
         val text = """
             {"type":"PARTICIPANT_JOINED","roomId":2,"occurredAt":"2026-08-27T10:00:00",
-             "payload":{"participantId":11,"nickname":"영희","isGuest":true,"avatarId":5,"count":3}}
+             "payload":{"participantId":11,"nickname":"영희","isGuest":true,"avatarId":"fox","count":3}}
         """.trimIndent()
 
         val frame = ServerEventDecoder.decode(text)
@@ -24,6 +24,8 @@ class ServerEventDecoderTest {
         assertEquals("영희", event.nickname)
         assertEquals(true, event.isGuest)
         assertEquals(3, event.count)
+        // avatarId는 문자열 키 — 화면 인덱스로 바뀐다 (fox는 6번째)
+        assertEquals(6, event.avatarId)
     }
 
     @Test
@@ -60,10 +62,11 @@ class ServerEventDecoderTest {
         assertNull(ServerEventDecoder.decode("""{"occurredAt":"2026-08-27T10:06:00","payload":{}}"""))
         // occurredAt 없음 — 스냅샷 비교 기준이 없으면 프레임을 쓸 수 없다 (규칙 §2-1-2)
         assertNull(ServerEventDecoder.decode("""{"type":"SCREEN_LOCKED","payload":{"locked":true}}"""))
-        // 필수 필드 누락
+        // payload 구조가 다르면(객체 자리에 문자열) 해당 프레임만 버린다.
+        // 필드 누락은 기본값으로 관대하게 받는다 — 서버가 필드를 늘려도 스트림이 끊기지 않는다.
         assertNull(
             ServerEventDecoder.decode(
-                """{"type":"PARTICIPANT_JOINED","occurredAt":"2026-08-27T10:07:00","payload":{"nickname":"영희"}}"""
+                """{"type":"PARTICIPANT_JOINED","occurredAt":"2026-08-27T10:07:00","payload":"문자열"}"""
             )
         )
     }

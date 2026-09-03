@@ -633,6 +633,7 @@ private val previewPaidRoom = RoomInfo(
     maxParticipants = 30,
     isPaid = true,
     entryFee = 500,
+    isGuestAllowed = true,
     host = RoomHost(userId = 11, nickname = "김민지", level = 3, avgStars = 4.8, ratingCount = 32)
 )
 

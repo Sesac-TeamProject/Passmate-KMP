@@ -163,7 +163,8 @@ class PlayViewModel(
             is ServerEvent.QuestionEnded -> onQuestionEnded(event)
             is ServerEvent.RankingUpdated -> _uiState.update { it.copy(ranking = event.ranking.map(::toRankEntry)) }
             is ServerEvent.ScreenLocked -> _uiState.update { it.copy(isLocked = event.locked) }
-            is ServerEvent.SessionStarted -> _uiState.update { it.copy(isLoading = false, questionCount = event.questionCount) }
+            // 서버는 SESSION_STARTED에 페이로드를 싣지 않는다 — 문항 수는 스냅샷 값을 유지한다
+            is ServerEvent.SessionStarted -> _uiState.update { it.copy(isLoading = false) }
             is ServerEvent.SessionEnded -> onSessionEnded(event)
             is ServerEvent.HintPublished -> onHintPublished(event)
             is ServerEvent.RoomCancelled -> _event.emit(PlayEvent.RoomClosed("방이 취소됐어요"))

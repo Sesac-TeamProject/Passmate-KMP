@@ -26,12 +26,31 @@ fun SessionSnapshotResponse.toDomain(serverTime: String): SessionSnapshot {
         ts = serverTime,
         questionCount = totalCount,
         currentQuestion = currentQuestion?.toDomain(),
-        myAnswers = emptyList(),
+        // 서버는 문항별 답변 목록 대신 현재 문항 제출 여부만 준다 — 중복 제출 차단(§9)에 쓰인다
+        myAnswers = submittedAnswers(),
         totalScore = null,
         rank = null,
         ranking = ranking.map { it.toDomain() },
         isLocked = screenLocked
     )
+}
+
+// 제출 여부만 오므로 현재 문항 한 건으로 복원한다. 정오·점수는 서버가 따로 주지 않는다.
+private fun SessionSnapshotResponse.submittedAnswers(): List<SubmittedAnswer> {
+    val question = currentQuestion
+
+    return if (submitted && question != null) {
+        listOf(
+            SubmittedAnswer(
+                questionId = question.questionId,
+                correct = null,
+                earnedScore = null,
+                isProvisional = true
+            )
+        )
+    } else {
+        emptyList()
+    }
 }
 
 fun SessionSnapshotResponse.QuestionDto.toDomain(): SessionQuestion {

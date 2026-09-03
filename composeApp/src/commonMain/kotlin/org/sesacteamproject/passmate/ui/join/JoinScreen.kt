@@ -532,6 +532,7 @@ private fun JoinContentScreenFilledPreview() {
                     maxParticipants = 30,
                     isPaid = false,
                     entryFee = null,
+                    isGuestAllowed = true,
                     host = RoomHost(
                         userId = 11,
                         nickname = "김선생",

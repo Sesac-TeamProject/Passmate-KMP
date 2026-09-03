@@ -1,5 +1,6 @@
 package org.sesacteamproject.passmate.payment.data.mapper
 
+import org.sesacteamproject.passmate.core.model.DisplayDate
 import org.sesacteamproject.passmate.core.model.PagedResult
 import org.sesacteamproject.passmate.payment.data.dto.ChargeCheckoutResponse
 import org.sesacteamproject.passmate.payment.data.dto.CoinBalanceResponse
@@ -118,7 +119,7 @@ fun EarningsResponse.toDomain(account: SettlementAccountSummary?): Earnings {
     return Earnings(
         monthlyTotal = thisMonthNet,
         hostSharePercent = HOST_SHARE_PERCENT,
-        nextPayout = nextPayoutDate?.let { NextPayout(dateLabel = it, amount = pendingNet) },
+        nextPayout = nextPayoutDate?.let { NextPayout(dateLabel = DisplayDate.format(it) ?: it, amount = pendingNet) },
         paidRoomCount = earnings.size,
         studentCount = earnings.sumOf { it.participantCount },
         items = earnings.map { it.toDomain() },
@@ -131,7 +132,7 @@ fun EarningsResponse.toDomain(account: SettlementAccountSummary?): Earnings {
 fun EarningsResponse.EarningRowDto.toDomain(): SettlementItem {
     return SettlementItem(
         settlementId = roomId,
-        dateLabel = displaySettlementDate(earnedAt),
+        dateLabel = DisplayDate.format(earnedAt) ?: "",
         roomTitle = roomTitle,
         participantCount = participantCount,
         entryFeeTotal = gross,
@@ -161,20 +162,9 @@ fun SettlementAccountResponse.toDomain(): SettlementAccount {
 
     return SettlementAccount(
         bankName = view?.bankName ?: "",
-        accountNumber = view?.accountNoMasked ?: "",
+        maskedAccountNumber = view?.accountNoMasked ?: "",
         holderName = view?.holderName ?: ""
     )
-}
-
-// LocalDateTime 문자열의 날짜 부분을 화면 표기(YYYY.MM.DD)로 바꾼다
-private fun displaySettlementDate(isoDateTime: String?): String {
-    val date = isoDateTime?.substringBefore("T")
-
-    return if (date != null && date.length == 10) {
-        date.replace("-", ".")
-    } else {
-        ""
-    }
 }
 
 private const val HOST_SHARE_PERCENT = 80

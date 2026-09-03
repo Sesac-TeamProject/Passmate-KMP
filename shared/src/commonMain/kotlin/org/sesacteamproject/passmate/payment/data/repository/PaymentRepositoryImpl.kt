@@ -22,6 +22,7 @@ import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
 import org.sesacteamproject.passmate.payment.domain.model.PublicRoom
 import org.sesacteamproject.passmate.payment.domain.model.RoomSort
 import org.sesacteamproject.passmate.payment.domain.model.SettlementAccount
+import org.sesacteamproject.passmate.payment.domain.model.SettlementAccountSummary
 import org.sesacteamproject.passmate.payment.domain.model.RoomTypeFilter
 import org.sesacteamproject.passmate.payment.domain.repository.PaymentRepository
 
@@ -68,11 +69,24 @@ class PaymentRepositoryImpl(
 
     // 정산 화면은 금액과 계좌를 함께 그린다. 계좌 은행 정보가 earnings 응답에 없어
     // 여기서 두 엔드포인트를 합성한다 (규칙 §6 — 화면 전용 집계는 Repository 책임).
+    // 등록 여부는 earnings 응답의 accountRegistered가 권위다 — 계좌 조회가 실패했다고
+    // "미등록"으로 보이면 이미 등록한 호스트에게 등록을 다시 요구하게 된다.
     override suspend fun getEarnings(cursor: String?): AppResult<Earnings> {
-        val accountResult = apiCall { remoteDataSource.fetchSettlementAccount() }
-        val account = (accountResult as? AppResult.Success)?.value?.toSummary()
+        return apiCall { remoteDataSource.fetchEarnings() }.map { earnings ->
+            earnings.toDomain(accountSummaryOrNull(earnings.accountRegistered))
+        }
+    }
 
-        return apiCall { remoteDataSource.fetchEarnings() }.map { it.toDomain(account) }
+    private suspend fun accountSummaryOrNull(isRegistered: Boolean): SettlementAccountSummary? {
+        return if (isRegistered) {
+            val result = apiCall { remoteDataSource.fetchSettlementAccount() }
+
+            // 조회가 실패해도 등록은 된 상태다 — 은행 정보만 비운다
+            (result as? AppResult.Success)?.value?.toSummary()
+                ?: SettlementAccountSummary(bankName = "", maskedNumber = "", payoutNote = null)
+        } else {
+            null
+        }
     }
 
     override suspend fun getSettlementAccount(): AppResult<SettlementAccount> {
@@ -82,7 +96,7 @@ class PaymentRepositoryImpl(
     override suspend fun saveSettlementAccount(account: SettlementAccount): AppResult<Unit> {
         val request = SettlementAccountDto(
             bankName = account.bankName.trim(),
-            accountNo = account.accountNumber.trim(),
+            accountNo = account.maskedAccountNumber.trim(),
             holderName = account.holderName.trim()
         )
 

@@ -75,6 +75,7 @@ private fun roomInfo(): RoomInfo {
         maxParticipants = 20,
         isPaid = false,
         entryFee = null,
+        isGuestAllowed = true,
         host = RoomHost(7L, "김선생", 3, 4.7, 28)
     )
 }

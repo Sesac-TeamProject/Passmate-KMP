@@ -7,6 +7,7 @@ import org.sesacteamproject.passmate.user.data.dto.GradeResponse
 import org.sesacteamproject.passmate.user.data.dto.HostProfileResponse
 import org.sesacteamproject.passmate.user.data.dto.UserProfileResponse
 import kotlin.math.roundToInt
+import org.sesacteamproject.passmate.core.model.DisplayDate
 import org.sesacteamproject.passmate.user.data.dto.MyPageResponse
 import org.sesacteamproject.passmate.user.data.dto.NotificationSettingsDto
 import org.sesacteamproject.passmate.user.domain.model.Badge
@@ -47,7 +48,7 @@ fun MyPageResponse.RoomDto.toDomain(): JoinedRoom {
     return JoinedRoom(
         roomId = roomId,
         title = title,
-        dateLabel = displayDate(endedAt ?: startedAt),
+        dateLabel = DisplayDate.format(endedAt ?: startedAt) ?: "",
         questionCount = questionCount,
         myScore = myScore?.toDouble(),
         myRank = myRank,
@@ -55,17 +56,7 @@ fun MyPageResponse.RoomDto.toDomain(): JoinedRoom {
     )
 }
 
-// LocalDateTime 문자열("2026-07-18T21:10:00")의 날짜 부분을 화면 표기로 바꾼다.
-// 시간대 변환이 필요 없는 표시용이라 문자열 처리로 충분하다.
-private fun displayDate(isoDateTime: String?): String {
-    val date = isoDateTime?.substringBefore("T")
-
-    return if (date != null && date.length == 10) {
-        date.replace("-", ".")
-    } else {
-        ""
-    }
-}
+// LocalDateTime 문자열("2026-07-18T21:10:00")의 날짜 부분을 화면 표기로 바꾼다.}
 
 // 서버는 평면 구조로 준다. 참여 횟수·정답률은 이 응답에 없어 0/null로 둔다 (계약 갱신 대상).
 fun GradeResponse.toDomain(): MyGrade {

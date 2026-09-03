@@ -154,7 +154,8 @@ final class PlayViewModel: ObservableObject {
             uiState.isLocked = locked.locked
         } else if let sessionStarted = serverEvent as? ServerEventSessionStarted {
             uiState.isLoading = false
-            uiState.questionCount = Int(sessionStarted.questionCount)
+            // 서버는 SESSION_STARTED에 페이로드를 싣지 않는다 — 문항 수는 스냅샷 값을 유지한다
+            _ = sessionStarted
         } else if let sessionEnded = serverEvent as? ServerEventSessionEnded {
             onSessionEnded(sessionEnded)
         } else if let hintPublished = serverEvent as? ServerEventHintPublished {

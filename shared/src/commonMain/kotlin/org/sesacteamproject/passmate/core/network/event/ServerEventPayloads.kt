@@ -45,6 +45,23 @@ internal object ServerEventPayloads {
         val totalScore: Long = 0
     )
 
+    // 참가자 입·퇴장 — avatarId는 문자열 키이고 count는 서버가 안 줄 수 있다
+    @Serializable
+    data class ParticipantJoined(
+        val participantId: Long = 0,
+        val nickname: String = "",
+        val isGuest: Boolean = false,
+        val avatarId: String? = null,
+        val count: Int = 0
+    )
+
+    @Serializable
+    data class ParticipantLeft(
+        val participantId: Long = 0,
+        val count: Int = 0,
+        val reason: String? = null
+    )
+
     @Serializable
     data class SubmissionStatus(
         val sessionQuestionId: Long = 0,
