@@ -13,7 +13,7 @@ import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // 스플래시(M-00) 표시 시간. 부트스트랩이 전부 동기라 대기 구간이 없어 의도적으로 유지한다
 // (2026-09-03 팀 결정 — 시안의 "준비되는 즉시"와 다름). 줄일 때는 이 값만 바꾼다.
-private const val SPLASH_DURATION_MS = 1_500L
+private const val SPLASH_DURATION_MS = 1_000L
 
 // 화면에 보여줄 앱 버전. Android versionName("1.0")과 같은 값을 쓴다.
 private const val APP_VERSION_LABEL = "v1.0"
