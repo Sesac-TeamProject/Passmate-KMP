@@ -10,6 +10,11 @@ enum PassmateColors {
 
     static let surface = Color(hex: 0xFFFFFF)
 
+    // 스플래시(M-00) 브랜드 배경 위 텍스트 — 흰색 80% / 50%
+    static let splashSubtleText = Color.white.opacity(0.8)
+
+    static let splashFaintText = Color.white.opacity(0.5)
+
     // 입력 필드·비활성 칩 배경 (v6 M-01 PIN 박스·닉네임 필드)
     static let fieldGray = Color(hex: 0xF3F4F6)
 
