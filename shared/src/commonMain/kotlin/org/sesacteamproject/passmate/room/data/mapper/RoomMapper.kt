@@ -1,6 +1,7 @@
 package org.sesacteamproject.passmate.room.data.mapper
 
 import org.sesacteamproject.passmate.room.data.dto.ParticipantsResponse
+import kotlin.math.roundToInt
 import org.sesacteamproject.passmate.core.model.PagedResult
 import org.sesacteamproject.passmate.room.data.dto.CreateRoomResponse
 import org.sesacteamproject.passmate.room.data.dto.HostedRoomsResponse
@@ -41,15 +42,17 @@ fun ParticipantsResponse.Entry.toDomain(): Participant {
     )
 }
 
+// 서버가 진행 중·종료를 나눠 주고 페이징하지 않는다. 화면은 status로 다시 가르므로
+// 한 목록으로 합쳐 도메인 `PagedResult` 계약(§6)을 유지한다.
 fun HostedRoomsResponse.toDomain(): PagedResult<HostedRoom> {
     return PagedResult(
-        items = items.map { it.toDomain() },
-        nextCursor = nextCursor,
-        hasNext = hasNext
+        items = active.map { it.toDomain() } + ended.map { it.toDomain() },
+        nextCursor = null,
+        hasNext = false
     )
 }
 
-fun HostedRoomsResponse.HostedRoomDto.toDomain(): HostedRoom {
+fun HostedRoomsResponse.ActiveRoomDto.toDomain(): HostedRoom {
     return HostedRoom(
         roomId = roomId,
         pin = pin,
@@ -57,9 +60,35 @@ fun HostedRoomsResponse.HostedRoomDto.toDomain(): HostedRoom {
         status = RoomStatus.from(status),
         participantCount = participantCount,
         scheduledAt = scheduledAt,
-        endedAtLabel = endedAtLabel,
-        avgAccuracyPercent = avgAccuracyPercent
+        endedAtLabel = null,
+        avgAccuracyPercent = null
     )
+}
+
+// 종료 방에는 pin·status가 없다 — 종료로 확정하고 pin은 빈 값으로 둔다.
+// 화면(M-13)은 종료 카드에서 PIN을 쓰지 않는다.
+fun HostedRoomsResponse.EndedRoomDto.toDomain(): HostedRoom {
+    return HostedRoom(
+        roomId = roomId,
+        pin = "",
+        title = title,
+        status = RoomStatus.FINISHED,
+        participantCount = studentCount,
+        scheduledAt = null,
+        endedAtLabel = displayRoomDate(endedAt),
+        avgAccuracyPercent = correctRate?.roundToInt()
+    )
+}
+
+// LocalDateTime 문자열의 날짜 부분을 화면 표기(YYYY.MM.DD)로 바꾼다
+private fun displayRoomDate(isoDateTime: String?): String? {
+    val date = isoDateTime?.substringBefore("T")
+
+    return if (date != null && date.length == 10) {
+        date.replace("-", ".")
+    } else {
+        null
+    }
 }
 
 fun CreateRoomResponse.toDomain(): CreatedRoom {
