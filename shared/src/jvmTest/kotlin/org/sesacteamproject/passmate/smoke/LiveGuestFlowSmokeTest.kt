@@ -1,11 +1,14 @@
 package org.sesacteamproject.passmate.smoke
 
 import kotlin.test.Test
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.context.stopKoin
 import org.koin.mp.KoinPlatform
 import org.sesacteamproject.passmate.core.di.initKoin
 import org.sesacteamproject.passmate.core.model.AppResult
+import org.sesacteamproject.passmate.core.network.SessionEventStream
 import org.sesacteamproject.passmate.room.domain.usecase.GetParticipantsUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetRoomInfoUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.JoinRoomUseCase
@@ -58,5 +61,18 @@ class LiveGuestFlowSmokeTest {
         check(snapshot is AppResult.Success) { "스냅샷 조회 실패" }
         // 스냅샷 ts는 응답 Date 헤더에서 채운다 (§2-1-2·§5) — 비면 카운트다운이 서지 않는다
         check(snapshot.value.ts.isNotBlank()) { "스냅샷 서버 시각이 비었다" }
+
+        checkStompConnects(room.roomId)
+    }
+
+    // 세션 전환(GAME_STARTED 등)이 전부 WS로 오므로 연결·구독이 되는지 본다
+    private suspend fun checkStompConnects(roomId: Long) {
+        val stream = KoinPlatform.getKoin().get<SessionEventStream>()
+        val first = withTimeoutOrNull(10_000) { stream.events(roomId).first() }
+
+        println("[SMOKE] stompConnect → $first")
+        check(first is SessionEventStream.StreamEvent.Connected) {
+            "STOMP 연결 실패 — 게스트 토큰 CONNECT 헤더·구독 인가를 확인"
+        }
     }
 }
