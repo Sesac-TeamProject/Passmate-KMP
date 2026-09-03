@@ -13,6 +13,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import org.sesacteamproject.passmate.core.network.ApiClient
 import org.sesacteamproject.passmate.session.data.dto.ScreenLockRequest
+import org.sesacteamproject.passmate.core.model.HttpDate
 import org.sesacteamproject.passmate.session.data.dto.SessionSnapshotResponse
 import org.sesacteamproject.passmate.session.data.dto.StartSessionResponse
 import org.sesacteamproject.passmate.session.data.dto.SubmissionsResponse
@@ -24,8 +25,14 @@ import org.sesacteamproject.passmate.session.data.dto.VoiceHintsResponse
 class SessionRemoteDataSource(
     private val apiClient: ApiClient
 ) {
-    suspend fun fetchSnapshot(roomId: Long): SessionSnapshotResponse {
-        return apiClient.http.get("${apiClient.baseUrl}/rooms/$roomId/session").body()
+    // 스냅샷 본문에 서버 시각이 없어 응답 Date 헤더를 함께 돌려준다 (§2-1-2·§5)
+    suspend fun fetchSnapshot(roomId: Long): SnapshotWithServerTime {
+        val response = apiClient.http.get("${apiClient.baseUrl}/rooms/$roomId/session")
+
+        return SnapshotWithServerTime(
+            snapshot = response.body(),
+            serverTime = HttpDate.toIsoOrNull(response.headers[HttpHeaders.Date])
+        )
     }
 
     suspend fun submitAnswer(roomId: Long, questionId: Long, request: SubmitAnswerRequest): SubmitAnswerResponse {
@@ -93,4 +100,10 @@ class SessionRemoteDataSource(
     suspend fun fetchSubmissions(roomId: Long): SubmissionsResponse {
         return apiClient.http.get("${apiClient.baseUrl}/rooms/$roomId/session/current/submissions").body()
     }
+
+    // 전송 계층이 본문과 응답 헤더를 함께 넘기기 위한 묶음 (규칙 §6 — 매핑은 Repository가 한다)
+    data class SnapshotWithServerTime(
+        val snapshot: SessionSnapshotResponse,
+        val serverTime: String?
+    )
 }

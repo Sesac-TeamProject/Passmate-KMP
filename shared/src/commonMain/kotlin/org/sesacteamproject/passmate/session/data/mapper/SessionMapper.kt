@@ -1,6 +1,7 @@
 package org.sesacteamproject.passmate.session.data.mapper
 
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
+import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
 import org.sesacteamproject.passmate.session.data.dto.SessionSnapshotResponse
 import org.sesacteamproject.passmate.session.data.dto.SubmissionsResponse
 import org.sesacteamproject.passmate.session.data.dto.SubmitAnswerResponse
@@ -16,40 +17,35 @@ import org.sesacteamproject.passmate.session.domain.model.SubmissionStatus
 import org.sesacteamproject.passmate.session.domain.model.SubmittedAnswer
 import org.sesacteamproject.passmate.session.domain.model.VoiceHint
 
-fun SessionSnapshotResponse.toDomain(): SessionSnapshot {
+// 서버 본문에 ts가 없어 응답 HTTP Date 헤더의 서버 시각을 받아 채운다.
+// 문항별 내 답변 목록·누적 점수·순위도 스냅샷에 없다 (계약 갱신 대상) —
+// 제출 여부만 오므로 myAnswers는 비우고, 점수·순위는 랭킹으로 갱신된다.
+fun SessionSnapshotResponse.toDomain(serverTime: String): SessionSnapshot {
     return SessionSnapshot(
         status = RoomStatus.from(status),
-        ts = ts,
-        questionCount = questionCount,
+        ts = serverTime,
+        questionCount = totalCount,
         currentQuestion = currentQuestion?.toDomain(),
-        myAnswers = myAnswers.map { it.toDomain() },
-        totalScore = totalScore,
-        rank = rank,
+        myAnswers = emptyList(),
+        totalScore = null,
+        rank = null,
         ranking = ranking.map { it.toDomain() },
-        isLocked = isLocked
+        isLocked = screenLocked
     )
 }
 
 fun SessionSnapshotResponse.QuestionDto.toDomain(): SessionQuestion {
     return SessionQuestion(
         questionId = questionId,
-        questionNo = questionNo,
+        questionNo = orderNo,
         type = QuestionType.from(type),
-        body = body,
-        choices = choices.orEmpty(),
+        body = content,
+        choices = choices,
         points = points,
         timeLimitSec = timeLimitSec,
         endsAt = endsAt,
-        isClosed = isClosed
-    )
-}
-
-fun SessionSnapshotResponse.AnswerDto.toDomain(): SubmittedAnswer {
-    return SubmittedAnswer(
-        questionId = questionId,
-        correct = correct,
-        earnedScore = earnedScore,
-        isProvisional = isProvisional
+        // 마감 여부는 QUESTION_ENDED 이벤트가 알린다 — 스냅샷에는 없다
+        isClosed = false
     )
 }
 
@@ -58,8 +54,8 @@ fun SessionSnapshotResponse.RankingEntryDto.toDomain(): RankEntry {
         rank = rank,
         participantId = participantId,
         nickname = nickname,
-        avatarId = avatarId,
-        total = total
+        avatarId = StudentAvatarKeys.toIndex(avatarId),
+        total = totalScore.toDouble()
     )
 }
 
