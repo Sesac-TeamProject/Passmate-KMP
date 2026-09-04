@@ -74,13 +74,20 @@ struct MyInfoView: View {
                 noticeMessage = message
             }
         }
-        .alert("로그아웃 할까요?", isPresented: $showSignOutConfirm) {
-            Button("로그아웃", role: .destructive) {
-                viewModel.action(.confirmSignOut)
+        .overlay {
+            // 시안 M-12-11 — 플랫폼 기본 알림이 아니라 공통 확인 다이얼로그를 쓴다
+            if showSignOutConfirm {
+                PassmateConfirmDialogView(
+                    title: "로그아웃 할까요?",
+                    message: "다시 로그인하면 기록과 코인은 그대로 있어요.",
+                    confirmLabel: "로그아웃",
+                    onConfirm: {
+                        showSignOutConfirm = false
+                        viewModel.action(.confirmSignOut)
+                    },
+                    onDismiss: { showSignOutConfirm = false }
+                )
             }
-            Button("취소", role: .cancel) {}
-        } message: {
-            Text("다시 로그인하면 기록과 코인은 그대로 있어요.")
         }
         .overlay(alignment: .bottom) {
             if let noticeMessage {
@@ -410,7 +417,13 @@ private struct MyInfoContentView: View {
     }
 
     private func coinRow(coins: Int64, onClickCharge: @escaping () -> Void) -> some View {
-        HStack {
+        HStack(spacing: 12) {
+            // 시안 M-12: 보유 코인 행 왼쪽에 민트 원형 배경 + 코인 마크
+            ZStack {
+                Circle().fill(PassmateColors.backgroundMint)
+                PassmateIconView(icon: .coin, tint: PassmateColors.primary, size: 22)
+            }
+            .frame(width: 40, height: 40)
             VStack(alignment: .leading, spacing: 4) {
                 Text("보유 코인")
                     .font(.system(size: 15, weight: .medium))

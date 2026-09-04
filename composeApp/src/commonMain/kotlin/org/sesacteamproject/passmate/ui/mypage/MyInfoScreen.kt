@@ -24,6 +24,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateConfirmDialog
 import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.component.ReputationBadge
@@ -99,40 +101,16 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
         )
     }
     if (showSignOutConfirm) {
-        AlertDialog(
-            onDismissRequest = { showSignOutConfirm = false },
-            title = {
-                Text(
-                    text = "로그아웃 할까요?",
-                    color = PassmateColors.TextPrimary,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+        // 시안 M-12-11 — 플랫폼 기본 알림이 아니라 공통 확인 다이얼로그를 쓴다
+        PassmateConfirmDialog(
+            title = "로그아웃 할까요?",
+            message = "다시 로그인하면 기록과 코인은 그대로 있어요.",
+            confirmLabel = "로그아웃",
+            onConfirm = {
+                showSignOutConfirm = false
+                viewModel.onAction(MyInfoAction.ConfirmSignOut)
             },
-            text = {
-                Text(
-                    text = "다시 로그인하면 기록과 코인은 그대로 있어요.",
-                    color = PassmateColors.TextSecondary,
-                    fontSize = 14.sp,
-                    letterSpacing = (-0.28).sp
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showSignOutConfirm = false
-                        viewModel.onAction(MyInfoAction.ConfirmSignOut)
-                    }
-                ) {
-                    Text(text = "로그아웃", color = PassmateColors.WeakTopicText, fontWeight = FontWeight.Bold)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showSignOutConfirm = false }) {
-                    Text(text = "취소", color = PassmateColors.TextSecondary)
-                }
-            },
-            containerColor = PassmateColors.Surface
+            onDismiss = { showSignOutConfirm = false }
         )
     }
 }
@@ -431,8 +409,24 @@ private fun CoinRow(
             .padding(vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // 시안 M-12: 보유 코인 행 왼쪽에 민트 원형 배경 + 코인 마크
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(PassmateColors.BackgroundMint, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            PassmateIcon(
+                icon = PassmateIcons.Coin,
+                contentDescription = null,
+                modifier = Modifier.size(22.dp),
+                tint = PassmateColors.Primary
+            )
+        }
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 12.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
