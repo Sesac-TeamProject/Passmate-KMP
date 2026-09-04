@@ -21,15 +21,11 @@ final class MyInfoViewModel: ObservableObject {
 
     let event = PassthroughSubject<MyInfoEvent, Never>()
 
-    private var hasEntered = false
-
     private func onEnter() {
-        if hasEntered {
-            return
-        }
-        hasEntered = true
         // 회원 전용 가드 — 서버 검증이 최종 권위 (규칙 §8)
         if isSignedInUseCase.invoke() {
+            // 재진입(상세 페이지에서 pop)마다 다시 부른다 — 시트가 아니라 push라
+            // 닉네임·결제 수단·정산 계좌 저장 결과가 이 화면으로 돌아온다 (hasEntered 가드 없음)
             loadAll()
         } else {
             event.send(.requireSignIn)
@@ -104,12 +100,7 @@ final class MyInfoViewModel: ObservableObject {
     }
 
     private func onClickEditProfile() {
-        if let profile = uiState.profile {
-            event.send(.openEditProfile(
-                nickname: profile.nickname,
-                avatarId: profile.avatarId.map { Int(truncating: $0) }
-            ))
-        }
+        event.send(.openEditProfile)
     }
 
     private func onConfirmSignOut() {
@@ -159,15 +150,6 @@ final class MyInfoViewModel: ObservableObject {
             event.send(.showNotice(message: termsNotice))
         case .confirmSignOut:
             onConfirmSignOut()
-        case .profileUpdated:
-            loadProfile()
-            event.send(.showNotice(message: "내 정보를 저장했어요"))
-        case .paymentMethodUpdated:
-            loadCoinInfo()
-            event.send(.showNotice(message: "기본 결제 수단을 저장했어요"))
-        case .accountUpdated:
-            loadEarnings()
-            event.send(.showNotice(message: "정산 계좌를 저장했어요"))
         case let .notice(message):
             event.send(.showNotice(message: message))
         }

@@ -23,9 +23,5 @@ enum MyInfoAction {
     case clickTerms
     // 확인 알림을 거친 뒤 호출된다 — 알림 소유는 화면 (규칙 §11-1)
     case confirmSignOut
-    // 시트 저장 완료 — 해당 섹션만 다시 불러온다
-    case profileUpdated
-    case paymentMethodUpdated
-    case accountUpdated
     case notice(message: String)
 }

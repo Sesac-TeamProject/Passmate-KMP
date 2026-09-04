@@ -2,15 +2,15 @@ import Combine
 import Foundation
 import Shared
 
-// Compose EditProfileViewModel.kt 미러 — 계정 정보 변경 (M-12-1). 캐릭터는 M-12-7이 담당한다
-final class EditProfileViewModel: ObservableObject {
+// Compose CharacterEditViewModel.kt 미러 — 내 캐릭터 변경 (M-12-7). 닉네임은 M-12-1이 담당한다
+final class CharacterEditViewModel: ObservableObject {
     private let getMyProfileUseCase: GetMyProfileUseCase
 
     private let updateMyProfileUseCase: UpdateMyProfileUseCase
 
-    @Published private(set) var uiState = EditProfileUiState()
+    @Published private(set) var uiState = CharacterEditUiState()
 
-    let event = PassthroughSubject<EditProfileEvent, Never>()
+    let event = PassthroughSubject<CharacterEditEvent, Never>()
 
     private var hasEntered = false
 
@@ -24,8 +24,6 @@ final class EditProfileViewModel: ObservableObject {
 
                 self.uiState.isLoading = false
                 if error == nil, let profile {
-                    self.uiState.nickname = profile.nickname
-                    self.uiState.email = profile.email
                     self.uiState.avatarId = profile.avatarId?.intValue
                 } else {
                     self.uiState.hasLoadError = true
@@ -50,41 +48,42 @@ final class EditProfileViewModel: ObservableObject {
             return
         }
         uiState.isSubmitting = true
-        // 캐릭터는 M-12-7이 담당한다 — nil이면 전송에서 생략돼(explicitNulls=false) 값이 보존된다
-        updateMyProfileUseCase.invoke(nickname: state.nickname, avatarId: nil) { [weak self] result, error in
+        // 닉네임은 M-12-1이 담당한다 — nil이면 전송에서 생략돼(explicitNulls=false) 값이 보존된다
+        updateMyProfileUseCase.invoke(
+            nickname: nil,
+            avatarId: state.avatarId.map { KotlinInt(value: Int32($0)) }
+        ) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.uiState.isSubmitting = false
                 if error == nil, result is AppResultSuccess<AnyObject> {
                     self.event.send(.saved)
                 } else {
-                    let appError = (result as? AppResultFailure)?.error
-
-                    self.event.send(.showNotice(message: self.saveFailMessage(appError)))
+                    self.event.send(.showNotice(message: self.saveFailMessage(result)))
                 }
             }
         }
     }
 
-    // 서버 code 기반 문구 분기 (규칙 §10) — 닉네임 최종 검증은 서버가 한다
-    private func saveFailMessage(_ error: AppError?) -> String {
-        if let validation = error as? AppError.ValidationFailed {
-            return validation.serverMessage ?? "닉네임을 확인해 주세요"
-        } else if error is AppError.NetworkError {
+    // 서버 code 기반 문구 분기 (규칙 §10)
+    private func saveFailMessage(_ result: Any?) -> String {
+        let error = (result as? AppResultFailure)?.error
+
+        if error is AppError.NetworkError {
             return "네트워크 연결을 확인해 주세요"
         } else {
             return "저장하지 못했어요. 다시 시도해 주세요"
         }
     }
 
-    func action(_ action: EditProfileAction) {
+    func action(_ action: CharacterEditAction) {
         switch action {
         case .enter:
             onEnter()
         case .retry:
             loadProfile()
-        case let .changeNickname(text):
-            uiState.nickname = String(text.prefix(12))
+        case let .selectAvatar(avatarId):
+            uiState.avatarId = avatarId
         case .submit:
             onSubmit()
         }

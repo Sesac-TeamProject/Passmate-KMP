@@ -2,11 +2,11 @@ import SwiftUI
 import Shared
 
 // Figma "UI 디자인 v6" M-12-10 미러 — 알림 설정 3종, 토글 즉시 저장.
-// 시트 표시 여부는 호스팅 화면(MyInfoView)이 소유한다 (규칙 §11-1)
-struct NotificationSettingsSheetView: View {
-    var onNotice: (String) -> Void = { _ in }
+// 시안이 전체 페이지라 라우트 push로 띄운다 (규칙 §2-1 — 상세는 모달이 아니라 push)
+struct NotificationSettingsView: View {
+    var onBack: () -> Void = {}
 
-    var onClose: () -> Void = {}
+    @State private var noticeMessage: String?
 
     @StateObject private var viewModel = NotificationSettingsViewModel(
         getNotificationSettingsUseCase: KoinHelper.shared.getNotificationSettingsUseCase(),
@@ -17,7 +17,7 @@ struct NotificationSettingsSheetView: View {
         NotificationSettingsContentView(
             uiState: viewModel.uiState,
             onAction: { viewModel.action($0) },
-            onClose: onClose
+            onBack: onBack
         )
         .onAppear {
             viewModel.action(.enter)
@@ -25,7 +25,24 @@ struct NotificationSettingsSheetView: View {
         .onReceive(viewModel.event) { event in
             switch event {
             case let .showNotice(message):
-                onNotice(message)
+                noticeMessage = message
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if let noticeMessage {
+                Text(noticeMessage)
+                    .font(.system(size: 13))
+                    .foregroundColor(PassmateColors.surface)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(PassmateColors.textPrimary.opacity(0.9))
+                    .cornerRadius(10)
+                    .padding(.bottom, 16)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                            self.noticeMessage = nil
+                        }
+                    }
             }
         }
     }
@@ -36,22 +53,19 @@ private struct NotificationSettingsContentView: View {
 
     let onAction: (NotificationSettingsAction) -> Void
 
-    let onClose: () -> Void
+    let onBack: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack {
+            HStack(spacing: 12) {
+                PassmateBackButton(onClick: onBack)
                 Text("알림 설정")
                     .font(.system(size: 20, weight: .bold))
                     .kerning(-0.4)
                     .foregroundColor(PassmateColors.textPrimary)
                 Spacer()
-                Button(action: onClose) {
-                    Text("✕")
-                        .font(.system(size: 18))
-                        .foregroundColor(PassmateColors.textSecondary)
-                }
             }
+            .padding(.top, 16)
             if uiState.isLoading {
                 HStack {
                     Spacer()

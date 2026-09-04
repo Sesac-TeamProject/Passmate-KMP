@@ -5,6 +5,8 @@ import Shared
 struct EarningsView: View {
     var onRequireSignIn: () -> Void = {}
 
+    var onOpenSettlementAccount: () -> Void = {}
+
     // 빈 상태 「유료 방 만들기」 CTA — 방 개설 진입점인 「내가 만든 방」 탭으로 보낸다
     var onOpenHostedRooms: () -> Void = {}
 
@@ -17,7 +19,6 @@ struct EarningsView: View {
         isSignedInUseCase: KoinHelper.shared.isSignedInUseCase()
     )
 
-    @State private var isAccountSheetVisible = false
 
     @State private var noticeMessage: String?
 
@@ -35,7 +36,7 @@ struct EarningsView: View {
             case .requireSignIn:
                 onRequireSignIn()
             case .openAccountSheet:
-                isAccountSheetVisible = true
+                onOpenSettlementAccount()
             case .openHostedRooms:
                 onOpenHostedRooms()
             case .openCoinHistory:
@@ -43,19 +44,6 @@ struct EarningsView: View {
             case let .showNotice(message):
                 noticeMessage = message
             }
-        }
-        .sheet(isPresented: $isAccountSheetVisible) {
-            SettlementAccountSheetView(
-                onSaved: {
-                    isAccountSheetVisible = false
-                    viewModel.action(.accountSaved)
-                },
-                onNotice: { message in
-                    viewModel.action(.notice(message: message))
-                },
-                onClose: { isAccountSheetVisible = false }
-            )
-            .passmateDetents([.medium, .large])
         }
         .overlay(alignment: .bottom) {
             if let noticeMessage {

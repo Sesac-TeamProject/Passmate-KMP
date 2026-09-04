@@ -59,6 +59,10 @@ struct ContentView: View {
                     onOpenCharge: { path.append(.coinCharge) },
                     onOpenEarnings: { path.append(.earnings) },
                     onOpenDeleteAccount: { path.append(.deleteAccount) },
+                    onOpenEditProfile: { path.append(.editProfile) },
+                    onOpenPaymentMethod: { path.append(.paymentMethod) },
+                    onOpenSettlementAccount: { path.append(.settlementAccount) },
+                    onOpenNotifications: { path.append(.notificationSettings) },
                     onSignedOut: {
                         path = []
                         selectedTab = .home
@@ -73,7 +77,23 @@ struct ContentView: View {
             .background(
                 NavigationLink(isActive: isStackActive) {
                     RouteStackLevel(path: $path, index: 0) { route, path in
-                        destinationView(for: route, path: path)
+                        // 시안이 탭바를 유지하는 화면(M-12-x·M-14)에서는 push 위에도 탭바를 그린다.
+                        // push가 TabView 전체를 덮는 구조라 화면마다 직접 얹어야 한다 (규칙 §2-1)
+                        if let owner = route.tabBarOwner {
+                            VStack(spacing: 0) {
+                                destinationView(for: route, path: path)
+                                    .frame(maxHeight: .infinity)
+                                PassmateBottomTabBar(
+                                    selectedTab: owner,
+                                    onSelectTab: { tab in
+                                        self.path = []
+                                        shellViewModel.action(.selectTab(tab))
+                                    }
+                                )
+                            }
+                        } else {
+                            destinationView(for: route, path: path)
+                        }
                     }
                 } label: {
                     EmptyView()
@@ -203,6 +223,7 @@ struct ContentView: View {
         case .earnings:
             EarningsView(
                 onRequireSignIn: { pushSignIn(pendingRoute: .earnings, path: path) },
+                onOpenSettlementAccount: { path.wrappedValue.append(.settlementAccount) },
                 // 빈 상태 CTA — 방 개설 진입점인 「내가 만든 방」 탭으로. 탭 전환은 셸 가드를 거친다 (규칙 §2-1-1)
                 onOpenHostedRooms: {
                     path.wrappedValue = []
@@ -234,6 +255,19 @@ struct ContentView: View {
                 },
                 onBack: { popOnce(path) }
             )
+        case .editProfile:
+            EditProfileView(
+                onBack: { popOnce(path) },
+                onOpenCharacterEdit: { path.wrappedValue.append(.characterEdit) }
+            )
+        case .characterEdit:
+            CharacterEditView(onBack: { popOnce(path) })
+        case .settlementAccount:
+            SettlementAccountView(onBack: { popOnce(path) })
+        case .paymentMethod:
+            PaymentMethodView(onBack: { popOnce(path) })
+        case .notificationSettings:
+            NotificationSettingsView(onBack: { popOnce(path) })
         }
     }
 

@@ -1,6 +1,7 @@
+// Compose EditProfileAction.kt 미러 (M-12-1)
 enum EditProfileAction {
-    case enter(nickname: String, avatarId: Int?)
+    case enter
+    case retry
     case changeNickname(text: String)
-    case selectAvatar(avatarId: Int)
     case submit
 }
