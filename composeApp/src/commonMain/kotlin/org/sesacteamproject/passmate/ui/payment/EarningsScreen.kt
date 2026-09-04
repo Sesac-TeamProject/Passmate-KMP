@@ -53,6 +53,7 @@ import org.sesacteamproject.passmate.payment.domain.model.SettlementStatus
 import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.theme.PassmateColors
 import org.sesacteamproject.passmate.theme.PassmateTheme
+import org.sesacteamproject.passmate.payment.domain.policy.SettlementPolicy
 
 // Figma "UI 디자인 v6" M-T4(349:10199) — 정산: 이번 달 수익(80%)·다음 지급·결제/정산 내역+계좌 관리(M-12-3 시트)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -726,7 +727,7 @@ private fun EarningsContentScreenPreview() {
                 isLoading = false,
                 earnings = Earnings(
                     monthlyTotal = 64000L,
-                    hostSharePercent = 80,
+                    hostSharePercent = SettlementPolicy.hostSharePercent,
                     nextPayout = NextPayout(dateLabel = "9/5", amount = 9600L),
                     paidRoomCount = 3,
                     studentCount = 53,
@@ -753,7 +754,7 @@ private fun EarningsContentScreenEmptyPreview() {
                 isLoading = false,
                 earnings = Earnings(
                     monthlyTotal = 0L,
-                    hostSharePercent = 80,
+                    hostSharePercent = SettlementPolicy.hostSharePercent,
                     nextPayout = null,
                     paidRoomCount = 0,
                     studentCount = 0,
@@ -779,7 +780,7 @@ private fun EarningsContentScreenNoSettlementsPreview() {
                 isLoading = false,
                 earnings = Earnings(
                     monthlyTotal = 0L,
-                    hostSharePercent = 80,
+                    hostSharePercent = SettlementPolicy.hostSharePercent,
                     nextPayout = null,
                     paidRoomCount = 0,
                     studentCount = 0,

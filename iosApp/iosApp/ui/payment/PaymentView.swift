@@ -196,8 +196,8 @@ private struct PaymentContentView: View {
                     .kerning(-0.4)
                     .foregroundColor(PassmateColors.primaryDeep)
             }
-            // 정산 비율은 기획서 §13.3 고정값(8:2)이다. 금액 분해는 서버 권위라 비율만 안내한다 (규칙 §13)
-            Text("선생님 정산 80% · 플랫폼 수수료 20% · 세션 시작 전 취소 시 전액 환불")
+            // 정산 비율은 SettlementPolicy가 단일 출처다. 금액 분해는 서버 권위라 비율만 안내한다 (규칙 §13)
+            Text("선생님 정산 \(SettlementPolicy.shared.hostSharePercent)% · 플랫폼 수수료 \(SettlementPolicy.shared.platformFeePercent)% · 세션 시작 전 취소 시 전액 환불")
                 .font(.system(size: 12))
                 .kerning(-0.24)
                 .foregroundColor(PassmateColors.textSecondary)

@@ -26,6 +26,7 @@ import org.sesacteamproject.passmate.payment.domain.model.SettlementAccount
 import org.sesacteamproject.passmate.payment.domain.model.SettlementAccountSummary
 import org.sesacteamproject.passmate.payment.domain.model.SettlementItem
 import org.sesacteamproject.passmate.payment.domain.model.SettlementStatus
+import org.sesacteamproject.passmate.payment.domain.policy.SettlementPolicy
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 
 fun CoinBalanceResponse.toDomain(): CoinBalance {
@@ -113,12 +114,12 @@ fun PublicRoomPageResponse.toDomain(): PagedResult<PublicRoom> {
     )
 }
 
-// 서버는 hostSharePercent를 주지 않는다 — 8:2 정산(FR-056)은 도메인 상수로 둔다.
+// 서버는 hostSharePercent를 주지 않는다 — 8:2 정산(FR-056)은 SettlementPolicy가 단일 출처다.
 // earnings가 페이징 없이 전량 오므로 방 수·학생 수 집계는 정확하다.
 fun EarningsResponse.toDomain(account: SettlementAccountSummary?): Earnings {
     return Earnings(
         monthlyTotal = thisMonthNet,
-        hostSharePercent = HOST_SHARE_PERCENT,
+        hostSharePercent = SettlementPolicy.hostSharePercent,
         nextPayout = nextPayoutDate?.let { NextPayout(dateLabel = DisplayDate.format(it) ?: it, amount = pendingNet) },
         paidRoomCount = earnings.size,
         studentCount = earnings.sumOf { it.participantCount },
@@ -167,5 +168,4 @@ fun SettlementAccountResponse.toDomain(): SettlementAccount {
     )
 }
 
-private const val HOST_SHARE_PERCENT = 80
 
