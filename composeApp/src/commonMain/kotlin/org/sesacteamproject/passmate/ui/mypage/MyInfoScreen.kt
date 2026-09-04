@@ -20,12 +20,10 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,17 +53,7 @@ import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.room.domain.model.HostLevel
 import org.sesacteamproject.passmate.theme.PassmateColors
 import org.sesacteamproject.passmate.theme.PassmateTheme
-import org.sesacteamproject.passmate.ui.payment.PaymentMethodSheet
-import org.sesacteamproject.passmate.ui.payment.SettlementAccountSheet
 import org.sesacteamproject.passmate.user.domain.model.UserProfile
-
-// 시트 4종 중 무엇이 열려 있는지 — 표시 여부는 이 화면이 소유한다 (규칙 §11-1)
-private enum class MyInfoSheet {
-    EDIT_PROFILE,
-    PAYMENT_METHOD,
-    SETTLEMENT_ACCOUNT,
-    NOTIFICATIONS
-}
 
 // Figma "UI 디자인 v6" M-12(349:9683) — 마이 탭 루트: 프로필·계정·코인·정산·알림·로그아웃
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,9 +62,6 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
     val viewModel: MyInfoViewModel = koinScreenViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val sheetState = rememberModalBottomSheetState()
-    var activeSheet by remember { mutableStateOf<MyInfoSheet?>(null) }
-    var editInitial by remember { mutableStateOf<Pair<String, Int?>>("" to null) }
     var showSignOutConfirm by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -89,16 +74,13 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
                     NavigationAction.NavigateToSignIn(NavigationAction.NavigateToTab(AppTab.MY_INFO))
                 )
                 is MyInfoEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
-                is MyInfoEvent.OpenEditProfile -> {
-                    editInitial = event.nickname to event.avatarId
-                    activeSheet = MyInfoSheet.EDIT_PROFILE
-                }
-                is MyInfoEvent.OpenPaymentMethod -> activeSheet = MyInfoSheet.PAYMENT_METHOD
+                is MyInfoEvent.OpenEditProfile -> onNavigate(NavigationAction.NavigateToEditProfile)
+                is MyInfoEvent.OpenPaymentMethod -> onNavigate(NavigationAction.NavigateToPaymentMethod)
                 is MyInfoEvent.OpenCoinHistory -> onNavigate(NavigationAction.NavigateToCoinHistory)
                 is MyInfoEvent.OpenCharge -> onNavigate(NavigationAction.NavigateToCoinCharge)
-                is MyInfoEvent.OpenSettlementAccount -> activeSheet = MyInfoSheet.SETTLEMENT_ACCOUNT
+                is MyInfoEvent.OpenSettlementAccount -> onNavigate(NavigationAction.NavigateToSettlementAccount)
                 is MyInfoEvent.OpenEarnings -> onNavigate(NavigationAction.NavigateToEarnings)
-                is MyInfoEvent.OpenNotifications -> activeSheet = MyInfoSheet.NOTIFICATIONS
+                is MyInfoEvent.OpenNotifications -> onNavigate(NavigationAction.NavigateToNotificationSettings)
                 is MyInfoEvent.OpenDeleteAccount -> onNavigate(NavigationAction.NavigateToDeleteAccount)
                 is MyInfoEvent.SignedOut -> onNavigate(NavigationAction.NavigateToHome)
                 is MyInfoEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
@@ -115,46 +97,6 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
-    }
-    activeSheet?.let { sheet ->
-        ModalBottomSheet(
-            onDismissRequest = { activeSheet = null },
-            sheetState = sheetState,
-            containerColor = PassmateColors.Surface
-        ) {
-            when (sheet) {
-                MyInfoSheet.EDIT_PROFILE -> EditProfileSheet(
-                    initialNickname = editInitial.first,
-                    initialAvatarId = editInitial.second,
-                    onSaved = {
-                        activeSheet = null
-                        viewModel.onAction(MyInfoAction.ProfileUpdated)
-                    },
-                    onNotice = { viewModel.onAction(MyInfoAction.Notice(it)) },
-                    onClose = { activeSheet = null }
-                )
-                MyInfoSheet.PAYMENT_METHOD -> PaymentMethodSheet(
-                    onSaved = {
-                        activeSheet = null
-                        viewModel.onAction(MyInfoAction.PaymentMethodUpdated)
-                    },
-                    onNotice = { viewModel.onAction(MyInfoAction.Notice(it)) },
-                    onClose = { activeSheet = null }
-                )
-                MyInfoSheet.SETTLEMENT_ACCOUNT -> SettlementAccountSheet(
-                    onSaved = {
-                        activeSheet = null
-                        viewModel.onAction(MyInfoAction.AccountUpdated)
-                    },
-                    onNotice = { viewModel.onAction(MyInfoAction.Notice(it)) },
-                    onClose = { activeSheet = null }
-                )
-                MyInfoSheet.NOTIFICATIONS -> NotificationSettingsSheet(
-                    onNotice = { viewModel.onAction(MyInfoAction.Notice(it)) },
-                    onClose = { activeSheet = null }
-                )
-            }
-        }
     }
     if (showSignOutConfirm) {
         AlertDialog(

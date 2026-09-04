@@ -6,7 +6,7 @@ sealed interface MyInfoEvent {
 
     data object OpenReputation : MyInfoEvent
 
-    data class OpenEditProfile(val nickname: String, val avatarId: Int?) : MyInfoEvent
+    data object OpenEditProfile : MyInfoEvent
 
     data object OpenPaymentMethod : MyInfoEvent
 

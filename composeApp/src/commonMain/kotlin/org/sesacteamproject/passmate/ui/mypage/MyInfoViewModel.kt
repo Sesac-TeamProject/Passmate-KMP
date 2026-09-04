@@ -24,17 +24,13 @@ class MyInfoViewModel(
     private val isSignedInUseCase: IsSignedInUseCase
 ) : MviViewModel<MyInfoUiState, MyInfoAction, MyInfoEvent>(MyInfoUiState()) {
 
-    private var hasEntered = false
-
     private fun onEnter() {
-        if (hasEntered) {
-            return
-        }
-        hasEntered = true
         // 회원 전용 가드 — 서버 검증이 최종 권위 (규칙 §8)
         if (!isSignedInUseCase.invoke()) {
             emit(MyInfoEvent.RequireSignIn)
         } else {
+            // 재진입(상세 페이지에서 pop)마다 다시 부른다 — 시트가 아니라 push라
+            // 닉네임·결제 수단·정산 계좌 저장 결과가 이 화면으로 돌아온다 (hasEntered 가드 없음)
             loadAll()
         }
     }
@@ -105,14 +101,6 @@ class MyInfoViewModel(
         }
     }
 
-    private fun onClickEditProfile() {
-        val profile = _uiState.value.profile
-
-        if (profile != null) {
-            emit(MyInfoEvent.OpenEditProfile(profile.nickname, profile.avatarId))
-        }
-    }
-
     private fun onConfirmSignOut() {
         if (_uiState.value.isProcessing) {
             return
@@ -124,21 +112,6 @@ class MyInfoViewModel(
             _uiState.update { it.copy(isProcessing = false) }
             _event.emit(MyInfoEvent.SignedOut)
         }
-    }
-
-    private fun onProfileUpdated() {
-        loadProfile()
-        emit(MyInfoEvent.ShowNotice("내 정보를 저장했어요"))
-    }
-
-    private fun onPaymentMethodUpdated() {
-        loadCoinInfo()
-        emit(MyInfoEvent.ShowNotice("기본 결제 수단을 저장했어요"))
-    }
-
-    private fun onAccountUpdated() {
-        loadEarnings()
-        emit(MyInfoEvent.ShowNotice("정산 계좌를 저장했어요"))
     }
 
     private fun emit(event: MyInfoEvent) {
@@ -154,7 +127,7 @@ class MyInfoViewModel(
             is MyInfoAction.RetryCoinInfo -> loadCoinInfo()
             is MyInfoAction.RetryEarnings -> loadEarnings()
             is MyInfoAction.ClickProfile -> emit(MyInfoEvent.OpenReputation)
-            is MyInfoAction.ClickEditProfile -> onClickEditProfile()
+            is MyInfoAction.ClickEditProfile -> emit(MyInfoEvent.OpenEditProfile)
             is MyInfoAction.ClickCharge -> emit(MyInfoEvent.OpenCharge)
             is MyInfoAction.ClickPaymentMethod -> emit(MyInfoEvent.OpenPaymentMethod)
             is MyInfoAction.ClickCoinHistory -> emit(MyInfoEvent.OpenCoinHistory)
@@ -164,9 +137,6 @@ class MyInfoViewModel(
             is MyInfoAction.ClickDeleteAccount -> emit(MyInfoEvent.OpenDeleteAccount)
             is MyInfoAction.ClickTerms -> emit(MyInfoEvent.ShowNotice(TERMS_NOTICE))
             is MyInfoAction.ConfirmSignOut -> onConfirmSignOut()
-            is MyInfoAction.ProfileUpdated -> onProfileUpdated()
-            is MyInfoAction.PaymentMethodUpdated -> onPaymentMethodUpdated()
-            is MyInfoAction.AccountUpdated -> onAccountUpdated()
             is MyInfoAction.Notice -> emit(MyInfoEvent.ShowNotice(action.message))
         }
     }

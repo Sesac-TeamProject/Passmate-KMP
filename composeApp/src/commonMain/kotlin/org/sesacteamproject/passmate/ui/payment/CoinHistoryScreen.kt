@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -88,10 +87,8 @@ private fun CoinHistoryContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.Surface)
-            // 화면 배경은 시스템 바 뒤까지 깔고 콘텐츠만 안쪽으로 들인다 (iOS의 background(...).ignoresSafeArea() 미러).
-            // 탭바 없는 push 화면은 Scaffold가 하단 인셋을 주지 않으므로(contentWindowInsets=0) 여기서 직접 준다
+            // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다 — 시안이 이 화면에 탭바를 유지한다
             .statusBarsPadding()
-            .navigationBarsPadding()
     ) {
         Spacer(Modifier.height(16.dp))
         TopBar(onBack = onBack)

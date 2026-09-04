@@ -52,5 +52,20 @@ sealed interface NavigationAction {
     // 회원 탈퇴 (M-12-12) — 설정에서 진입
     data object NavigateToDeleteAccount : NavigationAction
 
+    // 계정 정보 변경 (M-12-1) — 마이 › 계정 정보 행에서 진입
+    data object NavigateToEditProfile : NavigationAction
+
+    // 내 캐릭터 변경 (M-12-7) — M-12-1의 "캐릭터 바꾸기 →"에서 진입
+    data object NavigateToCharacterEdit : NavigationAction
+
+    // 정산 계좌 등록 (M-12-3) — 마이 · 정산(M-T4) 양쪽에서 진입
+    data object NavigateToSettlementAccount : NavigationAction
+
+    // 결제 수단 관리 (M-12-8)
+    data object NavigateToPaymentMethod : NavigationAction
+
+    // 알림 설정 (M-12-10)
+    data object NavigateToNotificationSettings : NavigationAction
+
     data object NavigateBack : NavigationAction
 }

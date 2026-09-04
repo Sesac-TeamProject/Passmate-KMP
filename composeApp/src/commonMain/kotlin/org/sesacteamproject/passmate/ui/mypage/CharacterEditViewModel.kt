@@ -10,10 +10,10 @@ import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.UpdateMyProfileUseCase
 
-class EditProfileViewModel(
+class CharacterEditViewModel(
     private val getMyProfileUseCase: GetMyProfileUseCase,
     private val updateMyProfileUseCase: UpdateMyProfileUseCase
-) : MviViewModel<EditProfileUiState, EditProfileAction, EditProfileEvent>(EditProfileUiState()) {
+) : MviViewModel<CharacterEditUiState, CharacterEditAction, CharacterEditEvent>(CharacterEditUiState()) {
 
     private var hasEntered = false
 
@@ -22,14 +22,7 @@ class EditProfileViewModel(
         viewModelScope.launch {
             getMyProfileUseCase.invoke()
                 .onSuccess { profile ->
-                    _uiState.update {
-                        it.copy(
-                            nickname = profile.nickname,
-                            email = profile.email,
-                            avatarId = profile.avatarId,
-                            isLoading = false
-                        )
-                    }
+                    _uiState.update { it.copy(avatarId = profile.avatarId, isLoading = false) }
                 }
                 .onFailure {
                     _uiState.update { it.copy(isLoading = false, hasLoadError = true) }
@@ -54,42 +47,34 @@ class EditProfileViewModel(
         }
         _uiState.update { it.copy(isSubmitting = true) }
         viewModelScope.launch {
-            // 캐릭터는 M-12-7이 담당한다 — null이면 전송에서 생략돼(explicitNulls=false) 값이 보존된다
-            updateMyProfileUseCase.invoke(state.nickname, null)
+            // 닉네임은 M-12-1이 담당한다 — null이면 전송에서 생략돼(explicitNulls=false) 값이 보존된다
+            updateMyProfileUseCase.invoke(null, state.avatarId)
                 .onSuccess {
                     _uiState.update { it.copy(isSubmitting = false) }
-                    _event.emit(EditProfileEvent.Saved)
+                    _event.emit(CharacterEditEvent.Saved)
                 }
                 .onFailure { error ->
                     _uiState.update { it.copy(isSubmitting = false) }
-                    _event.emit(EditProfileEvent.ShowNotice(saveFailMessage(error)))
+                    _event.emit(CharacterEditEvent.ShowNotice(saveFailMessage(error)))
                 }
         }
     }
 
-    // 서버 code 기반 문구 분기 (규칙 §10) — 닉네임 최종 검증은 서버가 한다
+    // 서버 code 기반 문구 분기 (규칙 §10)
     private fun saveFailMessage(error: AppError): String {
-        return if (error is AppError.ValidationFailed) {
-            error.serverMessage ?: "닉네임을 확인해 주세요"
-        } else if (error is AppError.NetworkError) {
+        return if (error is AppError.NetworkError) {
             "네트워크 연결을 확인해 주세요"
         } else {
             "저장하지 못했어요. 다시 시도해 주세요"
         }
     }
 
-    override fun onAction(action: EditProfileAction) {
+    override fun onAction(action: CharacterEditAction) {
         when (action) {
-            is EditProfileAction.Enter -> onEnter()
-            is EditProfileAction.Retry -> loadProfile()
-            is EditProfileAction.ChangeNickname -> _uiState.update {
-                it.copy(nickname = action.text.take(NICKNAME_MAX_LENGTH))
-            }
-            is EditProfileAction.Submit -> onSubmit()
+            is CharacterEditAction.Enter -> onEnter()
+            is CharacterEditAction.Retry -> loadProfile()
+            is CharacterEditAction.SelectAvatar -> _uiState.update { it.copy(avatarId = action.avatarId) }
+            is CharacterEditAction.Submit -> onSubmit()
         }
-    }
-
-    companion object {
-        private const val NICKNAME_MAX_LENGTH = 12
     }
 }

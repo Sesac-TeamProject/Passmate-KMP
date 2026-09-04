@@ -21,11 +21,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -63,8 +61,6 @@ fun EarningsScreen(onNavigate: (NavigationAction) -> Unit) {
     val viewModel: EarningsViewModel = koinScreenViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val accountSheetState = rememberModalBottomSheetState()
-    var isAccountSheetVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.onAction(EarningsAction.Enter)
@@ -75,7 +71,7 @@ fun EarningsScreen(onNavigate: (NavigationAction) -> Unit) {
                 is EarningsEvent.RequireSignIn -> onNavigate(
                     NavigationAction.NavigateToSignIn(NavigationAction.NavigateToEarnings)
                 )
-                is EarningsEvent.OpenAccountSheet -> isAccountSheetVisible = true
+                is EarningsEvent.OpenAccountSheet -> onNavigate(NavigationAction.NavigateToSettlementAccount)
                 // 방 개설 진입점은 「내가 만든 방」 탭의 새 방 만들기 시트(M-13)다
                 is EarningsEvent.OpenHostedRooms -> onNavigate(
                     NavigationAction.NavigateToTab(AppTab.HOSTED_ROOMS)
@@ -95,24 +91,6 @@ fun EarningsScreen(onNavigate: (NavigationAction) -> Unit) {
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
-    }
-    if (isAccountSheetVisible) {
-        ModalBottomSheet(
-            onDismissRequest = { isAccountSheetVisible = false },
-            sheetState = accountSheetState,
-            containerColor = PassmateColors.Surface
-        ) {
-            SettlementAccountSheet(
-                onSaved = {
-                    isAccountSheetVisible = false
-                    viewModel.onAction(EarningsAction.AccountSaved)
-                },
-                onNotice = { message ->
-                    viewModel.onAction(EarningsAction.Notice(message))
-                },
-                onClose = { isAccountSheetVisible = false }
-            )
-        }
     }
 }
 

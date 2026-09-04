@@ -6,14 +6,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -21,76 +25,76 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.di.koinScreenViewModel
+import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.theme.PassmateColors
 
 // Figma "UI 디자인 v6" M-12-3(437:5534) — 정산 계좌 등록/변경: 은행·계좌번호·예금주.
-// 시트 표시 여부는 호스팅 화면(EarningsScreen)이 소유한다 (규칙 §11-1)
+// 시안이 전체 페이지라 라우트 push로 띄운다 (규칙 §2-1 — 상세는 모달이 아니라 push)
 @Composable
-fun SettlementAccountSheet(
-    onSaved: () -> Unit,
-    onNotice: (String) -> Unit,
-    onClose: () -> Unit
+fun SettlementAccountScreen(
+    viewModel: SettlementAccountViewModel = koinScreenViewModel(),
+    onNavigate: (NavigationAction) -> Unit
 ) {
-    val viewModel: SettlementAccountViewModel = koinScreenViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         viewModel.onAction(SettlementAccountAction.Enter)
     }
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is SettlementAccountEvent.Saved -> onSaved()
-                is SettlementAccountEvent.ShowNotice -> onNotice(event.message)
+                is SettlementAccountEvent.Saved -> onNavigate(NavigationAction.NavigateBack)
+                is SettlementAccountEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
-    SettlementAccountContentView(
-        uiState = uiState,
-        onAction = viewModel::onAction,
-        onClose = onClose
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        SettlementAccountContentScreen(
+            uiState = uiState,
+            onAction = viewModel::onAction,
+            onBack = { onNavigate(NavigationAction.NavigateBack) }
+        )
+        SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
+    }
 }
 
 @Composable
-private fun SettlementAccountContentView(
+private fun SettlementAccountContentScreen(
     uiState: SettlementAccountUiState,
     onAction: (SettlementAccountAction) -> Unit,
-    onClose: () -> Unit
+    onBack: () -> Unit
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .background(PassmateColors.Surface)
-            .padding(start = 20.dp, end = 20.dp, bottom = 28.dp),
+            // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다
+            .statusBarsPadding()
+            .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 28.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            PassmateBackButton(onClick = onBack)
             Text(
-                text = "정산 계좌",
+                text = "정산 계좌 등록",
                 color = PassmateColors.TextPrimary,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.4).sp
-            )
-            Text(
-                text = "✕",
-                color = PassmateColors.TextSecondary,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .clickable(onClick = onClose)
-                    .padding(4.dp)
             )
         }
         if (uiState.isLoading) {

@@ -17,14 +17,19 @@ import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsScreen
 import org.sesacteamproject.passmate.ui.hostroom.RoomReportScreen
 import org.sesacteamproject.passmate.ui.hostroom.SessionControlScreen
 import org.sesacteamproject.passmate.ui.join.JoinScreen
+import org.sesacteamproject.passmate.ui.mypage.CharacterEditScreen
 import org.sesacteamproject.passmate.ui.mypage.DeleteAccountScreen
+import org.sesacteamproject.passmate.ui.mypage.EditProfileScreen
+import org.sesacteamproject.passmate.ui.mypage.NotificationSettingsScreen
 import org.sesacteamproject.passmate.ui.mypage.JoinedRoomsScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.payment.CoinChargeScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
 import org.sesacteamproject.passmate.ui.payment.EarningsScreen
+import org.sesacteamproject.passmate.ui.payment.PaymentMethodScreen
 import org.sesacteamproject.passmate.ui.payment.PaymentScreen
+import org.sesacteamproject.passmate.ui.payment.SettlementAccountScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
 import org.sesacteamproject.passmate.ui.result.ResultScreen
 import org.sesacteamproject.passmate.ui.waiting.WaitingScreen
@@ -49,6 +54,11 @@ private sealed interface JvmDestination {
     data class SessionControl(val roomId: Long, val pin: String) : JvmDestination
     data object Earnings : JvmDestination
     data object DeleteAccount : JvmDestination
+    data object EditProfile : JvmDestination
+    data object CharacterEdit : JvmDestination
+    data object SettlementAccount : JvmDestination
+    data object PaymentMethod : JvmDestination
+    data object NotificationSettings : JvmDestination
 }
 
 private fun JvmDestination.toTab(): AppTab? {
@@ -57,6 +67,23 @@ private fun JvmDestination.toTab(): AppTab? {
         is JvmDestination.HostedRooms -> AppTab.HOSTED_ROOMS
         is JvmDestination.JoinedRooms -> AppTab.JOINED_ROOMS
         is JvmDestination.MyInfo -> AppTab.MY_INFO
+        else -> null
+    }
+}
+
+// 탭 루트에서 push되지만 시안이 하단 탭바를 유지하는 화면 (M-12-x 전부 · M-14 방 리포트).
+// Android의 AppTab.barOwnerOf와 같은 규칙을 Desktop 목적지 타입으로 표현한다
+private fun JvmDestination.toTabBarOwner(): AppTab? {
+    return toTab() ?: when (this) {
+        is JvmDestination.EditProfile,
+        is JvmDestination.CharacterEdit,
+        is JvmDestination.SettlementAccount,
+        is JvmDestination.CoinCharge,
+        is JvmDestination.PaymentMethod,
+        is JvmDestination.CoinHistory,
+        is JvmDestination.NotificationSettings,
+        is JvmDestination.DeleteAccount -> AppTab.MY_INFO
+        is JvmDestination.RoomReport -> AppTab.HOSTED_ROOMS
         else -> null
     }
 }
@@ -82,7 +109,7 @@ actual fun AppNavHost() {
     val routeStack = remember { mutableStateListOf<JvmDestination>(JvmDestination.Home) }
     val shellViewModel: AppShellViewModel = koinScreenViewModel()
     val currentDestination = routeStack.last()
-    val currentTab = currentDestination.toTab()
+    val currentTab = currentDestination.toTabBarOwner()
     val switchTab: (AppTab) -> Unit = { tab ->
         routeStack.clear()
         routeStack.add(tab.toDestination())
@@ -125,6 +152,12 @@ actual fun AppNavHost() {
             is NavigationAction.NavigateToCoinCharge -> routeStack.add(JvmDestination.CoinCharge)
             is NavigationAction.NavigateToEarnings -> routeStack.add(JvmDestination.Earnings)
             is NavigationAction.NavigateToDeleteAccount -> routeStack.add(JvmDestination.DeleteAccount)
+            is NavigationAction.NavigateToEditProfile -> routeStack.add(JvmDestination.EditProfile)
+            is NavigationAction.NavigateToCharacterEdit -> routeStack.add(JvmDestination.CharacterEdit)
+            is NavigationAction.NavigateToSettlementAccount -> routeStack.add(JvmDestination.SettlementAccount)
+            is NavigationAction.NavigateToPaymentMethod -> routeStack.add(JvmDestination.PaymentMethod)
+            is NavigationAction.NavigateToNotificationSettings ->
+                routeStack.add(JvmDestination.NotificationSettings)
             is NavigationAction.NavigateBack -> {
                 if (routeStack.size > 1) {
                     routeStack.removeAt(routeStack.lastIndex)
@@ -168,6 +201,11 @@ actual fun AppNavHost() {
                 is JvmDestination.CoinCharge -> CoinChargeScreen(onNavigate = onNavigate)
                 is JvmDestination.Earnings -> EarningsScreen(onNavigate = onNavigate)
                 is JvmDestination.DeleteAccount -> DeleteAccountScreen(onNavigate = onNavigate)
+                is JvmDestination.EditProfile -> EditProfileScreen(onNavigate = onNavigate)
+                is JvmDestination.CharacterEdit -> CharacterEditScreen(onNavigate = onNavigate)
+                is JvmDestination.SettlementAccount -> SettlementAccountScreen(onNavigate = onNavigate)
+                is JvmDestination.PaymentMethod -> PaymentMethodScreen(onNavigate = onNavigate)
+                is JvmDestination.NotificationSettings -> NotificationSettingsScreen(onNavigate = onNavigate)
                 is JvmDestination.Waiting -> WaitingScreen(
                     pin = currentDestination.pin,
                     onNavigate = onNavigate
@@ -195,7 +233,7 @@ actual fun AppNavHost() {
                 )
             }
         }
-        // 탭 루트 4개에서만 하단 바 표시 (스펙 §1-2)
+        // 탭 루트 + 시안이 탭바를 유지하는 상세 화면에서 표시 (규칙 §2-1)
         if (currentTab != null) {
             PassmateBottomTabBar(
                 selectedTab = currentTab,
