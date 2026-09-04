@@ -87,9 +87,7 @@ private struct ResultContentView: View {
     var body: some View {
         Group {
             if uiState.isLoading {
-                ProgressView()
-                    .tint(PassmateColors.primary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                skeletonView
             } else if uiState.loadFailed || uiState.result == nil {
                 errorView
             } else if let result = uiState.result {
@@ -98,6 +96,62 @@ private struct ResultContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(PassmateColors.surface.ignoresSafeArea())
+    }
+
+    // 시안 "M-06 리포트 — 스켈레톤" — 로드된 화면과 같은 자리에 블록을 놓는다.
+    // 스피너 대신 쓰는 이유는 집계가 오래 걸려 빈 화면이 길게 남기 때문이다 (시안 07 로딩 규격).
+    private var skeletonView: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            PassmateSkeletonCard(cornerRadius: 24) {
+                HStack(spacing: 16) {
+                    PassmateSkeletonBlock(cornerRadius: 40)
+                        .frame(width: 80, height: 80)
+                    VStack(alignment: .leading, spacing: 10) {
+                        PassmateSkeletonBlock()
+                            .frame(width: 150, height: 20)
+                        PassmateSkeletonBlock(color: PassmateColors.skeletonBlockSoft)
+                            .frame(width: 110, height: 14)
+                    }
+                    Spacer()
+                }
+                .padding(20)
+            }
+            HStack(spacing: 8) {
+                skeletonChip(width: 84)
+                skeletonChip(width: 68)
+                skeletonChip(width: 92)
+            }
+            VStack(spacing: 8) {
+                skeletonQuestionRow(titleWidth: 180)
+                skeletonQuestionRow(titleWidth: 140)
+                // 마지막 줄은 짧게 (시안 스켈레톤 규격)
+                skeletonQuestionRow(titleWidth: 96)
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 60)
+        .padding(.bottom, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func skeletonChip(width: CGFloat) -> some View {
+        PassmateSkeletonBlock(cornerRadius: 15, color: PassmateColors.skeletonBlockSoft)
+            .frame(width: width, height: 30)
+    }
+
+    private func skeletonQuestionRow(titleWidth: CGFloat) -> some View {
+        PassmateSkeletonCard(cornerRadius: 16) {
+            HStack(spacing: 10) {
+                PassmateSkeletonBlock(cornerRadius: 8)
+                    .frame(width: 30, height: 24)
+                PassmateSkeletonBlock(color: PassmateColors.skeletonBlockSoft)
+                    .frame(width: titleWidth, height: 14)
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+        }
     }
 
     // 시안 M-05e 최종 결과 불러오기 실패 — 상단 경고 바·헤더·알림 아이콘·안내 문구·재시도/홈으로 버튼

@@ -62,9 +62,7 @@ private struct JoinedRoomsContentView: View {
     var body: some View {
         Group {
             if uiState.isLoading {
-                ProgressView()
-                    .tint(PassmateColors.primary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                skeletonView
             } else if uiState.loadFailed {
                 loadFailureView
             } else {
@@ -73,6 +71,65 @@ private struct JoinedRoomsContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(PassmateColors.surface.ignoresSafeArea())
+    }
+
+    // 시안 "M-08 참여한 방 — 스켈레톤" — 로드된 화면과 같은 자리에 블록을 놓는다.
+    // 탭 루트라 첫 진입 체감 속도를 가장 크게 좌우한다 (시안 07 로딩 규격).
+    private var skeletonView: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            PassmateSkeletonBlock(cornerRadius: 8)
+                .frame(width: 120, height: 22)
+            PassmateSkeletonCard(cornerRadius: 24) {
+                VStack(alignment: .leading, spacing: 12) {
+                    PassmateSkeletonBlock()
+                        .frame(width: 170, height: 18)
+                    PassmateSkeletonBlock(color: PassmateColors.skeletonBlockSoft)
+                        .frame(width: 240, height: 14)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(20)
+            }
+            HStack(spacing: 8) {
+                skeletonTopicChip()
+                skeletonTopicChip()
+                skeletonTopicChip()
+            }
+            VStack(spacing: 12) {
+                skeletonRoomRow(titleWidth: 190)
+                skeletonRoomRow(titleWidth: 150)
+                skeletonRoomRow(titleWidth: 170)
+                // 마지막 줄은 짧게 (시안 스켈레톤 규격)
+                skeletonRoomRow(titleWidth: 110)
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 60)
+        .padding(.bottom, 24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func skeletonTopicChip() -> some View {
+        PassmateSkeletonBlock(cornerRadius: 15, color: PassmateColors.skeletonBlockSoft)
+            .frame(width: 84, height: 30)
+    }
+
+    private func skeletonRoomRow(titleWidth: CGFloat) -> some View {
+        PassmateSkeletonCard(cornerRadius: 16) {
+            HStack(spacing: 12) {
+                PassmateSkeletonBlock(cornerRadius: 19)
+                    .frame(width: 38, height: 38)
+                VStack(alignment: .leading, spacing: 6) {
+                    PassmateSkeletonBlock()
+                        .frame(width: titleWidth, height: 14)
+                    PassmateSkeletonBlock(color: PassmateColors.skeletonBlockSoft)
+                        .frame(width: 96, height: 12)
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+        }
     }
 
     // 목록 불러오기 실패 — v6 "E-List 목록 불러오기 실패 — 공통 패턴"(코인 내역·정산·마이와 동일 레이아웃, 공통화 대상)

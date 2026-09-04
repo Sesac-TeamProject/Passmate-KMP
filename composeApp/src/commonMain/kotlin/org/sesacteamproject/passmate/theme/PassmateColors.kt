@@ -32,6 +32,16 @@ object PassmateColors {
 
     val Border = Color(0xFFE5E7EB)
 
+    // 로딩 스켈레톤 블록 (시안 "07 · 로딩 · 스켈레톤" 규격) — 민트 계열을 절대 쓰지 않는다.
+    // 로딩은 상태가 아니라 대기라서 브랜드색으로 강조하지 않는다.
+    val SkeletonBlock = Color(0xFFE7E9EC)
+
+    // 스켈레톤 보조 블록 — 캡션·부가 정보 자리
+    val SkeletonBlockSoft = Color(0xFFF1F3F5)
+
+    // 스켈레톤 카드 바탕 (테두리 없는 히어로 자리)
+    val SkeletonSurface = Color(0xFFF6F6F7)
+
     // 진행 타이머·프로그레스 (v6 M-03 타이머 링·문항 세그먼트)
     val TimerAmber = Color(0xFFF3B440)
 

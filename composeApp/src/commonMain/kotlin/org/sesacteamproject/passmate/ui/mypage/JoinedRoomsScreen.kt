@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateEmptyState
 import org.sesacteamproject.passmate.component.PassmateIcon
@@ -44,6 +45,8 @@ import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.preview.PassmatePreview
+import org.sesacteamproject.passmate.component.PassmateSkeletonBlock
+import org.sesacteamproject.passmate.component.PassmateSkeletonCard
 import org.sesacteamproject.passmate.theme.PassmateColors
 import org.sesacteamproject.passmate.theme.PassmateTheme
 import org.sesacteamproject.passmate.user.domain.model.JoinedRoom
@@ -101,7 +104,7 @@ private fun JoinedRoomsContentScreen(
             .statusBarsPadding()
     ) {
         when {
-            uiState.isLoading -> LoadingBox()
+            uiState.isLoading -> JoinedRoomsSkeleton()
             uiState.loadFailed -> LoadFailureBox(
                 onRetry = { onAction(JoinedRoomsAction.Retry) },
                 onClickContactSupport = { onAction(JoinedRoomsAction.ClickContactSupport) }
@@ -463,13 +466,70 @@ private fun EmptyRooms(onClickEnterPin: () -> Unit) {
     )
 }
 
+// 시안 "M-08 참여한 방 — 스켈레톤" — 로드된 화면(LoadedJoinedRooms)과 같은 자리에 블록을 놓는다.
+// 탭 루트라 첫 진입 체감 속도를 가장 크게 좌우한다 (시안 07 로딩 규격).
 @Composable
-private fun LoadingBox() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+private fun JoinedRoomsSkeleton() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        CircularProgressIndicator(color = PassmateColors.Primary)
+        PassmateSkeletonBlock(modifier = Modifier.size(width = 120.dp, height = 22.dp), cornerRadius = 8.dp)
+        PassmateSkeletonCard(cornerRadius = 24.dp) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                PassmateSkeletonBlock(modifier = Modifier.size(width = 170.dp, height = 18.dp))
+                PassmateSkeletonBlock(
+                    modifier = Modifier.size(width = 240.dp, height = 14.dp),
+                    color = PassmateColors.SkeletonBlockSoft
+                )
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SkeletonTopicChip(width = 84.dp)
+            SkeletonTopicChip(width = 84.dp)
+            SkeletonTopicChip(width = 84.dp)
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SkeletonRoomRow(titleWidth = 190.dp)
+            SkeletonRoomRow(titleWidth = 150.dp)
+            SkeletonRoomRow(titleWidth = 170.dp)
+            // 마지막 줄은 짧게 (시안 스켈레톤 규격)
+            SkeletonRoomRow(titleWidth = 110.dp)
+        }
+    }
+}
+
+@Composable
+private fun SkeletonTopicChip(width: Dp) {
+    PassmateSkeletonBlock(
+        modifier = Modifier.size(width = width, height = 30.dp),
+        cornerRadius = 15.dp,
+        color = PassmateColors.SkeletonBlockSoft
+    )
+}
+
+@Composable
+private fun SkeletonRoomRow(titleWidth: Dp) {
+    PassmateSkeletonCard(cornerRadius = 16.dp) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            PassmateSkeletonBlock(modifier = Modifier.size(38.dp), cornerRadius = 19.dp)
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                PassmateSkeletonBlock(modifier = Modifier.size(width = titleWidth, height = 14.dp))
+                PassmateSkeletonBlock(
+                    modifier = Modifier.size(width = 96.dp, height = 12.dp),
+                    color = PassmateColors.SkeletonBlockSoft
+                )
+            }
+        }
     }
 }
 
@@ -663,5 +723,14 @@ private fun JoinedRoomsContentScreenFailedPreview() {
             uiState = JoinedRoomsUiState(isLoading = false, loadFailed = true),
             onAction = {}
         )
+    }
+}
+
+// M-08 참여한 방 — 스켈레톤
+@PassmatePreview
+@Composable
+private fun JoinedRoomsSkeletonPreview() {
+    PassmateTheme {
+        JoinedRoomsSkeleton()
     }
 }
