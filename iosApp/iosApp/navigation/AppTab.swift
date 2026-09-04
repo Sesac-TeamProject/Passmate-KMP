@@ -16,12 +16,13 @@ enum AppTab: Hashable, CaseIterable {
         }
     }
 
-    var systemImage: String {
+    // 시안 v6 nav/4탭의 icon/* 과 1:1 — Compose PassmateBottomTabBar.iconFor와 같은 키 (규칙 §11-3·§14)
+    var icon: PassmateIcons {
         switch self {
-        case .home: return "house"
-        case .hostedRooms: return "plus.square"
-        case .joinedRooms: return "rectangle.stack"
-        case .myInfo: return "person"
+        case .home: return .home
+        case .hostedRooms: return .plusSquare
+        case .joinedRooms: return .doorOpen
+        case .myInfo: return .user
         }
     }
 

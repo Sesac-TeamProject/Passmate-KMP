@@ -20,6 +20,9 @@ struct PaymentUiState {
 
     var isProcessing: Bool = false
 
+    // 코인이 모자랄 때 뜨는 M-11 시트. 표시 여부 판단은 VM, 시트 생명주기는 화면이 갖는다 (규칙 §11-1)
+    var isCoinShortageSheetVisible: Bool = false
+
     var checkout: PortOneRequest? = nil
 
     var errorMessage: String? = nil

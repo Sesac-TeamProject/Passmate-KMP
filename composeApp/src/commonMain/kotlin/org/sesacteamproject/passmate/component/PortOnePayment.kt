@@ -24,6 +24,9 @@ sealed interface PortOneResult {
     data object Cancelled : PortOneResult
 }
 
+// PortOne SDK 로드를 기다리는 최대 시간. 초과하면 무한 대기 대신 실패로 끝낸다.
+private const val SDK_LOAD_TIMEOUT_MS = 10_000
+
 // 플랫폼별 웹뷰(Android WebView / Desktop 미지원 안내). onResult는 정확히 1회 호출된다.
 @Composable
 expect fun PortOnePaymentView(
@@ -63,9 +66,16 @@ fun buildPortOneHtml(request: PortOneRequest): String {
       }
       async function start() {
         try {
-          const waitSdk = new Promise((resolve) => {
+          const waitSdk = new Promise((resolve, reject) => {
+            const startedAt = Date.now();
             const t = setInterval(() => {
-              if (window.PortOne != null) { clearInterval(t); resolve(); }
+              if (window.PortOne != null) {
+                clearInterval(t);
+                resolve();
+              } else if (Date.now() - startedAt >= $SDK_LOAD_TIMEOUT_MS) {
+                clearInterval(t);
+                reject(new Error("결제 모듈을 불러오지 못했어요. 잠시 후 다시 시도해 주세요"));
+              }
             }, 50);
           });
           await waitSdk;
@@ -94,9 +104,26 @@ fun buildPortOneHtml(request: PortOneRequest): String {
     """.trimIndent()
 }
 
+// 인라인 <script> 안의 JS 문자열 리터럴에 값을 끼워 넣는다.
+// 따옴표뿐 아니라 꺾쇠도 막아야 한다 — 방 제목에 "</script>"가 들어오면 스크립트가 거기서 끊긴다.
 private fun String.jsEscape(): String {
-    return this
-        .replace("\\", "\\\\")
-        .replace("\"", "\\\"")
-        .replace("\n", " ")
+    val escaped = StringBuilder(length)
+
+    for (char in this) {
+        when (char) {
+            '\\' -> escaped.append("\\\\")
+            '"' -> escaped.append("\\\"")
+            '\'' -> escaped.append("\\'")
+            '\n' -> escaped.append("\\n")
+            '\r' -> escaped.append("\\r")
+            '<' -> escaped.append("\\u003C")
+            '>' -> escaped.append("\\u003E")
+            '&' -> escaped.append("\\u0026")
+            '\u2028' -> escaped.append("\\u2028")
+            '\u2029' -> escaped.append("\\u2029")
+            else -> escaped.append(char)
+        }
+    }
+
+    return escaped.toString()
 }

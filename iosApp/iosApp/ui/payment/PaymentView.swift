@@ -4,8 +4,16 @@ import Shared
 // 캐릭터 선택 한 줄에 놓는 수 (M-01 입장 폼과 동일)
 private let avatarsPerRow = 6
 
+// 천단위 구분 표기 (시안 "5,000 C") — Compose PaymentScreen.kt의 formatNumber 미러
+private func formatNumber(_ value: Int) -> String {
+    let digits = Array(String(value).reversed())
+    let chunks = stride(from: 0, to: digits.count, by: 3).map { String(digits[$0..<min($0 + 3, digits.count)]) }
+
+    return String(chunks.joined(separator: ",").reversed())
+}
+
 // 유료 방 입장 결제 (M-01 v2 / W-11) — Compose PaymentScreen.kt 미러.
-// 포트원 결제창(웹뷰) 오버레이는 이 컨테이너가 소유한다 (규칙 §11-1).
+// 포트원 결제창(웹뷰)과 코인 부족 시트(M-11) 오버레이는 이 컨테이너가 소유한다 (규칙 §11-1).
 struct PaymentView: View {
     let pin: String
 
@@ -59,6 +67,22 @@ struct PaymentView: View {
                         .padding(.bottom, 24)
                 }
             }
+        }
+        .sheet(isPresented: Binding(
+            get: { viewModel.uiState.isCoinShortageSheetVisible },
+            set: { isVisible in
+                if !isVisible {
+                    viewModel.action(.dismissCoinShortage)
+                }
+            }
+        )) {
+            CoinShortageSheetView(
+                entryFee: viewModel.uiState.entryFee,
+                balance: viewModel.uiState.balance,
+                shortfall: viewModel.uiState.shortfall,
+                onClickCharge: { viewModel.action(.confirmCharge) }
+            )
+            .passmateDetents([.medium])
         }
         .onAppear { viewModel.action(.start(pin: pin)) }
         .onReceive(viewModel.event) { event in
@@ -191,13 +215,13 @@ private struct PaymentContentView: View {
                     .kerning(-0.28)
                     .foregroundColor(PassmateColors.textPrimary)
                 Spacer()
-                Text("\(uiState.entryFee) C")
+                Text("\(formatNumber(uiState.entryFee)) C")
                     .font(.system(size: 20, weight: .bold))
                     .kerning(-0.4)
                     .foregroundColor(PassmateColors.primaryDeep)
             }
-            // 정산 비율은 기획서 §13.3 고정값(8:2)이다. 금액 분해는 서버 권위라 비율만 안내한다 (규칙 §13)
-            Text("선생님 정산 80% · 플랫폼 수수료 20% · 세션 시작 전 취소 시 전액 환불")
+            // 정산 비율은 SettlementPolicy가 단일 출처다. 금액 분해는 서버 권위라 비율만 안내한다 (규칙 §13)
+            Text("선생님 정산 \(SettlementPolicy.shared.hostSharePercent)% · 플랫폼 수수료 \(SettlementPolicy.shared.platformFeePercent)% · 세션 시작 전 취소 시 전액 환불")
                 .font(.system(size: 12))
                 .kerning(-0.24)
                 .foregroundColor(PassmateColors.textSecondary)
@@ -259,7 +283,7 @@ private struct PaymentContentView: View {
 
     private var methodField: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("보유 코인 \(uiState.balance) C · 부족 \(uiState.shortfall) C")
+            Text("보유 코인 \(formatNumber(uiState.balance)) C · 부족 \(formatNumber(uiState.shortfall)) C")
                 .font(.system(size: 14, weight: .medium))
                 .kerning(-0.28)
                 .foregroundColor(PassmateColors.textSecondary)
@@ -307,8 +331,8 @@ private struct PaymentContentView: View {
 
     private var payButton: some View {
         let label = uiState.hasEnough
-            ? "\(uiState.entryFee) C 결제하고 입장"
-            : "\(uiState.shortfall) C 충전하고 입장"
+            ? "\(formatNumber(uiState.entryFee)) C 결제하고 입장"
+            : "\(formatNumber(uiState.shortfall)) C 충전하고 입장"
 
         return Button(action: { onAction(.clickPay) }) {
             ZStack {
@@ -457,6 +481,61 @@ private struct RoomPreviewView: View {
     }
 }
 
+// Figma "UI 디자인 v6" 코인 부족 시트(M-11) — Compose CoinShortageSheetContent 미러.
+// 얼마가 모자란지와 충전 경로를 함께 보여 준다. 띄울지 말지는 VM이 정하고 여기서는 그리기만 한다 (규칙 §11-1)
+private struct CoinShortageSheetView: View {
+    let entryFee: Int
+
+    let balance: Int
+
+    let shortfall: Int
+
+    let onClickCharge: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                PassmateIconView(icon: .coin, tint: PassmateColors.primaryDeep, size: 26)
+                Text("코인이 모자라요")
+                    .font(.system(size: 20, weight: .bold))
+                    .kerning(-0.2)
+                    .foregroundColor(PassmateColors.textPrimary)
+            }
+            Text("참가비 \(formatNumber(entryFee)) C · 보유 \(formatNumber(balance)) C")
+                .font(.system(size: 15))
+                .kerning(-0.15)
+                .foregroundColor(PassmateColors.textSecondary)
+            HStack {
+                Text("\(formatNumber(shortfall)) C 더 필요해요")
+                    .font(.system(size: 16, weight: .bold))
+                    .kerning(-0.16)
+                    .foregroundColor(PassmateColors.errorIconTint)
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .frame(height: 56)
+            .background(PassmateColors.errorIconBg)
+            .cornerRadius(14)
+            Button(action: onClickCharge) {
+                Text("코인 충전하기")
+                    .font(.system(size: 16, weight: .bold))
+                    .kerning(-0.16)
+                    .foregroundColor(PassmateColors.surface)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(PassmateColors.primary)
+                    .cornerRadius(14)
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 24)
+        .padding(.bottom, 28)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(PassmateColors.surface.ignoresSafeArea())
+    }
+}
+
 // MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
 
 private let previewPaidRoom = RoomInfo(
@@ -519,5 +598,14 @@ private let previewPaidRoom = RoomInfo(
         isMethodExpanded: false,
         onToggleMethodExpanded: {},
         onBack: {}
+    )
+}
+
+#Preview("코인 부족 시트 (M-11)") {
+    CoinShortageSheetView(
+        entryFee: 5000,
+        balance: 1200,
+        shortfall: 3800,
+        onClickCharge: {}
     )
 }

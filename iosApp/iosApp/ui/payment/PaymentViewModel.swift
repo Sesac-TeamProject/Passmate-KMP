@@ -94,6 +94,17 @@ final class PaymentViewModel: ObservableObject {
             uiState.errorMessage = nil
             payEntryAndEnter(room: room)
         } else {
+            // 얼마가 모자란지 먼저 보여 준다 — 바로 결제창을 열면 무슨 금액인지 알 수 없다 (M-11)
+            uiState.errorMessage = nil
+            uiState.isCoinShortageSheetVisible = true
+        }
+    }
+
+    private func onConfirmCharge() {
+        if uiState.isProcessing {
+            return
+        } else {
+            uiState.isCoinShortageSheetVisible = false
             uiState.isProcessing = true
             uiState.errorMessage = nil
             startCharge()
@@ -250,6 +261,10 @@ final class PaymentViewModel: ObservableObject {
             uiState.selectedMethod = method
         case .clickPay:
             onClickPay()
+        case .confirmCharge:
+            onConfirmCharge()
+        case .dismissCoinShortage:
+            uiState.isCoinShortageSheetVisible = false
         case let .receivePortOneResult(result):
             onReceivePortOneResult(result: result)
         case .dismissError:

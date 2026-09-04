@@ -16,11 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
@@ -38,8 +38,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateCard
+import org.sesacteamproject.passmate.component.PassmateSkeletonBlock
+import org.sesacteamproject.passmate.component.PassmateSkeletonCard
 import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.component.PassyMascot
@@ -120,9 +123,11 @@ private fun ResultContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.Surface)
+            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            .statusBarsPadding()
     ) {
         when {
-            uiState.isLoading -> LoadingBox()
+            uiState.isLoading -> ResultSkeleton()
             uiState.loadFailed || uiState.result == null -> ErrorContent(
                 onRetry = { onAction(ResultAction.Retry) },
                 onGoHome = onClickHome,
@@ -139,13 +144,75 @@ private fun ResultContentScreen(
     }
 }
 
+// 시안 "M-06 리포트 — 스켈레톤" — 로드된 화면(LoadedResult)과 같은 자리에 블록을 놓는다.
+// 스피너 대신 쓰는 이유는 집계가 오래 걸려 빈 화면이 길게 남기 때문이다 (시안 07 로딩 규격).
 @Composable
-private fun LoadingBox() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+private fun ResultSkeleton() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        CircularProgressIndicator(color = PassmateColors.Primary)
+        PassmateSkeletonCard(cornerRadius = 24.dp) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PassmateSkeletonBlock(
+                    modifier = Modifier.size(80.dp),
+                    cornerRadius = 40.dp
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    PassmateSkeletonBlock(modifier = Modifier.size(width = 150.dp, height = 20.dp))
+                    PassmateSkeletonBlock(
+                        modifier = Modifier.size(width = 110.dp, height = 14.dp),
+                        color = PassmateColors.SkeletonBlockSoft
+                    )
+                }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SkeletonChip(width = 84.dp)
+            SkeletonChip(width = 68.dp)
+            SkeletonChip(width = 92.dp)
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            SkeletonQuestionRow(titleWidth = 180.dp)
+            SkeletonQuestionRow(titleWidth = 140.dp)
+            // 마지막 줄은 짧게 (시안 스켈레톤 규격)
+            SkeletonQuestionRow(titleWidth = 96.dp)
+        }
+    }
+}
+
+@Composable
+private fun SkeletonChip(width: Dp) {
+    PassmateSkeletonBlock(
+        modifier = Modifier.size(width = width, height = 30.dp),
+        cornerRadius = 15.dp,
+        color = PassmateColors.SkeletonBlockSoft
+    )
+}
+
+@Composable
+private fun SkeletonQuestionRow(titleWidth: Dp) {
+    PassmateSkeletonCard(cornerRadius = 16.dp) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            PassmateSkeletonBlock(
+                modifier = Modifier.size(width = 30.dp, height = 24.dp),
+                cornerRadius = 8.dp
+            )
+            PassmateSkeletonBlock(
+                modifier = Modifier.size(width = titleWidth, height = 14.dp),
+                color = PassmateColors.SkeletonBlockSoft
+            )
+        }
     }
 }
 
@@ -684,5 +751,14 @@ private fun ResultContentScreenFailedPreview() {
             onAction = {},
             onClickHome = {}
         )
+    }
+}
+
+// M-06 리포트 — 스켈레톤
+@PassmatePreview
+@Composable
+private fun ResultSkeletonPreview() {
+    PassmateTheme {
+        ResultSkeleton()
     }
 }

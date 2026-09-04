@@ -20,10 +20,11 @@ enum class BadgeType(val wireValue: String, val label: String) {
 }
 
 // 뱃지 1건 — 미획득이면 진행도(progressCurrent/Target)로 "12/30" 표시 (GET /users/me/badges)
+// progressTarget이 Double인 이유: RATING_45("평가 4.5+")처럼 소수 목표가 있다. 정수로 좁히면 4.5가 4가 된다
 data class Badge(
     val type: BadgeType,
     val earned: Boolean,
     val earnedAt: String?,
     val progressCurrent: Int?,
-    val progressTarget: Int?
+    val progressTarget: Double?
 )

@@ -29,6 +29,16 @@ enum PassmateColors {
 
     static let border = Color(hex: 0xE5E7EB)
 
+    // 로딩 스켈레톤 블록 (시안 "07 · 로딩 · 스켈레톤" 규격) — 민트 계열을 절대 쓰지 않는다.
+    // 로딩은 상태가 아니라 대기라서 브랜드색으로 강조하지 않는다.
+    static let skeletonBlock = Color(hex: 0xE7E9EC)
+
+    // 스켈레톤 보조 블록 — 캡션·부가 정보 자리
+    static let skeletonBlockSoft = Color(hex: 0xF1F3F5)
+
+    // 스켈레톤 카드 바탕 (테두리 없는 히어로 자리)
+    static let skeletonSurface = Color(hex: 0xF6F6F7)
+
     // 진행 타이머·프로그레스 (v6 M-03 타이머 링·문항 세그먼트)
     static let timerAmber = Color(hex: 0xF3B440)
 

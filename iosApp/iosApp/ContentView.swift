@@ -18,6 +18,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
+            ZStack(alignment: .bottom) {
             TabView(selection: tabSelection) {
                 // 홈 탭 = 입장 폼 인라인 (M-01 v6) — JoinView 재사용
                 JoinView(
@@ -29,7 +30,7 @@ struct ContentView: View {
                         pushSignIn(pendingRoute: .payment(pin: pin), path: $path)
                     }
                 )
-                .tabItem { Label(AppTab.home.label, systemImage: AppTab.home.systemImage) }
+                .tabItem { Text(AppTab.home.label) }
                 .tag(AppTab.home)
 
                 HostedRoomsView(
@@ -38,7 +39,7 @@ struct ContentView: View {
                     onOpenRoomReport: { roomId in path.append(.roomReport(roomId: roomId)) },
                     onOpenSessionControl: { roomId, pin in path.append(.sessionControl(roomId: roomId, pin: pin)) }
                 )
-                .tabItem { Label(AppTab.hostedRooms.label, systemImage: AppTab.hostedRooms.systemImage) }
+                .tabItem { Text(AppTab.hostedRooms.label) }
                 .tag(AppTab.hostedRooms)
 
                 JoinedRoomsView(
@@ -48,7 +49,7 @@ struct ContentView: View {
                     // 빈 상태 CTA — 홈 탭이 곧 PIN 입장 폼. 탭 전환은 셸 가드를 거친다 (규칙 §2-1-1)
                     onOpenPinEntry: { shellViewModel.action(.selectTab(.home)) }
                 )
-                .tabItem { Label(AppTab.joinedRooms.label, systemImage: AppTab.joinedRooms.systemImage) }
+                .tabItem { Text(AppTab.joinedRooms.label) }
                 .tag(AppTab.joinedRooms)
 
                 MyInfoView(
@@ -64,9 +65,10 @@ struct ContentView: View {
                         sessionGeneration += 1
                     }
                 )
-                .tabItem { Label(AppTab.myInfo.label, systemImage: AppTab.myInfo.systemImage) }
+                .tabItem { Text(AppTab.myInfo.label) }
                 .tag(AppTab.myInfo)
             }
+            .passmateHidesNativeTabBar()
             .navigationBarHidden(true)
             .background(
                 NavigationLink(isActive: isStackActive) {
@@ -78,6 +80,12 @@ struct ContentView: View {
                 }
                 .isDetailLink(false)
             )
+            // 시안 v6 nav/4탭 — 기본 탭 바 대신 Compose와 같은 커스텀 바를 그린다 (규칙 §14)
+            PassmateBottomTabBar(
+                selectedTab: selectedTab,
+                onSelectTab: { shellViewModel.action(.selectTab($0)) }
+            )
+            }
         }
         .navigationViewStyle(.stack)
         .id(sessionGeneration)

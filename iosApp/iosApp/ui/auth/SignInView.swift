@@ -11,7 +11,9 @@ struct SignInView: View {
     @StateObject private var viewModel = SignInViewModel(
         buildGoogleSignInUrlUseCase: KoinHelper.shared.buildGoogleSignInUrlUseCase(),
         completeSignInUseCase: KoinHelper.shared.completeSignInUseCase(),
-        completeGuestClaimUseCase: KoinHelper.shared.completeGuestClaimUseCase()
+        completeGuestClaimUseCase: KoinHelper.shared.completeGuestClaimUseCase(),
+        devSignInUseCase: KoinHelper.shared.devSignInUseCase(),
+        isDevSignInAvailableUseCase: KoinHelper.shared.isDevSignInAvailableUseCase()
     )
 
     @State private var authSession: ASWebAuthenticationSession?
@@ -94,12 +96,11 @@ private struct SignInContentView: View {
             PassyMascotView()
                 .frame(width: 120, height: 132)
             HStack(spacing: 8) {
-                Text("P")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(PassmateColors.surface)
+                // 시안 확정 로고 락업(가로형 국문) — 마크는 정사각 32pt
+                Image("BrandMark")
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 32, height: 32)
-                    .background(PassmateColors.primary)
-                    .cornerRadius(10)
                 Text("패스메이트")
                     .font(.system(size: 28, weight: .bold))
                     .kerning(-0.56)
@@ -122,6 +123,9 @@ private struct SignInContentView: View {
             appleButton
             orDivider
             guestButton
+            if uiState.isDevSignInAvailable {
+                devSignInButton
+            }
             Text("계속하면 이용약관과 개인정보 처리방침에 동의한 것으로 봅니다\n선생님·학생 공용 계정 · 게스트 기록은 세션 후 사라져요")
                 .font(.system(size: 12))
                 .kerning(-0.24)
@@ -208,6 +212,27 @@ private struct SignInContentView: View {
                 .fill(PassmateColors.border)
                 .frame(height: 1)
         }
+    }
+
+    // 로컬 개발 서버에서만 그려진다 — 운영 URL에서는 uiState.isDevSignInAvailable이 false다
+    private var devSignInButton: some View {
+        Button {
+            onAction(.clickDevSignIn)
+        } label: {
+            Text("개발용 로그인 (로컬 서버)")
+                .font(.system(size: 14, weight: .medium))
+                .kerning(-0.28)
+                .foregroundColor(PassmateColors.textTertiary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(PassmateColors.surface)
+                .cornerRadius(14)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(PassmateColors.border, lineWidth: 1)
+                )
+        }
+        .disabled(uiState.isSigningIn)
     }
 
     private var guestButton: some View {

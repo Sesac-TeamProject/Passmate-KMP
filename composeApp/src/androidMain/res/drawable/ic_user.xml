@@ -1,0 +1,23 @@
+<!-- user — lucide v0.300.0 user (ISC License, https://github.com/lucide-icons/lucide/blob/0.300.0/icons/user.svg)
+     시안 v6 nav/4탭의 icon/ 동일 지오메트리. 색은 중립 검정 스트로크뿐이다 — 표시 색은 호출부에서 (규칙 §11-2).
+     Desktop 사본: composeApp/src/jvmMain/resources/drawable/ic_user.xml (텍스트 동일, PassmateIconResourceTest가 강제) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M16,8c0,2.20914 -1.79086,4 -4,4c-2.20914,0 -4,-1.79086 -4,-4c0,-2.20914 1.79086,-4 4,-4c2.20914,0 4,1.79086 4,4z"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M4,21c0,-2.12173 0.84285,-4.15656 2.34315,-5.65685c1.50029,-1.50029 3.53512,-2.34315 5.65685,-2.34315c2.12173,0 4.15656,0.84285 5.65685,2.34315c1.50029,1.50029 2.34314,3.53512 2.34315,5.65685"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

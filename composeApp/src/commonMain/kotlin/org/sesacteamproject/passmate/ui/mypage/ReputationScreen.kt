@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -88,6 +89,8 @@ private fun ReputationContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.Surface)
+            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            .statusBarsPadding()
     ) {
         ReputationHeader(onClickBack = onClickBack)
         when {
@@ -587,13 +590,13 @@ private fun ReputationContentScreenPreview() {
                 ),
                 badges = listOf(
                     Badge(type = BadgeType.FIRST_ROOM, earned = true, earnedAt = "2026.06.02", progressCurrent = null, progressTarget = null),
-                    Badge(type = BadgeType.ROOMS_10, earned = false, earnedAt = null, progressCurrent = 8, progressTarget = 10),
-                    Badge(type = BadgeType.STUDENTS_100, earned = false, earnedAt = null, progressCurrent = 96, progressTarget = 100),
+                    Badge(type = BadgeType.ROOMS_10, earned = false, earnedAt = null, progressCurrent = 8, progressTarget = 10.0),
+                    Badge(type = BadgeType.STUDENTS_100, earned = false, earnedAt = null, progressCurrent = 96, progressTarget = 100.0),
                     Badge(type = BadgeType.RATING_45, earned = true, earnedAt = "2026.08.25", progressCurrent = null, progressTarget = null),
-                    Badge(type = BadgeType.RATINGS_50, earned = false, earnedAt = null, progressCurrent = 32, progressTarget = 50),
+                    Badge(type = BadgeType.RATINGS_50, earned = false, earnedAt = null, progressCurrent = 32, progressTarget = 50.0),
                     Badge(type = BadgeType.STREAK_30, earned = true, earnedAt = "2026.08.30", progressCurrent = null, progressTarget = null),
-                    Badge(type = BadgeType.FIRST_PAID_ROOM, earned = false, earnedAt = null, progressCurrent = 0, progressTarget = 1),
-                    Badge(type = BadgeType.AI_SETS_50, earned = false, earnedAt = null, progressCurrent = 8, progressTarget = 50)
+                    Badge(type = BadgeType.FIRST_PAID_ROOM, earned = false, earnedAt = null, progressCurrent = 0, progressTarget = 1.0),
+                    Badge(type = BadgeType.AI_SETS_50, earned = false, earnedAt = null, progressCurrent = 8, progressTarget = 50.0)
                 )
             ),
             onAction = {},

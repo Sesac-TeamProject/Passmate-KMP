@@ -28,7 +28,7 @@ import org.sesacteamproject.passmate.ui.waiting.WaitingViewModel
 
 val viewModelModule = module {
     factory { AppShellViewModel(get()) }
-    factory { SignInViewModel(get(), get(), get()) }
+    factory { SignInViewModel(get(), get(), get(), get(), get()) }
     factory { RoomListViewModel(get(), get()) }
     factory { JoinViewModel(get(), get(), get(), get()) }
     factory { PaymentViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }

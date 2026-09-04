@@ -3,6 +3,8 @@ package org.sesacteamproject.passmate.core.di
 import org.koin.mp.KoinPlatform
 import org.sesacteamproject.passmate.auth.domain.usecase.BuildGoogleSignInUrlUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.CompleteSignInUseCase
+import org.sesacteamproject.passmate.auth.domain.usecase.DevSignInUseCase
+import org.sesacteamproject.passmate.auth.domain.usecase.IsDevSignInAvailableUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.SignOutUseCase
 import org.sesacteamproject.passmate.core.network.SessionEventStreamWatcher
@@ -68,6 +70,10 @@ object KoinHelper {
     fun buildGoogleSignInUrlUseCase(): BuildGoogleSignInUrlUseCase = KoinPlatform.getKoin().get()
 
     fun completeSignInUseCase(): CompleteSignInUseCase = KoinPlatform.getKoin().get()
+
+    fun devSignInUseCase(): DevSignInUseCase = KoinPlatform.getKoin().get()
+
+    fun isDevSignInAvailableUseCase(): IsDevSignInAvailableUseCase = KoinPlatform.getKoin().get()
 
     fun isSignedInUseCase(): IsSignedInUseCase = KoinPlatform.getKoin().get()
 

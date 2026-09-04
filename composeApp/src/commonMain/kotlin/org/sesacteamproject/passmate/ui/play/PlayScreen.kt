@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -158,6 +159,8 @@ private fun PlayContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.Surface)
+            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            .statusBarsPadding()
     ) {
         if (uiState.isLoading) {
             Box(
@@ -390,7 +393,8 @@ private fun AnswerInputArea(
             onChange = { onAction(PlayAction.ChangeEssayAnswer(it)) }
         )
         QuestionType.OX -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            listOf("O", "X").forEachIndexed { index, label ->
+            // 제출값과 같은 목록을 그린다 — 화면에 O/X를 따로 적으면 인덱스와 값이 어긋난다
+            question.answerChoices.forEachIndexed { index, label ->
                 ChoiceRow(
                     chipLabel = label,
                     text = label,

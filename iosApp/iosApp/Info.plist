@@ -12,6 +12,9 @@
 		<key>UIImageName</key>
 		<string>LaunchLogo</string>
 	</dict>
+	<!-- 홈 화면에 보이는 이름. 실행 파일명(CFBundleName=Passmate)은 그대로 둔다 -->
+	<key>CFBundleDisplayName</key>
+	<string>패스메이트</string>
 	<key>NSCameraUsageDescription</key>
 	<string>방 입장용 QR 코드를 스캔하기 위해 카메라를 사용합니다.</string>
 	<key>NSMicrophoneUsageDescription</key>

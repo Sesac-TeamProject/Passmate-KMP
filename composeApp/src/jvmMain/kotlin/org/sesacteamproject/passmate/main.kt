@@ -13,7 +13,7 @@ fun main() {
     application {
         Window(
             onCloseRequest = ::exitApplication,
-            title = "Passmate",
+            title = "패스메이트",
             icon = painterResource("passmate-icon.png"),
         ) {
             App()

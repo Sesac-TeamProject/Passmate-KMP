@@ -20,6 +20,9 @@ enum PortOneResult {
 
 // 포트원 결제창을 WKWebView로 띄운다. 결과는 PassmateBridge(WKScriptMessageHandler)로 받아 onResult로 1회 전달.
 struct PortOnePaymentView: UIViewRepresentable {
+    // PortOne SDK 로드를 기다리는 최대 시간. 초과하면 무한 대기 대신 실패로 끝낸다.
+    private static let sdkLoadTimeoutMillis = 10_000
+
     let request: PortOneRequest
 
     let onResult: (PortOneResult) -> Void
@@ -126,9 +129,16 @@ struct PortOnePaymentView: UIViewRepresentable {
               }
               async function start() {
                 try {
-                  const waitSdk = new Promise((resolve) => {
+                  const waitSdk = new Promise((resolve, reject) => {
+                    const startedAt = Date.now();
                     const t = setInterval(() => {
-                      if (window.PortOne != null) { clearInterval(t); resolve(); }
+                      if (window.PortOne != null) {
+                        clearInterval(t);
+                        resolve();
+                      } else if (Date.now() - startedAt >= \(Self.sdkLoadTimeoutMillis)) {
+                        clearInterval(t);
+                        reject(new Error("결제 모듈을 불러오지 못했어요. 잠시 후 다시 시도해 주세요"));
+                      }
                     }, 50);
                   });
                   await waitSdk;
@@ -157,10 +167,28 @@ struct PortOnePaymentView: UIViewRepresentable {
         """
     }
 
+    // 인라인 <script> 안의 JS 문자열 리터럴에 값을 끼워 넣는다.
+    // 따옴표뿐 아니라 꺾쇠도 막아야 한다 — 방 제목에 "</script>"가 들어오면 스크립트가 거기서 끊긴다.
     private static func jsEscape(_ value: String) -> String {
-        value
-            .replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "\"", with: "\\\"")
-            .replacingOccurrences(of: "\n", with: " ")
+        var escaped = ""
+        escaped.reserveCapacity(value.count)
+
+        for character in value {
+            switch character {
+            case "\\": escaped += "\\\\"
+            case "\"": escaped += "\\\""
+            case "'": escaped += "\\'"
+            case "\n": escaped += "\\n"
+            case "\r": escaped += "\\r"
+            case "<": escaped += "\\u003C"
+            case ">": escaped += "\\u003E"
+            case "&": escaped += "\\u0026"
+            case "\u{2028}": escaped += "\\u2028"
+            case "\u{2029}": escaped += "\\u2029"
+            default: escaped.append(character)
+            }
+        }
+
+        return escaped
     }
 }

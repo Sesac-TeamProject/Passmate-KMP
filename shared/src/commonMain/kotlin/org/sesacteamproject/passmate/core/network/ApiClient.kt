@@ -6,6 +6,7 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.plugin
 import io.ktor.client.request.HttpRequestBuilder
@@ -48,6 +49,14 @@ class ApiClient(
             json(this@ApiClient.json)
         }
         install(Logging) {
+            // 기본 로거는 Android에서 아무 데도 출력하지 않는다 — 실기기에서 실제 요청 주소를
+            // 확인할 방법이 없어진다(`adb logcat | grep Passmate/Ktor`). println은 3플랫폼 모두
+            // 콘솔로 나간다: Android=logcat(System.out), Desktop=stdout, iOS=Xcode 콘솔
+            logger = object : Logger {
+                override fun log(message: String) {
+                    println("Passmate/Ktor: $message")
+                }
+            }
             level = LogLevel.INFO
         }
     }

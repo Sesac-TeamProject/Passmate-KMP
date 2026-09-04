@@ -9,6 +9,8 @@ final class SignInViewModel: ObservableObject {
 
     private let completeGuestClaimUseCase: CompleteGuestClaimUseCase
 
+    private let devSignInUseCase: DevSignInUseCase
+
     @Published private(set) var uiState: SignInUiState
 
     let event = PassthroughSubject<SignInEvent, Never>()
@@ -27,21 +29,42 @@ final class SignInViewModel: ObservableObject {
         event.send(.guestEnterRequested)
     }
 
-    private func onReceiveOAuthCallback(accessToken: String, refreshToken: String) {
-        if uiState.isSigningIn {
-            return
+    // 성공/실패 판정과 후처리는 두 로그인 경로가 공유한다 (Kotlin 미러의 finishSignIn과 1:1)
+    private func handleSignInResult(result: Any?, error: Error?, failureMessage: String) {
+        DispatchQueue.main.async {
+            self.uiState.isSigningIn = false
+            if error == nil, result != nil, !(result is AppResultFailure) {
+                self.claimPendingGuestRecord()
+                self.event.send(.signInCompleted)
+            } else {
+                self.event.send(.showNotice(message: failureMessage))
+            }
         }
-        uiState.isSigningIn = true
-        completeSignInUseCase.invoke(accessToken: accessToken, refreshToken: refreshToken) { [weak self] result, error in
-            DispatchQueue.main.async {
-                guard let self else { return }
-                self.uiState.isSigningIn = false
-                if error == nil, result != nil, !(result is AppResultFailure) {
-                    self.claimPendingGuestRecord()
-                    self.event.send(.signInCompleted)
-                } else {
-                    self.event.send(.showNotice(message: "로그인에 실패했어요. 다시 시도해 주세요"))
-                }
+    }
+
+    // 개발용 로그인 — 서버가 바로 토큰 쌍을 주므로 브라우저 왕복이 없다
+    private func onClickDevSignIn() {
+        if !uiState.isSigningIn {
+            uiState.isSigningIn = true
+            devSignInUseCase.invoke { [weak self] result, error in
+                self?.handleSignInResult(
+                    result: result,
+                    error: error,
+                    failureMessage: "개발 로그인에 실패했어요. 로컬 백엔드가 떠 있는지 확인해 주세요"
+                )
+            }
+        }
+    }
+
+    private func onReceiveOAuthCallback(accessToken: String, refreshToken: String) {
+        if !uiState.isSigningIn {
+            uiState.isSigningIn = true
+            completeSignInUseCase.invoke(accessToken: accessToken, refreshToken: refreshToken) { [weak self] result, error in
+                self?.handleSignInResult(
+                    result: result,
+                    error: error,
+                    failureMessage: "로그인에 실패했어요. 다시 시도해 주세요"
+                )
             }
         }
     }
@@ -70,6 +93,8 @@ final class SignInViewModel: ObservableObject {
             onClickAppleSignIn()
         case .clickGuestEnter:
             onClickGuestEnter()
+        case .clickDevSignIn:
+            onClickDevSignIn()
         case let .receiveOAuthCallback(accessToken, refreshToken):
             onReceiveOAuthCallback(accessToken: accessToken, refreshToken: refreshToken)
         }
@@ -78,11 +103,17 @@ final class SignInViewModel: ObservableObject {
     init(
         buildGoogleSignInUrlUseCase: BuildGoogleSignInUrlUseCase,
         completeSignInUseCase: CompleteSignInUseCase,
-        completeGuestClaimUseCase: CompleteGuestClaimUseCase
+        completeGuestClaimUseCase: CompleteGuestClaimUseCase,
+        devSignInUseCase: DevSignInUseCase,
+        isDevSignInAvailableUseCase: IsDevSignInAvailableUseCase
     ) {
         self.buildGoogleSignInUrlUseCase = buildGoogleSignInUrlUseCase
         self.completeSignInUseCase = completeSignInUseCase
         self.completeGuestClaimUseCase = completeGuestClaimUseCase
-        self.uiState = SignInUiState()
+        self.devSignInUseCase = devSignInUseCase
+        self.uiState = SignInUiState(
+            isSigningIn: false,
+            isDevSignInAvailable: isDevSignInAvailableUseCase.invoke()
+        )
     }
 }

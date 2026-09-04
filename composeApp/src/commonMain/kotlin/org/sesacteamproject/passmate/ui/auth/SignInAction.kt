@@ -10,6 +10,9 @@ sealed interface SignInAction {
 
     data object ClickGuestEnter : SignInAction
 
+    // 개발용 로그인 (POST /auth/dev-login) — 로컬 개발 서버에서만 노출된다
+    data object ClickDevSignIn : SignInAction
+
     data class ReceiveOAuthCallback(
         val accessToken: String,
         val refreshToken: String

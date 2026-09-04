@@ -72,19 +72,27 @@ class MyPageDetailMapperTest {
               "totalCount": 8,
               "badges": [
                 {"code":"FIRST_ROOM","name":"첫 방 개설","achieved":true,"achievedAt":"2026-07-01T09:00:00"},
-                {"code":"ROOMS_10","name":"방 10회 운영","achieved":false,"progress":4,"target":10},
+                {"code":"ROOMS_10","name":"방 10회 운영","achieved":false,"progress":4,"target":10.0},
+                {"code":"RATING_45","name":"평가 4.5+","achieved":false,"progress":0,"target":4.5},
                 {"code":"UNKNOWN_BADGE","name":"모르는 뱃지","achieved":false}
               ]
             }
         """.trimIndent()
 
+        // 서버 target은 double이다 (OpenAPI BadgeResponse.target: number/double) — 정수 픽스처는 실패를 가린다
         val badges = json.decodeFromString<BadgesResponse>(raw).toDomain()
 
         // 서버가 모르는 코드를 주면 화면에서 접는다
-        assertEquals(2, badges.size)
+        assertEquals(3, badges.size)
         assertEquals(BadgeType.FIRST_ROOM, badges.first().type)
         assertEquals(true, badges.first().earned)
-        assertEquals(4, badges.last().progressCurrent)
-        assertEquals(10, badges.last().progressTarget)
+
+        val roomsBadge = badges.first { it.type == BadgeType.ROOMS_10 }
+        val ratingBadge = badges.first { it.type == BadgeType.RATING_45 }
+
+        assertEquals(4, roomsBadge.progressCurrent)
+        assertEquals(10.0, roomsBadge.progressTarget)
+        // RATING_45("평가 4.5+")는 목표가 소수다 — 정수로 좁히면 4.5가 4가 된다
+        assertEquals(4.5, ratingBadge.progressTarget)
     }
 }

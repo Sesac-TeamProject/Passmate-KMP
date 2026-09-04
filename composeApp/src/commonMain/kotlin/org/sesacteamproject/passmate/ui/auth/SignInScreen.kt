@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHost
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBrandMark
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -84,6 +86,8 @@ private fun SignInContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.BackgroundMint)
+            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            .statusBarsPadding()
     ) {
         SignInHero(modifier = Modifier.weight(1f))
         SignInSheet(
@@ -107,19 +111,11 @@ private fun SignInHero(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(PassmateColors.Primary, RoundedCornerShape(10.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "P",
-                    color = PassmateColors.Surface,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            // 시안 확정 로고 락업(가로형 국문) — 마크는 정사각 32dp
+            PassmateBrandMark(
+                contentDescription = null,
+                modifier = Modifier.size(32.dp)
+            )
             Text(
                 text = "패스메이트",
                 color = PassmateColors.TextPrimary,
@@ -165,6 +161,12 @@ private fun SignInSheet(
             isSigningIn = uiState.isSigningIn,
             onClick = { onAction(SignInAction.ClickGuestEnter) }
         )
+        if (uiState.isDevSignInAvailable) {
+            DevSignInButton(
+                isSigningIn = uiState.isSigningIn,
+                onClick = { onAction(SignInAction.ClickDevSignIn) }
+            )
+        }
         Text(
             text = "계속하면 이용약관과 개인정보 처리방침에 동의한 것으로 봅니다\n선생님·학생 공용 계정 · 게스트 기록은 세션 후 사라져요",
             color = PassmateColors.TextTertiary,
@@ -263,6 +265,32 @@ private fun GuestEnterButton(
     }
 }
 
+// 로컬 개발 서버에서만 그려진다 — 운영 URL에서는 SignInUiState.isDevSignInAvailable이 false다
+@Composable
+private fun DevSignInButton(
+    isSigningIn: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(PassmateColors.Surface, RoundedCornerShape(14.dp))
+            .border(1.dp, PassmateColors.Border, RoundedCornerShape(14.dp))
+            .clickable(enabled = !isSigningIn, onClick = onClick)
+            .padding(vertical = 14.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "개발용 로그인 (로컬 서버)",
+            color = PassmateColors.TextTertiary,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.28).sp
+        )
+    }
+}
+
 @Composable
 internal expect fun GoogleSignInIcon(modifier: Modifier = Modifier)
 
@@ -274,6 +302,18 @@ private fun SignInContentScreenPreview() {
     PassmateTheme {
         SignInContentScreen(
             uiState = SignInUiState(),
+            onAction = {}
+        )
+    }
+}
+
+// 로컬 개발 서버에 붙었을 때 — 개발용 로그인 진입점이 하나 더 보인다
+@PassmatePreview
+@Composable
+private fun SignInContentScreenDevPreview() {
+    PassmateTheme {
+        SignInContentScreen(
+            uiState = SignInUiState(isDevSignInAvailable = true),
             onAction = {}
         )
     }

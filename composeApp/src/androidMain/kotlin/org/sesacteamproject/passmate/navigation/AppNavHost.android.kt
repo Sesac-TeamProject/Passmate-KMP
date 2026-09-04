@@ -209,6 +209,9 @@ actual fun AppNavHost() {
         }
     }
     Scaffold(
+        // 0을 유지한다 — 화면 배경이 상태바 뒤까지 깔려야 iOS와 같아진다.
+        // 상단 인셋은 각 화면이 배경 뒤에 statusBarsPadding으로 직접 준다
+        // (iOS도 화면마다 `.background(색.ignoresSafeArea())`로 같은 일을 한다)
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             // 탭 루트 4개에서만 하단 바 표시 (스펙 §1-2)

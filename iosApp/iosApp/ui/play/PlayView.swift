@@ -267,7 +267,8 @@ private struct QuestionCard: View {
             )
         } else if question.type == QuestionType.ox {
             VStack(spacing: 12) {
-                ForEach(Array(["O", "X"].enumerated()), id: \.offset) { index, label in
+                // 제출값과 같은 목록을 그린다 — 화면에 O/X를 따로 적으면 인덱스와 값이 어긋난다
+                ForEach(Array(question.answerChoices.enumerated()), id: \.offset) { index, label in
                     ChoiceRow(
                         chipLabel: label,
                         text: label,
