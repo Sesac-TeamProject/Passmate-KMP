@@ -171,18 +171,10 @@ private struct QuestionContent: View {
                         .foregroundColor(PassmateColors.textSecondary)
                 }
             }
-            if uiState.questionCount > 0 {
-                HStack(spacing: 4) {
-                    ForEach(0..<uiState.questionCount, id: \.self) { index in
-                        let isReached = index < Int(uiState.question?.questionNo ?? 0)
-
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(isReached ? PassmateColors.timerAmber : PassmateColors.fieldGray)
-                            .frame(width: isReached ? 26 : 12, height: 6)
-                    }
-                    Spacer()
-                }
-            }
+            PassmateTimerBar(
+                remainingSeconds: uiState.remainingSeconds,
+                totalSeconds: Int(uiState.question?.timeLimitSec ?? 0)
+            )
         }
         .padding(.horizontal, 20)
         .padding(.top, 24)
@@ -252,7 +244,6 @@ private struct QuestionCard: View {
                 .padding(.bottom, 22)
             }
             .padding(.top, 30)
-            TimerBadge(remainingSeconds: uiState.remainingSeconds)
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -291,24 +282,6 @@ private struct QuestionCard: View {
                 }
             }
         }
-    }
-}
-
-private struct TimerBadge: View {
-    let remainingSeconds: Int
-
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(PassmateColors.surface)
-            Circle()
-                .stroke(PassmateColors.timerAmber, lineWidth: 6)
-            Text("\(remainingSeconds)")
-                .font(.system(size: 20, weight: .bold))
-                .kerning(-0.4)
-                .foregroundColor(PassmateColors.primaryDeep)
-        }
-        .frame(width: 60, height: 60)
     }
 }
 

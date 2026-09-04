@@ -31,4 +31,7 @@ enum PassmateIcons: String {
 
     // 사람 (v6 nav/4탭 마이)
     case user = "User"
+
+    // 시계 (v6 M-03 풀이 · M-T2 진행 리모컨 남은 시간)
+    case clock = "Clock"
 }

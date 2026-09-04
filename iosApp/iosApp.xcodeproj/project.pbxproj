@@ -152,6 +152,7 @@
 		A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */; };
 		A1010001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */; };
 		A1010001159AABBCCDDEEFF0159 /* PassmateIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */; };
+		A1010000168AABBCCDDEE9100 /* PassmateTimerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEE9100 /* PassmateTimerBar.swift */; };
 		A1010002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift */; };
 		A1010002201AABBCCDDEEFF0301 /* PassmateSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002201AABBCCDDEEFF0301 /* PassmateSkeletonView.swift */; };
 		A1010002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift */; };
@@ -313,6 +314,7 @@
 		A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakTopicsRow.swift; sourceTree = "<group>"; };
 		A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateEmptyStateView.swift; sourceTree = "<group>"; };
 		A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateIconView.swift; sourceTree = "<group>"; };
+		A1011000168AABBCCDDEE9100 /* PassmateTimerBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateTimerBar.swift; sourceTree = "<group>"; };
 		A1011002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateBottomTabBar.swift; sourceTree = "<group>"; };
 		A1011002201AABBCCDDEEFF0301 /* PassmateSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateSkeletonView.swift; sourceTree = "<group>"; };
 		A1011002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeTabBarHidden.swift; sourceTree = "<group>"; };
@@ -632,6 +634,7 @@
 				A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */,
 				A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */,
 				A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */,
+				A1011000168AABBCCDDEE9100 /* PassmateTimerBar.swift */,
 				A1011002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift */,
 				A1011002201AABBCCDDEEFF0301 /* PassmateSkeletonView.swift */,
 				A1011002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift */,
@@ -885,6 +888,7 @@
 				A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */,
 				A1010001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift in Sources */,
 				A1010001159AABBCCDDEEFF0159 /* PassmateIconView.swift in Sources */,
+				A1010000168AABBCCDDEE9100 /* PassmateTimerBar.swift in Sources */,
 				A1010002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift in Sources */,
 				A1010002201AABBCCDDEEFF0301 /* PassmateSkeletonView.swift in Sources */,
 				A1010002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift in Sources */,

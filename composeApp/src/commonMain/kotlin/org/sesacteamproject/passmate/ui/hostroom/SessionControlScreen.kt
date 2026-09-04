@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTimerBar
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -354,11 +355,11 @@ private fun QuestionCard(uiState: SessionControlUiState) {
                         .padding(horizontal = 8.dp, vertical = 3.dp)
                 )
                 Box(modifier = Modifier.weight(1f))
-                TimerCircle(
-                    remainingSec = uiState.remainingSec,
-                    isClosed = uiState.isQuestionClosed
-                )
             }
+            PassmateTimerBar(
+                remainingSeconds = uiState.remainingSec,
+                totalSeconds = question.timeLimitSec
+            )
             Text(
                 text = question.body,
                 color = PassmateColors.TextPrimary,
@@ -370,29 +371,6 @@ private fun QuestionCard(uiState: SessionControlUiState) {
                 SubmissionSection(submissions = submissions)
             }
         }
-    }
-}
-
-@Composable
-private fun TimerCircle(
-    remainingSec: Int,
-    isClosed: Boolean
-) {
-    val ringColor = if (isClosed) PassmateColors.Border else PassmateColors.TimerAmber
-    val label = if (isClosed) "마감" else remainingSec.toString()
-
-    Box(
-        modifier = Modifier
-            .size(48.dp)
-            .border(3.dp, ringColor, CircleShape),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = label,
-            color = PassmateColors.TextPrimary,
-            fontSize = if (isClosed) 12.sp else 18.sp,
-            fontWeight = FontWeight.Bold
-        )
     }
 }
 

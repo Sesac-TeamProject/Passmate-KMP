@@ -1,0 +1,23 @@
+<!-- clock — lucide v0.300.0 clock (ISC License, https://github.com/lucide-icons/lucide/blob/0.300.0/icons/clock.svg)
+     색은 중립 검정 스트로크뿐이다. 표시 색은 호출부에서 PassmateColors 토큰으로 준다 (규칙 §11-2).
+     Desktop 사본: composeApp/src/jvmMain/resources/drawable/ic_clock.xml (텍스트 동일, PassmateIconResourceTest가 강제) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M22,12a10,10 0,1 1,-20,0a10,10 0,1 1,20,0"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M12,6v6l4,2"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

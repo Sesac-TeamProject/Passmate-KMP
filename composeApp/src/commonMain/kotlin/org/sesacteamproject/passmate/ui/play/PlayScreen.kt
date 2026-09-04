@@ -55,6 +55,7 @@ import org.sesacteamproject.passmate.session.domain.model.AnswerResult
 import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.session.domain.model.RankEntry
 import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
+import org.sesacteamproject.passmate.component.PassmateTimerBar
 import org.sesacteamproject.passmate.theme.PassmateColors
 import org.sesacteamproject.passmate.theme.PassmateTheme
 
@@ -267,34 +268,10 @@ private fun PlayHeader(
                     .padding(4.dp)
             )
         }
-        QuestionProgressBar(
-            currentQuestionNo = question?.questionNo ?: 0,
-            questionCount = uiState.questionCount
+        PassmateTimerBar(
+            remainingSeconds = uiState.remainingSeconds,
+            totalSeconds = question?.timeLimitSec ?: 0
         )
-    }
-}
-
-@Composable
-private fun QuestionProgressBar(
-    currentQuestionNo: Int,
-    questionCount: Int
-) {
-    if (questionCount > 0) {
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            repeat(questionCount) { index ->
-                val isReached = index < currentQuestionNo
-
-                Box(
-                    modifier = Modifier
-                        .width(if (isReached) 26.dp else 12.dp)
-                        .height(6.dp)
-                        .background(
-                            color = if (isReached) PassmateColors.TimerAmber else PassmateColors.FieldGray,
-                            shape = RoundedCornerShape(3.dp)
-                        )
-                )
-            }
-        }
     }
 }
 
@@ -353,34 +330,6 @@ private fun QuestionCard(
                 )
             }
         }
-        TimerBadge(
-            remainingSeconds = uiState.remainingSeconds,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = (-30).dp)
-        )
-    }
-}
-
-@Composable
-private fun TimerBadge(
-    remainingSeconds: Int,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .size(60.dp)
-            .background(PassmateColors.Surface, CircleShape)
-            .border(6.dp, PassmateColors.TimerAmber, CircleShape),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = remainingSeconds.toString(),
-            color = PassmateColors.PrimaryDeep,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.4).sp
-        )
     }
 }
 

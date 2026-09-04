@@ -30,5 +30,8 @@ enum class PassmateIcons(val resourceName: String) {
     PlusSquare("ic_plus_square"),
 
     // 사람 (v6 nav/4탭 마이) — iOS 에셋 이름은 "User"
-    User("ic_user")
+    User("ic_user"),
+
+    // 시계 (v6 M-03 풀이 · M-T2 진행 리모컨 남은 시간) — iOS 에셋 이름은 "Clock"
+    Clock("ic_clock")
 }
