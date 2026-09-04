@@ -32,6 +32,7 @@ struct ContentView: View {
                         pushSignIn(pendingRoute: .payment(pin: pin), path: $path)
                     }
                 )
+                .passmateHidesNativeTabBar()
                 .tabItem { Text(AppTab.home.label) }
                 .tag(AppTab.home)
 
@@ -41,6 +42,7 @@ struct ContentView: View {
                     onOpenRoomReport: { roomId in path.append(.roomReport(roomId: roomId)) },
                     onOpenSessionControl: { roomId, pin in path.append(.sessionControl(roomId: roomId, pin: pin)) }
                 )
+                .passmateHidesNativeTabBar()
                 .tabItem { Text(AppTab.hostedRooms.label) }
                 .tag(AppTab.hostedRooms)
 
@@ -51,6 +53,7 @@ struct ContentView: View {
                     // 빈 상태 CTA — 홈 탭이 곧 PIN 입장 폼. 탭 전환은 셸 가드를 거친다 (규칙 §2-1-1)
                     onOpenPinEntry: { shellViewModel.action(.selectTab(.home)) }
                 )
+                .passmateHidesNativeTabBar()
                 .tabItem { Text(AppTab.joinedRooms.label) }
                 .tag(AppTab.joinedRooms)
 
@@ -71,10 +74,10 @@ struct ContentView: View {
                         sessionGeneration += 1
                     }
                 )
+                .passmateHidesNativeTabBar()
                 .tabItem { Text(AppTab.myInfo.label) }
                 .tag(AppTab.myInfo)
             }
-            .passmateHidesNativeTabBar()
             .navigationBarHidden(true)
             .background(
                 NavigationLink(isActive: isStackActive) {

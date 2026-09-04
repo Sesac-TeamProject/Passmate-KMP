@@ -5,7 +5,9 @@ import UIKit
 // iOS 16+는 toolbar(.hidden, for: .tabBar), iOS 15는 UIKit으로 조상 UITabBarController의 탭 바를 숨긴다
 // (규칙 §2-1: iOS 16+ API는 공통 컴포넌트 안 #available 분기로만).
 //
-// 숨김이 실패해도 화면이 깨지지 않는다 — 커스텀 바가 같은 자리에 더 높게 겹쳐 그려져 가린다.
+// ⚠️ 반드시 TabView가 아니라 **각 탭의 콘텐츠**에 붙인다. TabView 자체에 붙이면 아무 일도 일어나지 않는다.
+// 셸이 ZStack이던 시절에는 커스텀 바가 위에 겹쳐 그려져 숨김이 실패해도 가려졌지만,
+// 탭바가 자리를 차지하도록 VStack으로 바꾼 뒤로는 가려 줄 것이 없다 — 네이티브 바가 그대로 드러난다.
 extension View {
     func passmateHidesNativeTabBar() -> some View {
         modifier(NativeTabBarHiddenModifier())
