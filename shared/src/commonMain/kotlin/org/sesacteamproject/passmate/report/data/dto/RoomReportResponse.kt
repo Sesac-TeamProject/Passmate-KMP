@@ -22,7 +22,7 @@ data class RoomReportResponse(
     data class SummaryDto(
         val participantCount: Int = 0,
         val questionCount: Int = 0,
-        // 0.0~1.0 비율이다 — 퍼센트 변환은 매퍼가 한다
+        // 이미 0~100 퍼센트다 (백엔드 correctCount * 100.0 / submitCount) — 매퍼가 반올림만 한다
         val avgCorrectRate: Double? = null,
         val avgScore: Double? = null,
         val aiAnalysisCount: Int = 0
@@ -38,7 +38,7 @@ data class RoomReportResponse(
         val points: Int = 0,
         val submitCount: Int = 0,
         val correctCount: Int = 0,
-        // 0.0~1.0 비율이다 — 서술형 미채점은 null
+        // 이미 0~100 퍼센트다 — 서술형 미채점은 null
         val correctRate: Double? = null,
         val aiAnalysisCount: Int? = null
     )

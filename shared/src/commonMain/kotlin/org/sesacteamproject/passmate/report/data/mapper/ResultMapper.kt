@@ -127,7 +127,7 @@ fun RoomReportResponse.toDomain(): RoomReport {
 
 fun RoomReportResponse.SummaryDto.toDomain(): RoomReportSummary {
     return RoomReportSummary(
-        avgAccuracyPercent = avgCorrectRate?.let { (it * 100).roundToInt() },
+        avgAccuracyPercent = avgCorrectRate?.roundToInt(),
         studentCount = participantCount,
         questionCount = questionCount,
         aiAnalysisCount = aiAnalysisCount,
@@ -143,7 +143,7 @@ fun RoomReportResponse.QuestionDto.toDomain(): ReportQuestion {
         questionNo = orderNo,
         title = content,
         type = QuestionType.from(type),
-        accuracyPercent = correctRate?.let { (it * 100).roundToInt() },
+        accuracyPercent = correctRate?.roundToInt(),
         aiFeedbackCount = aiAnalysisCount
     )
 }
