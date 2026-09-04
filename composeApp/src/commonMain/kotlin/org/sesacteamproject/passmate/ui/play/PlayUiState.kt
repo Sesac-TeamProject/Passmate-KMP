@@ -1,6 +1,7 @@
 package org.sesacteamproject.passmate.ui.play
 
 import org.sesacteamproject.passmate.session.domain.model.AnswerResult
+import org.sesacteamproject.passmate.session.domain.model.ChoiceDistribution
 import org.sesacteamproject.passmate.session.domain.model.RankEntry
 import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
 import org.sesacteamproject.passmate.session.domain.model.VoiceHint
@@ -41,6 +42,9 @@ data class PlayUiState(
     data class Reveal(
         val answer: String?,
         val explanation: String?,
-        val correctAnswererCount: Int
+        val correctAnswererCount: Int,
+        // M-04 응답 분포 — 보기 순서대로 이미 맞춰 둔 목록이다.
+        // 짝짓기는 shared의 SessionQuestion.distributionOf가 한다 (Compose·SwiftUI 공용)
+        val distribution: List<ChoiceDistribution> = emptyList()
     )
 }

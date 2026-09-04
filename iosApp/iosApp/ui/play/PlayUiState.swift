@@ -57,5 +57,9 @@ struct PlayUiState {
         let explanation: String?
 
         let correctAnswererCount: Int
+
+        // M-04 응답 분포 — 보기 순서대로 이미 맞춰 둔 목록이다.
+        // 짝짓기는 shared의 SessionQuestion.distributionOf가 한다 (Compose·SwiftUI 공용)
+        let distribution: [ChoiceDistribution]
     }
 }

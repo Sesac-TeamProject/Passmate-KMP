@@ -46,12 +46,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateCard
+import org.sesacteamproject.passmate.component.PassmateWaitingDots
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.session.domain.model.AnswerResult
+import org.sesacteamproject.passmate.session.domain.model.ChoiceDistribution
 import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.session.domain.model.RankEntry
 import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
@@ -495,117 +497,373 @@ private fun SubmitButton(
 }
 
 // ─── M-04 제출 결과 · 다음 문항 대기 ───
+// 시안(637:8588) 구성: 헤더 → 민트 점수 카드 → "정 답" → "응 답 분 포" → 대기 안내.
+// 예전 구현은 마스코트를 얹은 카드 하나를 화면 한가운데 띄웠다 — 시안과 완전히 다른 화면이었다
 
 @Composable
 private fun ColumnScope.WaitingNextContent(
     uiState: PlayUiState,
     onClickLeave: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 20.dp, top = 60.dp, end = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = if (uiState.question != null) "Q${uiState.question.questionNo} / ${uiState.questionCount}" else "잠시만요",
-            color = PassmateColors.PrimaryDeep,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp,
-            modifier = Modifier.weight(2f),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = "나가기",
-            color = PassmateColors.TextSecondary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp,
-            textAlign = TextAlign.End,
-            modifier = Modifier
-                .weight(1f)
-                .clickable(onClick = onClickLeave)
-                .padding(4.dp)
-        )
-    }
-    Spacer(modifier = Modifier.weight(1f))
-    MyResultCard(uiState = uiState)
-    Spacer(modifier = Modifier.weight(1f))
+    val reveal = uiState.reveal
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+            .weight(1f)
+            .verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = "다음 문항을 기다리고 있어요",
-            color = PassmateColors.TextSecondary,
-            fontSize = 14.sp,
-            letterSpacing = (-0.28).sp
+        RevealHeader(
+            uiState = uiState,
+            onClickLeave = onClickLeave
         )
+        ScoreCard(uiState = uiState)
+        if (reveal?.answer != null) {
+            AnswerSection(
+                answer = reveal.answer,
+                isMine = uiState.myAnswerResult?.correct == true,
+                distribution = reveal.distribution
+            )
+        }
+        if (reveal?.distribution?.isNotEmpty() == true) {
+            DistributionSection(distribution = reveal.distribution)
+        }
+        if (reveal?.explanation != null) {
+            Text(
+                text = reveal.explanation,
+                color = PassmateColors.TextSecondary,
+                fontSize = 13.sp,
+                letterSpacing = (-0.26).sp,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
+            )
+        }
+        SectionDivider(modifier = Modifier.padding(top = 20.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp, bottom = 40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "다음 문항을 기다리고 있어요",
+                color = PassmateColors.TextSecondary,
+                fontSize = 14.sp,
+                letterSpacing = (-0.28).sp
+            )
+            PassmateWaitingDots()
+        }
     }
 }
 
 @Composable
-private fun MyResultCard(uiState: PlayUiState) {
-    val result = uiState.myAnswerResult
-    val reveal = uiState.reveal
+private fun RevealHeader(
+    uiState: PlayUiState,
+    onClickLeave: () -> Unit
+) {
+    val label = if (uiState.question != null) {
+        "Q${uiState.question.questionNo} / ${uiState.questionCount} · 결과"
+    } else {
+        "잠시만요"
+    }
 
-    PassmateCard(modifier = Modifier.padding(horizontal = 20.dp)) {
-        Column(
+    Column {
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 34.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+                .padding(start = 20.dp, top = 28.dp, end = 20.dp, bottom = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            PassyMascot(modifier = Modifier.size(width = 84.dp, height = 92.dp))
             Text(
-                text = resultTitle(uiState),
-                color = if (result?.correct == false) PassmateColors.TextPrimary else PassmateColors.PrimaryDeep,
-                fontSize = 34.sp,
+                text = label,
+                color = PassmateColors.TextPrimary,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.68).sp
+                letterSpacing = (-0.28).sp
             )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "나가기",
+                color = PassmateColors.TextSecondary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = (-0.28).sp,
+                modifier = Modifier
+                    .clickable(onClick = onClickLeave)
+                    .padding(4.dp)
+            )
+        }
+        SectionDivider()
+    }
+}
+
+// 시안(637:8588)은 정답 맞힌 경우만 그려져 있다 — 민트 카드에 초록 "정답" 배지.
+// 오답·미제출까지 그 색을 쓰면 실패가 성공처럼 읽힌다(실측: "미제출"이 초록 배지로 나왔다).
+// 정답일 때만 민트를 쓰고 나머지는 중립색으로 내린다
+@Composable
+private fun ScoreCard(uiState: PlayUiState) {
+    val result = uiState.myAnswerResult
+    val isCorrect = result?.correct == true
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 20.dp)
+            .background(
+                color = if (isCorrect) PassmateColors.BackgroundMint else PassmateColors.FieldGray,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(horizontal = 20.dp, vertical = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            VerdictPill(uiState = uiState)
+            Spacer(modifier = Modifier.weight(1f))
             if (uiState.rank != null) {
                 RankChip(
                     rank = uiState.rank,
                     rankDelta = result?.rankDelta
                 )
             }
-            resultCaption(uiState)?.let { caption ->
-                Text(
-                    text = caption,
-                    color = PassmateColors.TextSecondary,
-                    fontSize = 14.sp,
-                    letterSpacing = (-0.28).sp,
-                    textAlign = TextAlign.Center
+        }
+        Text(
+            text = resultScoreText(uiState),
+            color = if (isCorrect) PassmateColors.PrimaryDeep else PassmateColors.TextPrimary,
+            fontSize = 38.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.76).sp
+        )
+        resultCaption(uiState)?.let { caption ->
+            Text(
+                text = caption,
+                color = if (isCorrect) PassmateColors.PrimaryDeep else PassmateColors.TextSecondary,
+                fontSize = 14.sp,
+                letterSpacing = (-0.28).sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun VerdictPill(uiState: PlayUiState) {
+    val result = uiState.myAnswerResult
+    val isCorrect = result?.correct == true
+    val label = when {
+        result?.isProvisional == true -> "채점 중"
+        isCorrect -> "정답"
+        result?.correct == false -> "오답"
+        !uiState.hasSubmitted -> "미제출"
+        else -> "제출 완료"
+    }
+
+    Text(
+        text = label,
+        color = if (isCorrect) PassmateColors.Surface else PassmateColors.TextSecondary,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = (-0.28).sp,
+        modifier = Modifier
+            .background(
+                color = if (isCorrect) PassmateColors.Primary else PassmateColors.Surface,
+                shape = RoundedCornerShape(percent = 50)
+            )
+            .padding(horizontal = 18.dp, vertical = 8.dp)
+    )
+}
+
+@Composable
+private fun AnswerSection(
+    answer: String,
+    isMine: Boolean,
+    distribution: List<ChoiceDistribution>
+) {
+    val answerNo = distribution.firstOrNull { it.isAnswer }?.choiceNo
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        SectionLabel(text = "정 답")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            if (answerNo != null) {
+                ChoiceNoChip(
+                    choiceNo = answerNo,
+                    isHighlighted = true
                 )
             }
-            if (reveal?.answer != null) {
+            Text(
+                text = answer,
+                color = PassmateColors.TextPrimary,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.44).sp
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            if (isMine) {
                 Text(
-                    text = "정답 ${reveal.answer} · ${reveal.correctAnswererCount}명 정답",
+                    text = "내가 고른 답과 같아요",
                     color = PassmateColors.PrimaryDeep,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     letterSpacing = (-0.28).sp,
-                    textAlign = TextAlign.Center
-                )
-            }
-            if (reveal?.explanation != null) {
-                Text(
-                    text = reveal.explanation,
-                    color = PassmateColors.TextSecondary,
-                    fontSize = 13.sp,
-                    letterSpacing = (-0.26).sp,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.End
                 )
             }
         }
+        SectionDivider()
     }
+}
+
+@Composable
+private fun DistributionSection(distribution: List<ChoiceDistribution>) {
+    // 막대 길이는 최다 응답이 아니라 전체 응답 수 기준이다 — 시안의 4/6이 3분의 2쯤 찬다
+    val total = distribution.sumOf { it.count }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        SectionLabel(text = "응 답 분 포")
+        distribution.forEach { entry ->
+            DistributionRow(
+                entry = entry,
+                total = total
+            )
+        }
+    }
+}
+
+@Composable
+private fun DistributionRow(
+    entry: ChoiceDistribution,
+    total: Int
+) {
+    val ratio = if (total == 0) 0f else entry.count.toFloat() / total
+    val background = if (entry.isAnswer) PassmateColors.BackgroundMint else Color.Transparent
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .background(background, RoundedCornerShape(12.dp))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ChoiceNoChip(
+                choiceNo = entry.choiceNo,
+                isHighlighted = entry.isAnswer
+            )
+            Text(
+                text = entry.label,
+                color = PassmateColors.TextPrimary,
+                fontSize = 17.sp,
+                fontWeight = if (entry.isAnswer) FontWeight.Bold else FontWeight.Normal,
+                letterSpacing = (-0.34).sp,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = "${entry.count}명",
+                color = if (entry.isAnswer) PassmateColors.PrimaryDeep else PassmateColors.TextSecondary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.28).sp
+            )
+        }
+        DistributionBar(
+            ratio = ratio,
+            isAnswer = entry.isAnswer
+        )
+    }
+}
+
+@Composable
+private fun DistributionBar(
+    ratio: Float,
+    isAnswer: Boolean
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(8.dp)
+            .background(PassmateColors.FieldGray, RoundedCornerShape(percent = 50))
+    ) {
+        // 0명이어도 트랙만 남기고 채우지 않는다 (시안 4번 보기)
+        if (ratio > 0f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(ratio)
+                    .height(8.dp)
+                    .background(
+                        color = if (isAnswer) PassmateColors.Primary else PassmateColors.SkeletonBlock,
+                        shape = RoundedCornerShape(percent = 50)
+                    )
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChoiceNoChip(
+    choiceNo: Int,
+    isHighlighted: Boolean
+) {
+    Box(
+        modifier = Modifier
+            .size(34.dp)
+            .background(
+                color = if (isHighlighted) PassmateColors.Primary else Color.Transparent,
+                shape = CircleShape
+            )
+            .border(
+                width = if (isHighlighted) 0.dp else 1.dp,
+                color = if (isHighlighted) PassmateColors.Primary else PassmateColors.Border,
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = choiceNo.toString(),
+            color = if (isHighlighted) PassmateColors.Surface else PassmateColors.TextSecondary,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text,
+        color = PassmateColors.TextSecondary,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 1.2.sp,
+        modifier = Modifier.padding(horizontal = 20.dp)
+    )
+}
+
+@Composable
+private fun SectionDivider(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .height(1.dp)
+            .background(PassmateColors.Border)
+    )
 }
 
 @Composable
@@ -615,7 +873,7 @@ private fun RankChip(
 ) {
     Row(
         modifier = Modifier
-            .background(PassmateColors.FieldGray, RoundedCornerShape(10.dp))
+            .background(PassmateColors.Surface, RoundedCornerShape(percent = 50))
             .padding(horizontal = 14.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -624,7 +882,7 @@ private fun RankChip(
             text = "현재 ${rank}위",
             color = PassmateColors.TextPrimary,
             fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Bold,
             letterSpacing = (-0.28).sp
         )
         if (rankDelta != null && rankDelta != 0) {
@@ -632,7 +890,7 @@ private fun RankChip(
                 text = if (rankDelta > 0) "▲$rankDelta" else "▼${-rankDelta}",
                 color = if (rankDelta > 0) PassmateColors.Primary else PassmateColors.TextSecondary,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -878,11 +1136,11 @@ private fun questionTypeLabel(type: QuestionType?): String {
     }
 }
 
-private fun resultTitle(uiState: PlayUiState): String {
+// 점수만 담당한다 — 정답/오답 판정 문구는 VerdictPill이 그린다 (시안 M-04)
+private fun resultScoreText(uiState: PlayUiState): String {
     val result = uiState.myAnswerResult
 
     return when {
-        result != null && result.isProvisional -> "+${result.earnedScore.toInt()}점 (잠정)"
         result != null -> "+${result.earnedScore.toInt()}점"
         uiState.reveal != null && !uiState.hasSubmitted -> "시간 종료!"
         else -> "곧 문제가 시작돼요!"
@@ -1014,7 +1272,13 @@ private fun PlayContentScreenRevealPreview() {
                 reveal = PlayUiState.Reveal(
                     answer = "3",
                     explanation = "이웃한 두 항의 차 5-2=3, 8-5=3으로 공차는 3이에요.",
-                    correctAnswererCount = 5
+                    correctAnswererCount = 4,
+                    distribution = listOf(
+                        ChoiceDistribution(1, "1", 1, isAnswer = false, isMine = false),
+                        ChoiceDistribution(2, "2", 1, isAnswer = false, isMine = false),
+                        ChoiceDistribution(3, "3", 4, isAnswer = true, isMine = true),
+                        ChoiceDistribution(4, "4", 0, isAnswer = false, isMine = false)
+                    )
                 ),
                 totalScore = 480.0,
                 rank = 2,

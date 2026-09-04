@@ -357,6 +357,8 @@ private struct EssayField: View {
 }
 
 // ─── M-04 제출 결과 · 다음 문항 대기 ───
+// 시안(637:8588) 구성: 헤더 → 민트 점수 카드 → "정 답" → "응 답 분 포" → 대기 안내.
+// 예전 구현은 마스코트를 얹은 카드 하나를 화면 한가운데 띄웠다 — 시안과 완전히 다른 화면이었다
 
 private struct WaitingNextContent: View {
     let uiState: PlayUiState
@@ -364,82 +366,304 @@ private struct WaitingNextContent: View {
     let onClickLeave: () -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Spacer()
-                    .frame(maxWidth: .infinity)
-                Text(uiState.question.map { "Q\($0.questionNo) / \(uiState.questionCount)" } ?? "잠시만요")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.primaryDeep)
-                    .frame(maxWidth: .infinity)
-                Button(action: onClickLeave) {
-                    Text("나가기")
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.textSecondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 24)
-            Spacer()
-            MyResultCard(uiState: uiState)
-            Spacer()
-            Text("다음 문항을 기다리고 있어요")
-                .font(.system(size: 14))
-                .kerning(-0.28)
-                .foregroundColor(PassmateColors.textSecondary)
-                .padding(.bottom, 40)
-        }
-    }
-}
-
-private struct MyResultCard: View {
-    let uiState: PlayUiState
-
-    var body: some View {
-        PassmateCard {
-            VStack(spacing: 14) {
-                PassyMascotView()
-                    .frame(width: 84, height: 92)
-                Text(resultTitle(uiState))
-                    .font(.system(size: 34, weight: .bold))
-                    .kerning(-0.68)
-                    .foregroundColor(
-                        uiState.myAnswerResult?.correct?.boolValue == false
-                            ? PassmateColors.textPrimary
-                            : PassmateColors.primaryDeep
-                    )
-                if let rank = uiState.rank {
-                    RankChip(rank: rank, rankDelta: uiState.myAnswerResult?.rankDelta.map { Int(truncating: $0) })
-                }
-                if let caption = resultCaption(uiState) {
-                    Text(caption)
-                        .font(.system(size: 14))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.textSecondary)
-                        .multilineTextAlignment(.center)
-                }
+        ScrollView {
+            VStack(spacing: 0) {
+                RevealHeader(uiState: uiState, onClickLeave: onClickLeave)
+                ScoreCard(uiState: uiState)
                 if let answer = uiState.reveal?.answer {
-                    Text("정답 \(answer) · \(uiState.reveal?.correctAnswererCount ?? 0)명 정답")
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.primaryDeep)
-                        .multilineTextAlignment(.center)
+                    AnswerSection(
+                        answer: answer,
+                        isMine: uiState.myAnswerResult?.correct?.boolValue == true,
+                        distribution: uiState.reveal?.distribution ?? []
+                    )
+                }
+                if let distribution = uiState.reveal?.distribution, !distribution.isEmpty {
+                    DistributionSection(distribution: distribution)
                 }
                 if let explanation = uiState.reveal?.explanation {
                     Text(explanation)
                         .font(.system(size: 13))
                         .kerning(-0.26)
                         .foregroundColor(PassmateColors.textSecondary)
-                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 4)
+                }
+                SectionDivider()
+                    .padding(.top, 20)
+                VStack(spacing: 12) {
+                    Text("다음 문항을 기다리고 있어요")
+                        .font(.system(size: 14))
+                        .kerning(-0.28)
+                        .foregroundColor(PassmateColors.textSecondary)
+                    PassmateWaitingDots()
+                }
+                .padding(.top, 24)
+                .padding(.bottom, 40)
+            }
+        }
+    }
+}
+
+private struct RevealHeader: View {
+    let uiState: PlayUiState
+
+    let onClickLeave: () -> Void
+
+    private var label: String {
+        if let question = uiState.question {
+            return "Q\(question.questionNo) / \(uiState.questionCount) · 결과"
+        } else {
+            return "잠시만요"
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text(label)
+                    .font(.system(size: 14, weight: .bold))
+                    .kerning(-0.28)
+                    .foregroundColor(PassmateColors.textPrimary)
+                Spacer()
+                Button(action: onClickLeave) {
+                    Text("나가기")
+                        .font(.system(size: 14, weight: .medium))
+                        .kerning(-0.28)
+                        .foregroundColor(PassmateColors.textSecondary)
                 }
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 34)
+            .padding(.horizontal, 20)
+            .padding(.top, 28)
+            .padding(.bottom, 16)
+            SectionDivider()
         }
+    }
+}
+
+// 시안(637:8588)은 정답 맞힌 경우만 그려져 있다 — 민트 카드에 초록 "정답" 배지.
+// 오답·미제출까지 그 색을 쓰면 실패가 성공처럼 읽힌다(실측: "미제출"이 초록 배지로 나왔다).
+// 정답일 때만 민트를 쓰고 나머지는 중립색으로 내린다
+private struct ScoreCard: View {
+    let uiState: PlayUiState
+
+    private var isCorrect: Bool {
+        uiState.myAnswerResult?.correct?.boolValue == true
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                VerdictPill(uiState: uiState)
+                Spacer()
+                if let rank = uiState.rank {
+                    RankChip(rank: rank, rankDelta: uiState.myAnswerResult?.rankDelta.map { Int(truncating: $0) })
+                }
+            }
+            Text(resultScoreText(uiState))
+                .font(.system(size: 38, weight: .bold))
+                .kerning(-0.76)
+                .foregroundColor(isCorrect ? PassmateColors.primaryDeep : PassmateColors.textPrimary)
+            if let caption = resultCaption(uiState) {
+                Text(caption)
+                    .font(.system(size: 14))
+                    .kerning(-0.28)
+                    .foregroundColor(isCorrect ? PassmateColors.primaryDeep : PassmateColors.textSecondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 20)
+        .padding(.vertical, 18)
+        .background(isCorrect ? PassmateColors.backgroundMint : PassmateColors.fieldGray)
+        .cornerRadius(16)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 20)
+    }
+}
+
+private struct VerdictPill: View {
+    let uiState: PlayUiState
+
+    private var isCorrect: Bool {
+        uiState.myAnswerResult?.correct?.boolValue == true
+    }
+
+    private var label: String {
+        let result = uiState.myAnswerResult
+
+        if result?.isProvisional == true {
+            return "채점 중"
+        } else if isCorrect {
+            return "정답"
+        } else if result?.correct?.boolValue == false {
+            return "오답"
+        } else if !uiState.hasSubmitted {
+            return "미제출"
+        } else {
+            return "제출 완료"
+        }
+    }
+
+    var body: some View {
+        Text(label)
+            .font(.system(size: 14, weight: .bold))
+            .kerning(-0.28)
+            .foregroundColor(isCorrect ? PassmateColors.surface : PassmateColors.textSecondary)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 8)
+            .background(isCorrect ? PassmateColors.primary : PassmateColors.surface)
+            .clipShape(Capsule())
+    }
+}
+
+private struct AnswerSection: View {
+    let answer: String
+
+    let isMine: Bool
+
+    let distribution: [ChoiceDistribution]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            SectionLabel(text: "정 답")
+                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 14) {
+                if let answerNo = distribution.first(where: { $0.isAnswer })?.choiceNo {
+                    ChoiceNoChip(choiceNo: Int(answerNo), isHighlighted: true)
+                }
+                Text(answer)
+                    .font(.system(size: 22, weight: .bold))
+                    .kerning(-0.44)
+                    .foregroundColor(PassmateColors.textPrimary)
+                Spacer()
+                if isMine {
+                    Text("내가 고른 답과 같아요")
+                        .font(.system(size: 14, weight: .medium))
+                        .kerning(-0.28)
+                        .foregroundColor(PassmateColors.primaryDeep)
+                        .multilineTextAlignment(.trailing)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 10)
+            .padding(.bottom, 18)
+            SectionDivider()
+        }
+    }
+}
+
+private struct DistributionSection: View {
+    let distribution: [ChoiceDistribution]
+
+    // 막대 길이는 최다 응답이 아니라 전체 응답 수 기준이다 — 시안의 4/6이 3분의 2쯤 찬다
+    private var total: Int {
+        distribution.reduce(0) { $0 + Int($1.count) }
+    }
+
+    var body: some View {
+        VStack(spacing: 6) {
+            SectionLabel(text: "응 답 분 포")
+                .frame(maxWidth: .infinity, alignment: .leading)
+            ForEach(distribution, id: \.choiceNo) { entry in
+                DistributionRow(entry: entry, total: total)
+            }
+        }
+        .padding(.top, 18)
+    }
+}
+
+private struct DistributionRow: View {
+    let entry: ChoiceDistribution
+
+    let total: Int
+
+    private var ratio: Double {
+        total == 0 ? 0 : Double(entry.count) / Double(total)
+    }
+
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 12) {
+                ChoiceNoChip(choiceNo: Int(entry.choiceNo), isHighlighted: entry.isAnswer)
+                Text(entry.label)
+                    .font(.system(size: 17, weight: entry.isAnswer ? .bold : .regular))
+                    .kerning(-0.34)
+                    .foregroundColor(PassmateColors.textPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text("\(entry.count)명")
+                    .font(.system(size: 14, weight: .bold))
+                    .kerning(-0.28)
+                    .foregroundColor(entry.isAnswer ? PassmateColors.primaryDeep : PassmateColors.textSecondary)
+            }
+            DistributionBar(ratio: ratio, isAnswer: entry.isAnswer)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(entry.isAnswer ? PassmateColors.backgroundMint : Color.clear)
+        .cornerRadius(12)
+        .padding(.horizontal, 20)
+    }
+}
+
+private struct DistributionBar: View {
+    let ratio: Double
+
+    let isAnswer: Bool
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(PassmateColors.fieldGray)
+                // 0명이어도 트랙만 남기고 채우지 않는다 (시안 4번 보기)
+                if ratio > 0 {
+                    Capsule()
+                        .fill(isAnswer ? PassmateColors.primary : PassmateColors.skeletonBlock)
+                        .frame(width: geometry.size.width * ratio)
+                }
+            }
+        }
+        .frame(height: 8)
+    }
+}
+
+private struct ChoiceNoChip: View {
+    let choiceNo: Int
+
+    let isHighlighted: Bool
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(isHighlighted ? PassmateColors.primary : Color.clear)
+            Circle()
+                .strokeBorder(isHighlighted ? Color.clear : PassmateColors.border, lineWidth: 1)
+            Text("\(choiceNo)")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(isHighlighted ? PassmateColors.surface : PassmateColors.textSecondary)
+        }
+        .frame(width: 34, height: 34)
+    }
+}
+
+private struct SectionLabel: View {
+    let text: String
+
+    var body: some View {
+        Text(text)
+            .font(.system(size: 12, weight: .bold))
+            .kerning(1.2)
+            .foregroundColor(PassmateColors.textSecondary)
+            .padding(.horizontal, 20)
+    }
+}
+
+private struct SectionDivider: View {
+    var body: some View {
+        Rectangle()
+            .fill(PassmateColors.border)
+            .frame(height: 1)
+            .padding(.horizontal, 20)
     }
 }
 
@@ -451,19 +675,19 @@ private struct RankChip: View {
     var body: some View {
         HStack(spacing: 6) {
             Text("현재 \(rank)위")
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: 14, weight: .bold))
                 .kerning(-0.28)
                 .foregroundColor(PassmateColors.textPrimary)
             if let rankDelta, rankDelta != 0 {
                 Text(rankDelta > 0 ? "▲\(rankDelta)" : "▼\(-rankDelta)")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundColor(rankDelta > 0 ? PassmateColors.primary : PassmateColors.textSecondary)
             }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
-        .background(PassmateColors.fieldGray)
-        .cornerRadius(10)
+        .background(PassmateColors.surface)
+        .clipShape(Capsule())
     }
 }
 
@@ -680,13 +904,10 @@ private func questionTypeLabel(_ type: QuestionType?) -> String {
     }
 }
 
-private func resultTitle(_ uiState: PlayUiState) -> String {
+// 점수만 담당한다 — 정답/오답 판정 문구는 VerdictPill이 그린다 (시안 M-04)
+private func resultScoreText(_ uiState: PlayUiState) -> String {
     if let result = uiState.myAnswerResult {
-        if result.isProvisional {
-            return "+\(Int(result.earnedScore))점 (잠정)"
-        } else {
-            return "+\(Int(result.earnedScore))점"
-        }
+        return "+\(Int(result.earnedScore))점"
     } else if uiState.reveal != nil && !uiState.hasSubmitted {
         return "시간 종료!"
     } else {
@@ -844,7 +1065,13 @@ private func formatScore(_ total: Double) -> String {
             reveal: PlayUiState.Reveal(
                 answer: "3",
                 explanation: "이웃한 두 항의 차 5-2=3, 8-5=3으로 공차는 3이에요.",
-                correctAnswererCount: 5
+                correctAnswererCount: 4,
+                distribution: [
+                    ChoiceDistribution(choiceNo: 1, label: "1", count: 1, isAnswer: false, isMine: false),
+                    ChoiceDistribution(choiceNo: 2, label: "2", count: 1, isAnswer: false, isMine: false),
+                    ChoiceDistribution(choiceNo: 3, label: "3", count: 4, isAnswer: true, isMine: true),
+                    ChoiceDistribution(choiceNo: 4, label: "4", count: 0, isAnswer: false, isMine: false)
+                ]
             ),
             totalScore: 480,
             rank: 2,

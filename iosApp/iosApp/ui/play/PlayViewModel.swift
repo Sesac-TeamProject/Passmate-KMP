@@ -196,6 +196,13 @@ final class PlayViewModel: ObservableObject {
     }
 
     private func onQuestionEnded(_ ended: ServerEventQuestionEnded) {
+        // 분포 짝짓기는 shared가 한다 — Compose와 같은 구현을 쓴다 (규칙 §2 미러)
+        let distribution = uiState.question?.distributionOf(
+            raw: ended.answerReveal.distribution,
+            answer: ended.answerReveal.answer,
+            myChoiceIndex: uiState.selectedChoiceIndex.map { KotlinInt(int: Int32($0)) }
+        ) ?? []
+
         deadline = nil
         stopTicker()
         uiState.phase = .idle
@@ -203,7 +210,8 @@ final class PlayViewModel: ObservableObject {
         uiState.reveal = PlayUiState.Reveal(
             answer: ended.answerReveal.answer,
             explanation: ended.answerReveal.explanation,
-            correctAnswererCount: Int(ended.correctCount)
+            correctAnswererCount: Int(ended.correctCount),
+            distribution: distribution
         )
     }
 

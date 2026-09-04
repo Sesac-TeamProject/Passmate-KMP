@@ -73,7 +73,8 @@ object ServerEventDecoder {
                     questionNo = it.orderNo,
                     answerReveal = ServerEvent.QuestionEnded.AnswerReveal(
                         answer = it.answer,
-                        explanation = it.explanation
+                        explanation = it.explanation,
+                        distribution = it.distribution
                     ),
                     correctCount = it.correctCount
                 )

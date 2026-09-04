@@ -22,6 +22,7 @@ import org.sesacteamproject.passmate.session.domain.model.QuestionDeadline
 import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.session.domain.model.RankEntry
 import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
+import org.sesacteamproject.passmate.session.domain.model.distributionOf
 import org.sesacteamproject.passmate.session.domain.model.SessionSnapshot
 import org.sesacteamproject.passmate.session.domain.model.VoiceHint
 import org.sesacteamproject.passmate.session.domain.policy.SnapshotPolicy
@@ -228,7 +229,12 @@ class PlayViewModel(
                 reveal = PlayUiState.Reveal(
                     answer = event.answerReveal.answer,
                     explanation = event.answerReveal.explanation,
-                    correctAnswererCount = event.correctCount
+                    correctAnswererCount = event.correctCount,
+                    distribution = state.question?.distributionOf(
+                        raw = event.answerReveal.distribution,
+                        answer = event.answerReveal.answer,
+                        myChoiceIndex = state.selectedChoiceIndex
+                    ).orEmpty()
                 )
             )
         }

@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateWaitingDots
 import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.component.StudentAvatar
@@ -114,7 +115,7 @@ private fun WaitingContentScreen(
         } else {
             EnteredCard(uiState = uiState)
             Spacer(modifier = Modifier.weight(1f))
-            WaitingDots(
+            PassmateWaitingDots(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 40.dp)
@@ -248,38 +249,6 @@ private fun ParticipantAvatarRow(
     }
 }
 
-@Composable
-private fun WaitingDots(modifier: Modifier = Modifier) {
-    val transition = rememberInfiniteTransition()
-    val phase by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = DOT_COUNT.toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        )
-    )
-
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        repeat(DOT_COUNT) { index ->
-            val isActive = phase.toInt() % DOT_COUNT == index
-
-            // 비활성 점도 같은 민트를 옅게 쓴다 — Border(연회색) x 0.4는 실기기에서 거의 안 보였다
-            Box(
-                modifier = Modifier
-                    .size(7.dp)
-                    .alpha(if (isActive) 1f else INACTIVE_DOT_ALPHA)
-                    .background(color = PassmateColors.Primary, shape = CircleShape)
-            )
-        }
-    }
-}
-
-private const val INACTIVE_DOT_ALPHA = 0.35f
-
 private fun formatPin(pin: String): String {
     return pin.chunked(3).joinToString(" ")
 }
@@ -294,7 +263,6 @@ private fun waitingMessage(nickname: String?): String {
 
 private const val MAX_VISIBLE_AVATARS = 4
 
-private const val DOT_COUNT = 3
 
 // --- Preview ---
 
