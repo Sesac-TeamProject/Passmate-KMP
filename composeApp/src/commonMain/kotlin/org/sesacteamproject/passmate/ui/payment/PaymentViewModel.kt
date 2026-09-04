@@ -98,7 +98,18 @@ class PaymentViewModel(
             _uiState.update { it.copy(isProcessing = true, errorMessage = null) }
             viewModelScope.launch { payEntryAndEnter(state.room) }
         } else {
-            _uiState.update { it.copy(isProcessing = true, errorMessage = null) }
+            // 얼마가 모자란지 먼저 보여 준다 — 바로 결제창을 열면 무슨 금액인지 알 수 없다 (M-11)
+            _uiState.update { it.copy(isCoinShortageSheetVisible = true, errorMessage = null) }
+        }
+    }
+
+    private fun onConfirmCharge() {
+        val state = _uiState.value
+
+        if (state.isProcessing) {
+            return
+        } else {
+            _uiState.update { it.copy(isCoinShortageSheetVisible = false, isProcessing = true, errorMessage = null) }
             viewModelScope.launch { startCharge() }
         }
     }
@@ -225,6 +236,8 @@ class PaymentViewModel(
             is PaymentAction.SelectAvatar -> onSelectAvatar(action.avatarId)
             is PaymentAction.SelectMethod -> onSelectMethod(action.method)
             is PaymentAction.ClickPay -> onClickPay()
+            is PaymentAction.ConfirmCharge -> onConfirmCharge()
+            is PaymentAction.DismissCoinShortage -> _uiState.update { it.copy(isCoinShortageSheetVisible = false) }
             is PaymentAction.ReceivePortOneResult -> onReceivePortOneResult(action.result)
             is PaymentAction.DismissError -> _uiState.update { it.copy(errorMessage = null) }
             is PaymentAction.Retry -> load()

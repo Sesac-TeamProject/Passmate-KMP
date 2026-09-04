@@ -14,8 +14,13 @@ sealed interface PaymentAction {
 
     data class SelectMethod(val method: PaymentMethod) : PaymentAction
 
-    // 주 CTA — 잔액 충분하면 참가비 차감, 부족하면 충전(포트원) 시작
+    // 주 CTA — 잔액 충분하면 참가비 차감, 부족하면 코인 부족 시트(M-11)를 띄운다
     data object ClickPay : PaymentAction
+
+    // 코인 부족 시트의 충전 CTA — 여기서부터 포트원 충전이 시작된다
+    data object ConfirmCharge : PaymentAction
+
+    data object DismissCoinShortage : PaymentAction
 
     data class ReceivePortOneResult(val result: PortOneResult) : PaymentAction
 

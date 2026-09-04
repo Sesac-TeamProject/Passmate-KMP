@@ -20,6 +20,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -39,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.PassmateCard
+import org.sesacteamproject.passmate.component.PassmateIcon
+import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.component.PortOnePaymentView
 import org.sesacteamproject.passmate.component.ReputationBadge
@@ -60,7 +65,8 @@ import org.sesacteamproject.passmate.payment.domain.policy.SettlementPolicy
 private const val AVATARS_PER_ROW = 6
 
 // 유료 방 입장 결제 (M-01 v2 / W-11). 방 정보 + 보유 코인/참가비 + 닉네임·캐릭터 + 결제 CTA.
-// 포트원 결제창(웹뷰) 오버레이는 이 컨테이너가 소유한다 (규칙 §11-1).
+// 포트원 결제창(웹뷰)과 코인 부족 시트(M-11) 오버레이는 이 컨테이너가 소유한다 (규칙 §11-1).
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentScreen(
     viewModel: PaymentViewModel = koinScreenViewModel(),
@@ -69,6 +75,7 @@ fun PaymentScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val coinShortageSheetState = rememberModalBottomSheetState()
     // 결제 수단 드롭다운 펼침은 순수 UI 상태 — 컨테이너가 소유한다 (규칙 §11-1)
     var isMethodExpanded by remember { mutableStateOf(false) }
 
@@ -108,6 +115,20 @@ fun PaymentScreen(
             }
         }
         SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
+    }
+    if (uiState.isCoinShortageSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.onAction(PaymentAction.DismissCoinShortage) },
+            sheetState = coinShortageSheetState,
+            containerColor = PassmateColors.Surface
+        ) {
+            CoinShortageSheetContent(
+                entryFee = uiState.entryFee,
+                balance = uiState.balance,
+                shortfall = uiState.shortfall,
+                onClickCharge = { viewModel.onAction(PaymentAction.ConfirmCharge) }
+            )
+        }
     }
 }
 
@@ -326,7 +347,7 @@ private fun EntryFeeSection(entryFee: Int) {
                 letterSpacing = (-0.28).sp
             )
             Text(
-                text = "$entryFee C",
+                text = "${formatNumber(entryFee)} C",
                 color = PassmateColors.PrimaryDeep,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -459,7 +480,7 @@ private fun MethodField(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
-            text = "보유 코인 $balance C · 부족 $shortfall C",
+            text = "보유 코인 ${formatNumber(balance)} C · 부족 ${formatNumber(shortfall)} C",
             color = PassmateColors.TextSecondary,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
@@ -518,9 +539,9 @@ private fun PayButton(
     onClick: () -> Unit
 ) {
     val label = if (uiState.hasEnough) {
-        "${uiState.entryFee} C 결제하고 입장"
+        "${formatNumber(uiState.entryFee)} C 결제하고 입장"
     } else {
-        "${uiState.shortfall} C 충전하고 입장"
+        "${formatNumber(uiState.shortfall)} C 충전하고 입장"
     }
     val enabled = !uiState.isProcessing
     val background = if (enabled) PassmateColors.Primary else PassmateColors.Border
@@ -622,6 +643,81 @@ private fun formatTime(isoTime: String): String {
     }
 }
 
+// Figma "UI 디자인 v6" 코인 부족 시트(M-11) — 얼마가 모자란지와 충전 경로를 함께 보여 준다.
+// 시트를 띄울지 말지는 VM이 정하고, 여기서는 그리기만 한다 (규칙 §11-1)
+@Composable
+private fun CoinShortageSheetContent(
+    entryFee: Int,
+    balance: Int,
+    shortfall: Int,
+    onClickCharge: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp, bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PassmateIcon(
+                icon = PassmateIcons.Coin,
+                contentDescription = null,
+                modifier = Modifier.size(26.dp),
+                tint = PassmateColors.PrimaryDeep
+            )
+            Text(
+                text = "코인이 모자라요",
+                color = PassmateColors.TextPrimary,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.2).sp
+            )
+        }
+        Text(
+            text = "참가비 ${formatNumber(entryFee)} C · 보유 ${formatNumber(balance)} C",
+            color = PassmateColors.TextSecondary,
+            fontSize = 15.sp,
+            letterSpacing = (-0.15).sp
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .background(PassmateColors.ErrorIconBg, RoundedCornerShape(14.dp))
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                text = "${formatNumber(shortfall)} C 더 필요해요",
+                color = PassmateColors.ErrorIconTint,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.16).sp
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .background(PassmateColors.Primary, RoundedCornerShape(14.dp))
+                .clickable(onClick = onClickCharge),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "코인 충전하기",
+                color = PassmateColors.Surface,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.16).sp
+            )
+        }
+    }
+}
+
+private fun formatNumber(value: Int): String {
+    return value.toString().reversed().chunked(3).joinToString(",").reversed()
+}
+
 // --- Preview ---
 
 private val previewPaidRoom = RoomInfo(
@@ -697,6 +793,20 @@ private fun PaymentContentScreenErrorPreview() {
             isMethodExpanded = false,
             onToggleMethodExpanded = {},
             onBack = {}
+        )
+    }
+}
+
+// M-11 코인 부족 시트
+@PassmatePreview
+@Composable
+private fun CoinShortageSheetContentPreview() {
+    PassmateTheme {
+        CoinShortageSheetContent(
+            entryFee = 5000,
+            balance = 1200,
+            shortfall = 3800,
+            onClickCharge = {}
         )
     }
 }
