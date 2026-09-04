@@ -72,12 +72,13 @@ class MyPageDetailMapperTest {
               "totalCount": 8,
               "badges": [
                 {"code":"FIRST_ROOM","name":"첫 방 개설","achieved":true,"achievedAt":"2026-07-01T09:00:00"},
-                {"code":"ROOMS_10","name":"방 10회 운영","achieved":false,"progress":4,"target":10},
+                {"code":"ROOMS_10","name":"방 10회 운영","achieved":false,"progress":4,"target":10.0},
                 {"code":"UNKNOWN_BADGE","name":"모르는 뱃지","achieved":false}
               ]
             }
         """.trimIndent()
 
+        // 서버 target은 double이다 (OpenAPI BadgeResponse.target: number/double) — 정수 픽스처는 실패를 가린다
         val badges = json.decodeFromString<BadgesResponse>(raw).toDomain()
 
         // 서버가 모르는 코드를 주면 화면에서 접는다

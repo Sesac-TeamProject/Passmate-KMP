@@ -19,6 +19,7 @@ data class BadgesResponse(
         val achieved: Boolean = false,
         val achievedAt: String? = null,
         val progress: Int? = null,
-        val target: Int? = null
+        // 서버는 target만 double로 준다 (OpenAPI BadgeResponse: progress int32 / target double)
+        val target: Double? = null
     )
 }
