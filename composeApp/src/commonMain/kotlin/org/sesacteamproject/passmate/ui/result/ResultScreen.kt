@@ -23,7 +23,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -41,11 +40,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.component.PassmateCard
-import org.sesacteamproject.passmate.component.PassmateSkeletonBlock
-import org.sesacteamproject.passmate.component.PassmateSkeletonCard
 import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.PassmateIcons
+import org.sesacteamproject.passmate.component.PassmateSkeletonBlock
+import org.sesacteamproject.passmate.component.PassmateSkeletonCard
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -101,10 +101,9 @@ fun ResultScreen(
     }
     // 평가 시트는 컨테이너가 소유 (규칙 §11-1) — 오버레이/모달은 콘텐츠 뷰에 두지 않는다
     if (uiState.isRatingSheetVisible) {
-        ModalBottomSheet(
+        PassmateBottomSheet(
             onDismissRequest = { viewModel.onAction(ResultAction.DismissRatingSheet) },
             sheetState = ratingSheetState,
-            containerColor = PassmateColors.Surface
         ) {
             RatingSection(
                 uiState = uiState,

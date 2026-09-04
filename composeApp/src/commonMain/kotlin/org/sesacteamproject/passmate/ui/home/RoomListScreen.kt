@@ -23,7 +23,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -43,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.ReputationBadge
 import org.sesacteamproject.passmate.di.koinScreenViewModel
@@ -90,10 +90,9 @@ fun RoomListScreen(onNavigate: (NavigationAction) -> Unit) {
     val hostId = profileHostId
 
     if (hostId != null) {
-        ModalBottomSheet(
+        PassmateBottomSheet(
             onDismissRequest = { profileHostId = null },
             sheetState = profileSheetState,
-            containerColor = PassmateColors.Surface
         ) {
             HostProfileSheet(
                 hostId = hostId,
