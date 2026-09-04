@@ -109,7 +109,7 @@ fun BadgesResponse.toDomain(): List<Badge> {
                 earned = item.achieved,
                 earnedAt = item.achievedAt,
                 progressCurrent = item.progress,
-                progressTarget = item.target?.toInt()
+                progressTarget = item.target
             )
         }
     }

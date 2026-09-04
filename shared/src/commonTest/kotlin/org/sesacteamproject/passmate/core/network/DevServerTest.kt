@@ -14,9 +14,10 @@ class DevServerTest {
             "http://localhost:8080",
             "http://127.0.0.1:8080",
             "http://10.0.2.2:8080",          // 안드로이드 에뮬레이터 별칭
-            "http://172.16.0.182:8080",      // 맥 LAN IP
+            "http://172.16.1.20:8080",       // 개발 PC LAN (172.16~31 대역)
             "http://192.168.0.5:8080",
-            "http://10.1.2.3:8080"
+            "http://10.1.2.3:8080",
+            "http://[::1]:8080"              // IPv6 루프백
         )
 
         devUrls.forEach { url ->
@@ -41,8 +42,11 @@ class DevServerTest {
 
     @Test
     fun parsesHostWithoutSchemeAndPort() {
-        assertEquals("172.16.0.182", hostOf("http://172.16.0.182:8080"))
+        assertEquals("172.16.1.20", hostOf("http://172.16.1.20:8080"))
         assertEquals("api.passmate.app", hostOf("https://api.passmate.app"))
         assertEquals("localhost", hostOf("http://localhost:8080/"))
+        // IPv6는 주소 자체에 콜론이 있다 — 포트부터 자르면 "[:"가 된다
+        assertEquals("::1", hostOf("http://[::1]:8080"))
+        assertEquals("::1", hostOf("http://[::1]"))
     }
 }

@@ -18,12 +18,17 @@ private fun String.isPrivateNetworkHost(): Boolean {
     }
 }
 
-// "http://172.16.0.182:8080" → "172.16.0.182"
+// "http://10.0.2.2:8080" → "10.0.2.2", "http://[::1]:8080" → "::1"
 internal fun hostOf(baseUrl: String): String {
     val withoutScheme = baseUrl.substringAfter("://")
     val withoutPath = withoutScheme.substringBefore("/")
 
-    return withoutPath.substringBeforeLast(":").removeSurrounding("[", "]")
+    return if (withoutPath.startsWith("[")) {
+        // IPv6는 주소 안에 콜론이 있어 포트부터 자르면 주소가 잘린다 — 대괄호를 먼저 판다
+        withoutPath.substringAfter("[").substringBefore("]")
+    } else {
+        withoutPath.substringBefore(":")
+    }
 }
 
 fun isLocalDevServer(baseUrl: String): Boolean {
