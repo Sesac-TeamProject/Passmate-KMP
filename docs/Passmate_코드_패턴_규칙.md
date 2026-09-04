@@ -33,7 +33,7 @@
 ### 2-1-1. 공통 라우트 규격
 
 - 루트 라우트: `Home`, `SignIn`, `Join`, `Waiting`, `Play`, `Result`, `MyInfo`, `Payment`
-- 하단 탭 루트(피그마 v6, 2026-08-30): `Home`(홈=입장 폼 인라인) · `HostedRooms`(내가 만든 방) · `JoinedRooms`(참여한 방) · `MyInfo`(마이). 탭 바는 이 4개 루트에서만 표시하고 push된 화면에서는 숨긴다. 게스트가 로그인 필수 탭(`HostedRooms`·`JoinedRooms`·`MyInfo`)을 누르면 화면을 열지 않고 `SignIn`으로 보낸다(판단은 셸 `AppShellViewModel`).
+- 하단 탭 루트(피그마 v6, 2026-08-30): `Home`(홈=입장 폼 인라인) · `HostedRooms`(내가 만든 방) · `JoinedRooms`(참여한 방) · `MyInfo`(마이). 탭 바는 이 4개 루트와 **시안이 탭 바를 유지하는 상세 화면**에서 표시하고, 그 밖의 push 화면에서는 숨긴다 (2026-09-04 실기기 대조로 갱신 — 이전 규칙은 "4개 루트에서만"이었다). 탭 바를 유지하는 상세는 마이 하위 `M-12-x` 전부(계정 정보·정산 계좌·코인 충전·내 캐릭터·결제 수단·코인 내역·알림 설정·회원 탈퇴)와 `M-14` 방 리포트다. 세션 플로우(`Waiting`·`Play`·`Result`·`Payment`)와 `M-09` 명성·`M-T4` 정산은 시안에 탭 바가 없다. 판정은 한 곳에 둔다 — Compose `AppTab.barOwnerOf`, iOS `Route.tabBarOwner`, Desktop `JvmDestination.toTabBarOwner`. 게스트가 로그인 필수 탭(`HostedRooms`·`JoinedRooms`·`MyInfo`)을 누르면 화면을 열지 않고 `SignIn`으로 보낸다(판단은 셸 `AppShellViewModel`).
 - `Join`은 `join?pin=`(QR·딥링크·방 목록 참여)일 때만 push 라우트로 쓴다. pin 없는 입장은 `Home` 탭이 담당한다.
 - 라우트 인자: `join?pin=`, `waiting/{pin}`, `play/{pin}`, `result/{participationId}`, `payment/{pin}`
 - `Home` = 입장 폼(인라인 PIN·QR·닉네임·캐릭터). 앱 시작 기본 진입은 항상 `Home`(게스트 포함).

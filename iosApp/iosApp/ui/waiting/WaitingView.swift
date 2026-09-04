@@ -192,10 +192,11 @@ private struct WaitingDots: View {
     var body: some View {
         HStack(spacing: 6) {
             ForEach(0..<3, id: \.self) { index in
+                // 비활성 점도 같은 민트를 옅게 쓴다 — border(연회색) x 0.4는 실기기에서 거의 안 보였다
                 Circle()
-                    .fill(index == activeDot ? PassmateColors.primary : PassmateColors.border)
+                    .fill(PassmateColors.primary)
                     .frame(width: 7, height: 7)
-                    .opacity(index == activeDot ? 1.0 : 0.4)
+                    .opacity(index == activeDot ? 1.0 : 0.35)
             }
         }
         .onReceive(timer) { _ in

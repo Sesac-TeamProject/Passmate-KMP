@@ -18,7 +18,9 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            ZStack(alignment: .bottom) {
+            // 탭바는 겹치지 않고 자리를 차지한다 — ZStack으로 덮으면 탭 루트 콘텐츠의
+            // 마지막 줄·버튼이 탭바 밑으로 들어간다(M-01 로그인 안내·M-13 + 버튼·M-12 하단)
+            VStack(spacing: 0) {
             TabView(selection: tabSelection) {
                 // 홈 탭 = 입장 폼 인라인 (M-01 v6) — JoinView 재사용
                 JoinView(
@@ -100,6 +102,7 @@ struct ContentView: View {
                 }
                 .isDetailLink(false)
             )
+            .frame(maxHeight: .infinity)
             // 시안 v6 nav/4탭 — 기본 탭 바 대신 Compose와 같은 커스텀 바를 그린다 (규칙 §14)
             PassmateBottomTabBar(
                 selectedTab: selectedTab,

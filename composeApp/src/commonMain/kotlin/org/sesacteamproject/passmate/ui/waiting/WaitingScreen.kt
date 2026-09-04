@@ -267,18 +267,18 @@ private fun WaitingDots(modifier: Modifier = Modifier) {
         repeat(DOT_COUNT) { index ->
             val isActive = phase.toInt() % DOT_COUNT == index
 
+            // 비활성 점도 같은 민트를 옅게 쓴다 — Border(연회색) x 0.4는 실기기에서 거의 안 보였다
             Box(
                 modifier = Modifier
                     .size(7.dp)
-                    .alpha(if (isActive) 1f else 0.4f)
-                    .background(
-                        color = if (isActive) PassmateColors.Primary else PassmateColors.Border,
-                        shape = CircleShape
-                    )
+                    .alpha(if (isActive) 1f else INACTIVE_DOT_ALPHA)
+                    .background(color = PassmateColors.Primary, shape = CircleShape)
             )
         }
     }
 }
+
+private const val INACTIVE_DOT_ALPHA = 0.35f
 
 private fun formatPin(pin: String): String {
     return pin.chunked(3).joinToString(" ")
