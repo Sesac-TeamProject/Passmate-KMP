@@ -230,6 +230,111 @@ public class BrandAssets {
             bg, bg, N_STROKE, N_PATH);
     }
 
+    /** 둥근 사각형 마크 — 시안 '심볼 단독 · 민트 배경 위'. 반경 = 한 변의 22.4%, 심볼 높이 = 62%. */
+    static String roundedSquarePath(double side) {
+        double r = side * CORNER_RATIO;
+
+        return String.format(
+            "M%.4f,0 H%.4f A%.4f,%.4f 0 0 1 %.4f,%.4f V%.4f A%.4f,%.4f 0 0 1 %.4f,%.4f H%.4f "
+                + "A%.4f,%.4f 0 0 1 0,%.4f V%.4f A%.4f,%.4f 0 0 1 %.4f,0 Z",
+            r, side - r, r, r, side, r, side - r, r, r, side - r, side, r,
+            r, r, side - r, r, r, r, r);
+    }
+
+    /** 마크의 안드로이드 벡터 드로어블 — 배경 도형 + 심볼 두 그룹. */
+    static String markVector(int side, String bgHex, String fgHex, String note) {
+        double symbolHeight = side * SYMBOL_RATIO;
+        double scale = symbolHeight / SYMBOL_H;
+        double width = SYMBOL_W * scale;
+        double tx = (side - width) / 2.0;
+        double ty = (side - symbolHeight) / 2.0;
+        double inner = scale * INNER_SCALE;
+
+        return String.format("""
+            <?xml version="1.0" encoding="utf-8"?>
+            <!-- 자동 생성 — tools/brand/BrandAssets.java (%s). 직접 고치지 말 것 -->
+            <vector xmlns:android="http://schemas.android.com/apk/res/android"
+                android:width="%ddp"
+                android:height="%ddp"
+                android:viewportWidth="%d"
+                android:viewportHeight="%d">
+                <path
+                    android:fillColor="%s"
+                    android:pathData="%s" />
+                <group
+                    android:translateX="%.4f"
+                    android:translateY="%.4f"
+                    android:scaleX="%.7f"
+                    android:scaleY="%.7f">
+                    <path
+                        android:fillColor="%s"
+                        android:pathData="%s" />
+                </group>
+                <group
+                    android:translateX="%.4f"
+                    android:translateY="%.4f"
+                    android:scaleX="%.7f"
+                    android:scaleY="%.7f">
+                    <path
+                        android:fillColor="%s"
+                        android:strokeColor="%s"
+                        android:strokeWidth="%s"
+                        android:strokeLineJoin="round"
+                        android:pathData="%s" />
+                </group>
+            </vector>
+            """, note, side, side, side, side,
+            bgHex, roundedSquarePath(side),
+            tx, ty, inner, inner, fgHex, P_PATH,
+            tx + N_OFFSET_X * scale, ty + N_OFFSET_Y * scale, inner, inner,
+            bgHex, bgHex, N_STROKE, N_PATH);
+    }
+
+    /** 위 벡터의 iOS 사본 — 같은 변환을 SVG로 적는다(벡터 보존 에셋). */
+    static String markSvg(int side, String bgHex, String fgHex) {
+        double symbolHeight = side * SYMBOL_RATIO;
+        double scale = symbolHeight / SYMBOL_H;
+        double width = SYMBOL_W * scale;
+        double tx = (side - width) / 2.0;
+        double ty = (side - symbolHeight) / 2.0;
+        double inner = scale * INNER_SCALE;
+
+        return String.format("""
+            <!-- 자동 생성 — tools/brand/BrandAssets.java (brand mark). 직접 고치지 말 것 -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">
+              <path fill="%s" d="%s"/>
+              <g transform="translate(%.4f,%.4f) scale(%.7f)">
+                <path fill="%s" d="%s"/>
+              </g>
+              <g transform="translate(%.4f,%.4f) scale(%.7f)">
+                <path fill="%s" stroke="%s" stroke-width="%s" stroke-linejoin="round" d="%s"/>
+              </g>
+            </svg>
+            """, side, side, side, side,
+            bgHex, roundedSquarePath(side),
+            tx, ty, inner, fgHex, P_PATH,
+            tx + N_OFFSET_X * scale, ty + N_OFFSET_Y * scale, inner,
+            bgHex, bgHex, N_STROKE, N_PATH);
+    }
+
+    static final String MARK_IMAGESET_CONTENTS = """
+        {
+          "images" : [
+            {
+              "filename" : "brand-mark.svg",
+              "idiom" : "universal"
+            }
+          ],
+          "info" : {
+            "author" : "xcode",
+            "version" : 1
+          },
+          "properties" : {
+            "preserves-vector-representation" : true
+          }
+        }
+        """;
+
     static final String SOLID_BACKGROUND = """
         <?xml version="1.0" encoding="utf-8"?>
         <!-- 자동 생성 — tools/brand/BrandAssets.java. 시안 앱 아이콘 배경(민트 단색) -->
@@ -301,6 +406,16 @@ public class BrandAssets {
         for (int i = 0; i < launchScales.length; i++) {
             writePng(launch + "LaunchLogo@" + (i + 1) + "x.png", symbolOnly(launchScales[i], WHITE, MINT));
         }
+
+        // 7) 브랜드 마크 — 로고 락업(로그인 화면 등)에 쓰는 둥근 사각형 형태.
+        //    시안 '11 · 브랜드 — 로고' > 심볼 단독 · 민트 배경 위 = 민트 바탕에 흰 심볼
+        String mark = markVector(100, MINT_HEX, WHITE_HEX, "brand mark (mint square)");
+        writeText(androidRes + "drawable/ic_brand_mark.xml", mark);
+        writeText("composeApp/src/jvmMain/resources/drawable/ic_brand_mark.xml", mark);
+
+        String brandMark = "iosApp/iosApp/Assets.xcassets/BrandMark.imageset/";
+        writeText(brandMark + "brand-mark.svg", markSvg(100, MINT_HEX, WHITE_HEX));
+        writeText(brandMark + "Contents.json", MARK_IMAGESET_CONTENTS);
 
         // 6) 데스크톱 윈도우 아이콘
         writePng("composeApp/src/jvmMain/resources/passmate-icon.png", icon(512, MINT, WHITE, Shape.SQUIRCLE));

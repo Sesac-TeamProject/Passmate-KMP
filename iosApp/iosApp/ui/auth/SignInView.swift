@@ -96,12 +96,11 @@ private struct SignInContentView: View {
             PassyMascotView()
                 .frame(width: 120, height: 132)
             HStack(spacing: 8) {
-                Text("P")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(PassmateColors.surface)
+                // 시안 확정 로고 락업(가로형 국문) — 마크는 정사각 32pt
+                Image("BrandMark")
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 32, height: 32)
-                    .background(PassmateColors.primary)
-                    .cornerRadius(10)
                 Text("패스메이트")
                     .font(.system(size: 28, weight: .bold))
                     .kerning(-0.56)

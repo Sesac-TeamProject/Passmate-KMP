@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBrandMark
 import org.sesacteamproject.passmate.component.PassyMascot
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -110,19 +111,11 @@ private fun SignInHero(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(PassmateColors.Primary, RoundedCornerShape(10.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "P",
-                    color = PassmateColors.Surface,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            // 시안 확정 로고 락업(가로형 국문) — 마크는 정사각 32dp
+            PassmateBrandMark(
+                contentDescription = null,
+                modifier = Modifier.size(32.dp)
+            )
             Text(
                 text = "패스메이트",
                 color = PassmateColors.TextPrimary,
