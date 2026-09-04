@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 로컬 개발 서버는 http라 평문 통신이 필요하다. 다만 릴리스까지 열어 둘 이유는 없어
+     디버그 빌드에만 허용한다. iOS의 NSAllowsArbitraryLoads를 커밋하지 않는 것과 같은 취급이다. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application android:usesCleartextTraffic="true" />
+
+</manifest>
