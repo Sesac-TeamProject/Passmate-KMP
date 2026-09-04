@@ -618,16 +618,34 @@ private struct RoomReportContentView: View {
         )
     }
 
+    // 시안 M-14: "8/22(금) 진행 · 종료된 방 · PIN 482 913".
+    // 상태는 서버 값을 따르고, pin은 서버가 주지 않을 때(빈 값) 조각을 통째로 생략한다
     private func subtitle(_ report: RoomReport) -> String {
         var parts: [String] = []
 
         if let dateLabel = report.dateLabel {
             parts.append("\(dateLabel) 진행")
         }
-        parts.append("종료된 방")
-        parts.append("PIN \(formatPin(report.pin))")
-
+        if let status = statusLabel(report.status) {
+            parts.append(status)
+        }
+        if !report.pin.isEmpty {
+            parts.append("PIN \(formatPin(report.pin))")
+        }
         return parts.joined(separator: " · ")
+    }
+
+    private func statusLabel(_ status: RoomStatus) -> String? {
+        switch status {
+        case .waiting:
+            return "대기 중인 방"
+        case .running:
+            return "진행 중인 방"
+        case .finished:
+            return "종료된 방"
+        default:
+            return nil
+        }
     }
 
     private func formatPin(_ pin: String) -> String {

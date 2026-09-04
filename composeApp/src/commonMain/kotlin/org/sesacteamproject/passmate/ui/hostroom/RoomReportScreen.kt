@@ -879,14 +879,26 @@ private fun formatScore(score: Double): String {
     return digits.reversed().chunked(3).joinToString(",").reversed()
 }
 
+// 시안 M-14: "8/22(금) 진행 · 종료된 방 · PIN 482 913".
+// 상태는 서버 값을 따르고, pin은 서버가 주지 않을 때(빈 값) 조각을 통째로 생략한다
 private fun reportSubtitle(report: RoomReport): String {
     val parts = mutableListOf<String>()
 
     report.dateLabel?.let { parts.add("$it 진행") }
-    parts.add("종료된 방")
-    parts.add("PIN ${report.pin.chunked(3).joinToString(" ")}")
-
+    statusLabel(report.status)?.let { parts.add(it) }
+    if (report.pin.isNotBlank()) {
+        parts.add("PIN ${report.pin.chunked(3).joinToString(" ")}")
+    }
     return parts.joinToString(" · ")
+}
+
+private fun statusLabel(status: RoomStatus): String? {
+    return when (status) {
+        RoomStatus.WAITING -> "대기 중인 방"
+        RoomStatus.RUNNING -> "진행 중인 방"
+        RoomStatus.FINISHED -> "종료된 방"
+        RoomStatus.UNKNOWN -> null
+    }
 }
 
 // --- Preview ---
