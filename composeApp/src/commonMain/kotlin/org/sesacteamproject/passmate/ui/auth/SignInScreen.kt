@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHost
@@ -84,6 +85,8 @@ private fun SignInContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.BackgroundMint)
+            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            .statusBarsPadding()
     ) {
         SignInHero(modifier = Modifier.weight(1f))
         SignInSheet(
