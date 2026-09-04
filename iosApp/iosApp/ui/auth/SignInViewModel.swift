@@ -9,6 +9,8 @@ final class SignInViewModel: ObservableObject {
 
     private let completeGuestClaimUseCase: CompleteGuestClaimUseCase
 
+    private let devSignInUseCase: DevSignInUseCase
+
     @Published private(set) var uiState: SignInUiState
 
     let event = PassthroughSubject<SignInEvent, Never>()
@@ -25,6 +27,26 @@ final class SignInViewModel: ObservableObject {
 
     private func onClickGuestEnter() {
         event.send(.guestEnterRequested)
+    }
+
+    // 개발용 로그인 — 서버가 바로 토큰 쌍을 주므로 브라우저 왕복이 없다
+    private func onClickDevSignIn() {
+        if uiState.isSigningIn {
+            return
+        }
+        uiState.isSigningIn = true
+        devSignInUseCase.invoke { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.uiState.isSigningIn = false
+                if error == nil, result != nil, !(result is AppResultFailure) {
+                    self.claimPendingGuestRecord()
+                    self.event.send(.signInCompleted)
+                } else {
+                    self.event.send(.showNotice(message: "개발 로그인에 실패했어요. 로컬 백엔드가 떠 있는지 확인해 주세요"))
+                }
+            }
+        }
     }
 
     private func onReceiveOAuthCallback(accessToken: String, refreshToken: String) {
@@ -70,6 +92,8 @@ final class SignInViewModel: ObservableObject {
             onClickAppleSignIn()
         case .clickGuestEnter:
             onClickGuestEnter()
+        case .clickDevSignIn:
+            onClickDevSignIn()
         case let .receiveOAuthCallback(accessToken, refreshToken):
             onReceiveOAuthCallback(accessToken: accessToken, refreshToken: refreshToken)
         }
@@ -78,11 +102,17 @@ final class SignInViewModel: ObservableObject {
     init(
         buildGoogleSignInUrlUseCase: BuildGoogleSignInUrlUseCase,
         completeSignInUseCase: CompleteSignInUseCase,
-        completeGuestClaimUseCase: CompleteGuestClaimUseCase
+        completeGuestClaimUseCase: CompleteGuestClaimUseCase,
+        devSignInUseCase: DevSignInUseCase,
+        isDevSignInAvailableUseCase: IsDevSignInAvailableUseCase
     ) {
         self.buildGoogleSignInUrlUseCase = buildGoogleSignInUrlUseCase
         self.completeSignInUseCase = completeSignInUseCase
         self.completeGuestClaimUseCase = completeGuestClaimUseCase
-        self.uiState = SignInUiState()
+        self.devSignInUseCase = devSignInUseCase
+        self.uiState = SignInUiState(
+            isSigningIn: false,
+            isDevSignInAvailable: isDevSignInAvailableUseCase.invoke()
+        )
     }
 }

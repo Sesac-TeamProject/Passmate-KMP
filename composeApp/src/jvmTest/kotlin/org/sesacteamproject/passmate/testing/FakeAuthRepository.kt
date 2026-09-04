@@ -13,6 +13,14 @@ class FakeAuthRepository(
 
     var signOutCount: Int = 0
 
+    @get:JvmName("getIsDevSignInAvailableState")
+    @set:JvmName("setIsDevSignInAvailableState")
+    var isDevSignInAvailable: Boolean = false
+
+    var devSignInResult: AppResult<Unit> = AppResult.Success(Unit)
+
+    var devSignInCount: Int = 0
+
     override fun googleSignInUrl(): String {
         return "https://example.test/oauth"
     }
@@ -20,6 +28,20 @@ class FakeAuthRepository(
     override suspend fun completeSignIn(accessToken: String, refreshToken: String): AppResult<Unit> {
         isSignedIn = true
         return AppResult.Success(Unit)
+    }
+
+    override fun isDevSignInAvailable(): Boolean {
+        return isDevSignInAvailable
+    }
+
+    override suspend fun devSignIn(): AppResult<Unit> {
+        devSignInCount += 1
+
+        return if (devSignInResult is AppResult.Success) {
+            completeSignIn("dev-access", "dev-refresh")
+        } else {
+            devSignInResult
+        }
     }
 
     override fun isSignedIn(): Boolean {

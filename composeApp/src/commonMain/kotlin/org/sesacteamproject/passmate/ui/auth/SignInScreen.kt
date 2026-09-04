@@ -165,6 +165,12 @@ private fun SignInSheet(
             isSigningIn = uiState.isSigningIn,
             onClick = { onAction(SignInAction.ClickGuestEnter) }
         )
+        if (uiState.isDevSignInAvailable) {
+            DevSignInButton(
+                isSigningIn = uiState.isSigningIn,
+                onClick = { onAction(SignInAction.ClickDevSignIn) }
+            )
+        }
         Text(
             text = "계속하면 이용약관과 개인정보 처리방침에 동의한 것으로 봅니다\n선생님·학생 공용 계정 · 게스트 기록은 세션 후 사라져요",
             color = PassmateColors.TextTertiary,
@@ -263,6 +269,32 @@ private fun GuestEnterButton(
     }
 }
 
+// 로컬 개발 서버에서만 그려진다 — 운영 URL에서는 SignInUiState.isDevSignInAvailable이 false다
+@Composable
+private fun DevSignInButton(
+    isSigningIn: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(PassmateColors.Surface, RoundedCornerShape(14.dp))
+            .border(1.dp, PassmateColors.Border, RoundedCornerShape(14.dp))
+            .clickable(enabled = !isSigningIn, onClick = onClick)
+            .padding(vertical = 14.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "개발용 로그인 (로컬 서버)",
+            color = PassmateColors.TextTertiary,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.28).sp
+        )
+    }
+}
+
 @Composable
 internal expect fun GoogleSignInIcon(modifier: Modifier = Modifier)
 
@@ -274,6 +306,18 @@ private fun SignInContentScreenPreview() {
     PassmateTheme {
         SignInContentScreen(
             uiState = SignInUiState(),
+            onAction = {}
+        )
+    }
+}
+
+// 로컬 개발 서버에 붙었을 때 — 개발용 로그인 진입점이 하나 더 보인다
+@PassmatePreview
+@Composable
+private fun SignInContentScreenDevPreview() {
+    PassmateTheme {
+        SignInContentScreen(
+            uiState = SignInUiState(isDevSignInAvailable = true),
             onAction = {}
         )
     }
