@@ -22,4 +22,13 @@ enum PassmateIcons: String {
 
     // 경고 원 (목록 불러오기 실패 E-List 공통 패턴)
     case alertCircle = "AlertCircle"
+
+    // 집 (v6 nav/4탭 홈)
+    case home = "Home"
+
+    // 네모 안 더하기 (v6 nav/4탭 내가 만든 방)
+    case plusSquare = "PlusSquare"
+
+    // 사람 (v6 nav/4탭 마이)
+    case user = "User"
 }

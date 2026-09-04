@@ -21,5 +21,14 @@ enum class PassmateIcons(val resourceName: String) {
     Bookmark("ic_bookmark"),
 
     // 경고 원 (목록 불러오기 실패 E-List 공통 패턴 · v6 M-12e 마이 부분 실패) — iOS 에셋 이름은 "AlertCircle"
-    AlertCircle("ic_alert_circle")
+    AlertCircle("ic_alert_circle"),
+
+    // 집 (v6 nav/4탭 홈) — iOS 에셋 이름은 "Home"
+    Home("ic_home"),
+
+    // 네모 안 더하기 (v6 nav/4탭 내가 만든 방) — iOS 에셋 이름은 "PlusSquare"
+    PlusSquare("ic_plus_square"),
+
+    // 사람 (v6 nav/4탭 마이) — iOS 에셋 이름은 "User"
+    User("ic_user")
 }

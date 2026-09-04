@@ -9,18 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,8 +61,8 @@ private fun TabItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Icon(
-            imageVector = iconFor(tab),
+        PassmateIcon(
+            icon = iconFor(tab),
             contentDescription = tab.label,
             tint = color,
             modifier = Modifier.size(24.dp)
@@ -84,11 +77,12 @@ private fun TabItem(
     }
 }
 
-private fun iconFor(tab: AppTab): ImageVector {
+// 시안 v6 nav/4탭의 icon/* 과 1:1 (규칙 §11-3 — 화면 코드에 지오메트리를 쓰지 않는다)
+private fun iconFor(tab: AppTab): PassmateIcons {
     return when (tab) {
-        AppTab.HOME -> Icons.Filled.Home
-        AppTab.HOSTED_ROOMS -> Icons.Filled.Add
-        AppTab.JOINED_ROOMS -> Icons.Filled.List
-        AppTab.MY_INFO -> Icons.Filled.Person
+        AppTab.HOME -> PassmateIcons.Home
+        AppTab.HOSTED_ROOMS -> PassmateIcons.PlusSquare
+        AppTab.JOINED_ROOMS -> PassmateIcons.DoorOpen
+        AppTab.MY_INFO -> PassmateIcons.User
     }
 }

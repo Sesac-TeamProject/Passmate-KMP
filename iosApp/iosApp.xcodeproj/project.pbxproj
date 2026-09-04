@@ -147,6 +147,8 @@
 		A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */; };
 		A1010001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */; };
 		A1010001159AABBCCDDEEFF0159 /* PassmateIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */; };
+		A1010002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift */; };
+		A1010002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift */; };
 		A1010001158AABBCCDDEEFF0158 /* SheetDetents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001158AABBCCDDEEFF0158 /* SheetDetents.swift */; };
 		A1010000169AABBCCDDEEFF0169 /* PassmateIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000169AABBCCDDEEFF0169 /* PassmateIcons.swift */; };
 		A1010000170AABBCCDDEEFF0170 /* PassmateIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000170AABBCCDDEEFF0170 /* PassmateIconView.swift */; };
@@ -300,6 +302,8 @@
 		A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakTopicsRow.swift; sourceTree = "<group>"; };
 		A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateEmptyStateView.swift; sourceTree = "<group>"; };
 		A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateIconView.swift; sourceTree = "<group>"; };
+		A1011002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateBottomTabBar.swift; sourceTree = "<group>"; };
+		A1011002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeTabBarHidden.swift; sourceTree = "<group>"; };
 		A1011001158AABBCCDDEEFF0158 /* SheetDetents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetDetents.swift; sourceTree = "<group>"; };
 		A1011000169AABBCCDDEEFF0169 /* PassmateIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateIcons.swift; sourceTree = "<group>"; };
 		A1011000170AABBCCDDEEFF0170 /* PassmateIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateIconView.swift; sourceTree = "<group>"; };
@@ -611,6 +615,8 @@
 				A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */,
 				A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */,
 				A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */,
+				A1011002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift */,
+				A1011002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift */,
 				A1011001158AABBCCDDEEFF0158 /* SheetDetents.swift */,
 				A1011000169AABBCCDDEEFF0169 /* PassmateIcons.swift */,
 				A1011000170AABBCCDDEEFF0170 /* PassmateIconView.swift */,
@@ -856,6 +862,8 @@
 				A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */,
 				A1010001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift in Sources */,
 				A1010001159AABBCCDDEEFF0159 /* PassmateIconView.swift in Sources */,
+				A1010002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift in Sources */,
+				A1010002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift in Sources */,
 				A1010001158AABBCCDDEEFF0158 /* SheetDetents.swift in Sources */,
 				A1010000169AABBCCDDEEFF0169 /* PassmateIcons.swift in Sources */,
 				A1010000170AABBCCDDEEFF0170 /* PassmateIconView.swift in Sources */,
