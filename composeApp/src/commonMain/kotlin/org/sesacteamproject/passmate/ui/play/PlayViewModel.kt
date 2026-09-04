@@ -291,7 +291,8 @@ class PlayViewModel(
                 else -> null
             }
             QuestionType.ESSAY -> state.essayAnswer.trim().ifEmpty { null }
-            else -> state.selectedChoiceIndex?.let { question.choices.getOrNull(it) }
+            // OX는 서버가 choices를 주지 않아 answerChoices가 O/X를 채운다 (도메인 단일 출처)
+            else -> state.selectedChoiceIndex?.let { question.answerChoices.getOrNull(it) }
         }
     }
 

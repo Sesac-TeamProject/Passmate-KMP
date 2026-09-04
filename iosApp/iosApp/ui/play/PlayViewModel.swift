@@ -278,21 +278,14 @@ final class PlayViewModel: ObservableObject {
 
     private func buildAnswerContent() -> String? {
         guard let question = uiState.question else { return nil }
-        if question.type == QuestionType.ox {
-            if uiState.selectedChoiceIndex == 0 {
-                return "O"
-            } else if uiState.selectedChoiceIndex == 1 {
-                return "X"
-            } else {
-                return nil
-            }
-        } else if question.type == QuestionType.essay {
+        if question.type == QuestionType.essay {
             let trimmed = uiState.essayAnswer.trimmingCharacters(in: .whitespacesAndNewlines)
 
             return trimmed.isEmpty ? nil : trimmed
         } else {
-            if let index = uiState.selectedChoiceIndex, index < question.choices.count {
-                return question.choices[index]
+            // OX 포함 — answerChoices가 서버가 안 주는 O/X를 채운다 (도메인 단일 출처)
+            if let index = uiState.selectedChoiceIndex, index < question.answerChoices.count {
+                return question.answerChoices[index]
             } else {
                 return nil
             }

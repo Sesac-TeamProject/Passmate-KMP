@@ -393,7 +393,8 @@ private fun AnswerInputArea(
             onChange = { onAction(PlayAction.ChangeEssayAnswer(it)) }
         )
         QuestionType.OX -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            listOf("O", "X").forEachIndexed { index, label ->
+            // 제출값과 같은 목록을 그린다 — 화면에 O/X를 따로 적으면 인덱스와 값이 어긋난다
+            question.answerChoices.forEachIndexed { index, label ->
                 ChoiceRow(
                     chipLabel = label,
                     text = label,
