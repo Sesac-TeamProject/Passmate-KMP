@@ -93,8 +93,7 @@ private struct SignInContentView: View {
 
     private var heroSection: some View {
         VStack(spacing: 14) {
-            PassmateMascotView(mascot: .default)
-                .frame(width: 120, height: 132)
+            PassmateMascotView(mascot: .default, width: 120, height: 132)
             HStack(spacing: 8) {
                 // 시안 확정 로고 락업(가로형 국문) — 마크는 정사각 32pt
                 Image("BrandMark")

@@ -229,7 +229,7 @@ private struct SessionControlContentView: View {
                         .font(.system(size: 18, weight: .bold))
                         .kerning(-0.36)
                         .foregroundColor(PassmateColors.textPrimary)
-                    Text(typeLabel(question.type))
+                    Text(question.type.displayLabel)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(PassmateColors.ratingTagSelectedText)
                         .padding(.horizontal, 8)
@@ -373,17 +373,6 @@ private struct SessionControlContentView: View {
         }
     }
 
-    private func typeLabel(_ type: QuestionType) -> String {
-        if type == QuestionType.multipleChoice {
-            return "객관식"
-        } else if type == QuestionType.ox {
-            return "OX"
-        } else if type == QuestionType.essay {
-            return "서술형"
-        } else {
-            return "문항"
-        }
-    }
 
     private func formatPin(_ pin: String) -> String {
         stride(from: 0, to: pin.count, by: 3).map { start in

@@ -127,8 +127,7 @@ private struct WaitingContentView: View {
                     Circle()
                         .fill(PassmateColors.fieldGray)
                         .frame(width: 88, height: 88)
-                    PassmateMascotView(mascot: .waiting)
-                        .frame(width: 60, height: 66)
+                    PassmateMascotView(mascot: .waiting, width: 60, height: 66)
                 }
                 Text("입장 완료!")
                     .font(.system(size: 24, weight: .bold))

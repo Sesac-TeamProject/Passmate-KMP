@@ -159,7 +159,7 @@ private struct QuestionContent: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Q\(uiState.question.map { String($0.questionNo) } ?? "-") / \(uiState.questionCount) · \(questionTypeLabel(uiState.question?.type))")
+                Text("Q\(uiState.question.map { String($0.questionNo) } ?? "-") / \(uiState.questionCount) · \((uiState.question?.type ?? QuestionType.unknown).displayLabel)")
                     .font(.system(size: 14, weight: .medium))
                     .kerning(-0.28)
                     .foregroundColor(PassmateColors.textPrimary)
@@ -756,8 +756,7 @@ private struct FinalResultContent: View {
             .padding(.top, 32)
             .padding(.bottom, 70)
             .background(PassmateColors.backgroundMint)
-            PassmateMascotView(mascot: .success)
-                .frame(width: 60, height: 66)
+            PassmateMascotView(mascot: .success, width: 60, height: 66)
                 .padding(.top, 16)
                 .padding(.trailing, 6)
         }
@@ -892,17 +891,6 @@ private func choiceLetter(_ index: Int) -> String {
     return letters[min(index, letters.count - 1)]
 }
 
-private func questionTypeLabel(_ type: QuestionType?) -> String {
-    if type == QuestionType.multipleChoice {
-        return "객관식"
-    } else if type == QuestionType.ox {
-        return "OX"
-    } else if type == QuestionType.essay {
-        return "서술형"
-    } else {
-        return "문항"
-    }
-}
 
 // 점수만 담당한다 — 정답/오답 판정 문구는 VerdictPill이 그린다 (시안 M-04)
 private func resultScoreText(_ uiState: PlayUiState) -> String {

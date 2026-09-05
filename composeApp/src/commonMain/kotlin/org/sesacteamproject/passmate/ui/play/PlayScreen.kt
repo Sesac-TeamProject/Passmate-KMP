@@ -254,7 +254,7 @@ private fun PlayHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Q${question?.questionNo ?: "-"} / ${uiState.questionCount} · ${questionTypeLabel(question?.type)}",
+                text = "Q${question?.questionNo ?: "-"} / ${uiState.questionCount} · ${(question?.type ?: QuestionType.UNKNOWN).displayLabel}",
                 color = PassmateColors.TextPrimary,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
@@ -985,10 +985,11 @@ private fun FinalResultHeader(uiState: PlayUiState) {
         }
         PassmateMascot(
             mascot = PassmateMascots.Success,
+            width = 60.dp,
+            height = 66.dp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 36.dp, end = 6.dp)
-                .size(width = 60.dp, height = 66.dp)
         )
     }
 }
@@ -1128,15 +1129,6 @@ private fun FinalRankingRow(
 }
 
 // ─── 공통 헬퍼 ───
-
-private fun questionTypeLabel(type: QuestionType?): String {
-    return when (type) {
-        QuestionType.MULTIPLE_CHOICE -> "객관식"
-        QuestionType.OX -> "OX"
-        QuestionType.ESSAY -> "서술형"
-        else -> "문항"
-    }
-}
 
 // 점수만 담당한다 — 정답/오답 판정 문구는 VerdictPill이 그린다 (시안 M-04)
 private fun resultScoreText(uiState: PlayUiState): String {

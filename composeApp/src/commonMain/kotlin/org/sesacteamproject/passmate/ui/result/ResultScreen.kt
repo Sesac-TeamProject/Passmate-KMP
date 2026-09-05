@@ -437,7 +437,8 @@ private fun ReportHeaderCard(result: SessionResult) {
             }
             PassmateMascot(
                 mascot = PassmateMascots.Feedback,
-                modifier = Modifier.size(width = 52.dp, height = 57.dp)
+                width = 52.dp,
+                height = 57.dp
             )
         }
     }

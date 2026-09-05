@@ -1,6 +1,8 @@
 package org.sesacteamproject.passmate.component
 
 import androidx.compose.runtime.Composable
+import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.toCssHex
 
 // 포트원 V2 브라우저 SDK 결제창을 웹뷰로 띄우는 공통 계약.
 // 서버 /coins/charges 응답(CoinCheckout)을 그대로 담아 PortOne.requestPayment(...)에 전달한다.
@@ -43,6 +45,7 @@ fun buildPortOneHtml(request: PortOneRequest): String {
     val orderName = request.orderName.jsEscape()
     val currency = request.currency.jsEscape()
     val payMethod = request.payMethod.jsEscape()
+    val textColor = PassmateColors.TextSecondary.toCssHex()
 
     return """
 <!doctype html>
@@ -52,7 +55,7 @@ fun buildPortOneHtml(request: PortOneRequest): String {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
   </head>
-  <body style="margin:0;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#5B6B62">
+  <body style="margin:0;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:$textColor">
     <p>결제창을 여는 중이에요…</p>
     <script>
       function report(name, arg) {

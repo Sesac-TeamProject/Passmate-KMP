@@ -109,7 +109,8 @@ private fun SignInHero(modifier: Modifier = Modifier) {
     ) {
         PassmateMascot(
             mascot = PassmateMascots.Default,
-            modifier = Modifier.size(width = 120.dp, height = 132.dp)
+            width = 120.dp,
+            height = 132.dp
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),

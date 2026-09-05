@@ -23,7 +23,12 @@ enum PassmateColors {
 
     static let textPrimary = Color(hex: 0x1B1F24)
 
-    static let textSecondary = Color(hex: 0x6B7280)
+    // 웹뷰 HTML(PortOne 로딩 화면)이 CSS 문자열로도 쓴다 — 값을 한 번만 적는다 (규칙 §11-2)
+    static let textSecondaryHex: UInt32 = 0x6B7280
+
+    static let textSecondary = Color(hex: textSecondaryHex)
+
+    static let textSecondaryCssHex = String(format: "#%06X", textSecondaryHex)
 
     static let textTertiary = Color(hex: 0xA0A6B0)
 

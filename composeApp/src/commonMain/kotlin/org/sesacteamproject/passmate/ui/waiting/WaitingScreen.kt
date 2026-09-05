@@ -183,7 +183,8 @@ private fun EnteredCard(uiState: WaitingUiState) {
             ) {
                 PassmateMascot(
                     mascot = PassmateMascots.Waiting,
-                    modifier = Modifier.size(width = 60.dp, height = 66.dp)
+                    width = 60.dp,
+                    height = 66.dp
                 )
             }
             Text(

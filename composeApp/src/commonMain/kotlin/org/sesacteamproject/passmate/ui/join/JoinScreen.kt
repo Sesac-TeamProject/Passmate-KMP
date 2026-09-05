@@ -155,10 +155,11 @@ private fun JoinHeader() {
         }
         PassmateMascot(
             mascot = PassmateMascots.Enter,
+            width = 68.dp,
+            height = 75.dp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 44.dp, end = 4.dp)
-                .size(width = 68.dp, height = 75.dp)
         )
     }
 }

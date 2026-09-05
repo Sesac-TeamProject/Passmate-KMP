@@ -291,13 +291,9 @@ class PlayViewModel(
         val question = state.question ?: return null
 
         return when (question.type) {
-            QuestionType.OX -> when (state.selectedChoiceIndex) {
-                0 -> "O"
-                1 -> "X"
-                else -> null
-            }
             QuestionType.ESSAY -> state.essayAnswer.trim().ifEmpty { null }
-            // OX는 서버가 choices를 주지 않아 answerChoices가 O/X를 채운다 (도메인 단일 출처)
+            // OX 포함 — answerChoices가 서버가 안 주는 O/X를 채운다 (도메인 단일 출처).
+            // 화면도 같은 목록으로 그리므로(PlayScreen) 눌린 보기와 보낸 값이 어긋나지 않는다
             else -> state.selectedChoiceIndex?.let { question.answerChoices.getOrNull(it) }
         }
     }

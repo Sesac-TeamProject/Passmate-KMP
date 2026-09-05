@@ -16,15 +16,13 @@ import kotlin.test.assertTrue
 // 상태마다 다른 크기로 뽑으면 마스코트가 화면마다 다른 크기·위치로 그려진다
 class PassmateMascotResourceTest {
 
-    private val canvasWidth = 576
-    private val canvasHeight = 624
-    private val iosAssetName = mapOf(
-        PassmateMascots.Default to "MascotDefault",
-        PassmateMascots.Enter to "MascotEnter",
-        PassmateMascots.Waiting to "MascotWaiting",
-        PassmateMascots.Success to "MascotSuccess",
-        PassmateMascots.Feedback to "MascotFeedback"
-    )
+    // 컴포넌트가 실제로 계산에 쓰는 상수에서 끌어온다 — 테스트가 네 번째 사본을 갖지 않게 한다.
+    // 리소스는 4배율로 뽑으므로 dp에 4를 곱한다
+    private val assetScale = 4
+
+    private val canvasWidth = (MASCOT_CANVAS_WIDTH * assetScale).toInt()
+
+    private val canvasHeight = (MASCOT_CANVAS_HEIGHT * assetScale).toInt()
 
     private fun moduleDir(): File {
         var dir = File(System.getProperty("user.dir")).absoluteFile
@@ -43,7 +41,8 @@ class PassmateMascotResourceTest {
     }
 
     private fun iosDir(mascot: PassmateMascots): File {
-        return File(moduleDir().parentFile, "iosApp/iosApp/Assets.xcassets/${iosAssetName.getValue(mascot)}.imageset")
+        // iOS 에셋 이름은 "Mascot" + enum 이름이다 (PassmateMascots.swift의 rawValue와 같은 규칙)
+        return File(moduleDir().parentFile, "iosApp/iosApp/Assets.xcassets/Mascot${mascot.name}.imageset")
     }
 
     private fun classpathBytes(mascot: PassmateMascots): ByteArray? {

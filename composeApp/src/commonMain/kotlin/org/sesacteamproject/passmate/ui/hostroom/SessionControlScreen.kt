@@ -346,7 +346,7 @@ private fun QuestionCard(uiState: SessionControlUiState) {
                     letterSpacing = (-0.36).sp
                 )
                 Text(
-                    text = typeLabel(question.type),
+                    text = question.type.displayLabel,
                     color = PassmateColors.RatingTagSelectedText,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
@@ -708,15 +708,6 @@ private fun ErrorBox(onRetry: () -> Unit) {
                 .clickable(onClick = onRetry)
                 .padding(8.dp)
         )
-    }
-}
-
-private fun typeLabel(type: QuestionType): String {
-    return when (type) {
-        QuestionType.MULTIPLE_CHOICE -> "객관식"
-        QuestionType.OX -> "OX"
-        QuestionType.ESSAY -> "서술형"
-        QuestionType.UNKNOWN -> "문항"
     }
 }
 
