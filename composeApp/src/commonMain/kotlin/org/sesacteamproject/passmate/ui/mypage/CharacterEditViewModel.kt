@@ -1,0 +1,80 @@
+package org.sesacteamproject.passmate.ui.mypage
+
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import org.sesacteamproject.passmate.core.model.AppError
+import org.sesacteamproject.passmate.core.model.onFailure
+import org.sesacteamproject.passmate.core.model.onSuccess
+import org.sesacteamproject.passmate.mvi.MviViewModel
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.UpdateMyProfileUseCase
+
+class CharacterEditViewModel(
+    private val getMyProfileUseCase: GetMyProfileUseCase,
+    private val updateMyProfileUseCase: UpdateMyProfileUseCase
+) : MviViewModel<CharacterEditUiState, CharacterEditAction, CharacterEditEvent>(CharacterEditUiState()) {
+
+    private var hasEntered = false
+
+    private fun loadProfile() {
+        _uiState.update { it.copy(isLoading = true, hasLoadError = false) }
+        viewModelScope.launch {
+            getMyProfileUseCase.invoke()
+                .onSuccess { profile ->
+                    _uiState.update { it.copy(avatarId = profile.avatarId, isLoading = false) }
+                }
+                .onFailure {
+                    _uiState.update { it.copy(isLoading = false, hasLoadError = true) }
+                }
+        }
+    }
+
+    private fun onEnter() {
+        if (hasEntered) {
+            return
+        }
+        hasEntered = true
+
+        loadProfile()
+    }
+
+    private fun onSubmit() {
+        val state = _uiState.value
+
+        if (!state.canSubmit) {
+            return
+        }
+        _uiState.update { it.copy(isSubmitting = true) }
+        viewModelScope.launch {
+            // 닉네임은 M-12-1이 담당한다 — null이면 전송에서 생략돼(explicitNulls=false) 값이 보존된다
+            updateMyProfileUseCase.invoke(null, state.avatarId)
+                .onSuccess {
+                    _uiState.update { it.copy(isSubmitting = false) }
+                    _event.emit(CharacterEditEvent.Saved)
+                }
+                .onFailure { error ->
+                    _uiState.update { it.copy(isSubmitting = false) }
+                    _event.emit(CharacterEditEvent.ShowNotice(saveFailMessage(error)))
+                }
+        }
+    }
+
+    // 서버 code 기반 문구 분기 (규칙 §10)
+    private fun saveFailMessage(error: AppError): String {
+        return if (error is AppError.NetworkError) {
+            "네트워크 연결을 확인해 주세요"
+        } else {
+            "저장하지 못했어요. 다시 시도해 주세요"
+        }
+    }
+
+    override fun onAction(action: CharacterEditAction) {
+        when (action) {
+            is CharacterEditAction.Enter -> onEnter()
+            is CharacterEditAction.Retry -> loadProfile()
+            is CharacterEditAction.SelectAvatar -> _uiState.update { it.copy(avatarId = action.avatarId) }
+            is CharacterEditAction.Submit -> onSubmit()
+        }
+    }
+}

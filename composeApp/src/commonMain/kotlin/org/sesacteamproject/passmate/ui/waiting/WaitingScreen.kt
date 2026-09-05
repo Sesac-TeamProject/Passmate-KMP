@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -35,8 +36,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateWaitingDots
 import org.sesacteamproject.passmate.component.PassmateCard
-import org.sesacteamproject.passmate.component.PassyMascot
+import org.sesacteamproject.passmate.component.PassmateMascot
+import org.sesacteamproject.passmate.component.PassmateMascots
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -92,8 +95,10 @@ private fun WaitingContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.Surface)
-            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            // 화면 배경은 시스템 바 뒤까지 깔고 콘텐츠만 안쪽으로 들인다 (iOS의 background(...).ignoresSafeArea() 미러).
+            // 탭바 없는 push 화면은 Scaffold가 하단 인셋을 주지 않으므로(contentWindowInsets=0) 여기서 직접 준다
             .statusBarsPadding()
+            .navigationBarsPadding()
     ) {
         WaitingHeader(
             uiState = uiState,
@@ -111,7 +116,7 @@ private fun WaitingContentScreen(
         } else {
             EnteredCard(uiState = uiState)
             Spacer(modifier = Modifier.weight(1f))
-            WaitingDots(
+            PassmateWaitingDots(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 40.dp)
@@ -176,7 +181,11 @@ private fun EnteredCard(uiState: WaitingUiState) {
                     .background(PassmateColors.FieldGray, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                PassyMascot(modifier = Modifier.size(width = 60.dp, height = 66.dp))
+                PassmateMascot(
+                    mascot = PassmateMascots.Waiting,
+                    width = 60.dp,
+                    height = 66.dp
+                )
             }
             Text(
                 text = "입장 완료!",
@@ -245,38 +254,6 @@ private fun ParticipantAvatarRow(
     }
 }
 
-@Composable
-private fun WaitingDots(modifier: Modifier = Modifier) {
-    val transition = rememberInfiniteTransition()
-    val phase by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = DOT_COUNT.toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        )
-    )
-
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        repeat(DOT_COUNT) { index ->
-            val isActive = phase.toInt() % DOT_COUNT == index
-
-            Box(
-                modifier = Modifier
-                    .size(7.dp)
-                    .alpha(if (isActive) 1f else 0.4f)
-                    .background(
-                        color = if (isActive) PassmateColors.Primary else PassmateColors.Border,
-                        shape = CircleShape
-                    )
-            )
-        }
-    }
-}
-
 private fun formatPin(pin: String): String {
     return pin.chunked(3).joinToString(" ")
 }
@@ -291,7 +268,6 @@ private fun waitingMessage(nickname: String?): String {
 
 private const val MAX_VISIBLE_AVATARS = 4
 
-private const val DOT_COUNT = 3
 
 // --- Preview ---
 

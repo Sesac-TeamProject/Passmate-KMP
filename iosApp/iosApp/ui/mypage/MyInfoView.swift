@@ -1,23 +1,6 @@
 import SwiftUI
 import Shared
 
-// 시트 4종 중 무엇이 열려 있는지 — 표시 여부는 이 화면이 소유한다 (규칙 §11-1)
-private enum MyInfoSheet: Identifiable {
-    case editProfile(nickname: String, avatarId: Int?)
-    case paymentMethod
-    case settlementAccount
-    case notifications
-
-    var id: String {
-        switch self {
-        case .editProfile: return "editProfile"
-        case .paymentMethod: return "paymentMethod"
-        case .settlementAccount: return "settlementAccount"
-        case .notifications: return "notifications"
-        }
-    }
-}
-
 // Figma "UI 디자인 v6" M-12(349:9683) 미러 — 마이 탭 루트: 프로필·계정·코인·정산·알림·로그아웃
 struct MyInfoView: View {
     var onRequireSignIn: () -> Void = {}
@@ -32,6 +15,14 @@ struct MyInfoView: View {
 
     var onOpenDeleteAccount: () -> Void = {}
 
+    var onOpenEditProfile: () -> Void = {}
+
+    var onOpenPaymentMethod: () -> Void = {}
+
+    var onOpenSettlementAccount: () -> Void = {}
+
+    var onOpenNotifications: () -> Void = {}
+
     var onSignedOut: () -> Void = {}
 
     @StateObject private var viewModel = MyInfoViewModel(
@@ -41,8 +32,6 @@ struct MyInfoView: View {
         signOutUseCase: KoinHelper.shared.signOutUseCase(),
         isSignedInUseCase: KoinHelper.shared.isSignedInUseCase()
     )
-
-    @State private var activeSheet: MyInfoSheet?
 
     @State private var showSignOutConfirm = false
 
@@ -63,20 +52,20 @@ struct MyInfoView: View {
                 onRequireSignIn()
             case .openReputation:
                 onOpenReputation()
-            case let .openEditProfile(nickname, avatarId):
-                activeSheet = .editProfile(nickname: nickname, avatarId: avatarId)
+            case .openEditProfile:
+                onOpenEditProfile()
             case .openPaymentMethod:
-                activeSheet = .paymentMethod
+                onOpenPaymentMethod()
             case .openCoinHistory:
                 onOpenCoinHistory()
             case .openCharge:
                 onOpenCharge()
             case .openSettlementAccount:
-                activeSheet = .settlementAccount
+                onOpenSettlementAccount()
             case .openEarnings:
                 onOpenEarnings()
             case .openNotifications:
-                activeSheet = .notifications
+                onOpenNotifications()
             case .openDeleteAccount:
                 onOpenDeleteAccount()
             case .signedOut:
@@ -85,17 +74,20 @@ struct MyInfoView: View {
                 noticeMessage = message
             }
         }
-        .sheet(item: $activeSheet) { sheet in
-            sheetContent(sheet)
-                .passmateDetents([.medium, .large])
-        }
-        .alert("로그아웃 할까요?", isPresented: $showSignOutConfirm) {
-            Button("로그아웃", role: .destructive) {
-                viewModel.action(.confirmSignOut)
+        .overlay {
+            // 시안 M-12-11 — 플랫폼 기본 알림이 아니라 공통 확인 다이얼로그를 쓴다
+            if showSignOutConfirm {
+                PassmateConfirmDialogView(
+                    title: "로그아웃 할까요?",
+                    message: "다시 로그인하면 기록과 코인은 그대로 있어요.",
+                    confirmLabel: "로그아웃",
+                    onConfirm: {
+                        showSignOutConfirm = false
+                        viewModel.action(.confirmSignOut)
+                    },
+                    onDismiss: { showSignOutConfirm = false }
+                )
             }
-            Button("취소", role: .cancel) {}
-        } message: {
-            Text("다시 로그인하면 기록과 코인은 그대로 있어요.")
         }
         .overlay(alignment: .bottom) {
             if let noticeMessage {
@@ -109,45 +101,6 @@ struct MyInfoView: View {
         }
     }
 
-    @ViewBuilder
-    private func sheetContent(_ sheet: MyInfoSheet) -> some View {
-        switch sheet {
-        case let .editProfile(nickname, avatarId):
-            EditProfileSheetView(
-                initialNickname: nickname,
-                initialAvatarId: avatarId,
-                onSaved: {
-                    activeSheet = nil
-                    viewModel.action(.profileUpdated)
-                },
-                onNotice: { viewModel.action(.notice(message: $0)) },
-                onClose: { activeSheet = nil }
-            )
-        case .paymentMethod:
-            PaymentMethodSheetView(
-                onSaved: {
-                    activeSheet = nil
-                    viewModel.action(.paymentMethodUpdated)
-                },
-                onNotice: { viewModel.action(.notice(message: $0)) },
-                onClose: { activeSheet = nil }
-            )
-        case .settlementAccount:
-            SettlementAccountSheetView(
-                onSaved: {
-                    activeSheet = nil
-                    viewModel.action(.accountUpdated)
-                },
-                onNotice: { viewModel.action(.notice(message: $0)) },
-                onClose: { activeSheet = nil }
-            )
-        case .notifications:
-            NotificationSettingsSheetView(
-                onNotice: { viewModel.action(.notice(message: $0)) },
-                onClose: { activeSheet = nil }
-            )
-        }
-    }
 }
 
 private struct MyInfoNoticeToast: View {
@@ -464,7 +417,13 @@ private struct MyInfoContentView: View {
     }
 
     private func coinRow(coins: Int64, onClickCharge: @escaping () -> Void) -> some View {
-        HStack {
+        HStack(spacing: 12) {
+            // 시안 M-12: 보유 코인 행 왼쪽에 민트 원형 배경 + 코인 마크
+            ZStack {
+                Circle().fill(PassmateColors.backgroundMint)
+                PassmateIconView(icon: .coin, tint: PassmateColors.primary, size: 22)
+            }
+            .frame(width: 40, height: 40)
             VStack(alignment: .leading, spacing: 4) {
                 Text("보유 코인")
                     .font(.system(size: 15, weight: .medium))

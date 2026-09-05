@@ -20,6 +20,7 @@ private fun PassmateIcons.drawableId(): Int {
         PassmateIcons.Home -> R.drawable.ic_home
         PassmateIcons.PlusSquare -> R.drawable.ic_plus_square
         PassmateIcons.User -> R.drawable.ic_user
+        PassmateIcons.Clock -> R.drawable.ic_clock
     }
 }
 

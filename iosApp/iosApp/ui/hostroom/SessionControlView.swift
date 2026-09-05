@@ -229,7 +229,7 @@ private struct SessionControlContentView: View {
                         .font(.system(size: 18, weight: .bold))
                         .kerning(-0.36)
                         .foregroundColor(PassmateColors.textPrimary)
-                    Text(typeLabel(question.type))
+                    Text(question.type.displayLabel)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(PassmateColors.ratingTagSelectedText)
                         .padding(.horizontal, 8)
@@ -237,8 +237,11 @@ private struct SessionControlContentView: View {
                         .background(PassmateColors.ratingTagSelectedBg)
                         .cornerRadius(8)
                     Spacer()
-                    timerCircle
                 }
+                PassmateTimerBar(
+                    remainingSeconds: Int(uiState.remainingSec),
+                    totalSeconds: Int(question.timeLimitSec)
+                )
                 Text(question.body)
                     .font(.system(size: 15, weight: .medium))
                     .kerning(-0.3)
@@ -257,17 +260,6 @@ private struct SessionControlContentView: View {
         .padding(18)
         .background(PassmateColors.surface)
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(PassmateColors.border, lineWidth: 1))
-    }
-
-    private var timerCircle: some View {
-        let ringColor = uiState.isQuestionClosed ? PassmateColors.border : PassmateColors.timerAmber
-        let label = uiState.isQuestionClosed ? "마감" : "\(uiState.remainingSec)"
-
-        return Text(label)
-            .font(.system(size: uiState.isQuestionClosed ? 12 : 18, weight: .bold))
-            .foregroundColor(PassmateColors.textPrimary)
-            .frame(width: 48, height: 48)
-            .overlay(Circle().stroke(ringColor, lineWidth: 3))
     }
 
     // "길게 눌러 힌트 말하기" (M-T2, T121) — 누르는 동안 녹음, 놓으면 업로드
@@ -378,18 +370,6 @@ private struct SessionControlContentView: View {
                     .kerning(-0.28)
                     .foregroundColor(PassmateColors.weakTopicText)
             }
-        }
-    }
-
-    private func typeLabel(_ type: QuestionType) -> String {
-        if type == QuestionType.multipleChoice {
-            return "객관식"
-        } else if type == QuestionType.ox {
-            return "OX"
-        } else if type == QuestionType.essay {
-            return "서술형"
-        } else {
-            return "문항"
         }
     }
 

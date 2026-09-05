@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -21,7 +22,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -41,10 +41,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.PassmateIcons
-import org.sesacteamproject.passmate.component.PassyMascot
+import org.sesacteamproject.passmate.component.PassmateMascot
+import org.sesacteamproject.passmate.component.PassmateMascots
 import org.sesacteamproject.passmate.component.PortOnePaymentView
 import org.sesacteamproject.passmate.component.ReputationBadge
 import org.sesacteamproject.passmate.component.StudentAvatar
@@ -117,10 +119,9 @@ fun PaymentScreen(
         SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
     if (uiState.isCoinShortageSheetVisible) {
-        ModalBottomSheet(
+        PassmateBottomSheet(
             onDismissRequest = { viewModel.onAction(PaymentAction.DismissCoinShortage) },
             sheetState = coinShortageSheetState,
-            containerColor = PassmateColors.Surface
         ) {
             CoinShortageSheetContent(
                 entryFee = uiState.entryFee,
@@ -144,8 +145,10 @@ private fun PaymentContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.Surface)
-            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            // 화면 배경은 시스템 바 뒤까지 깔고 콘텐츠만 안쪽으로 들인다 (iOS의 background(...).ignoresSafeArea() 미러).
+            // 탭바 없는 push 화면은 Scaffold가 하단 인셋을 주지 않으므로(contentWindowInsets=0) 여기서 직접 준다
             .statusBarsPadding()
+            .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
     ) {
         PaymentHeader(onBack = onBack)
@@ -170,11 +173,13 @@ private fun PaymentHeader(onBack: () -> Unit) {
             onClick = onBack,
             modifier = Modifier.padding(start = 20.dp, top = 58.dp)
         )
-        PassyMascot(
+        PassmateMascot(
+            mascot = PassmateMascots.Enter,
+            width = 68.dp,
+            height = 75.dp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 44.dp, end = 28.dp)
-                .size(width = 68.dp, height = 75.dp)
         )
         Column(
             modifier = Modifier.padding(start = 60.dp, top = 56.dp, end = 24.dp, bottom = 24.dp),

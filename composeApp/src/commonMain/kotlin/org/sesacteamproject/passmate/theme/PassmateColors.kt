@@ -45,6 +45,9 @@ object PassmateColors {
     // 진행 타이머·프로그레스 (v6 M-03 타이머 링·문항 세그먼트)
     val TimerAmber = Color(0xFFF3B440)
 
+    // 남은 시간 진행 바의 바탕 (v6 M-03·M-T2) — TimerAmber를 연하게 깐 트랙
+    val TimerTrack = Color(0xFFFDEBCF)
+
     // 짙은 잉크 그린 — 민트 배경 위 라벨 (v6 M-05 최종 결과)
     val InkGreen = Color(0xFF0F3D2E)
 

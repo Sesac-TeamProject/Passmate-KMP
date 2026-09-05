@@ -115,7 +115,7 @@ struct PortOnePaymentView: UIViewRepresentable {
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
           </head>
-          <body style="margin:0;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#5B6B62">
+          <body style="margin:0;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:\(PassmateColors.textSecondary.cssHex)">
             <p>결제창을 여는 중이에요…</p>
             <script>
               function report(name, arg) {

@@ -64,7 +64,10 @@ sealed interface ServerEvent {
         @Serializable
         data class AnswerReveal(
             val answer: String? = null,
-            val explanation: String? = null
+            val explanation: String? = null,
+            // 보기별 응답 수 — 키는 학생이 제출한 문자열 그대로다(백엔드 JpaRoomStateRepository:
+            // answers.groupingBy { it.submitted }). 객관식은 보기 원문, OX는 "O"/"X"
+            val distribution: Map<String, Int> = emptyMap()
         )
     }
 

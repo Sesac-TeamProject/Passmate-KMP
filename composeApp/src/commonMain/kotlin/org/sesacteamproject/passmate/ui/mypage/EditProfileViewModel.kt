@@ -7,20 +7,43 @@ import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.mvi.MviViewModel
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.UpdateMyProfileUseCase
 
 class EditProfileViewModel(
+    private val getMyProfileUseCase: GetMyProfileUseCase,
     private val updateMyProfileUseCase: UpdateMyProfileUseCase
 ) : MviViewModel<EditProfileUiState, EditProfileAction, EditProfileEvent>(EditProfileUiState()) {
 
     private var hasEntered = false
 
-    private fun onEnter(nickname: String, avatarId: Int?) {
+    private fun loadProfile() {
+        _uiState.update { it.copy(isLoading = true, hasLoadError = false) }
+        viewModelScope.launch {
+            getMyProfileUseCase.invoke()
+                .onSuccess { profile ->
+                    _uiState.update {
+                        it.copy(
+                            nickname = profile.nickname,
+                            email = profile.email,
+                            avatarId = profile.avatarId,
+                            isLoading = false
+                        )
+                    }
+                }
+                .onFailure {
+                    _uiState.update { it.copy(isLoading = false, hasLoadError = true) }
+                }
+        }
+    }
+
+    private fun onEnter() {
         if (hasEntered) {
             return
         }
         hasEntered = true
-        _uiState.update { it.copy(nickname = nickname, avatarId = avatarId) }
+
+        loadProfile()
     }
 
     private fun onSubmit() {
@@ -31,7 +54,8 @@ class EditProfileViewModel(
         }
         _uiState.update { it.copy(isSubmitting = true) }
         viewModelScope.launch {
-            updateMyProfileUseCase.invoke(state.nickname, state.avatarId)
+            // 캐릭터는 M-12-7이 담당한다 — null이면 전송에서 생략돼(explicitNulls=false) 값이 보존된다
+            updateMyProfileUseCase.invoke(state.nickname, null)
                 .onSuccess {
                     _uiState.update { it.copy(isSubmitting = false) }
                     _event.emit(EditProfileEvent.Saved)
@@ -56,11 +80,11 @@ class EditProfileViewModel(
 
     override fun onAction(action: EditProfileAction) {
         when (action) {
-            is EditProfileAction.Enter -> onEnter(action.nickname, action.avatarId)
+            is EditProfileAction.Enter -> onEnter()
+            is EditProfileAction.Retry -> loadProfile()
             is EditProfileAction.ChangeNickname -> _uiState.update {
                 it.copy(nickname = action.text.take(NICKNAME_MAX_LENGTH))
             }
-            is EditProfileAction.SelectAvatar -> _uiState.update { it.copy(avatarId = action.avatarId) }
             is EditProfileAction.Submit -> onSubmit()
         }
     }

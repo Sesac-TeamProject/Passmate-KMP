@@ -29,14 +29,19 @@ import org.sesacteamproject.passmate.ui.join.JoinScreen
 import org.sesacteamproject.passmate.ui.hostroom.HostedRoomsScreen
 import org.sesacteamproject.passmate.ui.hostroom.RoomReportScreen
 import org.sesacteamproject.passmate.ui.hostroom.SessionControlScreen
+import org.sesacteamproject.passmate.ui.mypage.CharacterEditScreen
 import org.sesacteamproject.passmate.ui.mypage.DeleteAccountScreen
+import org.sesacteamproject.passmate.ui.mypage.EditProfileScreen
+import org.sesacteamproject.passmate.ui.mypage.NotificationSettingsScreen
 import org.sesacteamproject.passmate.ui.mypage.JoinedRoomsScreen
 import org.sesacteamproject.passmate.ui.mypage.MyInfoScreen
 import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.payment.CoinChargeScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
 import org.sesacteamproject.passmate.ui.payment.EarningsScreen
+import org.sesacteamproject.passmate.ui.payment.PaymentMethodScreen
 import org.sesacteamproject.passmate.ui.payment.PaymentScreen
+import org.sesacteamproject.passmate.ui.payment.SettlementAccountScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
 import org.sesacteamproject.passmate.ui.result.ResultScreen
 import org.sesacteamproject.passmate.ui.waiting.WaitingScreen
@@ -108,6 +113,11 @@ private fun NavigationAction.destinationTemplate(): String? {
         is NavigationAction.NavigateToSessionControl -> Route.SessionControl.route
         is NavigationAction.NavigateToEarnings -> Route.Earnings.route
         is NavigationAction.NavigateToDeleteAccount -> Route.DeleteAccount.route
+        is NavigationAction.NavigateToEditProfile -> Route.EditProfile.route
+        is NavigationAction.NavigateToCharacterEdit -> Route.CharacterEdit.route
+        is NavigationAction.NavigateToSettlementAccount -> Route.SettlementAccount.route
+        is NavigationAction.NavigateToPaymentMethod -> Route.PaymentMethod.route
+        is NavigationAction.NavigateToNotificationSettings -> Route.NotificationSettings.route
         // 복귀 대상이 될 수 없는 액션 — SignIn·로그인 성공 처리·뒤로가기 (스펙 §0)
         is NavigationAction.NavigateToSignIn -> null
         is NavigationAction.NavigateAfterSignIn -> null
@@ -153,6 +163,11 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
         is NavigationAction.NavigateToCoinCharge -> navigate(Route.CoinCharge.route)
         is NavigationAction.NavigateToEarnings -> navigate(Route.Earnings.route)
         is NavigationAction.NavigateToDeleteAccount -> navigate(Route.DeleteAccount.route)
+        is NavigationAction.NavigateToEditProfile -> navigate(Route.EditProfile.route)
+        is NavigationAction.NavigateToCharacterEdit -> navigate(Route.CharacterEdit.route)
+        is NavigationAction.NavigateToSettlementAccount -> navigate(Route.SettlementAccount.route)
+        is NavigationAction.NavigateToPaymentMethod -> navigate(Route.PaymentMethod.route)
+        is NavigationAction.NavigateToNotificationSettings -> navigate(Route.NotificationSettings.route)
         is NavigationAction.NavigateBack -> popBackStack()
     }
 }
@@ -162,7 +177,8 @@ actual fun AppNavHost() {
     val navController = rememberNavController()
     val shellViewModel: AppShellViewModel = koinScreenViewModel()
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentTab = AppTab.fromRoute(backStackEntry?.destination?.route)
+    // 시안은 마이 하위 상세(M-12-x)와 방 리포트(M-14)에서도 하단 탭바를 유지한다
+    val currentTab = AppTab.barOwnerOf(backStackEntry?.destination?.route)
     val activity = LocalContext.current.findComponentActivity()
 
     // SignIn 관련 두 액션만 셸로 보내고 나머지 17개 분기는 기존 확장함수가 처리한다 (스펙 §4-1)
@@ -329,6 +345,21 @@ actual fun AppNavHost() {
             }
             composable(Route.DeleteAccount.route) {
                 DeleteAccountScreen(onNavigate = onNavigate)
+            }
+            composable(Route.EditProfile.route) {
+                EditProfileScreen(onNavigate = onNavigate)
+            }
+            composable(Route.CharacterEdit.route) {
+                CharacterEditScreen(onNavigate = onNavigate)
+            }
+            composable(Route.SettlementAccount.route) {
+                SettlementAccountScreen(onNavigate = onNavigate)
+            }
+            composable(Route.PaymentMethod.route) {
+                PaymentMethodScreen(onNavigate = onNavigate)
+            }
+            composable(Route.NotificationSettings.route) {
+                NotificationSettingsScreen(onNavigate = onNavigate)
             }
         }
     }

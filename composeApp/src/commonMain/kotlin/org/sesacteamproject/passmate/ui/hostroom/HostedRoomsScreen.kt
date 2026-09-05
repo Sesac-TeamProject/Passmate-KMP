@@ -20,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -38,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.LevelEmblem
+import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -60,7 +60,7 @@ fun HostedRoomsScreen(onNavigate: (NavigationAction) -> Unit) {
     val viewModel: HostedRoomsViewModel = koinScreenViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val createSheetState = rememberModalBottomSheetState()
+    val createSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isCreateSheetVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -99,10 +99,9 @@ fun HostedRoomsScreen(onNavigate: (NavigationAction) -> Unit) {
         )
     }
     if (isCreateSheetVisible) {
-        ModalBottomSheet(
+        PassmateBottomSheet(
             onDismissRequest = { isCreateSheetVisible = false },
             sheetState = createSheetState,
-            containerColor = PassmateColors.Surface
         ) {
             CreateRoomSheet(
                 onCreated = { pin ->

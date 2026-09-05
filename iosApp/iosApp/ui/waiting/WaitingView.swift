@@ -76,7 +76,7 @@ private struct WaitingContentView: View {
             } else {
                 enteredCard
                 Spacer()
-                WaitingDots()
+                PassmateWaitingDots()
                     .padding(.bottom, 40)
             }
         }
@@ -127,8 +127,7 @@ private struct WaitingContentView: View {
                     Circle()
                         .fill(PassmateColors.fieldGray)
                         .frame(width: 88, height: 88)
-                    PassyMascotView()
-                        .frame(width: 60, height: 66)
+                    PassmateMascotView(mascot: .waiting, width: 60, height: 66)
                 }
                 Text("입장 완료!")
                     .font(.system(size: 24, weight: .bold))
@@ -180,26 +179,6 @@ private struct WaitingContentView: View {
                 }
                 .frame(width: 34, height: 34)
             }
-        }
-    }
-}
-
-private struct WaitingDots: View {
-    @State private var activeDot = 0
-
-    private let timer = Timer.publish(every: 0.4, on: .main, in: .common).autoconnect()
-
-    var body: some View {
-        HStack(spacing: 6) {
-            ForEach(0..<3, id: \.self) { index in
-                Circle()
-                    .fill(index == activeDot ? PassmateColors.primary : PassmateColors.border)
-                    .frame(width: 7, height: 7)
-                    .opacity(index == activeDot ? 1.0 : 0.4)
-            }
-        }
-        .onReceive(timer) { _ in
-            activeDot = (activeDot + 1) % 3
         }
     }
 }

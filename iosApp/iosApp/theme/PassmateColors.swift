@@ -42,6 +42,9 @@ enum PassmateColors {
     // 진행 타이머·프로그레스 (v6 M-03 타이머 링·문항 세그먼트)
     static let timerAmber = Color(hex: 0xF3B440)
 
+    // 남은 시간 진행 바의 바탕 (v6 M-03·M-T2) — timerAmber를 연하게 깐 트랙
+    static let timerTrack = Color(hex: 0xFDEBCF)
+
     // 짙은 잉크 그린 — 민트 배경 위 라벨 (v6 M-05 최종 결과)
     static let inkGreen = Color(hex: 0x0F3D2E)
 
@@ -104,6 +107,30 @@ enum PassmateColors {
     static let brandGoogleBlue = Color(hex: 0x4285F4)
 
     static let brandAppleBlack = Color(hex: 0x111111)
+}
+
+// 웹뷰에 넣는 HTML은 CSS 색 문자열이 필요하다. 화면 코드에 hex를 다시 적으면 토큰과 갈라지므로
+// (규칙 §11-2) 토큰을 여기서 문자열로 바꿔 쓴다. Compose 미러는 theme/ColorExtensions.kt의 toCssHex다
+extension Color {
+    var cssHex: String {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+
+        UIColor(self).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+
+        // 반투명 토큰을 불투명으로 삼켜버리지 않도록 alpha가 1이 아니면 #RRGGBBAA로 낸다
+        if alpha < 1 {
+            return String(format: "#%02X%02X%02X%02X",
+                          Int((red * 255).rounded()), Int((green * 255).rounded()),
+                          Int((blue * 255).rounded()), Int((alpha * 255).rounded()))
+        } else {
+            return String(format: "#%02X%02X%02X",
+                          Int((red * 255).rounded()), Int((green * 255).rounded()),
+                          Int((blue * 255).rounded()))
+        }
+    }
 }
 
 private extension Color {

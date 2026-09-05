@@ -1,6 +1,23 @@
 import SwiftUI
 import Shared
 
+// 한 뷰에 .sheet를 여러 개 겹쳐 달면 iOS 15에서 동작이 보장되지 않는다(최소 배포 타깃 15.0).
+// 시트는 하나만 달고 무엇을 띄울지는 이 열거형이 정한다 — MyInfoView와 같은 방식이다.
+private enum ResultSheet: Identifiable {
+    case rating
+
+    case share(text: String)
+
+    var id: String {
+        switch self {
+        case .rating:
+            return "rating"
+        case .share:
+            return "share"
+        }
+    }
+}
+
 // Figma "UI 디자인 v6" M-06(349:9395) 미러 — 정답 링·보완 주제·문항 리스트·AI 분석 카드 + 내보내기 (T062·T056)
 struct ResultView: View {
     let roomId: Int64
@@ -22,6 +39,30 @@ struct ResultView: View {
     @State private var shareText: String?
 
     @State private var noticeMessage: String?
+
+    // 평가는 ViewModel 상태(Compose 미러와 동일), 공유는 화면 로컬 상태라 둘을 하나로 모은다
+    private var activeSheet: Binding<ResultSheet?> {
+        Binding(
+            get: {
+                if viewModel.uiState.isRatingSheetVisible {
+                    return .rating
+                } else if let shareText {
+                    return .share(text: shareText)
+                } else {
+                    return nil
+                }
+            },
+            set: { newValue in
+                if newValue == nil {
+                    shareText = nil
+
+                    if viewModel.uiState.isRatingSheetVisible {
+                        viewModel.action(.dismissRatingSheet)
+                    }
+                }
+            }
+        )
+    }
 
     var body: some View {
         ResultContentView(
@@ -58,20 +99,17 @@ struct ResultView: View {
                     }
             }
         }
-        // 평가 시트는 컨테이너가 소유 (규칙 §11-1)
-        .sheet(isPresented: Binding(
-            get: { viewModel.uiState.isRatingSheetVisible },
-            set: { if !$0 { viewModel.action(.dismissRatingSheet) } }
-        )) {
-            RatingSectionView(
-                uiState: viewModel.uiState,
-                onAction: { viewModel.action($0) }
-            )
-            .passmateDetents([.large])
-        }
-        .sheet(isPresented: Binding(get: { shareText != nil }, set: { if !$0 { shareText = nil } })) {
-            if let shareText {
-                ShareSheet(items: [shareText])
+        // 평가·공유 시트는 컨테이너가 소유한다 (규칙 §11-1). 시트는 하나만 단다
+        .sheet(item: activeSheet) { sheet in
+            switch sheet {
+            case .rating:
+                RatingSectionView(
+                    uiState: viewModel.uiState,
+                    onAction: { viewModel.action($0) }
+                )
+                .passmateDetents([.large])
+            case let .share(text):
+                ShareSheet(items: [text])
             }
         }
     }
@@ -318,8 +356,7 @@ private struct ReportHeaderCard: View {
                         .foregroundColor(PassmateColors.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                PassyMascotView()
-                    .frame(width: 52, height: 57)
+                PassmateMascotView(mascot: .feedback, width: 52, height: 57)
             }
             .padding(20)
         }

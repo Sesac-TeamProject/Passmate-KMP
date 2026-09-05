@@ -2,8 +2,10 @@ import Combine
 import Foundation
 import Shared
 
-// Compose EditProfileViewModel.kt 미러 — 닉네임·기본 캐릭터 수정 (M-12-1·M-12-7)
+// Compose EditProfileViewModel.kt 미러 — 계정 정보 변경 (M-12-1). 캐릭터는 M-12-7이 담당한다
 final class EditProfileViewModel: ObservableObject {
+    private let getMyProfileUseCase: GetMyProfileUseCase
+
     private let updateMyProfileUseCase: UpdateMyProfileUseCase
 
     @Published private(set) var uiState = EditProfileUiState()
@@ -12,13 +14,33 @@ final class EditProfileViewModel: ObservableObject {
 
     private var hasEntered = false
 
-    private func onEnter(nickname: String, avatarId: Int?) {
+    private func loadProfile() {
+        uiState.isLoading = true
+        uiState.hasLoadError = false
+        getMyProfileUseCase.invoke { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let profile = (result as? AppResultSuccess<AnyObject>)?.value as? UserProfile
+
+                self.uiState.isLoading = false
+                if error == nil, let profile {
+                    self.uiState.nickname = profile.nickname
+                    self.uiState.email = profile.email
+                    self.uiState.avatarId = profile.avatarId?.intValue
+                } else {
+                    self.uiState.hasLoadError = true
+                }
+            }
+        }
+    }
+
+    private func onEnter() {
         if hasEntered {
             return
         }
         hasEntered = true
-        uiState.nickname = nickname
-        uiState.avatarId = avatarId
+
+        loadProfile()
     }
 
     private func onSubmit() {
@@ -28,10 +50,8 @@ final class EditProfileViewModel: ObservableObject {
             return
         }
         uiState.isSubmitting = true
-        updateMyProfileUseCase.invoke(
-            nickname: state.nickname,
-            avatarId: state.avatarId.map { KotlinInt(value: Int32($0)) }
-        ) { [weak self] result, error in
+        // 캐릭터는 M-12-7이 담당한다 — nil이면 전송에서 생략돼(explicitNulls=false) 값이 보존된다
+        updateMyProfileUseCase.invoke(nickname: state.nickname, avatarId: nil) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.uiState.isSubmitting = false
@@ -59,18 +79,19 @@ final class EditProfileViewModel: ObservableObject {
 
     func action(_ action: EditProfileAction) {
         switch action {
-        case let .enter(nickname, avatarId):
-            onEnter(nickname: nickname, avatarId: avatarId)
+        case .enter:
+            onEnter()
+        case .retry:
+            loadProfile()
         case let .changeNickname(text):
             uiState.nickname = String(text.prefix(12))
-        case let .selectAvatar(avatarId):
-            uiState.avatarId = avatarId
         case .submit:
             onSubmit()
         }
     }
 
-    init(updateMyProfileUseCase: UpdateMyProfileUseCase) {
+    init(getMyProfileUseCase: GetMyProfileUseCase, updateMyProfileUseCase: UpdateMyProfileUseCase) {
+        self.getMyProfileUseCase = getMyProfileUseCase
         self.updateMyProfileUseCase = updateMyProfileUseCase
     }
 }

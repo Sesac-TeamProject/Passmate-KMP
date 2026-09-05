@@ -246,7 +246,7 @@ class MyInfoViewModelTest {
         assertEquals(
             listOf(
                 MyInfoEvent.OpenReputation,
-                MyInfoEvent.OpenEditProfile(nickname = "준영", avatarId = 3),
+                MyInfoEvent.OpenEditProfile,
                 MyInfoEvent.OpenCharge,
                 MyInfoEvent.OpenSettlementAccount,
                 MyInfoEvent.OpenDeleteAccount
@@ -271,13 +271,14 @@ class MyInfoViewModelTest {
         assertEquals(true, events.first() is MyInfoEvent.ShowNotice)
     }
 
+    // 상세는 시트가 아니라 push라(M-12-x) 저장 결과가 pop으로 돌아온다.
+    // 재진입 때 다시 부르지 않으면 닉네임·코인·정산이 옛 값으로 남는다
     @Test
-    fun updatedActionsReloadOnlyTheirSection() = runTest {
+    fun reenteringReloadsSections() = runTest {
         val viewModel = viewModel()
 
         viewModel.onAction(MyInfoAction.Enter)
-        viewModel.onAction(MyInfoAction.PaymentMethodUpdated)
-        viewModel.onAction(MyInfoAction.AccountUpdated)
+        viewModel.onAction(MyInfoAction.Enter)
 
         assertEquals(2, paymentRepository.coinsCalls)
         assertEquals(2, paymentRepository.earningsCalls)

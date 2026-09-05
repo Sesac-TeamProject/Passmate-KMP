@@ -2,13 +2,11 @@ import SwiftUI
 import Shared
 
 // Figma "UI 디자인 v6" M-12-3(437:5534) 미러 — 정산 계좌 등록/변경: 은행·계좌번호·예금주.
-// 시트 표시 여부는 호스팅 화면(EarningsView)이 소유한다 (규칙 §11-1)
-struct SettlementAccountSheetView: View {
-    var onSaved: () -> Void = {}
+// 시안이 전체 페이지라 라우트 push로 띄운다 (규칙 §2-1 — 상세는 모달이 아니라 push)
+struct SettlementAccountView: View {
+    var onBack: () -> Void = {}
 
-    var onNotice: (String) -> Void = { _ in }
-
-    var onClose: () -> Void = {}
+    @State private var noticeMessage: String?
 
     @StateObject private var viewModel = SettlementAccountViewModel(
         getSettlementAccountUseCase: KoinHelper.shared.getSettlementAccountUseCase(),
@@ -19,7 +17,7 @@ struct SettlementAccountSheetView: View {
         SettlementAccountContentView(
             uiState: viewModel.uiState,
             onAction: { viewModel.action($0) },
-            onClose: onClose
+            onBack: onBack
         )
         .onAppear {
             viewModel.action(.enter)
@@ -27,9 +25,26 @@ struct SettlementAccountSheetView: View {
         .onReceive(viewModel.event) { event in
             switch event {
             case .saved:
-                onSaved()
+                onBack()
             case let .showNotice(message):
-                onNotice(message)
+                noticeMessage = message
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if let noticeMessage {
+                Text(noticeMessage)
+                    .font(.system(size: 13))
+                    .foregroundColor(PassmateColors.surface)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(PassmateColors.textPrimary.opacity(0.9))
+                    .cornerRadius(10)
+                    .padding(.bottom, 16)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                            self.noticeMessage = nil
+                        }
+                    }
             }
         }
     }
@@ -40,23 +55,20 @@ private struct SettlementAccountContentView: View {
 
     let onAction: (SettlementAccountAction) -> Void
 
-    let onClose: () -> Void
+    let onBack: () -> Void
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text("정산 계좌")
+                HStack(spacing: 12) {
+                    PassmateBackButton(onClick: onBack)
+                    Text("정산 계좌 등록")
                         .font(.system(size: 20, weight: .bold))
                         .kerning(-0.4)
                         .foregroundColor(PassmateColors.textPrimary)
                     Spacer()
-                    Button(action: onClose) {
-                        Text("✕")
-                            .font(.system(size: 18))
-                            .foregroundColor(PassmateColors.textSecondary)
-                    }
                 }
+                .padding(.top, 16)
                 if uiState.isLoading {
                     HStack {
                         Spacer()

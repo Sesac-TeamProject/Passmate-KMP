@@ -114,45 +114,48 @@ fun LearningReportResponse.toDomain(): LearningReport {
 
 fun RoomReportResponse.toDomain(): RoomReport {
     return RoomReport(
-        roomTitle = roomTitle,
-        pin = pin,
+        roomTitle = title,
+        // 서버가 pin을 주지 않는다 — 빈 값이면 화면이 PIN 조각을 생략한다 (백엔드 요청 중)
+        pin = "",
         status = RoomStatus.from(status),
-        dateLabel = dateLabel,
+        dateLabel = startedAt?.substringBefore('T'),
         summary = summary.toDomain(),
         questions = questions.map { it.toDomain() },
-        students = students.map { it.toDomain() }
+        students = participants.map { it.toDomain() }
     )
 }
 
 fun RoomReportResponse.SummaryDto.toDomain(): RoomReportSummary {
     return RoomReportSummary(
-        avgAccuracyPercent = avgAccuracyPercent,
-        studentCount = studentCount,
+        avgAccuracyPercent = avgCorrectRate?.roundToInt(),
+        studentCount = participantCount,
         questionCount = questionCount,
         aiAnalysisCount = aiAnalysisCount,
         avgScore = avgScore,
-        topScore = topScore
+        // 서버 응답에 최고점이 없다 — 참가자 목록에서 뽑지 않고 비운다(정렬 기준이 서버 권위다)
+        topScore = null
     )
 }
 
 fun RoomReportResponse.QuestionDto.toDomain(): ReportQuestion {
     return ReportQuestion(
         questionId = questionId,
-        questionNo = questionNo,
-        title = title,
+        questionNo = orderNo,
+        title = content,
         type = QuestionType.from(type),
-        accuracyPercent = accuracyPercent,
-        aiFeedbackCount = aiFeedbackCount
+        accuracyPercent = correctRate?.roundToInt(),
+        aiFeedbackCount = aiAnalysisCount
     )
 }
 
-fun RoomReportResponse.StudentDto.toDomain(): ReportStudent {
+fun RoomReportResponse.ParticipantDto.toDomain(): ReportStudent {
     return ReportStudent(
         participantId = participantId,
         nickname = nickname,
         rank = rank,
         totalScore = totalScore,
         correctCount = correctCount,
-        isGuest = isGuest
+        // 서버가 게스트 여부를 주지 않는다 — 목록에서 구분 표시를 하지 않는다
+        isGuest = false
     )
 }

@@ -4,7 +4,7 @@ enum MyInfoEvent {
     // 마이는 회원 전용 — 딥링크 직접 진입 대비 보험 (탭 가드는 AppShellViewModel, 규칙 §8)
     case requireSignIn
     case openReputation
-    case openEditProfile(nickname: String, avatarId: Int?)
+    case openEditProfile
     case openPaymentMethod
     case openCoinHistory
     // 코인 충전 화면 (M-12-4·M-12-6)

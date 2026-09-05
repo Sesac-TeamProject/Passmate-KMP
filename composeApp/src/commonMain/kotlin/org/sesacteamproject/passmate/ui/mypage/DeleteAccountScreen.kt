@@ -78,7 +78,7 @@ private fun DeleteAccountContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.Surface)
-            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다 — 시안이 이 화면에 탭바를 유지한다
             .statusBarsPadding()
             .padding(horizontal = 20.dp)
     ) {

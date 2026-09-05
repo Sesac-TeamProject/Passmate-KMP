@@ -108,7 +108,7 @@
 		A1010001120AABBCCDDEEFF0120 /* SettlementAccountAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001120AABBCCDDEEFF0120 /* SettlementAccountAction.swift */; };
 		A1010001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift */; };
 		A1010001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */; };
-		A1010001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */; };
+		A1010001123AABBCCDDEEFF0123 /* SettlementAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001123AABBCCDDEEFF0123 /* SettlementAccountView.swift */; };
 		A1010001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift */; };
 		A1010001125AABBCCDDEEFF0125 /* MyInfoUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001125AABBCCDDEEFF0125 /* MyInfoUiState.swift */; };
 		A1010001126AABBCCDDEEFF0126 /* MyInfoAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001126AABBCCDDEEFF0126 /* MyInfoAction.swift */; };
@@ -119,17 +119,17 @@
 		A1010001131AABBCCDDEEFF0131 /* EditProfileAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001131AABBCCDDEEFF0131 /* EditProfileAction.swift */; };
 		A1010001132AABBCCDDEEFF0132 /* EditProfileEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001132AABBCCDDEEFF0132 /* EditProfileEvent.swift */; };
 		A1010001133AABBCCDDEEFF0133 /* EditProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001133AABBCCDDEEFF0133 /* EditProfileViewModel.swift */; };
-		A1010001134AABBCCDDEEFF0134 /* EditProfileSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001134AABBCCDDEEFF0134 /* EditProfileSheetView.swift */; };
+		A1010001134AABBCCDDEEFF0134 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001134AABBCCDDEEFF0134 /* EditProfileView.swift */; };
 		A1010001135AABBCCDDEEFF0135 /* NotificationSettingsUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001135AABBCCDDEEFF0135 /* NotificationSettingsUiState.swift */; };
 		A1010001136AABBCCDDEEFF0136 /* NotificationSettingsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001136AABBCCDDEEFF0136 /* NotificationSettingsAction.swift */; };
 		A1010001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift */; };
 		A1010001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift */; };
-		A1010001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift */; };
+		A1010001139AABBCCDDEEFF0139 /* NotificationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001139AABBCCDDEEFF0139 /* NotificationSettingsView.swift */; };
 		A1010001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift */; };
 		A1010001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift */; };
 		A1010001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */; };
 		A1010001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */; };
-		A1010001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift */; };
+		A1010001144AABBCCDDEEFF0144 /* PaymentMethodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001144AABBCCDDEEFF0144 /* PaymentMethodView.swift */; };
 		A1010001145AABBCCDDEEFF0145 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001145AABBCCDDEEFF0145 /* AppTab.swift */; };
 		A1010001146AABBCCDDEEFF0146 /* AppShellUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001146AABBCCDDEEFF0146 /* AppShellUiState.swift */; };
 		A1010001147AABBCCDDEEFF0147 /* AppShellAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */; };
@@ -139,6 +139,11 @@
 		A1010000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift */; };
 		A1010000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */; };
 		A1010000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift */; };
+		A1010000168AABBCCDDEE9000 /* CharacterEditAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEE9000 /* CharacterEditAction.swift */; };
+		A1010000168AABBCCDDEE9001 /* CharacterEditEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEE9001 /* CharacterEditEvent.swift */; };
+		A1010000168AABBCCDDEE9002 /* CharacterEditUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEE9002 /* CharacterEditUiState.swift */; };
+		A1010000168AABBCCDDEE9003 /* CharacterEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEE9003 /* CharacterEditViewModel.swift */; };
+		A1010000168AABBCCDDEE9004 /* CharacterEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEE9004 /* CharacterEditView.swift */; };
 		A1010000168AABBCCDDEEFF0168 /* DeleteAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEEFF0168 /* DeleteAccountView.swift */; };
 		A1010000171AABBCCDDEEFF0171 /* PassmateBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000171AABBCCDDEEFF0171 /* PassmateBackButton.swift */; };
 		A1010000172AABBCCDDEEFF0172 /* PassmateSplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000172AABBCCDDEEFF0172 /* PassmateSplashView.swift */; };
@@ -147,6 +152,9 @@
 		A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */; };
 		A1010001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */; };
 		A1010001159AABBCCDDEEFF0159 /* PassmateIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */; };
+		A1010000168AABBCCDDEE9100 /* PassmateTimerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEE9100 /* PassmateTimerBar.swift */; };
+		A1010000168AABBCCDDEE9200 /* PassmateConfirmDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEE9200 /* PassmateConfirmDialogView.swift */; };
+		A1010000168AABBCCDDEE9300 /* PassmateWaitingDots.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000168AABBCCDDEE9300 /* PassmateWaitingDots.swift */; };
 		A1010002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift */; };
 		A1010002201AABBCCDDEEFF0301 /* PassmateSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002201AABBCCDDEEFF0301 /* PassmateSkeletonView.swift */; };
 		A1010002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift */; };
@@ -156,7 +164,8 @@
 		A101000071AABBCCDDEEFF0071 /* RatingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */; };
 		A101000072AABBCCDDEEFF0072 /* RoomInfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */; };
 		A1010065AABBCCDDEEFF0065 /* StudentAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */; };
-		A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */; };
+		A1010066AABBCCDDEEFF0066 /* PassmateMascotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011066AABBCCDDEEFF0066 /* PassmateMascotView.swift */; };
+		A1010000180AABBCCDDEEFF0180 /* PassmateMascots.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000180AABBCCDDEEFF0180 /* PassmateMascots.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -264,7 +273,7 @@
 		A1011001120AABBCCDDEEFF0120 /* SettlementAccountAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountAction.swift; sourceTree = "<group>"; };
 		A1011001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountEvent.swift; sourceTree = "<group>"; };
 		A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountViewModel.swift; sourceTree = "<group>"; };
-		A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountSheetView.swift; sourceTree = "<group>"; };
+		A1011001123AABBCCDDEEFF0123 /* SettlementAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementAccountView.swift; sourceTree = "<group>"; };
 		A1011001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceHintRecorder.swift; sourceTree = "<group>"; };
 		A1011001125AABBCCDDEEFF0125 /* MyInfoUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoUiState.swift; sourceTree = "<group>"; };
 		A1011001126AABBCCDDEEFF0126 /* MyInfoAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoAction.swift; sourceTree = "<group>"; };
@@ -275,17 +284,17 @@
 		A1011001131AABBCCDDEEFF0131 /* EditProfileAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileAction.swift; sourceTree = "<group>"; };
 		A1011001132AABBCCDDEEFF0132 /* EditProfileEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileEvent.swift; sourceTree = "<group>"; };
 		A1011001133AABBCCDDEEFF0133 /* EditProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewModel.swift; sourceTree = "<group>"; };
-		A1011001134AABBCCDDEEFF0134 /* EditProfileSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileSheetView.swift; sourceTree = "<group>"; };
+		A1011001134AABBCCDDEEFF0134 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
 		A1011001135AABBCCDDEEFF0135 /* NotificationSettingsUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsUiState.swift; sourceTree = "<group>"; };
 		A1011001136AABBCCDDEEFF0136 /* NotificationSettingsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsAction.swift; sourceTree = "<group>"; };
 		A1011001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsEvent.swift; sourceTree = "<group>"; };
 		A1011001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsViewModel.swift; sourceTree = "<group>"; };
-		A1011001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsSheetView.swift; sourceTree = "<group>"; };
+		A1011001139AABBCCDDEEFF0139 /* NotificationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsView.swift; sourceTree = "<group>"; };
 		A1011001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodUiState.swift; sourceTree = "<group>"; };
 		A1011001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodAction.swift; sourceTree = "<group>"; };
 		A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodEvent.swift; sourceTree = "<group>"; };
 		A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodViewModel.swift; sourceTree = "<group>"; };
-		A1011001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodSheetView.swift; sourceTree = "<group>"; };
+		A1011001144AABBCCDDEEFF0144 /* PaymentMethodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodView.swift; sourceTree = "<group>"; };
 		A1011001145AABBCCDDEEFF0145 /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		A1011001146AABBCCDDEEFF0146 /* AppShellUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellUiState.swift; sourceTree = "<group>"; };
 		A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellAction.swift; sourceTree = "<group>"; };
@@ -295,6 +304,11 @@
 		A1011000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountAction.swift; sourceTree = "<group>"; };
 		A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountEvent.swift; sourceTree = "<group>"; };
 		A1011000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountViewModel.swift; sourceTree = "<group>"; };
+		A1011000168AABBCCDDEE9000 /* CharacterEditAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterEditAction.swift; sourceTree = "<group>"; };
+		A1011000168AABBCCDDEE9001 /* CharacterEditEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterEditEvent.swift; sourceTree = "<group>"; };
+		A1011000168AABBCCDDEE9002 /* CharacterEditUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterEditUiState.swift; sourceTree = "<group>"; };
+		A1011000168AABBCCDDEE9003 /* CharacterEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterEditViewModel.swift; sourceTree = "<group>"; };
+		A1011000168AABBCCDDEE9004 /* CharacterEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterEditView.swift; sourceTree = "<group>"; };
 		A1011000168AABBCCDDEEFF0168 /* DeleteAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountView.swift; sourceTree = "<group>"; };
 		A1011000171AABBCCDDEEFF0171 /* PassmateBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateBackButton.swift; sourceTree = "<group>"; };
 		A1011000172AABBCCDDEEFF0172 /* PassmateSplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateSplashView.swift; sourceTree = "<group>"; };
@@ -303,6 +317,9 @@
 		A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakTopicsRow.swift; sourceTree = "<group>"; };
 		A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateEmptyStateView.swift; sourceTree = "<group>"; };
 		A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateIconView.swift; sourceTree = "<group>"; };
+		A1011000168AABBCCDDEE9100 /* PassmateTimerBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateTimerBar.swift; sourceTree = "<group>"; };
+		A1011000168AABBCCDDEE9200 /* PassmateConfirmDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateConfirmDialogView.swift; sourceTree = "<group>"; };
+		A1011000168AABBCCDDEE9300 /* PassmateWaitingDots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateWaitingDots.swift; sourceTree = "<group>"; };
 		A1011002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateBottomTabBar.swift; sourceTree = "<group>"; };
 		A1011002201AABBCCDDEEFF0301 /* PassmateSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateSkeletonView.swift; sourceTree = "<group>"; };
 		A1011002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeTabBarHidden.swift; sourceTree = "<group>"; };
@@ -312,7 +329,8 @@
 		A101100071AABBCCDDEEFF0071 /* RatingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSectionView.swift; sourceTree = "<group>"; };
 		A101100072AABBCCDDEEFF0072 /* RoomInfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomInfoCardView.swift; sourceTree = "<group>"; };
 		A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentAvatar.swift; sourceTree = "<group>"; };
-		A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassyMascot.swift; sourceTree = "<group>"; };
+		A1011066AABBCCDDEEFF0066 /* PassmateMascotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateMascotView.swift; sourceTree = "<group>"; };
+		A1011000180AABBCCDDEEFF0180 /* PassmateMascots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassmateMascots.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -491,16 +509,21 @@
 				A1011001131AABBCCDDEEFF0131 /* EditProfileAction.swift */,
 				A1011001132AABBCCDDEEFF0132 /* EditProfileEvent.swift */,
 				A1011001133AABBCCDDEEFF0133 /* EditProfileViewModel.swift */,
-				A1011001134AABBCCDDEEFF0134 /* EditProfileSheetView.swift */,
+				A1011001134AABBCCDDEEFF0134 /* EditProfileView.swift */,
 				A1011001135AABBCCDDEEFF0135 /* NotificationSettingsUiState.swift */,
 				A1011001136AABBCCDDEEFF0136 /* NotificationSettingsAction.swift */,
 				A1011001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift */,
 				A1011001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift */,
-				A1011001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift */,
+				A1011001139AABBCCDDEEFF0139 /* NotificationSettingsView.swift */,
 				A1011000164AABBCCDDEEFF0164 /* DeleteAccountUiState.swift */,
 				A1011000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift */,
 				A1011000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift */,
 				A1011000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift */,
+				A1011000168AABBCCDDEE9000 /* CharacterEditAction.swift */,
+				A1011000168AABBCCDDEE9001 /* CharacterEditEvent.swift */,
+				A1011000168AABBCCDDEE9002 /* CharacterEditUiState.swift */,
+				A1011000168AABBCCDDEE9003 /* CharacterEditViewModel.swift */,
+				A1011000168AABBCCDDEE9004 /* CharacterEditView.swift */,
 				A1011000168AABBCCDDEEFF0168 /* DeleteAccountView.swift */,
 			);
 			path = mypage;
@@ -533,12 +556,12 @@
 				A1011001120AABBCCDDEEFF0120 /* SettlementAccountAction.swift */,
 				A1011001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift */,
 				A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */,
-				A1011001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift */,
+				A1011001123AABBCCDDEEFF0123 /* SettlementAccountView.swift */,
 				A1011001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift */,
 				A1011001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift */,
 				A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */,
 				A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */,
-				A1011001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift */,
+				A1011001144AABBCCDDEEFF0144 /* PaymentMethodView.swift */,
 			);
 			path = payment;
 			sourceTree = "<group>";
@@ -612,11 +635,15 @@
 				A101100070AABBCCDDEEFF0070 /* StarRatingView.swift */,
 				A1011065AABBCCDDEEFF0065 /* StudentAvatar.swift */,
 				A101100073AABBCCDDEEFF0073 /* PortOnePaymentView.swift */,
-				A1011066AABBCCDDEEFF0066 /* PassyMascot.swift */,
+				A1011066AABBCCDDEEFF0066 /* PassmateMascotView.swift */,
+				A1011000180AABBCCDDEEFF0180 /* PassmateMascots.swift */,
 				A1011001156AABBCCDDEEFF0156 /* FlowLayout.swift */,
 				A1011001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift */,
 				A1011001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift */,
 				A1011001159AABBCCDDEEFF0159 /* PassmateIconView.swift */,
+				A1011000168AABBCCDDEE9100 /* PassmateTimerBar.swift */,
+				A1011000168AABBCCDDEE9200 /* PassmateConfirmDialogView.swift */,
+				A1011000168AABBCCDDEE9300 /* PassmateWaitingDots.swift */,
 				A1011002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift */,
 				A1011002201AABBCCDDEEFF0301 /* PassmateSkeletonView.swift */,
 				A1011002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift */,
@@ -826,7 +853,7 @@
 				A1010001120AABBCCDDEEFF0120 /* SettlementAccountAction.swift in Sources */,
 				A1010001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift in Sources */,
 				A1010001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift in Sources */,
-				A1010001123AABBCCDDEEFF0123 /* SettlementAccountSheetView.swift in Sources */,
+				A1010001123AABBCCDDEEFF0123 /* SettlementAccountView.swift in Sources */,
 				A1010001124AABBCCDDEEFF0124 /* VoiceHintRecorder.swift in Sources */,
 				A1010001125AABBCCDDEEFF0125 /* MyInfoUiState.swift in Sources */,
 				A1010001126AABBCCDDEEFF0126 /* MyInfoAction.swift in Sources */,
@@ -837,17 +864,17 @@
 				A1010001131AABBCCDDEEFF0131 /* EditProfileAction.swift in Sources */,
 				A1010001132AABBCCDDEEFF0132 /* EditProfileEvent.swift in Sources */,
 				A1010001133AABBCCDDEEFF0133 /* EditProfileViewModel.swift in Sources */,
-				A1010001134AABBCCDDEEFF0134 /* EditProfileSheetView.swift in Sources */,
+				A1010001134AABBCCDDEEFF0134 /* EditProfileView.swift in Sources */,
 				A1010001135AABBCCDDEEFF0135 /* NotificationSettingsUiState.swift in Sources */,
 				A1010001136AABBCCDDEEFF0136 /* NotificationSettingsAction.swift in Sources */,
 				A1010001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift in Sources */,
 				A1010001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift in Sources */,
-				A1010001139AABBCCDDEEFF0139 /* NotificationSettingsSheetView.swift in Sources */,
+				A1010001139AABBCCDDEEFF0139 /* NotificationSettingsView.swift in Sources */,
 				A1010001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift in Sources */,
 				A1010001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift in Sources */,
 				A1010001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift in Sources */,
 				A1010001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift in Sources */,
-				A1010001144AABBCCDDEEFF0144 /* PaymentMethodSheetView.swift in Sources */,
+				A1010001144AABBCCDDEEFF0144 /* PaymentMethodView.swift in Sources */,
 				A1010001145AABBCCDDEEFF0145 /* AppTab.swift in Sources */,
 				A1010001146AABBCCDDEEFF0146 /* AppShellUiState.swift in Sources */,
 				A1010001147AABBCCDDEEFF0147 /* AppShellAction.swift in Sources */,
@@ -857,6 +884,11 @@
 				A1010000165AABBCCDDEEFF0165 /* DeleteAccountAction.swift in Sources */,
 				A1010000166AABBCCDDEEFF0166 /* DeleteAccountEvent.swift in Sources */,
 				A1010000167AABBCCDDEEFF0167 /* DeleteAccountViewModel.swift in Sources */,
+				A1010000168AABBCCDDEE9000 /* CharacterEditAction.swift in Sources */,
+				A1010000168AABBCCDDEE9001 /* CharacterEditEvent.swift in Sources */,
+				A1010000168AABBCCDDEE9002 /* CharacterEditUiState.swift in Sources */,
+				A1010000168AABBCCDDEE9003 /* CharacterEditViewModel.swift in Sources */,
+				A1010000168AABBCCDDEE9004 /* CharacterEditView.swift in Sources */,
 				A1010000168AABBCCDDEEFF0168 /* DeleteAccountView.swift in Sources */,
 				A1010000171AABBCCDDEEFF0171 /* PassmateBackButton.swift in Sources */,
 				A1010000172AABBCCDDEEFF0172 /* PassmateSplashView.swift in Sources */,
@@ -865,13 +897,17 @@
 				A1010001157AABBCCDDEEFF0157 /* WeakTopicsRow.swift in Sources */,
 				A1010001160AABBCCDDEEFF0160 /* PassmateEmptyStateView.swift in Sources */,
 				A1010001159AABBCCDDEEFF0159 /* PassmateIconView.swift in Sources */,
+				A1010000168AABBCCDDEE9100 /* PassmateTimerBar.swift in Sources */,
+				A1010000168AABBCCDDEE9200 /* PassmateConfirmDialogView.swift in Sources */,
+				A1010000168AABBCCDDEE9300 /* PassmateWaitingDots.swift in Sources */,
 				A1010002201AABBCCDDEEFF0201 /* PassmateBottomTabBar.swift in Sources */,
 				A1010002201AABBCCDDEEFF0301 /* PassmateSkeletonView.swift in Sources */,
 				A1010002202AABBCCDDEEFF0202 /* NativeTabBarHidden.swift in Sources */,
 				A1010001158AABBCCDDEEFF0158 /* SheetDetents.swift in Sources */,
 				A1010000169AABBCCDDEEFF0169 /* PassmateIcons.swift in Sources */,
 				A1010000170AABBCCDDEEFF0170 /* PassmateIconView.swift in Sources */,
-				A1010066AABBCCDDEEFF0066 /* PassyMascot.swift in Sources */,
+				A1010066AABBCCDDEEFF0066 /* PassmateMascotView.swift in Sources */,
+				A1010000180AABBCCDDEEFF0180 /* PassmateMascots.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

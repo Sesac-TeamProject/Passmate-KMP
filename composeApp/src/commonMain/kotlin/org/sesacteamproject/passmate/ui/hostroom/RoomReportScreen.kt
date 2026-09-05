@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -102,7 +102,7 @@ private fun RoomReportContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.Surface)
-            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다 — 시안이 이 화면에 탭바를 유지한다
             .statusBarsPadding()
     ) {
         when {
@@ -474,7 +474,11 @@ private fun OverviewSummaryCard(report: RoomReport) {
     ) {
         OverviewRow(label = "평균 점수", value = summary.avgScore?.let { "${formatScore(it)}점" } ?: "—")
         OverviewRow(label = "최고 점수", value = summary.topScore?.let { "${formatScore(it)}점" } ?: "—")
-        OverviewRow(label = "문항 구성", value = "객관식 $choiceCount · OX $oxCount · 서술형 $essayCount")
+        OverviewRow(
+            label = "문항 구성",
+            value = "${QuestionType.MULTIPLE_CHOICE.displayLabel} $choiceCount · " +
+                "${QuestionType.OX.displayLabel} $oxCount · ${QuestionType.ESSAY.displayLabel} $essayCount"
+        )
         OverviewRow(label = "AI 분석", value = "${summary.aiAnalysisCount}건")
     }
 }
@@ -586,7 +590,7 @@ private fun QuestionRow(question: ReportQuestion) {
             }
             if (question.type == QuestionType.ESSAY && question.aiFeedbackCount == null) {
                 Text(
-                    text = "서술형",
+                    text = QuestionType.ESSAY.displayLabel,
                     color = PassmateColors.PrimaryDeep,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
@@ -879,14 +883,26 @@ private fun formatScore(score: Double): String {
     return digits.reversed().chunked(3).joinToString(",").reversed()
 }
 
+// 시안 M-14: "8/22(금) 진행 · 종료된 방 · PIN 482 913".
+// 상태는 서버 값을 따르고, pin은 서버가 주지 않을 때(빈 값) 조각을 통째로 생략한다
 private fun reportSubtitle(report: RoomReport): String {
     val parts = mutableListOf<String>()
 
     report.dateLabel?.let { parts.add("$it 진행") }
-    parts.add("종료된 방")
-    parts.add("PIN ${report.pin.chunked(3).joinToString(" ")}")
-
+    statusLabel(report.status)?.let { parts.add(it) }
+    if (report.pin.isNotBlank()) {
+        parts.add("PIN ${report.pin.chunked(3).joinToString(" ")}")
+    }
     return parts.joinToString(" · ")
+}
+
+private fun statusLabel(status: RoomStatus): String? {
+    return when (status) {
+        RoomStatus.WAITING -> "대기 중인 방"
+        RoomStatus.RUNNING -> "진행 중인 방"
+        RoomStatus.FINISHED -> "종료된 방"
+        RoomStatus.UNKNOWN -> null
+    }
 }
 
 // --- Preview ---

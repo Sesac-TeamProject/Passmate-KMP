@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTimerBar
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -145,8 +147,10 @@ private fun SessionControlContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.Surface)
-            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            // 화면 배경은 시스템 바 뒤까지 깔고 콘텐츠만 안쪽으로 들인다 (iOS의 background(...).ignoresSafeArea() 미러).
+            // 탭바 없는 push 화면은 Scaffold가 하단 인셋을 주지 않으므로(contentWindowInsets=0) 여기서 직접 준다
             .statusBarsPadding()
+            .navigationBarsPadding()
     ) {
         when {
             uiState.isLoading -> LoadingBox()
@@ -342,7 +346,7 @@ private fun QuestionCard(uiState: SessionControlUiState) {
                     letterSpacing = (-0.36).sp
                 )
                 Text(
-                    text = typeLabel(question.type),
+                    text = question.type.displayLabel,
                     color = PassmateColors.RatingTagSelectedText,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
@@ -351,11 +355,11 @@ private fun QuestionCard(uiState: SessionControlUiState) {
                         .padding(horizontal = 8.dp, vertical = 3.dp)
                 )
                 Box(modifier = Modifier.weight(1f))
-                TimerCircle(
-                    remainingSec = uiState.remainingSec,
-                    isClosed = uiState.isQuestionClosed
-                )
             }
+            PassmateTimerBar(
+                remainingSeconds = uiState.remainingSec,
+                totalSeconds = question.timeLimitSec
+            )
             Text(
                 text = question.body,
                 color = PassmateColors.TextPrimary,
@@ -367,29 +371,6 @@ private fun QuestionCard(uiState: SessionControlUiState) {
                 SubmissionSection(submissions = submissions)
             }
         }
-    }
-}
-
-@Composable
-private fun TimerCircle(
-    remainingSec: Int,
-    isClosed: Boolean
-) {
-    val ringColor = if (isClosed) PassmateColors.Border else PassmateColors.TimerAmber
-    val label = if (isClosed) "마감" else remainingSec.toString()
-
-    Box(
-        modifier = Modifier
-            .size(48.dp)
-            .border(3.dp, ringColor, CircleShape),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = label,
-            color = PassmateColors.TextPrimary,
-            fontSize = if (isClosed) 12.sp else 18.sp,
-            fontWeight = FontWeight.Bold
-        )
     }
 }
 
@@ -727,15 +708,6 @@ private fun ErrorBox(onRetry: () -> Unit) {
                 .clickable(onClick = onRetry)
                 .padding(8.dp)
         )
-    }
-}
-
-private fun typeLabel(type: QuestionType): String {
-    return when (type) {
-        QuestionType.MULTIPLE_CHOICE -> "객관식"
-        QuestionType.OX -> "OX"
-        QuestionType.ESSAY -> "서술형"
-        QuestionType.UNKNOWN -> "문항"
     }
 }
 

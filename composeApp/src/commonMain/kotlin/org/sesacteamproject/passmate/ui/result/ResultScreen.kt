@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -22,7 +23,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -40,12 +40,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.component.PassmateCard
-import org.sesacteamproject.passmate.component.PassmateSkeletonBlock
-import org.sesacteamproject.passmate.component.PassmateSkeletonCard
 import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.PassmateIcons
-import org.sesacteamproject.passmate.component.PassyMascot
+import org.sesacteamproject.passmate.component.PassmateSkeletonBlock
+import org.sesacteamproject.passmate.component.PassmateSkeletonCard
+import org.sesacteamproject.passmate.component.PassmateMascot
+import org.sesacteamproject.passmate.component.PassmateMascots
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.preview.PassmatePreview
@@ -100,10 +102,9 @@ fun ResultScreen(
     }
     // 평가 시트는 컨테이너가 소유 (규칙 §11-1) — 오버레이/모달은 콘텐츠 뷰에 두지 않는다
     if (uiState.isRatingSheetVisible) {
-        ModalBottomSheet(
+        PassmateBottomSheet(
             onDismissRequest = { viewModel.onAction(ResultAction.DismissRatingSheet) },
             sheetState = ratingSheetState,
-            containerColor = PassmateColors.Surface
         ) {
             RatingSection(
                 uiState = uiState,
@@ -123,8 +124,10 @@ private fun ResultContentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PassmateColors.Surface)
-            // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
+            // 화면 배경은 시스템 바 뒤까지 깔고 콘텐츠만 안쪽으로 들인다 (iOS의 background(...).ignoresSafeArea() 미러).
+            // 탭바 없는 push 화면은 Scaffold가 하단 인셋을 주지 않으므로(contentWindowInsets=0) 여기서 직접 준다
             .statusBarsPadding()
+            .navigationBarsPadding()
     ) {
         when {
             uiState.isLoading -> ResultSkeleton()
@@ -432,7 +435,11 @@ private fun ReportHeaderCard(result: SessionResult) {
                     letterSpacing = (-0.28).sp
                 )
             }
-            PassyMascot(modifier = Modifier.size(width = 52.dp, height = 57.dp))
+            PassmateMascot(
+                mascot = PassmateMascots.Feedback,
+                width = 52.dp,
+                height = 57.dp
+            )
         }
     }
 }
