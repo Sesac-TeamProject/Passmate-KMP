@@ -3,6 +3,7 @@ package org.sesacteamproject.passmate.component
 import java.io.ByteArrayInputStream
 import java.io.File
 import javax.imageio.ImageIO
+import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -20,9 +21,9 @@ class PassmateMascotResourceTest {
     // 리소스는 4배율로 뽑으므로 dp에 4를 곱한다
     private val assetScale = 4
 
-    private val canvasWidth = (MASCOT_CANVAS_WIDTH * assetScale).toInt()
+    private val canvasWidth = (MASCOT_CANVAS_WIDTH * assetScale).roundToInt()
 
-    private val canvasHeight = (MASCOT_CANVAS_HEIGHT * assetScale).toInt()
+    private val canvasHeight = (MASCOT_CANVAS_HEIGHT * assetScale).roundToInt()
 
     private fun moduleDir(): File {
         var dir = File(System.getProperty("user.dir")).absoluteFile
@@ -90,6 +91,34 @@ class PassmateMascotResourceTest {
         }
     }
 
+    // M5 — iOS 미러는 같은 상수를 Swift로 한 벌 더 갖는다. 여기서 어긋나면 Kotlin 상수만 고쳤을 때
+    // 안드로이드·데스크톱은 맞고 iOS만 마스코트가 다른 자리에 그려진다 (아이콘 사본 검사와 같은 취지)
+    @Test
+    fun iosMirrorUsesTheSameCanvasConstants() {
+        val source = File(moduleDir().parentFile, "iosApp/iosApp/component/PassmateMascotView.swift")
+        val expected = mapOf(
+            "frameWidth" to MASCOT_FRAME_WIDTH,
+            "frameHeight" to MASCOT_FRAME_HEIGHT,
+            "canvasWidth" to MASCOT_CANVAS_WIDTH,
+            "canvasHeight" to MASCOT_CANVAS_HEIGHT,
+            "bleedLeft" to MASCOT_BLEED_LEFT,
+            "bleedTop" to MASCOT_BLEED_TOP
+        )
+
+        assertTrue(source.isFile, "${source.path} 없음")
+
+        val text = source.readText()
+
+        expected.forEach { (name, value) ->
+            val match = assertNotNull(
+                Regex("static let " + name + ": CGFloat = ([0-9.]+)").find(text),
+                "PassmateMascotView.swift에 " + name + " 상수가 없다"
+            )
+
+            assertEquals(value, match.groupValues[1].toFloat(), name + ": Compose 상수와 다르다")
+        }
+    }
+
     // M4 — iOS 미러가 빠지면 SwiftUI에서 빈 이미지가 나온다. 배율별 파일 크기도 캔버스 비율을 지켜야 한다
     @Test
     fun everyMascotHasIosImageSet() {
@@ -103,7 +132,7 @@ class PassmateMascotResourceTest {
 
                 assertTrue(file.isFile, "${file.path} 없음")
                 assertEquals(
-                    (canvasWidth / 4 * scale) to (canvasHeight / 4 * scale),
+                    (canvasWidth / assetScale * scale) to (canvasHeight / assetScale * scale),
                     sizeOf(file.readBytes()),
                     "${mascot.name} ${scale}x: 크기가 캔버스 비율과 다르다"
                 )

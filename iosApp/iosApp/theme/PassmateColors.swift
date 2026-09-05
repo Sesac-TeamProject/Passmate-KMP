@@ -23,12 +23,7 @@ enum PassmateColors {
 
     static let textPrimary = Color(hex: 0x1B1F24)
 
-    // 웹뷰 HTML(PortOne 로딩 화면)이 CSS 문자열로도 쓴다 — 값을 한 번만 적는다 (규칙 §11-2)
-    static let textSecondaryHex: UInt32 = 0x6B7280
-
-    static let textSecondary = Color(hex: textSecondaryHex)
-
-    static let textSecondaryCssHex = String(format: "#%06X", textSecondaryHex)
+    static let textSecondary = Color(hex: 0x6B7280)
 
     static let textTertiary = Color(hex: 0xA0A6B0)
 
@@ -112,6 +107,30 @@ enum PassmateColors {
     static let brandGoogleBlue = Color(hex: 0x4285F4)
 
     static let brandAppleBlack = Color(hex: 0x111111)
+}
+
+// 웹뷰에 넣는 HTML은 CSS 색 문자열이 필요하다. 화면 코드에 hex를 다시 적으면 토큰과 갈라지므로
+// (규칙 §11-2) 토큰을 여기서 문자열로 바꿔 쓴다. Compose 미러는 theme/ColorExtensions.kt의 toCssHex다
+extension Color {
+    var cssHex: String {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+
+        UIColor(self).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+
+        // 반투명 토큰을 불투명으로 삼켜버리지 않도록 alpha가 1이 아니면 #RRGGBBAA로 낸다
+        if alpha < 1 {
+            return String(format: "#%02X%02X%02X%02X",
+                          Int((red * 255).rounded()), Int((green * 255).rounded()),
+                          Int((blue * 255).rounded()), Int((alpha * 255).rounded()))
+        } else {
+            return String(format: "#%02X%02X%02X",
+                          Int((red * 255).rounded()), Int((green * 255).rounded()),
+                          Int((blue * 255).rounded()))
+        }
+    }
 }
 
 private extension Color {

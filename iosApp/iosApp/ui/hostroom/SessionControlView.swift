@@ -373,7 +373,6 @@ private struct SessionControlContentView: View {
         }
     }
 
-
     private func formatPin(_ pin: String) -> String {
         stride(from: 0, to: pin.count, by: 3).map { start in
             let begin = pin.index(pin.startIndex, offsetBy: start)

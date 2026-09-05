@@ -23,6 +23,9 @@ struct PassmateMascotView: View {
 
     let height: CGFloat
 
+    // Compose의 contentDescription 미러 — 장식으로 쓸 때 nil을 주면 보이스오버가 읽지 않는다
+    var contentDescription: String? = "패스메이트 마스코트 패시"
+
     var body: some View {
         Image(mascot.rawValue)
             .resizable()
@@ -35,6 +38,7 @@ struct PassmateMascotView: View {
                 y: -height * (Self.bleedTop / Self.frameHeight)
             )
             .frame(width: width, height: height, alignment: .topLeading)
-            .accessibilityLabel("패스메이트 마스코트 패시")
+            .accessibilityLabel(contentDescription ?? "")
+            .accessibilityHidden(contentDescription == nil)
     }
 }

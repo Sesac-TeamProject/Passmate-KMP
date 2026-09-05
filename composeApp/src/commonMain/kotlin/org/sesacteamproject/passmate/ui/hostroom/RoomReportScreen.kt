@@ -474,7 +474,11 @@ private fun OverviewSummaryCard(report: RoomReport) {
     ) {
         OverviewRow(label = "평균 점수", value = summary.avgScore?.let { "${formatScore(it)}점" } ?: "—")
         OverviewRow(label = "최고 점수", value = summary.topScore?.let { "${formatScore(it)}점" } ?: "—")
-        OverviewRow(label = "문항 구성", value = "객관식 $choiceCount · OX $oxCount · 서술형 $essayCount")
+        OverviewRow(
+            label = "문항 구성",
+            value = "${QuestionType.MULTIPLE_CHOICE.displayLabel} $choiceCount · " +
+                "${QuestionType.OX.displayLabel} $oxCount · ${QuestionType.ESSAY.displayLabel} $essayCount"
+        )
         OverviewRow(label = "AI 분석", value = "${summary.aiAnalysisCount}건")
     }
 }
@@ -586,7 +590,7 @@ private fun QuestionRow(question: ReportQuestion) {
             }
             if (question.type == QuestionType.ESSAY && question.aiFeedbackCount == null) {
                 Text(
-                    text = "서술형",
+                    text = QuestionType.ESSAY.displayLabel,
                     color = PassmateColors.PrimaryDeep,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,

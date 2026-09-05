@@ -342,7 +342,11 @@ private struct RoomReportContentView: View {
         return VStack(spacing: 10) {
             overviewRow(label: "평균 점수", value: report.summary.avgScore.map { "\(formatScore($0.doubleValue))점" } ?? "—")
             overviewRow(label: "최고 점수", value: report.summary.topScore.map { "\(formatScore($0.doubleValue))점" } ?? "—")
-            overviewRow(label: "문항 구성", value: "객관식 \(choiceCount) · OX \(oxCount) · 서술형 \(essayCount)")
+            overviewRow(
+                label: "문항 구성",
+                value: "\(QuestionType.multipleChoice.displayLabel) \(choiceCount) · "
+                    + "\(QuestionType.ox.displayLabel) \(oxCount) · \(QuestionType.essay.displayLabel) \(essayCount)"
+            )
             overviewRow(label: "AI 분석", value: "\(report.summary.aiAnalysisCount)건")
         }
         .padding(16)
@@ -417,7 +421,7 @@ private struct RoomReportContentView: View {
                         .kerning(-0.24)
                         .foregroundColor(PassmateColors.primaryDeep)
                 } else if question.type == QuestionType.essay {
-                    Text("서술형")
+                    Text(QuestionType.essay.displayLabel)
                         .font(.system(size: 12, weight: .medium))
                         .kerning(-0.24)
                         .foregroundColor(PassmateColors.primaryDeep)

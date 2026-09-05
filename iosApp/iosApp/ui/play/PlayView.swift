@@ -891,7 +891,6 @@ private func choiceLetter(_ index: Int) -> String {
     return letters[min(index, letters.count - 1)]
 }
 
-
 // 점수만 담당한다 — 정답/오답 판정 문구는 VerdictPill이 그린다 (시안 M-04)
 private func resultScoreText(_ uiState: PlayUiState) -> String {
     if let result = uiState.myAnswerResult {
