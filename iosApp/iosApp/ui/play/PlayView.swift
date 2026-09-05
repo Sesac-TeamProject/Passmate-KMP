@@ -756,7 +756,7 @@ private struct FinalResultContent: View {
             .padding(.top, 32)
             .padding(.bottom, 70)
             .background(PassmateColors.backgroundMint)
-            PassyMascotView()
+            PassmateMascotView(mascot: .success)
                 .frame(width: 60, height: 66)
                 .padding(.top, 16)
                 .padding(.trailing, 6)

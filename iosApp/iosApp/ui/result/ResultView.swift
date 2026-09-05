@@ -356,7 +356,7 @@ private struct ReportHeaderCard: View {
                         .foregroundColor(PassmateColors.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                PassyMascotView()
+                PassmateMascotView(mascot: .feedback)
                     .frame(width: 52, height: 57)
             }
             .padding(20)

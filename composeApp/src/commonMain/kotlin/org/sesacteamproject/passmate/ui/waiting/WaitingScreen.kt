@@ -38,7 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateWaitingDots
 import org.sesacteamproject.passmate.component.PassmateCard
-import org.sesacteamproject.passmate.component.PassyMascot
+import org.sesacteamproject.passmate.component.PassmateMascot
+import org.sesacteamproject.passmate.component.PassmateMascots
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -180,7 +181,10 @@ private fun EnteredCard(uiState: WaitingUiState) {
                     .background(PassmateColors.FieldGray, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                PassyMascot(modifier = Modifier.size(width = 60.dp, height = 66.dp))
+                PassmateMascot(
+                    mascot = PassmateMascots.Waiting,
+                    modifier = Modifier.size(width = 60.dp, height = 66.dp)
+                )
             }
             Text(
                 text = "입장 완료!",

@@ -150,7 +150,7 @@ private struct PaymentContentView: View {
                 .padding(.top, 14)
             HStack {
                 Spacer()
-                PassyMascotView()
+                PassmateMascotView(mascot: .enter)
                     .frame(width: 68, height: 75)
                     .padding(.trailing, 28)
             }

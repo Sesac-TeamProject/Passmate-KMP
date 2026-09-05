@@ -47,7 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.PassmateWaitingDots
-import org.sesacteamproject.passmate.component.PassyMascot
+import org.sesacteamproject.passmate.component.PassmateMascot
+import org.sesacteamproject.passmate.component.PassmateMascots
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -982,7 +983,8 @@ private fun FinalResultHeader(uiState: PlayUiState) {
             )
             PodiumRow(finalRanking = uiState.finalRanking)
         }
-        PassyMascot(
+        PassmateMascot(
+            mascot = PassmateMascots.Success,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 36.dp, end = 6.dp)

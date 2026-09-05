@@ -41,7 +41,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateCard
-import org.sesacteamproject.passmate.component.PassyMascot
+import org.sesacteamproject.passmate.component.PassmateMascot
+import org.sesacteamproject.passmate.component.PassmateMascots
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.component.StudentAvatars
 import org.sesacteamproject.passmate.di.koinScreenViewModel
@@ -152,7 +153,8 @@ private fun JoinHeader() {
                 letterSpacing = (-0.28).sp
             )
         }
-        PassyMascot(
+        PassmateMascot(
+            mascot = PassmateMascots.Enter,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 44.dp, end = 4.dp)

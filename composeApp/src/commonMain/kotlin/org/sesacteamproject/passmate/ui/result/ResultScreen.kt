@@ -46,7 +46,8 @@ import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.component.PassmateSkeletonBlock
 import org.sesacteamproject.passmate.component.PassmateSkeletonCard
-import org.sesacteamproject.passmate.component.PassyMascot
+import org.sesacteamproject.passmate.component.PassmateMascot
+import org.sesacteamproject.passmate.component.PassmateMascots
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.preview.PassmatePreview
@@ -434,7 +435,10 @@ private fun ReportHeaderCard(result: SessionResult) {
                     letterSpacing = (-0.28).sp
                 )
             }
-            PassyMascot(modifier = Modifier.size(width = 52.dp, height = 57.dp))
+            PassmateMascot(
+                mascot = PassmateMascots.Feedback,
+                modifier = Modifier.size(width = 52.dp, height = 57.dp)
+            )
         }
     }
 }

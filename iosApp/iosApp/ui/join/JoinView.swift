@@ -105,7 +105,7 @@ private struct JoinContentView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, 40)
             .padding(.bottom, 24)
-            PassyMascotView()
+            PassmateMascotView(mascot: .enter)
                 .frame(width: 68, height: 75)
                 .padding(.top, 20)
                 .padding(.trailing, 4)

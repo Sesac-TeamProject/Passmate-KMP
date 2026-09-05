@@ -269,7 +269,20 @@ private struct WaitingRoomContentView: View {
 - 리소스에는 **중립색만** 넣는다(`#FF000000` 스트로크·`#00000000` 채움). 표시 색은 호출부에서 `PassmateColors` 토큰으로 준다(§11-2). 테마 속성(`?attr/…`)·`@color/…` 참조는 Desktop 파서가 해석하지 못하므로 금지한다.
 - 외부 아이콘 세트를 쓰면 **출처·버전·라이선스**를 파일 머리 주석에 남기고 버전을 고정한다(최신판이 시안과 방향이 다를 수 있다).
 - 새 아이콘 추가는 파일 3개 + `PassmateIcons` 항목 1줄 + Android `drawableId()` 분기 1줄이면 끝난다. 테스트는 enum을 순회하므로 따로 추가하지 않는다.
-- 미전환 잔재(후속 대상): `AlertCircleIcon`(Result)·`EmptyIcon`·`ErrorIcon`(CoinHistory)·`HintIcon`(VoiceHintBanner)·`PassyMascot`·`StudentAvatar`·jvm `GoogleSignInIcon`.
+- 미전환 잔재(후속 대상): `AlertCircleIcon`(Result)·`EmptyIcon`·`ErrorIcon`(CoinHistory)·`HintIcon`(VoiceHintBanner)·`StudentAvatar`·jvm `GoogleSignInIcon`.
+
+### 11-3-1. 마스코트 리소스 규칙
+
+마스코트(패시)는 아이콘과 같은 "리소스로 두고 화면은 이름만 참조한다" 원칙을 따르되, 다색 그림이라 규격이 다르다.
+
+- Compose는 `PassmateMascot(mascot = PassmateMascots.X, modifier = Modifier.size(...))`, iOS는 `PassmateMascotView(mascot: .x).frame(...)`으로 그린다. 상태 키는 시안 컴포넌트 세트 `Mascot`(172:1037)의 State 변형과 1:1이다.
+- 다색이라 **중립색·템플릿 렌더링 규칙(§11-3)을 적용하지 않는다.** 시안에서 뽑은 PNG를 그대로 쓴다.
+  - Android: `composeApp/src/androidMain/res/drawable-xxxhdpi/img_mascot_<state>.png` (4x 하나. 낮은 밀도는 안드로이드가 축소한다)
+  - Desktop: `composeApp/src/jvmMain/resources/drawable/img_mascot_<state>.png` (같은 파일의 사본)
+  - iOS: `iosApp/iosApp/Assets.xcassets/Mascot<State>.imageset/` (1x·2x·3x PNG + `Contents.json`)
+- **모든 상태는 공통 캔버스(144x156)로 뽑는다.** 시안 프레임은 120x132이고 PASS 배지·컨페티·생각 방울 같은 장식이 그 밖으로 번지는데(시안 인스턴스도 `clipsContent=false`), 상태마다 렌더 크기가 달라 그대로 넣으면 화면마다 마스코트 크기가 달라진다. 캔버스 안에서 프레임은 항상 (16,24)에 온다.
+- 호출부가 주는 크기는 **프레임 크기**다(시안 인스턴스 크기 그대로). 컴포넌트가 캔버스만큼 키운 뒤 번짐만큼 당겨 프레임을 맞춘다. Compose는 이때 `size`가 아니라 **`requiredSize`**를 써야 한다 — `size`는 부모 제약(=프레임)을 넘지 못해 캔버스가 눌려 들어간다.
+- 새 상태 추가는 파일 3곳 + `PassmateMascots` 항목 1줄(Compose·Swift) + Android `drawableId()` 분기 1줄이면 끝난다. `PassmateMascotResourceTest`가 enum을 순회하며 사본 일치·캔버스 규격·iOS 에셋을 검사한다.
 
 ## 12. 테스트 규칙
 

@@ -45,7 +45,8 @@ import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.PassmateIcons
-import org.sesacteamproject.passmate.component.PassyMascot
+import org.sesacteamproject.passmate.component.PassmateMascot
+import org.sesacteamproject.passmate.component.PassmateMascots
 import org.sesacteamproject.passmate.component.PortOnePaymentView
 import org.sesacteamproject.passmate.component.ReputationBadge
 import org.sesacteamproject.passmate.component.StudentAvatar
@@ -172,7 +173,8 @@ private fun PaymentHeader(onBack: () -> Unit) {
             onClick = onBack,
             modifier = Modifier.padding(start = 20.dp, top = 58.dp)
         )
-        PassyMascot(
+        PassmateMascot(
+            mascot = PassmateMascots.Enter,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 44.dp, end = 28.dp)
