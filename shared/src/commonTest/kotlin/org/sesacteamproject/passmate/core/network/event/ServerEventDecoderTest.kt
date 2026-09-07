@@ -9,11 +9,14 @@ import kotlin.test.assertNull
 // 여기서는 나머지 이벤트와 손상 프레임 처리를 본다.
 class ServerEventDecoderTest {
 
+    // 실제 서버 payload는 ParticipantEventPayload — 식별자 키가 `id`이고 count·reason은 없다.
+    // 예전 테스트가 앱이 지어낸 모양(participantId·count)을 그대로 굳혀 버그를 통과시켰다.
     @Test
     fun decodeParticipantJoined() {
         val text = """
             {"type":"PARTICIPANT_JOINED","roomId":2,"occurredAt":"2026-08-27T10:00:00",
-             "payload":{"participantId":11,"nickname":"영희","isGuest":true,"avatarId":"fox","count":3}}
+             "payload":{"id":11,"nickname":"영희","avatarId":"fox","isGuest":true,
+                        "joinedAt":"2026-08-27T10:00:00"}}
         """.trimIndent()
 
         val frame = ServerEventDecoder.decode(text)
@@ -23,23 +26,24 @@ class ServerEventDecoderTest {
         assertEquals(11L, event.participantId)
         assertEquals("영희", event.nickname)
         assertEquals(true, event.isGuest)
-        assertEquals(3, event.count)
         // avatarId는 문자열 키 — 화면 인덱스로 바뀐다 (fox는 6번째)
         assertEquals(6, event.avatarId)
     }
 
     @Test
-    fun decodeParticipantLeftWithReason() {
+    fun decodeParticipantLeft() {
         val text = """
             {"type":"PARTICIPANT_LEFT","roomId":2,"occurredAt":"2026-08-27T10:00:30",
-             "payload":{"participantId":11,"count":2,"reason":"KICKED"}}
+             "payload":{"id":11,"nickname":"영희","avatarId":"fox","isGuest":true,
+                        "joinedAt":"2026-08-27T10:00:00"}}
         """.trimIndent()
 
         val frame = ServerEventDecoder.decode(text)
         val event = assertIs<ServerEvent.ParticipantLeft>(frame?.event)
 
         assertEquals(11L, event.participantId)
-        assertEquals(ServerEvent.ParticipantLeft.REASON_KICKED, event.reason)
+        // 서버가 아직 reason을 안 실어 준다 — 내보내기(kick) 구분은 백엔드 대기 중이다
+        assertNull(event.reason)
     }
 
     @Test

@@ -43,14 +43,12 @@ object ServerEventDecoder {
                     participantId = it.participantId,
                     nickname = it.nickname,
                     isGuest = it.isGuest,
-                    avatarId = StudentAvatarKeys.toIndex(it.avatarId),
-                    count = it.count
+                    avatarId = StudentAvatarKeys.toIndex(it.avatarId)
                 )
             }
             "PARTICIPANT_LEFT" -> decodePayload<ServerEventPayloads.ParticipantLeft>(data).let {
                 ServerEvent.ParticipantLeft(
                     participantId = it.participantId,
-                    count = it.count,
                     reason = it.reason
                 )
             }
