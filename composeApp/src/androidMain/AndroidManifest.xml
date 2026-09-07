@@ -15,7 +15,10 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.Passmate.Splash">
+        <!-- configChanges: 회전으로 액티비티가 재생성되면 installSplashScreen()이 다시 돌아
+             스플래시가 또 뜬다. Compose는 설정 변경을 리컴포지션으로 처리하므로 재생성이 필요 없다 -->
         <activity
+                android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density|fontScale|layoutDirection"
                 android:exported="true"
                 android:launchMode="singleTop"
                 android:name="org.sesacteamproject.passmate.MainActivity">
