@@ -6,6 +6,9 @@ import UIKit
 enum PassmateSheetDetent {
     case medium
     case large
+    // 내용 높이에 맞춘 바텀 시트 — Compose PassmateBottomSheet(내용 높이) 미러.
+    // iOS 15에는 커스텀 detent가 없어 반높이로 떨어진다
+    case contentHeight(CGFloat)
 }
 
 extension View {
@@ -23,13 +26,17 @@ private struct PassmateSheetDetentsModifier: ViewModifier {
             switch detent {
             case .medium: return .medium
             case .large: return .large
+            // 측정 전(0)에는 detent를 만들 수 없다 — 반높이로 열고 측정되면 갱신된다
+            case let .contentHeight(height): return height > 0 ? .height(height) : .medium
             }
         })
     }
 
     func body(content: Content) -> some View {
         if #available(iOS 16.0, *) {
-            content.presentationDetents(nativeDetents)
+            content
+                .presentationDetents(nativeDetents)
+                .presentationDragIndicator(.visible)
         } else {
             content.background(SheetDetentsBridge(detents: detents))
         }
@@ -56,6 +63,8 @@ private final class SheetDetentsController: UIViewController {
 
     func applyDetents() {
         sheetPresentationController?.detents = detents
+        // 시안 v6의 시트는 모두 손잡이를 보여준다 (iOS 16+는 presentationDragIndicator)
+        sheetPresentationController?.prefersGrabberVisible = true
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -78,6 +87,7 @@ private extension PassmateSheetDetent {
         switch self {
         case .medium: return .medium()
         case .large: return .large()
+        case .contentHeight: return .medium()
         }
     }
 }

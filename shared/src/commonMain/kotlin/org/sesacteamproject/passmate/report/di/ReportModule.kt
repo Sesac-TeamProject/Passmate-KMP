@@ -8,12 +8,14 @@ import org.sesacteamproject.passmate.report.domain.usecase.BuildReportSummaryUse
 import org.sesacteamproject.passmate.report.domain.usecase.BuildRoomReportSummaryUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetLearningReportUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetRoomReportUseCase
+import org.sesacteamproject.passmate.report.domain.usecase.GetSessionHostUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetSessionResultUseCase
 
 val reportModule = module {
     single { ResultRemoteDataSource(get()) }
     single<ResultRepository> { ResultRepositoryImpl(get()) }
     factory { GetSessionResultUseCase(get()) }
+    factory { GetSessionHostUseCase(get(), get()) }
     factory { GetLearningReportUseCase(get()) }
     factory { BuildReportSummaryUseCase() }
     factory { GetRoomReportUseCase(get()) }

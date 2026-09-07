@@ -16,6 +16,7 @@ import org.sesacteamproject.passmate.rating.domain.model.RatingTag
 import org.sesacteamproject.passmate.rating.domain.usecase.SubmitRatingUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.BuildReportSummaryUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetLearningReportUseCase
+import org.sesacteamproject.passmate.report.domain.usecase.GetSessionHostUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetSessionResultUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetMyParticipationUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.RequestGuestClaimUseCase
@@ -23,6 +24,7 @@ import org.sesacteamproject.passmate.user.domain.usecase.RequestGuestClaimUseCas
 class ResultViewModel(
     private val getSessionResultUseCase: GetSessionResultUseCase,
     private val getLearningReportUseCase: GetLearningReportUseCase,
+    private val getSessionHostUseCase: GetSessionHostUseCase,
     private val buildReportSummaryUseCase: BuildReportSummaryUseCase,
     private val getMyParticipationUseCase: GetMyParticipationUseCase,
     private val requestGuestClaimUseCase: RequestGuestClaimUseCase,
@@ -66,6 +68,17 @@ class ResultViewModel(
                 }
                 .onFailure {
                     _uiState.update { it.copy(isLoading = false, loadFailed = true) }
+                }
+            loadHostIfRatable(roomId)
+        }
+    }
+
+    // 선생님 카드는 평가 시트에만 있다 — 평가할 수 있을 때만 조회해 불필요한 왕복을 줄인다
+    private suspend fun loadHostIfRatable(roomId: Long) {
+        if (_uiState.value.result?.canRate == true && _uiState.value.host == null) {
+            getSessionHostUseCase.invoke(roomId)
+                .onSuccess { host ->
+                    _uiState.update { it.copy(host = host) }
                 }
         }
     }

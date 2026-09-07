@@ -28,6 +28,7 @@ import org.sesacteamproject.passmate.testing.FakePaymentRepository
 import org.sesacteamproject.passmate.testing.FakeUserRepository
 import org.sesacteamproject.passmate.testing.TestMainDispatcher
 import org.sesacteamproject.passmate.user.domain.model.UserProfile
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyGradeUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -81,6 +82,7 @@ class MyInfoViewModelTest {
         authRepository = FakeAuthRepository(isSignedIn)
         return MyInfoViewModel(
             getMyProfileUseCase = GetMyProfileUseCase(userRepository),
+            getMyGradeUseCase = GetMyGradeUseCase(userRepository),
             getMyCoinsUseCase = GetMyCoinsUseCase(paymentRepository),
             getEarningsUseCase = GetEarningsUseCase(paymentRepository),
             signOutUseCase = SignOutUseCase(authRepository),

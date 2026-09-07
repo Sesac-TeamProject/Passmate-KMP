@@ -16,6 +16,7 @@ class BuildReportSummaryUseCaseTest {
             rank = 3,
             totalScore = 990.0,
             correctCount = 6,
+            submitCount = 8,
             questionCount = 8,
             questions = emptyList(),
             canRate = true,

@@ -18,11 +18,19 @@ struct FlowLayout<Data: RandomAccessCollection, ID: Hashable, Content: View>: Vi
 
     private let content: (Data.Element) -> Content
 
+    private static var coordinateSpace: String { "PassmateFlowLayout" }
+
     @State private var totalHeight: CGFloat = 0
 
-    private var heightReader: some View {
+    // 자식은 alignmentGuide 음수 오프셋으로 아래 줄에 놓인다. 그 이동은 ZStack 자체 크기에는
+    // 반영되지 않으므로 ZStack 프레임을 재면 항상 "한 줄" 높이가 나온다(줄바꿈된 칩 위로 다음
+    // 뷰가 겹친다). 자식마다 실제 놓인 자리의 maxY를 재서 그중 최댓값을 전체 높이로 쓴다
+    private func boundsReader(in space: String) -> some View {
         GeometryReader { geometry in
-            Color.clear.preference(key: FlowLayoutHeightKey.self, value: geometry.size.height)
+            Color.clear.preference(
+                key: FlowLayoutHeightKey.self,
+                value: geometry.frame(in: .named(space)).maxY
+            )
         }
     }
 
@@ -63,9 +71,10 @@ struct FlowLayout<Data: RandomAccessCollection, ID: Hashable, Content: View>: Vi
                         }
                         return -result
                     }
+                    .background(boundsReader(in: Self.coordinateSpace))
             }
         }
-        .background(heightReader)
+        .coordinateSpace(name: Self.coordinateSpace)
     }
 
     var body: some View {
@@ -93,7 +102,8 @@ struct FlowLayout<Data: RandomAccessCollection, ID: Hashable, Content: View>: Vi
 private struct FlowLayoutHeightKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
 
+    // 자식들이 각자 자기 maxY를 올린다 — 가장 아래 자식이 전체 높이다
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
+        value = max(value, nextValue())
     }
 }

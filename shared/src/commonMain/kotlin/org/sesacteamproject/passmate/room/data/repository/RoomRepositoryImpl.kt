@@ -33,6 +33,10 @@ class RoomRepositoryImpl(
         return apiCall { remoteDataSource.fetchRoomById(roomId) }.map { it.pin }
     }
 
+    override suspend fun getRoomHostUserId(roomId: Long): AppResult<Long?> {
+        return apiCall { remoteDataSource.fetchRoomById(roomId) }.map { it.hostUserId }
+    }
+
     override suspend fun joinRoom(room: RoomInfo, nickname: String, avatarId: Int?): AppResult<MyParticipation> {
         val request = JoinRoomRequest(nickname = nickname, avatarId = StudentAvatarKeys.toKey(avatarId))
 

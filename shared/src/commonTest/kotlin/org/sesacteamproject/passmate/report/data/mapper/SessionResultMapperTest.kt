@@ -83,6 +83,8 @@ class SessionResultMapperTest {
         assertEquals(3, result.rank)
         assertEquals(780.0, result.totalScore)
         assertEquals(6, result.correctCount)
+        // 평가 시트 카드의 "내 제출 n/N" — 정답 수와 다르다 (M-06 v2)
+        assertEquals(8, result.submitCount)
         assertEquals(8, result.questionCount)
         // 서버는 guest·rating.available로 준다
         assertEquals(true, result.isGuest)

@@ -647,6 +647,7 @@ private val previewSessionResult = SessionResult(
     rank = 3,
     totalScore = 990.0,
     correctCount = 6,
+    submitCount = 8,
     questionCount = 8,
     questions = listOf(
         QuestionResult(

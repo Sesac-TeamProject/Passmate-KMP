@@ -30,6 +30,10 @@ private class FakeRoomRepository(
         return AppResult.Failure(AppError.NotFound())
     }
 
+    override suspend fun getRoomHostUserId(roomId: Long): AppResult<Long?> {
+        return AppResult.Failure(AppError.NotFound())
+    }
+
     override suspend fun joinRoom(room: RoomInfo, nickname: String, avatarId: Int?): AppResult<MyParticipation> {
         lastNickname = nickname
         return joinResult

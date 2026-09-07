@@ -61,12 +61,11 @@ class ApiClient(
         }
     }
 
-    private fun bearerToken(): String? {
-        return tokenStorage.accessToken() ?: tokenStorage.guestToken
-    }
-
     private fun HttpRequestBuilder.attachAuthorization() {
-        val token = bearerToken()
+        val isPublicEndpoint = headers[PUBLIC_ENDPOINT_HEADER] != null
+
+        headers.remove(PUBLIC_ENDPOINT_HEADER)
+        val token = authTokenFor(isPublicEndpoint, tokenStorage.accessToken(), tokenStorage.guestToken)
 
         if (headers[HttpHeaders.Authorization] == null && token != null) {
             header(HttpHeaders.Authorization, "Bearer $token")
@@ -133,5 +132,19 @@ class ApiClient(
     companion object {
         // 2026-08-28 백엔드 API 명세서 확정 경로 — 응답의 refreshToken은 미회전 시 생략될 수 있다
         private const val REFRESH_PATH = "/auth/refresh"
+
+        // 이 헤더가 붙은 요청은 게스트 토큰을 싣지 않는다 (전송 전에 제거된다)
+        const val PUBLIC_ENDPOINT_HEADER = "X-Passmate-Public"
+    }
+}
+
+// 공개 엔드포인트에 게스트 토큰을 실으면 서버가 403 GUEST_NOT_ALLOWED로 막는다
+// (백엔드 CurrentUserArgumentResolver가 `required = false`인데도 게스트면 예외를 던진다).
+// 토큰 없이 부르면 200이므로 게스트는 익명으로 보낸다. 회원 토큰은 차단 필터가 동작하도록 그대로 싣는다.
+internal fun authTokenFor(isPublicEndpoint: Boolean, accessToken: String?, guestToken: String?): String? {
+    return if (isPublicEndpoint) {
+        accessToken
+    } else {
+        accessToken ?: guestToken
     }
 }

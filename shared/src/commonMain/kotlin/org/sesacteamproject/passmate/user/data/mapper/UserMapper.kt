@@ -2,6 +2,7 @@ package org.sesacteamproject.passmate.user.data.mapper
 
 import org.sesacteamproject.passmate.payment.data.mapper.toDomain
 import org.sesacteamproject.passmate.room.domain.model.HostLevel
+import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
 import org.sesacteamproject.passmate.user.data.dto.BadgesResponse
 import org.sesacteamproject.passmate.user.data.dto.GradeResponse
 import org.sesacteamproject.passmate.user.data.dto.HostProfileResponse
@@ -48,7 +49,7 @@ fun MyPageResponse.RoomDto.toDomain(): JoinedRoom {
     return JoinedRoom(
         roomId = roomId,
         title = title,
-        dateLabel = DisplayDate.format(endedAt ?: startedAt) ?: "",
+        dateLabel = DisplayDate.formatWithWeekday(endedAt ?: startedAt) ?: "",
         questionCount = questionCount,
         myScore = myScore?.toDouble(),
         myRank = myRank,
@@ -115,31 +116,34 @@ fun BadgesResponse.toDomain(): List<Badge> {
     }
 }
 
+// 서버는 소개 문구(intro)를 주지 않는다 — 계약 갱신 대상
 fun HostProfileResponse.toDomain(): HostProfile {
     return HostProfile(
         userId = userId,
         nickname = nickname,
-        intro = intro,
+        intro = null,
+        avatarId = StudentAvatarKeys.toIndex(defaultAvatarId),
         level = HostLevel.from(level),
-        avgStars = avgStars,
+        avgStars = avgRating,
         ratingCount = ratingCount,
-        roomCount = roomCount,
+        roomCount = roomsHosted,
         totalStudents = totalStudents,
-        badges = badges.mapNotNull { BadgeType.from(it) },
-        rooms = rooms.map { it.toDomain() }
+        badges = badges.filter { it.achieved }.mapNotNull { BadgeType.from(it.code) },
+        rooms = openRooms.map { it.toDomain() }
     )
 }
 
+// 서버 /users/me는 등급을 주지 않는다 — 등급은 GET /users/me/grade가 담당한다 (계약 갱신 대상)
 fun UserProfileResponse.toDomain(): UserProfile {
     return UserProfile(
         nickname = nickname,
         email = email,
         joinedAt = joinedAt,
-        avatarId = avatarId,
-        level = HostLevel.from(level),
-        coins = coins,
-        joinedRoomCount = joinedRoomCount,
-        hostedRoomCount = hostedRoomCount
+        avatarId = StudentAvatarKeys.toIndex(defaultAvatarId),
+        level = null,
+        coins = coinBalance,
+        joinedRoomCount = stats?.joinedRoomCount,
+        hostedRoomCount = stats?.hostedRoomCount
     )
 }
 

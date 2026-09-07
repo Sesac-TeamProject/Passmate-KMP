@@ -9,6 +9,9 @@ struct ResultUiState {
 
     var report: LearningReport?
 
+    // 평가 시트 카드의 선생님(M-06 v2) — 계약에 host가 없어 별도 조회한다 (G-8)
+    var host: HostProfile?
+
     var selectedQuestionNo: Int?
 
     var isSharing: Bool = false

@@ -18,6 +18,9 @@ struct RatingSectionView: View {
                 .font(.system(size: 12))
                 .kerning(-0.24)
                 .foregroundColor(PassmateColors.textSecondary)
+            if let result = uiState.result {
+                sessionInfoCard(result, host: uiState.host)
+            }
             VStack(spacing: 8) {
                 StarRatingView(
                     stars: uiState.ratingStars,
@@ -45,8 +48,52 @@ struct RatingSectionView: View {
             .frame(maxWidth: .infinity)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 10)
+        // 시안은 시트 상단에서 제목까지 62pt를 둔다(손잡이 20 + 여백). 시스템 손잡이 높이를 뺀 값
+        .padding(.top, 48)
         .padding(.bottom, 28)
+    }
+
+    // 시안(M-06 v2)의 세션 정보 카드 — 선생님 아바타·이름·등급 배지 + 방 제목·문항 수·내 제출.
+    // 선생님 정보는 결과 응답에 없어 별도 조회한다(계약 갭 G-8) — 아직 안 왔으면 방 정보 줄만 그린다
+    private func sessionInfoCard(_ result: SessionResult, host: HostProfile?) -> some View {
+        HStack(spacing: 10) {
+            if let host {
+                StudentAvatarView(avatarId: host.avatarId.map { Int(truncating: $0) } ?? 0)
+                    .frame(width: 36, height: 36)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                if let host {
+                    HStack(spacing: 6) {
+                        Text("\(host.nickname) 선생님")
+                            .font(.system(size: 14, weight: .medium))
+                            .kerning(-0.28)
+                            .foregroundColor(PassmateColors.textPrimary)
+                        if let level = localLevel(host) {
+                            ReputationBadgeView(level: level)
+                        }
+                    }
+                }
+                Text("\(result.roomTitle) · \(result.questionCount)문항 · 내 제출 \(result.submitCount)/\(result.questionCount)")
+                    .font(.system(size: 12))
+                    .kerning(-0.24)
+                    .foregroundColor(PassmateColors.textSecondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.leading, 12)
+        .padding(.trailing, 14)
+        .padding(.vertical, 10)
+        .background(PassmateColors.fieldGray)
+        .cornerRadius(14)
+    }
+
+    // Kotlin(Shared)의 HostLevel과 화면용 Swift enum HostLevel은 이름이 같아 서로 가린다 — 여기서 옮겨 담는다
+    private func localLevel(_ host: HostProfile) -> HostLevel? {
+        if let level = host.level {
+            return HostLevel.from(Int(level.level))
+        } else {
+            return nil
+        }
     }
 
     private func tagChip(_ tag: RatingTag) -> some View {

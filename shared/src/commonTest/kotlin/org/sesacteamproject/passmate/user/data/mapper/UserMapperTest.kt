@@ -44,7 +44,7 @@ class UserMapperTest {
         assertEquals(71, myPage.summary.accuracyPercent)
         assertEquals(listOf("JPA 영속성", "트랜잭션"), myPage.summary.weakTopics)
         assertEquals(1, myPage.rooms.size)
-        assertEquals("2026.08.22", myPage.rooms.first().dateLabel)
+        assertEquals("8/22 (토)", myPage.rooms.first().dateLabel)
         assertEquals(990.0, myPage.rooms.first().myScore)
         assertEquals(true, myPage.rooms.first().hasReport)
         assertEquals("1", myPage.nextCursor)
@@ -70,14 +70,19 @@ class UserMapperTest {
         val response = HostProfileResponse(
             userId = 7,
             nickname = "김민지",
-            intro = "Spring · JPA · CS 면접 대비 방 운영 · 2026",
             level = 3,
-            avgStars = 4.6,
+            avgRating = 4.6,
             ratingCount = 128,
-            roomCount = 24,
+            roomsHosted = 24,
             totalStudents = 312,
-            badges = listOf("FIRST_ROOM", "ROOMS_10", "UNKNOWN"),
-            rooms = listOf(
+            // 서버가 모르는 코드는 화면에서 접고, 미획득 뱃지는 보여주지 않는다
+            badges = listOf(
+                HostProfileResponse.BadgeDto(code = "FIRST_ROOM", achieved = true),
+                HostProfileResponse.BadgeDto(code = "ROOMS_10", achieved = true),
+                HostProfileResponse.BadgeDto(code = "UNKNOWN", achieved = true),
+                HostProfileResponse.BadgeDto(code = "STUDENTS_100", achieved = false)
+            ),
+            openRooms = listOf(
                 org.sesacteamproject.passmate.payment.data.dto.PublicRoomDto(
                     id = 1,
                     title = "백엔드 면접 스프린트",

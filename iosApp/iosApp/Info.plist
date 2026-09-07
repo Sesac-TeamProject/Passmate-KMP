@@ -24,5 +24,11 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<!-- 실기기에서 맥의 로컬 백엔드에 붙을 때 iOS 14+가 요구한다. 없으면 권한 팝업조차 뜨지 않고 조용히 실패한다 -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>같은 네트워크에 있는 개발용 서버에 연결하기 위해 로컬 네트워크를 사용합니다.</string>
+	<!-- 백엔드 주소(호스트:포트) — Configuration/Config.xcconfig의 PASSMATE_SERVER_HOST에서 온다 -->
+	<key>PassmateServerHost</key>
+	<string>$(PASSMATE_SERVER_HOST)</string>
 </dict>
 </plist>

@@ -29,6 +29,7 @@ struct ResultView: View {
     @StateObject private var viewModel = ResultViewModel(
         getSessionResultUseCase: KoinHelper.shared.getSessionResultUseCase(),
         getLearningReportUseCase: KoinHelper.shared.getLearningReportUseCase(),
+        getSessionHostUseCase: KoinHelper.shared.getSessionHostUseCase(),
         buildReportSummaryUseCase: KoinHelper.shared.buildReportSummaryUseCase(),
         getMyParticipationUseCase: KoinHelper.shared.getMyParticipationUseCase(),
         requestGuestClaimUseCase: KoinHelper.shared.requestGuestClaimUseCase(),
@@ -39,6 +40,9 @@ struct ResultView: View {
     @State private var shareText: String?
 
     @State private var noticeMessage: String?
+
+    // 평가 시트를 내용 높이로 열기 위한 측정값 (M-06 v2 — Compose PassmateBottomSheet 미러)
+    @State private var ratingSheetHeight: CGFloat = 0
 
     // 평가는 ViewModel 상태(Compose 미러와 동일), 공유는 화면 로컬 상태라 둘을 하나로 모은다
     private var activeSheet: Binding<ResultSheet?> {
@@ -107,7 +111,18 @@ struct ResultView: View {
                     uiState: viewModel.uiState,
                     onAction: { viewModel.action($0) }
                 )
-                .passmateDetents([.large])
+                .background(
+                    GeometryReader { geometry in
+                        Color.clear.preference(key: RatingSheetHeightKey.self, value: geometry.size.height)
+                    }
+                )
+                .onPreferenceChange(RatingSheetHeightKey.self) { ratingSheetHeight = $0 }
+                // 시트가 내용보다 높을 때 내용이 세로 가운데로 밀리지 않게 위로 붙인다
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                // 시트 바탕은 흰색이다 — 안 주면 iOS 기본 회색이 깔려 회색 카드·입력창이 묻힌다
+                // (Compose PassmateBottomSheet의 containerColor = Surface 미러)
+                .background(PassmateColors.surface.ignoresSafeArea())
+                .passmateDetents([.contentHeight(ratingSheetHeight)])
             case let .share(text):
                 ShareSheet(items: [text])
             }
@@ -515,6 +530,7 @@ private struct ShareSheet: UIViewControllerRepresentable {
                 rank: KotlinInt(int: 3),
                 totalScore: 990,
                 correctCount: 6,
+                submitCount: 8,
                 questionCount: 8,
                 questions: [
                     QuestionResult(
@@ -593,4 +609,13 @@ private struct ShareSheet: UIViewControllerRepresentable {
         onAction: { _ in },
         onBack: {}
     )
+}
+
+// 평가 시트 내용 높이 — 시트 detent를 내용에 맞추기 위해 되읽는다
+private struct RatingSheetHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
 }

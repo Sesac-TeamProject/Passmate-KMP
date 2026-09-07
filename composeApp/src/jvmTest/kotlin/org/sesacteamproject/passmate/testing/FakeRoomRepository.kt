@@ -30,6 +30,10 @@ class FakeRoomRepository(
         }
     }
 
+    override suspend fun getRoomHostUserId(roomId: Long): AppResult<Long?> {
+        return AppResult.Success(null)
+    }
+
     override suspend fun getRoomInfo(pin: String): AppResult<RoomInfo> {
         val room = roomInfo
 

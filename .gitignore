@@ -17,3 +17,6 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+
+# 실기기 테스트용 로컬 서버 주소 — 커밋하지 않는다 (Config.xcconfig가 optional include)
+iosApp/Configuration/Local.xcconfig

@@ -2,6 +2,7 @@ package org.sesacteamproject.passmate.ui.result
 
 import org.sesacteamproject.passmate.rating.domain.model.RatingTag
 import org.sesacteamproject.passmate.report.domain.model.LearningReport
+import org.sesacteamproject.passmate.user.domain.model.HostProfile
 import org.sesacteamproject.passmate.report.domain.model.SessionResult
 
 data class ResultUiState(
@@ -9,6 +10,8 @@ data class ResultUiState(
     val loadFailed: Boolean = false,
     val result: SessionResult? = null,
     val report: LearningReport? = null,
+    // 평가 시트 카드의 선생님(M-06 v2) — 계약에 host가 없어 별도 조회한다 (G-8)
+    val host: HostProfile? = null,
     val selectedQuestionNo: Int? = null,
     val isSharing: Boolean = false,
     // 평가 시트 (M-06 v2) — 세션 종료 후 제출 학생에게만, 결과 로드 시 자동으로 연다.
