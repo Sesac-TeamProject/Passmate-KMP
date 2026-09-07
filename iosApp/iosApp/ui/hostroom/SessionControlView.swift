@@ -12,8 +12,6 @@ struct SessionControlView: View {
 
     var onSessionEnded: (Int64) -> Void = { _ in }
 
-    var onBack: () -> Void = {}
-
     @StateObject private var viewModel = SessionControlViewModel(
         getRoomInfoUseCase: KoinHelper.shared.getRoomInfoUseCase(),
         getSessionSnapshotUseCase: KoinHelper.shared.getSessionSnapshotUseCase(),
@@ -36,7 +34,6 @@ struct SessionControlView: View {
         SessionControlContentView(
             uiState: viewModel.uiState,
             onAction: { viewModel.action($0) },
-            onClickBack: onBack,
             onClickEndSession: { showEndConfirm = true }
         )
         .onAppear {
@@ -93,8 +90,6 @@ private struct SessionControlContentView: View {
 
     let onAction: (SessionControlAction) -> Void
 
-    let onClickBack: () -> Void
-
     let onClickEndSession: () -> Void
 
     // PTT 녹음 — 순수 UI 상태(레코더·누름 상태)만 콘텐츠 뷰에 둔다 (규칙 §11-1)
@@ -142,7 +137,7 @@ private struct SessionControlContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 12) {
-                    PassmateBackButton(onClick: onClickBack)
+                    // 시안 M-T2에는 뒤로가기 버튼이 없다 — 시스템 뒤로가기로만 나간다
                     Text(uiState.roomTitle)
                         .font(.system(size: 17, weight: .bold))
                         .kerning(-0.34)

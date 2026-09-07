@@ -43,7 +43,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.PassmateTimerBar
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
@@ -91,7 +90,6 @@ fun SessionControlScreen(
         SessionControlContentScreen(
             uiState = uiState,
             onAction = viewModel::onAction,
-            onClickBack = { onNavigate(NavigationAction.NavigateBack) },
             onClickEndSession = { showEndConfirm = true }
         )
         SnackbarHost(
@@ -141,7 +139,6 @@ fun SessionControlScreen(
 private fun SessionControlContentScreen(
     uiState: SessionControlUiState,
     onAction: (SessionControlAction) -> Unit,
-    onClickBack: () -> Unit,
     onClickEndSession: () -> Unit
 ) {
     Column(
@@ -159,7 +156,6 @@ private fun SessionControlContentScreen(
             else -> LoadedControl(
                 uiState = uiState,
                 onAction = onAction,
-                onClickBack = onClickBack,
                 onClickEndSession = onClickEndSession
             )
         }
@@ -170,7 +166,6 @@ private fun SessionControlContentScreen(
 private fun LoadedControl(
     uiState: SessionControlUiState,
     onAction: (SessionControlAction) -> Unit,
-    onClickBack: () -> Unit,
     onClickEndSession: () -> Unit
 ) {
     Column(
@@ -184,16 +179,14 @@ private fun LoadedControl(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            PassmateBackButton(onClick = onClickBack)
+            // 시안 M-T2에는 뒤로가기 버튼이 없다 — 시스템 뒤로가기로만 나간다
             Text(
                 text = uiState.roomTitle,
                 color = PassmateColors.TextPrimary,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.34).sp,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 12.dp)
+                modifier = Modifier.weight(1f)
             )
             Text(
                 text = "PIN ${formatPin(uiState.pin)}",
@@ -742,7 +735,6 @@ private fun SessionControlContentScreenWaitingPreview() {
                 questionCount = 8
             ),
             onAction = {},
-            onClickBack = {},
             onClickEndSession = {}
         )
     }
@@ -793,7 +785,6 @@ private fun SessionControlContentScreenRunningPreview() {
                 isProjectorConnected = true
             ),
             onAction = {},
-            onClickBack = {},
             onClickEndSession = {}
         )
     }
@@ -828,7 +819,6 @@ private fun SessionControlContentScreenClosedPreview() {
                 isLocked = true
             ),
             onAction = {},
-            onClickBack = {},
             onClickEndSession = {}
         )
     }
@@ -841,7 +831,6 @@ private fun SessionControlContentScreenFailedPreview() {
         SessionControlContentScreen(
             uiState = SessionControlUiState(isLoading = false, loadFailed = true),
             onAction = {},
-            onClickBack = {},
             onClickEndSession = {}
         )
     }
