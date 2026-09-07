@@ -28,6 +28,17 @@ class ServerHostTest {
         assertEquals(DEFAULT_SERVER_HOST, resolveServerHost("\$(PASSMATE_SERVER_HOST)"))
     }
 
+    // 기본값은 플랫폼마다 다르다 — 안드로이드 에뮬레이터만 호스트 PC를 10.0.2.2로 본다
+    @Test
+    fun fallsBackToPlatformDefaultWhenGiven() {
+        val emulatorHost = "10.0.2.2:8080"
+
+        assertEquals(emulatorHost, resolveServerHost(null, emulatorHost))
+        assertEquals(emulatorHost, resolveServerHost("", emulatorHost))
+        assertEquals(emulatorHost, resolveServerHost("\$(PASSMATE_SERVER_HOST)", emulatorHost))
+        assertEquals("172.31.98.123:8080", resolveServerHost("172.31.98.123:8080", emulatorHost))
+    }
+
     @Test
     fun trimsSurroundingWhitespace() {
         assertEquals("192.168.45.4:8080", resolveServerHost("  192.168.45.4:8080  "))
