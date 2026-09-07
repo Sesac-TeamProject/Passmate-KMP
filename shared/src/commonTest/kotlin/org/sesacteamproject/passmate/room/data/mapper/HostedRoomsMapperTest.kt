@@ -66,7 +66,7 @@ class HostedRoomsMapperTest {
         assertEquals(302L, ended.roomId)
         assertEquals(RoomStatus.FINISHED, ended.status)
         assertEquals(false, ended.isOngoing)
-        assertEquals("2026.08.19", ended.endedAtLabel)
+        assertEquals("8/19", ended.endedAtLabel)
         assertEquals(9, ended.participantCount)
         // correctRate는 서버가 0~100 퍼센트로 준다 (SessionService: correctCount * 100.0 / submitCount)
         assertEquals(78, ended.avgAccuracyPercent)

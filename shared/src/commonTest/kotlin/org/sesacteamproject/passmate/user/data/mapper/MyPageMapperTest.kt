@@ -64,7 +64,7 @@ class MyPageMapperTest {
         assertEquals(1, myPage.rooms.size)
         assertEquals(401L, room.roomId)
         // 종료 시각의 날짜 부분을 화면 표기(YYYY.MM.DD)로 바꾼다
-        assertEquals("2026.07.18", room.dateLabel)
+        assertEquals("7/18 (토)", room.dateLabel)
         assertEquals(10, room.questionCount)
         assertEquals(890.0, room.myScore)
         assertEquals(2, room.myRank)

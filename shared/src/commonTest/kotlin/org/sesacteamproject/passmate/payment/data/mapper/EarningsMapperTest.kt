@@ -54,7 +54,7 @@ class EarningsMapperTest {
         assertEquals(128000L, earnings.monthlyTotal)
         // 다음 지급일 + 지급 예정 금액(pendingNet)
         // 목록 행과 같은 표기로 맞춘다 (YYYY.MM.DD)
-        assertEquals("2026.09.05", earnings.nextPayout?.dateLabel)
+        assertEquals("9/5", earnings.nextPayout?.dateLabel)
         assertEquals(42000L, earnings.nextPayout?.amount)
         // earnings가 전량이라 집계가 정확하다
         assertEquals(2, earnings.paidRoomCount)
@@ -65,7 +65,7 @@ class EarningsMapperTest {
 
         assertEquals(2, earnings.items.size)
         assertEquals(11L, first.settlementId)
-        assertEquals("2026.08.22", first.dateLabel)
+        assertEquals("8/22", first.dateLabel)
         assertEquals("8월 4주차 Spring 스터디", first.roomTitle)
         assertEquals(12, first.participantCount)
         assertEquals(60000L, first.entryFeeTotal)
