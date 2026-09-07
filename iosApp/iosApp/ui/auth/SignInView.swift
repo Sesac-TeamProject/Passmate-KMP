@@ -157,16 +157,12 @@ private struct SignInContentView: View {
             onAction(.clickAppleSignIn)
         } label: {
             HStack(spacing: 10) {
-                if uiState.isSigningIn {
-                    ProgressView()
-                        .tint(PassmateColors.surface)
-                        .frame(width: 20, height: 20)
-                } else {
-                    Image("AppleSignIn")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                }
+                // 진행 표시는 실제로 로그인이 도는 버튼에만 둔다. isSigningIn은 구글·개발 로그인이
+                // 세우는 값이라, 여기에 스피너를 걸면 구글을 누를 때 이 버튼까지 도는 것처럼 보인다
+                Image("AppleSignIn")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
                 Text("Apple로 계속하기")
                     .font(.system(size: 14, weight: .medium))
                     .kerning(-0.28)
