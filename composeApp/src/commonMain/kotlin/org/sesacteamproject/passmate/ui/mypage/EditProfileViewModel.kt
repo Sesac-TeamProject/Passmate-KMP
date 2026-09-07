@@ -15,8 +15,7 @@ class EditProfileViewModel(
     private val updateMyProfileUseCase: UpdateMyProfileUseCase
 ) : MviViewModel<EditProfileUiState, EditProfileAction, EditProfileEvent>(EditProfileUiState()) {
 
-    private var hasEntered = false
-
+    // 캐릭터 저장 결과가 M-12-7에서 이 화면으로 돌아온다 — 진입할 때마다 다시 조회한다 (hasEntered 가드 없음)
     private fun loadProfile() {
         _uiState.update { it.copy(isLoading = true, hasLoadError = false) }
         viewModelScope.launch {
@@ -35,15 +34,6 @@ class EditProfileViewModel(
                     _uiState.update { it.copy(isLoading = false, hasLoadError = true) }
                 }
         }
-    }
-
-    private fun onEnter() {
-        if (hasEntered) {
-            return
-        }
-        hasEntered = true
-
-        loadProfile()
     }
 
     private fun onSubmit() {
@@ -80,7 +70,7 @@ class EditProfileViewModel(
 
     override fun onAction(action: EditProfileAction) {
         when (action) {
-            is EditProfileAction.Enter -> onEnter()
+            is EditProfileAction.Enter -> loadProfile()
             is EditProfileAction.Retry -> loadProfile()
             is EditProfileAction.ChangeNickname -> _uiState.update {
                 it.copy(nickname = action.text.take(NICKNAME_MAX_LENGTH))
