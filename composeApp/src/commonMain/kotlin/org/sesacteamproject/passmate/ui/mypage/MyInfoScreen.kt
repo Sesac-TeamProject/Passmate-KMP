@@ -408,10 +408,10 @@ private fun CoinRow(
             .padding(vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 시안 M-12: 보유 코인 행 왼쪽에 민트 원형 배경 + 코인 마크
+        // 시안 M-12: 보유 코인 행 왼쪽에 민트 원형 배경(36) + 코인 마크(22) — iOS 미러와 같은 값
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(36.dp)
                 .background(PassmateColors.BackgroundMint, CircleShape),
             contentAlignment = Alignment.Center
         ) {
