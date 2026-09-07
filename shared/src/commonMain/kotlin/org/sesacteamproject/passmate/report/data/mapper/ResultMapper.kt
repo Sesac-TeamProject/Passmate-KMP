@@ -25,6 +25,7 @@ fun SessionResultResponse.toDomain(): SessionResult {
         rank = rank,
         totalScore = totalScore.toDouble(),
         correctCount = correctCount,
+        submitCount = submitCount,
         questionCount = questionCount,
         questions = questions.map { it.toDomain() },
         canRate = rating?.available ?: false,

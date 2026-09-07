@@ -74,7 +74,7 @@ fun ChargeCheckoutResponse.toDomain(): CoinCheckout {
 fun EntryPaymentResponse.toDomain(): EntryPayment {
     return EntryPayment(
         paymentNo = paymentNo,
-        balance = balance
+        balance = balanceAfter
     )
 }
 

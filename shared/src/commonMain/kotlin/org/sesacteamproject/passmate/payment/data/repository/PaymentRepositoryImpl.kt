@@ -10,6 +10,7 @@ import org.sesacteamproject.passmate.payment.data.dto.CreateEntryPaymentRequest
 import org.sesacteamproject.passmate.payment.data.dto.PaymentMethodRequest
 import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
 import org.sesacteamproject.passmate.payment.data.mapper.toDomain
+import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
 import org.sesacteamproject.passmate.payment.data.mapper.toSummary
 import org.sesacteamproject.passmate.payment.data.remote.PaymentRemoteDataSource
 import org.sesacteamproject.passmate.payment.domain.model.ChargeConfirm
@@ -51,7 +52,7 @@ class PaymentRepositoryImpl(
     }
 
     override suspend fun payEntryFee(roomId: Long, nickname: String, avatarId: Int?): AppResult<EntryPayment> {
-        val request = CreateEntryPaymentRequest(nickname = nickname, avatarId = avatarId)
+        val request = CreateEntryPaymentRequest(nickname = nickname, avatarId = StudentAvatarKeys.toKey(avatarId))
 
         return apiCall { remoteDataSource.createEntryPayment(roomId, request) }.map { it.toDomain() }
     }

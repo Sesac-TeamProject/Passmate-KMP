@@ -1,11 +1,13 @@
 package org.sesacteamproject.passmate.user.data.repository
 
+import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.AppResult
 import org.sesacteamproject.passmate.core.model.map
 import org.sesacteamproject.passmate.core.network.apiCall
 import org.sesacteamproject.passmate.user.data.dto.ClaimGuestRecordRequest
 import org.sesacteamproject.passmate.user.data.dto.NotificationSettingsDto
 import org.sesacteamproject.passmate.user.data.dto.ReportRequest
+import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
 import org.sesacteamproject.passmate.user.data.dto.UpdateProfileRequest
 import org.sesacteamproject.passmate.user.data.mapper.toDomain
 import org.sesacteamproject.passmate.user.data.remote.UserRemoteDataSource
@@ -61,13 +63,28 @@ class UserRepositoryImpl(
         return apiCall { remoteDataSource.fetchMyProfile() }.map { it.toDomain() }
     }
 
-    override suspend fun updateMyProfile(nickname: String?, avatarId: Int?): AppResult<Unit> {
-        val request = UpdateProfileRequest(
-            nickname = nickname?.trim()?.ifEmpty { null },
-            avatarId = avatarId
-        )
+    // 캐릭터만 바꿀 때 쓸 현재 닉네임 — 실패하면 null로 두고 호출부가 검증 실패로 접는다
+    private suspend fun currentNicknameOrNull(): String? {
+        val result = apiCall { remoteDataSource.fetchMyProfile() }
 
-        return apiCall { remoteDataSource.updateMyProfile(request) }
+        return (result as? AppResult.Success)?.value?.nickname?.trim()?.ifEmpty { null }
+    }
+
+    // 서버는 nickname을 필수로 받는다 — 캐릭터만 바꾸는 M-12-7에서는 현재 닉네임을 실어 보낸다
+    override suspend fun updateMyProfile(nickname: String?, avatarId: Int?): AppResult<Unit> {
+        val requested = nickname?.trim()?.ifEmpty { null }
+        val resolved = requested ?: currentNicknameOrNull()
+
+        return if (resolved == null) {
+            AppResult.Failure(AppError.ValidationFailed("닉네임을 확인하지 못했어요"))
+        } else {
+            val request = UpdateProfileRequest(
+                nickname = resolved,
+                defaultAvatarId = StudentAvatarKeys.toKey(avatarId)
+            )
+
+            apiCall { remoteDataSource.updateMyProfile(request) }
+        }
     }
 
     override suspend fun deleteAccount(): AppResult<Unit> {

@@ -8,6 +8,8 @@ data class HostProfile(
     val userId: Long,
     val nickname: String,
     val intro: String?,
+    // 선생님 캐릭터 — 평가 시트 카드(M-06 v2)·프로필 시트(M-10)에서 그린다
+    val avatarId: Int?,
     val level: HostLevel?,
     val avgStars: Double?,
     val ratingCount: Int,

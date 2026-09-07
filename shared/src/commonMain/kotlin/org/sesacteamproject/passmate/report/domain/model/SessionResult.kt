@@ -6,6 +6,8 @@ data class SessionResult(
     val rank: Int?,
     val totalScore: Double,
     val correctCount: Int,
+    // 내가 제출한 문항 수 — 정답 수와 다르다. 평가 시트 카드의 "내 제출 n/N" (M-06 v2)
+    val submitCount: Int,
     val questionCount: Int,
     val questions: List<QuestionResult>,
     val canRate: Boolean,
