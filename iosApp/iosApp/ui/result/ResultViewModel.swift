@@ -10,6 +10,8 @@ final class ResultViewModel: ObservableObject {
 
     private let getLearningReportUseCase: GetLearningReportUseCase
 
+    private let getSessionHostUseCase: GetSessionHostUseCase
+
     private let buildReportSummaryUseCase: BuildReportSummaryUseCase
 
     private let getMyParticipationUseCase: GetMyParticipationUseCase
@@ -41,30 +43,55 @@ final class ResultViewModel: ObservableObject {
         getLearningReportUseCase.invoke(roomId: roomId) { [weak self] reportResult, _ in
             let report = (reportResult as? AppResultSuccess<AnyObject>)?.value as? LearningReport
 
-            self?.getSessionResultUseCase.invoke(roomId: roomId) { [weak self] result, error in
+            // 완료 콜백은 Ktor의 백그라운드 스레드다 — Kotlin suspend 함수는 메인에서만 호출할 수 있다
+            DispatchQueue.main.async {
+                self?.loadSessionResult(roomId: roomId, report: report)
+            }
+        }
+    }
+
+    private func loadSessionResult(roomId: Int64, report: LearningReport?) {
+        getSessionResultUseCase.invoke(roomId: roomId) { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let success = result as? AppResultSuccess<AnyObject>
+
+                if error == nil, let sessionResult = success?.value as? SessionResult {
+                    self.uiState.isLoading = false
+                    self.uiState.loadFailed = false
+                    self.uiState.result = sessionResult
+                    self.uiState.report = report
+                    if self.uiState.selectedQuestionNo == nil {
+                        self.uiState.selectedQuestionNo = self.firstAiQuestionNo(sessionResult)
+                    }
+                    let shouldPromptRating = sessionResult.canRate
+                        && !self.uiState.hasRated
+                        && !self.uiState.hasPromptedRating
+
+                    if shouldPromptRating {
+                        self.uiState.isRatingSheetVisible = true
+                        self.uiState.hasPromptedRating = true
+                    }
+                    self.loadHostIfRatable(roomId: roomId, canRate: sessionResult.canRate)
+                } else {
+                    self.uiState.isLoading = false
+                    self.uiState.loadFailed = true
+                }
+            }
+        }
+    }
+
+
+    // 선생님 카드는 평가 시트에만 있다 — 평가할 수 있을 때만 조회해 불필요한 왕복을 줄인다
+    private func loadHostIfRatable(roomId: Int64, canRate: Bool) {
+        if canRate, uiState.host == nil {
+            getSessionHostUseCase.invoke(roomId: roomId) { [weak self] result, error in
                 DispatchQueue.main.async {
                     guard let self else { return }
-                    let success = result as? AppResultSuccess<AnyObject>
+                    let host = (result as? AppResultSuccess<AnyObject>)?.value as? HostProfile
 
-                    if error == nil, let sessionResult = success?.value as? SessionResult {
-                        self.uiState.isLoading = false
-                        self.uiState.loadFailed = false
-                        self.uiState.result = sessionResult
-                        self.uiState.report = report
-                        if self.uiState.selectedQuestionNo == nil {
-                            self.uiState.selectedQuestionNo = self.firstAiQuestionNo(sessionResult)
-                        }
-                        let shouldPromptRating = sessionResult.canRate
-                            && !self.uiState.hasRated
-                            && !self.uiState.hasPromptedRating
-
-                        if shouldPromptRating {
-                            self.uiState.isRatingSheetVisible = true
-                            self.uiState.hasPromptedRating = true
-                        }
-                    } else {
-                        self.uiState.isLoading = false
-                        self.uiState.loadFailed = true
+                    if error == nil, let host {
+                        self.uiState.host = host
                     }
                 }
             }
@@ -102,16 +129,23 @@ final class ResultViewModel: ObservableObject {
         getLearningReportUseCase.invoke(roomId: roomId) { [weak self] reportResult, _ in
             let report = (reportResult as? AppResultSuccess<AnyObject>)?.value as? LearningReport
 
-            self?.getSessionResultUseCase.invoke(roomId: roomId) { [weak self] result, error in
-                DispatchQueue.main.async {
-                    guard let self else { return }
-                    let success = result as? AppResultSuccess<AnyObject>
+            // 완료 콜백은 Ktor의 백그라운드 스레드다 — Kotlin suspend 함수는 메인에서만 호출할 수 있다
+            DispatchQueue.main.async {
+                self?.reloadSessionResult(roomId: roomId, report: report)
+            }
+        }
+    }
 
-                    if error == nil, let sessionResult = success?.value as? SessionResult {
-                        self.uiState.result = sessionResult
-                        if let report {
-                            self.uiState.report = report
-                        }
+    private func reloadSessionResult(roomId: Int64, report: LearningReport?) {
+        getSessionResultUseCase.invoke(roomId: roomId) { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let success = result as? AppResultSuccess<AnyObject>
+
+                if error == nil, let sessionResult = success?.value as? SessionResult {
+                    self.uiState.result = sessionResult
+                    if let report {
+                        self.uiState.report = report
                     }
                 }
             }
@@ -239,6 +273,7 @@ final class ResultViewModel: ObservableObject {
     init(
         getSessionResultUseCase: GetSessionResultUseCase,
         getLearningReportUseCase: GetLearningReportUseCase,
+        getSessionHostUseCase: GetSessionHostUseCase,
         buildReportSummaryUseCase: BuildReportSummaryUseCase,
         getMyParticipationUseCase: GetMyParticipationUseCase,
         requestGuestClaimUseCase: RequestGuestClaimUseCase,
@@ -247,6 +282,7 @@ final class ResultViewModel: ObservableObject {
     ) {
         self.getSessionResultUseCase = getSessionResultUseCase
         self.getLearningReportUseCase = getLearningReportUseCase
+        self.getSessionHostUseCase = getSessionHostUseCase
         self.buildReportSummaryUseCase = buildReportSummaryUseCase
         self.getMyParticipationUseCase = getMyParticipationUseCase
         self.requestGuestClaimUseCase = requestGuestClaimUseCase
