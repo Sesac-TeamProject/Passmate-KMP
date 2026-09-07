@@ -1,0 +1,13 @@
+<!-- badge-droplet — 30일 연속 활동
+     시안 M-09 AchievementBadge 도형 구성을 24 뷰포트로 옮긴 Passmate 자체 제작 마크다.
+     채움만 쓰고 색은 중립 검정이다 — 표시 색은 호출부에서 (규칙 §11-2).
+     Desktop 사본: composeApp/src/jvmMain/resources/drawable/ic_badge_droplet.xml (텍스트 동일) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M12,2.6c0,0 -6.4,7 -6.4,11.2a6.4,6.4 0 0 0 12.8,0C18.4,9.6 12,2.6 12,2.6z"
+        android:fillColor="#FF000000" />
+</vector>

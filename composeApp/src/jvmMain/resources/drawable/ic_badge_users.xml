@@ -1,0 +1,22 @@
+<!-- badge-users — 학생 100명 (머리 원 + 몸통, 시안은 2인)
+     시안 M-09 AchievementBadge 도형 구성을 24 뷰포트로 옮긴 Passmate 자체 제작 마크다.
+     채움만 쓰고 색은 중립 검정이다 — 표시 색은 호출부에서 (규칙 §11-2).
+     Desktop 사본: composeApp/src/jvmMain/resources/drawable/ic_badge_users.xml (텍스트 동일) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M15.6,5.4m-3.1,0a3.1,3.1 0,1 1,6.2 0a3.1,3.1 0,1 1,-6.2 0"
+        android:fillColor="#FF000000" />
+    <path
+        android:pathData="M11.4,17.6v-2.4a4.2,4.2 0 0 1 4.2,-4.2h1.2a4.2,4.2 0 0 1 4.2,4.2v2.4z"
+        android:fillColor="#FF000000" />
+    <path
+        android:pathData="M8.6,7.2m-3.6,0a3.6,3.6 0,1 1,7.2 0a3.6,3.6 0,1 1,-7.2 0"
+        android:fillColor="#FF000000" />
+    <path
+        android:pathData="M2,20.4v-2.8a4.8,4.8 0 0 1 4.8,-4.8h3.6a4.8,4.8 0 0 1 4.8,4.8v2.8z"
+        android:fillColor="#FF000000" />
+</vector>

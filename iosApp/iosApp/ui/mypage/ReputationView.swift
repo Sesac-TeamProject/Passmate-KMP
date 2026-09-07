@@ -364,9 +364,7 @@ private struct BadgeCellView: View {
 
     var body: some View {
         VStack(spacing: 5) {
-            Text(glyph)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(PassmateColors.primaryDeep)
+            mark
                 .frame(width: 44, height: 44)
                 .background(PassmateColors.backgroundMint)
                 .cornerRadius(13)
@@ -383,23 +381,45 @@ private struct BadgeCellView: View {
         }
     }
 
-    private var glyph: String {
+    // 시안 M-09의 AchievementBadge는 마크가 도형이거나 숫자다 — 폰트 글리프(⚑·★)를 쓰면
+    // 기기 폰트에 따라 모양이 달라진다 (규칙 §11-3). Compose ReputationScreen.kt와 1:1 미러다
+    @ViewBuilder
+    private var mark: some View {
+        if let icon {
+            PassmateIconView(icon: icon, tint: PassmateColors.primaryDeep, size: 22)
+        } else {
+            Text(label)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(PassmateColors.primaryDeep)
+        }
+    }
+
+    private var icon: PassmateIcons? {
         if badge.type == BadgeType.firstRoom {
-            return "⚑"
-        } else if badge.type == BadgeType.rooms10 {
-            return "10"
+            return .badgeFlag
         } else if badge.type == BadgeType.students100 {
-            return "100"
+            return .badgeUsers
         } else if badge.type == BadgeType.rating45 {
-            return "★"
+            return .starFilled
+        } else if badge.type == BadgeType.streak30 {
+            return .badgeDroplet
+        } else if badge.type == BadgeType.aiSets50 {
+            return .badgeSparkles
+        } else {
+            return nil
+        }
+    }
+
+    // 시안이 숫자·기호를 그대로 쓰는 뱃지들
+    private var label: String {
+        if badge.type == BadgeType.rooms10 {
+            return "10"
         } else if badge.type == BadgeType.ratings50 {
             return "50"
-        } else if badge.type == BadgeType.streak30 {
-            return "30"
         } else if badge.type == BadgeType.firstPaidRoom {
             return "₩"
         } else {
-            return "AI"
+            return ""
         }
     }
 }

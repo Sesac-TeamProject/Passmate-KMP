@@ -23,6 +23,10 @@ private fun PassmateIcons.drawableId(): Int {
         PassmateIcons.Clock -> R.drawable.ic_clock
         PassmateIcons.Star -> R.drawable.ic_star
         PassmateIcons.StarFilled -> R.drawable.ic_star_filled
+        PassmateIcons.BadgeFlag -> R.drawable.ic_badge_flag
+        PassmateIcons.BadgeUsers -> R.drawable.ic_badge_users
+        PassmateIcons.BadgeDroplet -> R.drawable.ic_badge_droplet
+        PassmateIcons.BadgeSparkles -> R.drawable.ic_badge_sparkles
     }
 }
 

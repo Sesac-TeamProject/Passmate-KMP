@@ -38,6 +38,15 @@ enum class PassmateIcons(val resourceName: String) {
     // 빈 별 (v6 M-06 v2 별점 미선택) — iOS 에셋 이름은 "Star"
     Star("ic_star"),
 
-    // 채운 별 (v6 M-06 v2 별점 선택) — iOS 에셋 이름은 "StarFilled"
-    StarFilled("ic_star_filled")
+    // 채운 별 (v6 M-06 v2 별점 선택 · M-09 평가 4.5+ 뱃지) — iOS 에셋 이름은 "StarFilled"
+    StarFilled("ic_star_filled"),
+
+    // M-09 업적 뱃지 마크 — 시안이 채워진 도형이라 채움만 쓴다
+    BadgeFlag("ic_badge_flag"),
+
+    BadgeUsers("ic_badge_users"),
+
+    BadgeDroplet("ic_badge_droplet"),
+
+    BadgeSparkles("ic_badge_sparkles")
 }

@@ -32,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateIcons
+import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.LevelEmblem
 import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.ReputationBadge
@@ -423,12 +425,7 @@ private fun BadgeCell(
                 .background(PassmateColors.BackgroundMint, RoundedCornerShape(13.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = badgeGlyph(badge),
-                color = PassmateColors.PrimaryDeep,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
+            BadgeMark(badge)
         }
         Text(
             text = badge.type.label,
@@ -528,16 +525,47 @@ private fun unlockNote(nextLevel: HostLevel): String? {
     }
 }
 
-private fun badgeGlyph(badge: Badge): String {
-    return when (badge.type) {
-        BadgeType.FIRST_ROOM -> "⚑"
+// 시안 M-09의 AchievementBadge는 마크가 도형이거나 숫자다 — 폰트 글리프(⚑·★)를 쓰면
+// 기기 폰트에 따라 모양이 달라진다 (규칙 §11-3)
+@Composable
+private fun BadgeMark(badge: Badge) {
+    val icon = badgeIcon(badge.type)
+
+    if (icon != null) {
+        PassmateIcon(
+            icon = icon,
+            contentDescription = null,
+            tint = PassmateColors.PrimaryDeep,
+            modifier = Modifier.size(22.dp)
+        )
+    } else {
+        Text(
+            text = badgeLabel(badge.type),
+            color = PassmateColors.PrimaryDeep,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+private fun badgeIcon(type: BadgeType): PassmateIcons? {
+    return when (type) {
+        BadgeType.FIRST_ROOM -> PassmateIcons.BadgeFlag
+        BadgeType.STUDENTS_100 -> PassmateIcons.BadgeUsers
+        BadgeType.RATING_45 -> PassmateIcons.StarFilled
+        BadgeType.STREAK_30 -> PassmateIcons.BadgeDroplet
+        BadgeType.AI_SETS_50 -> PassmateIcons.BadgeSparkles
+        // 시안이 숫자·기호를 그대로 쓰는 뱃지들
+        BadgeType.ROOMS_10, BadgeType.RATINGS_50, BadgeType.FIRST_PAID_ROOM -> null
+    }
+}
+
+private fun badgeLabel(type: BadgeType): String {
+    return when (type) {
         BadgeType.ROOMS_10 -> "10"
-        BadgeType.STUDENTS_100 -> "100"
-        BadgeType.RATING_45 -> "★"
         BadgeType.RATINGS_50 -> "50"
-        BadgeType.STREAK_30 -> "30"
         BadgeType.FIRST_PAID_ROOM -> "₩"
-        BadgeType.AI_SETS_50 -> "AI"
+        else -> ""
     }
 }
 
