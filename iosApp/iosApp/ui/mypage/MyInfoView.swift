@@ -27,6 +27,7 @@ struct MyInfoView: View {
 
     @StateObject private var viewModel = MyInfoViewModel(
         getMyProfileUseCase: KoinHelper.shared.getMyProfileUseCase(),
+        getMyGradeUseCase: KoinHelper.shared.getMyGradeUseCase(),
         getMyCoinsUseCase: KoinHelper.shared.getMyCoinsUseCase(),
         getEarningsUseCase: KoinHelper.shared.getEarningsUseCase(),
         signOutUseCase: KoinHelper.shared.signOutUseCase(),
@@ -222,7 +223,7 @@ private struct MyInfoContentView: View {
                     partialFailureBanner
                 }
                 if let profile = uiState.profile {
-                    ProfileCardView(profile: profile, onClick: { onAction(.clickProfile) })
+                    ProfileCardView(profile: profile, level: uiState.level, onClick: { onAction(.clickProfile) })
                     sectionCard {
                         infoRow(title: "닉네임", subtitle: profile.nickname, actionLabel: "변경") { onAction(.clickEditProfile) }
                         rowDivider
@@ -389,13 +390,13 @@ private struct MyInfoContentView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
-                        .font(.system(size: 15, weight: .medium))
-                        .kerning(-0.3)
+                        .font(.system(size: 14, weight: .medium))
+                        .kerning(-0.28)
                         .foregroundColor(PassmateColors.textPrimary)
                     if let subtitle {
                         Text(subtitle)
-                            .font(.system(size: 13))
-                            .kerning(-0.26)
+                            .font(.system(size: 12))
+                            .kerning(-0.24)
                             .foregroundColor(PassmateColors.textSecondary)
                     }
                 }
@@ -406,8 +407,8 @@ private struct MyInfoContentView: View {
                         .tint(PassmateColors.primary)
                 } else {
                     Text(actionLabel.isEmpty ? "›" : "\(actionLabel) ›")
-                        .font(.system(size: 14, weight: .medium))
-                        .kerning(-0.28)
+                        .font(.system(size: 12))
+                        .kerning(-0.24)
                         .foregroundColor(actionColor)
                 }
             }
@@ -418,20 +419,20 @@ private struct MyInfoContentView: View {
 
     private func coinRow(coins: Int64, onClickCharge: @escaping () -> Void) -> some View {
         HStack(spacing: 12) {
-            // 시안 M-12: 보유 코인 행 왼쪽에 민트 원형 배경 + 코인 마크
+            // 시안 M-12: 보유 코인 행 왼쪽에 민트 원형 배경(36) + 코인 마크(22)
             ZStack {
                 Circle().fill(PassmateColors.backgroundMint)
                 PassmateIconView(icon: .coin, tint: PassmateColors.primary, size: 22)
             }
-            .frame(width: 40, height: 40)
-            VStack(alignment: .leading, spacing: 4) {
+            .frame(width: 36, height: 36)
+            VStack(alignment: .leading, spacing: 2) {
                 Text("보유 코인")
-                    .font(.system(size: 15, weight: .medium))
-                    .kerning(-0.3)
+                    .font(.system(size: 14, weight: .medium))
+                    .kerning(-0.28)
                     .foregroundColor(PassmateColors.textPrimary)
                 Text("\(formatNumber(coins)) C · 유료 방 참가비에 사용")
-                    .font(.system(size: 13))
-                    .kerning(-0.26)
+                    .font(.system(size: 12))
+                    .kerning(-0.24)
                     .foregroundColor(PassmateColors.textSecondary)
             }
             Spacer()
@@ -479,6 +480,8 @@ private struct MyInfoContentView: View {
 private struct ProfileCardView: View {
     let profile: UserProfile
 
+    let level: Shared.HostLevel?
+
     let onClick: () -> Void
 
     var body: some View {
@@ -510,9 +513,13 @@ private struct ProfileCardView: View {
         }
     }
 
+    // 등급은 프로필이 아니라 /users/me/grade에서 온다 (Compose MyInfoUiState.level 미러)
     private var localLevel: HostLevel? {
-        guard let level = profile.level else { return nil }
-        return HostLevel.from(Int(level.level))
+        if let level {
+            return HostLevel.from(Int(level.level))
+        } else {
+            return nil
+        }
     }
 }
 

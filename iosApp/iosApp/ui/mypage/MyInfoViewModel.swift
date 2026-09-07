@@ -9,6 +9,8 @@ private let termsNotice = "약관 · 개인정보 처리방침은 준비 중이�
 final class MyInfoViewModel: ObservableObject {
     private let getMyProfileUseCase: GetMyProfileUseCase
 
+    private let getMyGradeUseCase: GetMyGradeUseCase
+
     private let getMyCoinsUseCase: GetMyCoinsUseCase
 
     private let getEarningsUseCase: GetEarningsUseCase
@@ -34,8 +36,23 @@ final class MyInfoViewModel: ObservableObject {
 
     private func loadAll() {
         loadProfile()
+        loadGrade()
         loadCoinInfo()
         loadEarnings()
+    }
+
+    // 등급은 프로필 응답에 없다 — 실패해도 배지만 빠지고 화면은 그대로 뜬다
+    private func loadGrade() {
+        getMyGradeUseCase.invoke { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                let grade = (result as? AppResultSuccess<AnyObject>)?.value as? MyGrade
+
+                if error == nil, let grade {
+                    self.uiState.level = grade.level
+                }
+            }
+        }
     }
 
     private func loadProfile() {
@@ -157,12 +174,14 @@ final class MyInfoViewModel: ObservableObject {
 
     init(
         getMyProfileUseCase: GetMyProfileUseCase,
+        getMyGradeUseCase: GetMyGradeUseCase,
         getMyCoinsUseCase: GetMyCoinsUseCase,
         getEarningsUseCase: GetEarningsUseCase,
         signOutUseCase: SignOutUseCase,
         isSignedInUseCase: IsSignedInUseCase
     ) {
         self.getMyProfileUseCase = getMyProfileUseCase
+        self.getMyGradeUseCase = getMyGradeUseCase
         self.getMyCoinsUseCase = getMyCoinsUseCase
         self.getEarningsUseCase = getEarningsUseCase
         self.signOutUseCase = signOutUseCase

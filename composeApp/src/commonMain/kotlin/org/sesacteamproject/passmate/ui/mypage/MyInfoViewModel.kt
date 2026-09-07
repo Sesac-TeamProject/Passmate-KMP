@@ -10,6 +10,7 @@ import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.payment.domain.usecase.GetEarningsUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.GetMyCoinsUseCase
+import org.sesacteamproject.passmate.user.domain.usecase.GetMyGradeUseCase
 import org.sesacteamproject.passmate.user.domain.usecase.GetMyProfileUseCase
 
 // 약관 전용 화면·계약이 아직 없다 — 라우트가 생기기 전까지는 안내 문구만 노출한다
@@ -18,6 +19,7 @@ private const val TERMS_NOTICE = "약관 · 개인정보 처리방침은 준비 
 // 마이 탭 루트 (M-12) — 프로필·코인·정산 3섹션을 독립 로드한다. 금액·등급 계산은 전부 서버 값 렌더 (규칙 §1)
 class MyInfoViewModel(
     private val getMyProfileUseCase: GetMyProfileUseCase,
+    private val getMyGradeUseCase: GetMyGradeUseCase,
     private val getMyCoinsUseCase: GetMyCoinsUseCase,
     private val getEarningsUseCase: GetEarningsUseCase,
     private val signOutUseCase: SignOutUseCase,
@@ -37,8 +39,19 @@ class MyInfoViewModel(
 
     private fun loadAll() {
         loadProfile()
+        loadGrade()
         loadCoinInfo()
         loadEarnings()
+    }
+
+    // 등급은 프로필 응답에 없다 — 실패해도 배지만 빠지고 화면은 그대로 뜬다
+    private fun loadGrade() {
+        viewModelScope.launch {
+            getMyGradeUseCase.invoke()
+                .onSuccess { grade ->
+                    _uiState.update { it.copy(level = grade.level) }
+                }
+        }
     }
 
     private fun loadProfile() {

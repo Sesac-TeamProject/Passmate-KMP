@@ -172,6 +172,7 @@ private fun LoadedMyInfo(
         uiState.profile?.let { profile ->
             ProfileCard(
                 profile = profile,
+                level = uiState.level,
                 onClick = { onAction(MyInfoAction.ClickProfile) }
             )
             SectionCard {
@@ -281,6 +282,7 @@ private fun LoadedMyInfo(
 @Composable
 private fun ProfileCard(
     profile: UserProfile,
+    level: HostLevel?,
     onClick: () -> Unit
 ) {
     Row(
@@ -312,9 +314,7 @@ private fun ProfileCard(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = (-0.36).sp
                 )
-                profile.level?.let { level ->
-                    ReputationBadge(level = level)
-                }
+                level?.let { ReputationBadge(level = it) }
             }
             Text(
                 text = "참여한 방 ${profile.joinedRoomCount ?: 0} · 내가 만든 방 ${profile.hostedRoomCount ?: 0}",
@@ -375,8 +375,8 @@ private fun InfoRow(
                 Text(
                     text = subtitle,
                     color = PassmateColors.TextSecondary,
-                    fontSize = 13.sp,
-                    letterSpacing = (-0.26).sp
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.24).sp
                 )
             }
         }
@@ -390,9 +390,8 @@ private fun InfoRow(
             Text(
                 text = if (actionLabel.isEmpty()) "›" else "$actionLabel ›",
                 color = actionColor,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.28).sp
+                fontSize = 12.sp,
+                letterSpacing = (-0.24).sp
             )
         }
     }
@@ -427,20 +426,20 @@ private fun CoinRow(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
                 text = "보유 코인",
                 color = PassmateColors.TextPrimary,
-                fontSize = 15.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                letterSpacing = (-0.3).sp
+                letterSpacing = (-0.28).sp
             )
             Text(
                 text = "${formatNumber(coins ?: 0L)} C · 유료 방 참가비에 사용",
                 color = PassmateColors.TextSecondary,
-                fontSize = 13.sp,
-                letterSpacing = (-0.26).sp
+                fontSize = 12.sp,
+                letterSpacing = (-0.24).sp
             )
         }
         Text(
