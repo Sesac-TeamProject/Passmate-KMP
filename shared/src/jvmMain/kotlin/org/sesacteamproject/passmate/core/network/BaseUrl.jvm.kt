@@ -1,5 +1,5 @@
 package org.sesacteamproject.passmate.core.network
 
-actual fun defaultApiBaseUrl(): String = "http://localhost:8080"
+actual fun defaultApiBaseUrl(): String = apiBaseUrlOf(DEFAULT_SERVER_HOST)
 
-actual fun defaultWsUrl(): String = "ws://localhost:8080/ws"
+actual fun defaultWsUrl(): String = wsUrlOf(DEFAULT_SERVER_HOST)

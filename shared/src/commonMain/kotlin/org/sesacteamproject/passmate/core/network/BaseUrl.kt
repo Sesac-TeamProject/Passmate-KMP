@@ -4,3 +4,22 @@ package org.sesacteamproject.passmate.core.network
 expect fun defaultApiBaseUrl(): String
 
 expect fun defaultWsUrl(): String
+
+// 시뮬레이터/Desktop 기본값. 실기기는 빌드 설정으로 맥의 LAN 주소를 덮어쓴다
+internal const val DEFAULT_SERVER_HOST = "localhost:8080"
+
+// 스킴은 코드에서 붙인다 — xcconfig는 `//`를 주석으로 읽어 전체 URL을 값으로 둘 수 없다
+internal fun apiBaseUrlOf(host: String): String = "http://$host"
+
+internal fun wsUrlOf(host: String): String = "ws://$host/ws"
+
+// 빌드 설정이 비어 있으면 Info.plist의 `$(...)`가 치환되지 않은 채 그대로 들어온다
+internal fun resolveServerHost(configured: String?): String {
+    val host = configured?.trim().orEmpty()
+
+    return if (host.isEmpty() || host.startsWith("\$(")) {
+        DEFAULT_SERVER_HOST
+    } else {
+        host
+    }
+}
