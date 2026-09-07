@@ -45,7 +45,8 @@ struct RatingSectionView: View {
                     .kerning(-0.28)
                     .foregroundColor(PassmateColors.textTertiary)
             }
-            .frame(maxWidth: .infinity)
+            // 시안 M-06 v2 — 건너뛰기는 좌측 정렬이다
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 20)
         // 시안은 시트 상단에서 제목까지 62pt를 둔다(손잡이 20 + 여백). 시스템 손잡이 높이를 뺀 값
@@ -189,7 +190,7 @@ struct RatingSectionView: View {
     RatingSectionView(
         uiState: ResultUiState(
             ratingStars: 5,
-            ratingTags: [.clearExplanation, .helpfulHints],
+            ratingTags: [.clearExplanation, .helpfulHint],
             ratingComment: "설명이 명확하고 힌트가 큰 도움이 됐어요!",
             hasRated: true
         ),

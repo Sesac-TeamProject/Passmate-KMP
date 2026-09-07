@@ -110,8 +110,9 @@ fun RatingSection(
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             letterSpacing = (-0.28).sp,
+            // 시안 M-06 v2 — 건너뛰기는 좌측 정렬이다
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
+                .align(Alignment.Start)
                 .clickable { onAction(ResultAction.SkipRating) }
                 .padding(4.dp)
         )
