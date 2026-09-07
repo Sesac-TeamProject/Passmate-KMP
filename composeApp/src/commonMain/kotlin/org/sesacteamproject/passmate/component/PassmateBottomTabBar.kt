@@ -32,9 +32,10 @@ fun PassmateBottomTabBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                // 하단 여백은 navigationBarsPadding()이 이미 시스템 내비게이션 바만큼 준다.
-                // 여기에 12을 더 얹으면 실기기에서 탭바가 뜬다 — 4로 줄인다
-                .padding(top = 8.dp, bottom = 4.dp),
+                // 시안(M-01) 탭바는 상단 10 · 항목 49 · 하단 14다. 하단 14는 시스템 바 자리를
+                // 대신하는 값이라 실기기에서는 navigationBarsPadding()이 그 역할을 한다 —
+                // 여기에 또 얹으면 탭바가 뜬다
+                .padding(top = 10.dp, bottom = 0.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             AppTab.entries.forEach { tab ->

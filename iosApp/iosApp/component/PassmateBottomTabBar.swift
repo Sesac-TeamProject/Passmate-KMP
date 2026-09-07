@@ -22,10 +22,10 @@ struct PassmateBottomTabBar: View {
                     .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.top, 8)
-            // 하단 여백은 홈 인디케이터 세이프에어리어가 이미 준다.
-            // 여기에 12을 더 얹으면 실기기에서 탭바가 뜬다 — 4로 줄인다 (Compose와 같은 값)
-            .padding(.bottom, 4)
+            // 시안(M-01) 탭바는 상단 10 · 항목 49 · 하단 14다. 하단 14는 시스템 바 자리를
+            // 대신하는 값이라 실기기에서는 홈 인디케이터 세이프에어리어가 그 역할을 한다
+            .padding(.top, 10)
+            .padding(.bottom, 0)
         }
         .background(PassmateColors.surface)
     }

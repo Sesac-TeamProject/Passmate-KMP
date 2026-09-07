@@ -83,6 +83,8 @@ private struct JoinContentView: View {
                 header
                 card
             }
+            // 카드가 탭바에 붙지 않게 한다 (시안은 카드 아래 여백을 둔다) — Compose 미러와 같은 값
+            .padding(.bottom, 16)
         }
         .background(PassmateColors.surface.ignoresSafeArea())
     }
