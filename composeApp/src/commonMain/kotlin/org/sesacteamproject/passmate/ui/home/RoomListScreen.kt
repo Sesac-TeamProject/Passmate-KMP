@@ -84,7 +84,8 @@ fun RoomListScreen(onNavigate: (NavigationAction) -> Unit) {
         )
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
+            // 탭바 없는 push 화면이라 스낵바가 시스템 내비게이션 바에 겹친다 — 여기서 직접 띄운다
+            modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding()
         )
     }
     val hostId = profileHostId
