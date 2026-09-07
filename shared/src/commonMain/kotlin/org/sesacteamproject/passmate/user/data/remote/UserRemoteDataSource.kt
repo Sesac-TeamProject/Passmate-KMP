@@ -3,6 +3,7 @@ package org.sesacteamproject.passmate.user.data.remote
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -48,8 +49,12 @@ class UserRemoteDataSource(
         return apiClient.http.get("${apiClient.baseUrl}/users/me/badges").body()
     }
 
+    // 공개 프로필 — 게스트도 볼 수 있어야 한다(평가 시트의 선생님 카드).
+    // 게스트 토큰을 실으면 서버가 403으로 막으므로 공개 엔드포인트로 표시해 보낸다
     suspend fun fetchHostProfile(userId: Long): HostProfileResponse {
-        return apiClient.http.get("${apiClient.baseUrl}/users/$userId/profile").body()
+        return apiClient.http.get("${apiClient.baseUrl}/users/$userId/profile") {
+            header(ApiClient.PUBLIC_ENDPOINT_HEADER, "1")
+        }.body()
     }
 
     suspend fun blockUser(userId: Long) {

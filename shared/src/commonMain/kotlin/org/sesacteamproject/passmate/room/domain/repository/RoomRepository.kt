@@ -16,6 +16,9 @@ interface RoomRepository {
     // 공개 방 카드 → Join 라우트 이동용. 목록 응답에 pin이 없어 roomId로 조회한다
     suspend fun getRoomPin(roomId: Long): AppResult<String>
 
+    // 방을 연 선생님 — 결과·평가 시트에서 선생님 카드를 그릴 때 쓴다 (M-06 v2)
+    suspend fun getRoomHostUserId(roomId: Long): AppResult<Long?>
+
     suspend fun joinRoom(room: RoomInfo, nickname: String, avatarId: Int?): AppResult<MyParticipation>
 
     suspend fun getParticipants(roomId: Long): AppResult<List<Participant>>

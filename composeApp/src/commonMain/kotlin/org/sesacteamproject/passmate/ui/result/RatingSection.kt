@@ -24,6 +24,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import org.sesacteamproject.passmate.component.ReputationBadge
+import org.sesacteamproject.passmate.component.StudentAvatar
+import org.sesacteamproject.passmate.report.domain.model.SessionResult
+import org.sesacteamproject.passmate.user.domain.model.HostProfile
 import org.sesacteamproject.passmate.component.StarRating
 import org.sesacteamproject.passmate.rating.domain.model.RatingTag
 import org.sesacteamproject.passmate.theme.PassmateColors
@@ -39,7 +45,8 @@ fun RatingSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 10.dp),
+            // 시안은 시트 상단에서 제목까지 62dp를 둔다(손잡이 20 + 여백). 핸들 높이를 뺀 값
+            .padding(start = 20.dp, top = 34.dp, end = 20.dp, bottom = 28.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text(
@@ -55,6 +62,9 @@ fun RatingSection(
             fontSize = 12.sp,
             letterSpacing = (-0.24).sp
         )
+        uiState.result?.let { result ->
+            SessionInfoCard(result = result, host = uiState.host)
+        }
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -212,5 +222,53 @@ private fun starLabel(stars: Int): String {
         4 -> "4점 · 좋았어요"
         5 -> "5점 · 최고예요"
         else -> "별점을 선택해 주세요"
+    }
+}
+
+// 시안(M-06 v2)의 세션 정보 카드 — 선생님 아바타·이름·등급 배지 + 방 제목·문항 수·내 제출.
+// 선생님 정보는 결과 응답에 없어 별도 조회한다(계약 갭 G-8) — 아직 안 왔으면 방 정보 줄만 그린다
+@Composable
+private fun SessionInfoCard(
+    result: SessionResult,
+    host: HostProfile?
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(PassmateColors.FieldGray, RoundedCornerShape(14.dp))
+            .padding(start = 12.dp, top = 10.dp, end = 14.dp, bottom = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (host != null) {
+            StudentAvatar(
+                avatarId = host.avatarId,
+                modifier = Modifier.size(36.dp)
+            )
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            if (host != null) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${host.nickname} 선생님",
+                        color = PassmateColors.TextPrimary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        letterSpacing = (-0.28).sp
+                    )
+                    host.level?.let { ReputationBadge(level = it) }
+                }
+            }
+            Text(
+                text = "${result.roomTitle} · ${result.questionCount}문항 · " +
+                    "내 제출 ${result.submitCount}/${result.questionCount}",
+                color = PassmateColors.TextSecondary,
+                fontSize = 12.sp,
+                letterSpacing = (-0.24).sp
+            )
+        }
     }
 }

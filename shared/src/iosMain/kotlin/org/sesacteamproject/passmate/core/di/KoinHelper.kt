@@ -24,6 +24,7 @@ import org.sesacteamproject.passmate.report.domain.usecase.BuildReportSummaryUse
 import org.sesacteamproject.passmate.report.domain.usecase.BuildRoomReportSummaryUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetLearningReportUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetRoomReportUseCase
+import org.sesacteamproject.passmate.report.domain.usecase.GetSessionHostUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetSessionResultUseCase
 import org.sesacteamproject.passmate.question.domain.usecase.GetMyQuestionSetsUseCase
 import org.sesacteamproject.passmate.room.domain.policy.JoinInputPolicy
@@ -102,6 +103,8 @@ object KoinHelper {
     fun getSessionResultUseCase(): GetSessionResultUseCase = KoinPlatform.getKoin().get()
 
     fun getLearningReportUseCase(): GetLearningReportUseCase = KoinPlatform.getKoin().get()
+
+    fun getSessionHostUseCase(): GetSessionHostUseCase = KoinPlatform.getKoin().get()
 
     fun buildReportSummaryUseCase(): BuildReportSummaryUseCase = KoinPlatform.getKoin().get()
 
