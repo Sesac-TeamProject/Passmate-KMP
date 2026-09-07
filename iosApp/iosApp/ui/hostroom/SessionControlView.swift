@@ -407,29 +407,37 @@ private struct SubmissionSectionView: View {
         }
     }
 
+    // 제출 아바타는 인원이 많으면 한 줄을 넘는다 — Compose FlowRow 미러 (규칙 §14)
     private var avatarRow: some View {
         let participants = submissionParticipants
         let submitted = participants.filter { $0.submitted }
         let pendingCount = participants.filter { !$0.submitted }.count
+        let items: [SubmittedAvatarItem] = submitted.map { .avatar($0.participantId, $0.avatarId.map { Int(truncating: $0) } ?? 0) }
+            + (pendingCount > 0 ? [.pending(pendingCount)] : [])
 
-        return HStack(spacing: 6) {
-            ForEach(submitted, id: \.participantId) { participant in
-                ZStack(alignment: .bottomTrailing) {
-                    StudentAvatarView(avatarId: participant.avatarId.map { Int(truncating: $0) } ?? 0)
-                        .frame(width: 30, height: 30)
-                    Circle()
-                        .fill(PassmateColors.primary)
-                        .frame(width: 9, height: 9)
-                        .overlay(Circle().stroke(PassmateColors.surface, lineWidth: 1))
-                }
+        return FlowLayout(items, id: \.self, spacing: 6) { item in
+            avatarItem(item)
+        }
+    }
+
+    @ViewBuilder
+    private func avatarItem(_ item: SubmittedAvatarItem) -> some View {
+        switch item {
+        case let .avatar(_, avatarId):
+            ZStack(alignment: .bottomTrailing) {
+                StudentAvatarView(avatarId: avatarId)
+                    .frame(width: 30, height: 30)
+                Circle()
+                    .fill(PassmateColors.primary)
+                    .frame(width: 9, height: 9)
+                    .overlay(Circle().stroke(PassmateColors.surface, lineWidth: 1))
             }
-            if pendingCount > 0 {
-                Text("미제출 \(pendingCount)명")
-                    .font(.system(size: 13))
-                    .kerning(-0.26)
-                    .foregroundColor(PassmateColors.textTertiary)
-            }
-            Spacer()
+        case let .pending(count):
+            Text("미제출 \(count)명")
+                .font(.system(size: 13))
+                .kerning(-0.26)
+                .foregroundColor(PassmateColors.textTertiary)
+                .frame(height: 30)
         }
     }
 
@@ -479,4 +487,10 @@ private struct SubmissionSectionView: View {
         default: return PassmateColors.chipGreen
         }
     }
+}
+
+// 제출 현황 줄의 항목 — 아바타와 "미제출 N명"을 한 흐름에 놓아 줄바꿈을 함께 받는다
+private enum SubmittedAvatarItem: Hashable {
+    case avatar(Int64, Int)
+    case pending(Int)
 }
