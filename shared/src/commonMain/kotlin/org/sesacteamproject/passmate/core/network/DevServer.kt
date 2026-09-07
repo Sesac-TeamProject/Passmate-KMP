@@ -31,8 +31,12 @@ internal fun hostOf(baseUrl: String): String {
     }
 }
 
-fun isLocalDevServer(baseUrl: String): Boolean {
-    val host = hostOf(baseUrl)
+// 스킴이 붙은 URL과 "localhost:8080"·"api.passmate.kr" 같은 맨 호스트를 모두 받는다 —
+// hostOf가 `://`가 없으면 입력을 그대로 흘려보내므로 양쪽에 같은 판정을 쓸 수 있다
+internal fun isLocalDevHost(hostOrUrl: String): Boolean {
+    val host = hostOf(hostOrUrl)
 
     return host in LOCAL_HOSTS || host.isPrivateNetworkHost()
 }
+
+fun isLocalDevServer(baseUrl: String): Boolean = isLocalDevHost(baseUrl)
