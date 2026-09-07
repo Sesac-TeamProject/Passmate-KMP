@@ -11,14 +11,12 @@ sealed interface ServerEvent {
         val participantId: Long,
         val nickname: String,
         val isGuest: Boolean,
-        val avatarId: Int? = null,
-        val count: Int
+        val avatarId: Int? = null
     ) : ServerEvent
 
     @Serializable
     data class ParticipantLeft(
         val participantId: Long,
-        val count: Int,
         val reason: String? = null
     ) : ServerEvent {
 

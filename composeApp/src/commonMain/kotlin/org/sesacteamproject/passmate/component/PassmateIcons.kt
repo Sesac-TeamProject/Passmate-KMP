@@ -33,5 +33,11 @@ enum class PassmateIcons(val resourceName: String) {
     User("ic_user"),
 
     // 시계 (v6 M-03 풀이 · M-T2 진행 리모컨 남은 시간) — iOS 에셋 이름은 "Clock"
-    Clock("ic_clock")
+    Clock("ic_clock"),
+
+    // 빈 별 (v6 M-06 v2 별점 미선택) — iOS 에셋 이름은 "Star"
+    Star("ic_star"),
+
+    // 채운 별 (v6 M-06 v2 별점 선택) — iOS 에셋 이름은 "StarFilled"
+    StarFilled("ic_star_filled")
 }

@@ -1,5 +1,6 @@
 package org.sesacteamproject.passmate.core.network.event
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 // STOMP 이벤트 페이로드의 서버 형태 — 백엔드 `SessionEvents.kt`와 1:1.
@@ -45,20 +46,20 @@ internal object ServerEventPayloads {
         val totalScore: Long = 0
     )
 
-    // 참가자 입·퇴장 — avatarId는 문자열 키이고 count는 서버가 안 줄 수 있다
+    // 참가자 입·퇴장 — 서버 kr.passmate.session.dto.ParticipantEventPayload 와 1:1.
+    // 식별자 키는 `id`이고, 현재 인원(count)과 퇴장 사유(reason)는 서버가 싣지 않는다.
+    // 인원은 화면이 명단 길이로 세고, reason은 서버가 실어 주면 그대로 동작한다.
     @Serializable
     data class ParticipantJoined(
-        val participantId: Long = 0,
+        @SerialName("id") val participantId: Long = 0,
         val nickname: String = "",
         val isGuest: Boolean = false,
-        val avatarId: String? = null,
-        val count: Int = 0
+        val avatarId: String? = null
     )
 
     @Serializable
     data class ParticipantLeft(
-        val participantId: Long = 0,
-        val count: Int = 0,
+        @SerialName("id") val participantId: Long = 0,
         val reason: String? = null
     )
 

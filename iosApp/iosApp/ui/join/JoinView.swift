@@ -82,9 +82,6 @@ private struct JoinContentView: View {
             VStack(spacing: 0) {
                 header
                 card
-                if !uiState.isSignedIn {
-                    signInLinkRow
-                }
             }
         }
         .background(PassmateColors.surface.ignoresSafeArea())
@@ -250,24 +247,6 @@ private struct JoinContentView: View {
             .cornerRadius(16)
         }
         .disabled(uiState.isJoining)
-    }
-
-    private var signInLinkRow: some View {
-        HStack(spacing: 4) {
-            Text("기록을 남기려면")
-                .font(.system(size: 14))
-                .kerning(-0.28)
-                .foregroundColor(PassmateColors.textSecondary)
-            Button {
-                onAction(.clickSignIn)
-            } label: {
-                Text("로그인")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.primaryDeep)
-            }
-        }
-        .padding(.vertical, 20)
     }
 }
 

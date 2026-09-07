@@ -13,12 +13,13 @@ internal fun apiBaseUrlOf(host: String): String = "http://$host"
 
 internal fun wsUrlOf(host: String): String = "ws://$host/ws"
 
-// 빌드 설정이 비어 있으면 Info.plist의 `$(...)`가 치환되지 않은 채 그대로 들어온다
-internal fun resolveServerHost(configured: String?): String {
+// 빌드 설정이 비어 있으면 Info.plist의 `$(...)`가 치환되지 않은 채 그대로 들어온다.
+// 기본값은 플랫폼이 준다 — 안드로이드 에뮬레이터만 호스트 PC를 10.0.2.2로 본다
+internal fun resolveServerHost(configured: String?, default: String = DEFAULT_SERVER_HOST): String {
     val host = configured?.trim().orEmpty()
 
     return if (host.isEmpty() || host.startsWith("\$(")) {
-        DEFAULT_SERVER_HOST
+        default
     } else {
         host
     }

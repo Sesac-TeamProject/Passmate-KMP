@@ -121,9 +121,6 @@ private fun JoinContentScreen(
             isQrScanAvailable = isQrScanAvailable,
             onAction = onAction
         )
-        if (!uiState.isSignedIn) {
-            SignInLinkRow(onClickSignIn = { onAction(JoinAction.ClickSignIn) })
-        }
     }
 }
 
@@ -135,7 +132,9 @@ private fun JoinHeader() {
             .padding(horizontal = 24.dp)
     ) {
         Column(
-            modifier = Modifier.padding(top = 64.dp, bottom = 24.dp),
+            // 작은 기기(720x1520급)에서 입장 버튼까지 한 화면에 들어오도록 줄였다.
+            // 상태바 아래 여백은 statusBarsPadding()이 이미 준다
+            modifier = Modifier.padding(top = 32.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
@@ -159,7 +158,7 @@ private fun JoinHeader() {
             height = 75.dp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 44.dp, end = 4.dp)
+                .padding(top = 12.dp, end = 4.dp)
         )
     }
 }
@@ -469,32 +468,6 @@ private fun JoinButton(
                 letterSpacing = (-0.32).sp
             )
         }
-    }
-}
-
-@Composable
-private fun SignInLinkRow(onClickSignIn: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "기록을 남기려면",
-            color = PassmateColors.TextSecondary,
-            fontSize = 14.sp,
-            letterSpacing = (-0.28).sp
-        )
-        Text(
-            text = "로그인",
-            color = PassmateColors.PrimaryDeep,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp,
-            modifier = Modifier.clickable(onClick = onClickSignIn)
-        )
     }
 }
 

@@ -95,8 +95,9 @@ final class WaitingViewModel: ObservableObject {
         )
         let others = uiState.participants.filter { $0.participantId != participant.participantId }
 
+        // 서버가 현재 인원을 안 실어 준다 — 명단 길이로 센다
         uiState.participants = others + [participant]
-        uiState.totalCount = Int(joined.count)
+        uiState.totalCount = uiState.participants.count
     }
 
     private func onParticipantLeft(_ left: ServerEventParticipantLeft) {
@@ -107,7 +108,7 @@ final class WaitingViewModel: ObservableObject {
             event.send(.roomClosed(message: "선생님이 내보냈어요"))
         } else {
             uiState.participants = uiState.participants.filter { $0.participantId != left.participantId }
-            uiState.totalCount = Int(left.count)
+            uiState.totalCount = uiState.participants.count
         }
     }
 

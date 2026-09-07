@@ -1,6 +1,9 @@
 import SwiftUI
 
-// 별점 1~5 (디자인 시스템 §StarRating, 골드 #F2C94C 전용). onSelect가 nil이면 읽기 전용
+// 별점 1~5 (디자인 시스템 §StarRating, 골드 #F2C94C 전용). onSelect가 nil이면 읽기 전용.
+// 별은 리소스 아이콘으로 그린다 — 예전엔 ★/☆ 글리프였는데 기기 폰트마다 모양이 달라
+// 시안과 같아질 수 없었고 규칙 §11-3(화면 코드에 아이콘을 그리지 않는다)에도 어긋났다.
+// Compose component/StarRating.kt와 1:1 미러다
 struct StarRatingView: View {
     let stars: Int
 
@@ -13,12 +16,14 @@ struct StarRatingView: View {
             ForEach(1...5, id: \.self) { index in
                 let isFilled = index <= stars
 
-                Text(isFilled ? "★" : "☆")
-                    .font(.system(size: starSize, weight: .medium))
-                    .foregroundColor(isFilled ? PassmateColors.starGold : PassmateColors.border)
-                    .onTapGesture {
-                        onSelect?(index)
-                    }
+                PassmateIconView(
+                    icon: isFilled ? .starFilled : .star,
+                    tint: isFilled ? PassmateColors.starGold : PassmateColors.border,
+                    size: starSize
+                )
+                .onTapGesture {
+                    onSelect?(index)
+                }
             }
         }
     }

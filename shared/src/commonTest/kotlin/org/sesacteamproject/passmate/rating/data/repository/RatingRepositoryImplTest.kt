@@ -26,7 +26,7 @@ class RatingRepositoryImplTest {
         // Repository의 매핑 규칙을 직접 재현해 검증 (impl과 동일 로직)
         val draft = RatingDraft(
             stars = 4,
-            tags = setOf(RatingTag.CLEAR_EXPLANATION, RatingTag.GOOD_QUALITY),
+            tags = setOf(RatingTag.CLEAR_EXPLANATION, RatingTag.GOOD_QUESTIONS),
             comment = "   "
         )
         val request = SubmitRatingRequest(
@@ -36,7 +36,7 @@ class RatingRepositoryImplTest {
         )
 
         assertEquals(4, request.stars)
-        assertEquals(setOf("CLEAR_EXPLANATION", "GOOD_QUALITY"), request.tags.toSet())
+        assertEquals(setOf("CLEAR_EXPLANATION", "GOOD_QUESTIONS"), request.tags.toSet())
         assertNull(request.comment)
     }
 

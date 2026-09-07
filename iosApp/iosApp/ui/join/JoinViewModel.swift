@@ -139,6 +139,10 @@ final class JoinViewModel: ObservableObject {
                     guard let self else { return }
                     self.uiState.isJoining = false
                     if error == nil, result is AppResultSuccess<AnyObject> {
+                        // 입장에 성공하면 폼의 PIN을 비운다 — 대기실에서 나와 홈으로 돌아왔을 때
+                        // 지난 방의 PIN이 남아 있으면 안 된다. 닉네임·캐릭터는 다음 입장에도 쓰므로 남긴다
+                        self.uiState.pin = ""
+                        self.uiState.roomInfo = nil
                         self.event.send(.joinCompleted(pin: room.pin))
                     } else {
                         self.handleJoinFailure(error: (result as? AppResultFailure)?.error)
