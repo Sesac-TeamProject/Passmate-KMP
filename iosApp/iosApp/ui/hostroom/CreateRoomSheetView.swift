@@ -10,6 +10,9 @@ struct CreateRoomSheetView: View {
 
     var onClose: () -> Void = {}
 
+    // 유료 탭은 입력칸이 늘어난다 — 상위가 시트 높이를 올리도록 알린다 (M-13a)
+    var onPaidChanged: (Bool) -> Void = { _ in }
+
     @StateObject private var viewModel = CreateRoomViewModel(
         getMyQuestionSetsUseCase: KoinHelper.shared.getMyQuestionSetsUseCase(),
         createRoomUseCase: KoinHelper.shared.createRoomUseCase()
@@ -23,6 +26,9 @@ struct CreateRoomSheetView: View {
         )
         .onAppear {
             viewModel.action(.enter)
+        }
+        .onChange(of: viewModel.uiState.isPaid) { isPaid in
+            onPaidChanged(isPaid)
         }
         .onReceive(viewModel.event) { event in
             switch event {
