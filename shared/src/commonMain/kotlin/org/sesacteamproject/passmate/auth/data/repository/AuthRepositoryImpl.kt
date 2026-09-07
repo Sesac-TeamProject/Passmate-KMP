@@ -1,7 +1,8 @@
 package org.sesacteamproject.passmate.auth.data.repository
 
 import org.sesacteamproject.passmate.auth.data.dto.DevLoginRequest
-import org.sesacteamproject.passmate.auth.data.dto.DevLoginResponse
+import org.sesacteamproject.passmate.auth.data.dto.LoginResponse
+import org.sesacteamproject.passmate.auth.data.dto.SocialLoginRequest
 import org.sesacteamproject.passmate.auth.data.remote.AuthRemoteDataSource
 import org.sesacteamproject.passmate.auth.domain.repository.AuthRepository
 import org.sesacteamproject.passmate.core.model.AppError
@@ -17,19 +18,23 @@ class AuthRepositoryImpl(
     private val remoteDataSource: AuthRemoteDataSource
 ) : AuthRepository {
 
-    // dev-login 응답의 토큰 쌍을 딥링크 콜백과 같은 경로로 저장한다
-    private suspend fun AppResult<DevLoginResponse>.flatMapToSession(): AppResult<Unit> {
+    // 로그인 응답의 토큰 쌍을 세션 저장 경로로 넘긴다 — 구글·개발용 로그인이 공유한다
+    private suspend fun AppResult<LoginResponse>.flatMapToSession(): AppResult<Unit> {
         return when (this) {
             is AppResult.Success -> completeSignIn(value.accessToken, value.refreshToken)
             is AppResult.Failure -> AppResult.Failure(error)
         }
     }
 
-    override fun googleSignInUrl(): String {
-        return "${apiClient.baseUrl}/auth/oauth/google?client=mobile"
+    override suspend fun signInWithGoogle(idToken: String): AppResult<Unit> {
+        val request = SocialLoginRequest(idToken)
+        val result = apiCall { remoteDataSource.loginWithGoogle(request) }
+
+        return result.flatMapToSession()
     }
 
-    override suspend fun completeSignIn(accessToken: String, refreshToken: String): AppResult<Unit> {
+    // 로그인 응답의 토큰 쌍을 세션에 저장한다 — 구글·개발용 로그인이 공유하는 마지막 단계다
+    private suspend fun completeSignIn(accessToken: String, refreshToken: String): AppResult<Unit> {
         return if (accessToken.isBlank() || refreshToken.isBlank()) {
             AppResult.Failure(AppError.ValidationFailed(serverMessage = "로그인 콜백 토큰이 비어 있습니다"))
         } else {

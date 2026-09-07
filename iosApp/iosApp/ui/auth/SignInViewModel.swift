@@ -3,9 +3,7 @@ import Foundation
 import Shared
 
 final class SignInViewModel: ObservableObject {
-    private let buildGoogleSignInUrlUseCase: BuildGoogleSignInUrlUseCase
-
-    private let completeSignInUseCase: CompleteSignInUseCase
+    private let signInWithGoogleUseCase: SignInWithGoogleUseCase
 
     private let completeGuestClaimUseCase: CompleteGuestClaimUseCase
 
@@ -15,10 +13,22 @@ final class SignInViewModel: ObservableObject {
 
     let event = PassthroughSubject<SignInEvent, Never>()
 
+    // 구글 로그인은 플랫폼 SDK 시트를 여는 것부터 시작한다 — ID 토큰은 액션으로 되돌아온다
     private func onClickGoogleSignIn() {
-        let url = buildGoogleSignInUrlUseCase.invoke()
+        if !uiState.isSigningIn {
+            uiState.isSigningIn = true
+            event.send(.requestGoogleSignIn)
+        }
+    }
 
-        event.send(.openSignInPage(url: url))
+    // 시트를 닫은 것뿐이면 실패가 아니다 — 진행 표시만 걷는다
+    private func onCancelGoogleSignIn() {
+        uiState.isSigningIn = false
+    }
+
+    private func onFailGoogleSignIn() {
+        uiState.isSigningIn = false
+        event.send(.showNotice(message: "구글 로그인을 마치지 못했어요. 다시 시도해 주세요"))
     }
 
     private func onClickAppleSignIn() {
@@ -56,16 +66,14 @@ final class SignInViewModel: ObservableObject {
         }
     }
 
-    private func onReceiveOAuthCallback(accessToken: String, refreshToken: String) {
-        if !uiState.isSigningIn {
-            uiState.isSigningIn = true
-            completeSignInUseCase.invoke(accessToken: accessToken, refreshToken: refreshToken) { [weak self] result, error in
-                self?.handleSignInResult(
-                    result: result,
-                    error: error,
-                    failureMessage: "로그인에 실패했어요. 다시 시도해 주세요"
-                )
-            }
+    private func onReceiveGoogleIdToken(idToken: String) {
+        uiState.isSigningIn = true
+        signInWithGoogleUseCase.invoke(idToken: idToken) { [weak self] result, error in
+            self?.handleSignInResult(
+                result: result,
+                error: error,
+                failureMessage: "로그인에 실패했어요. 다시 시도해 주세요"
+            )
         }
     }
 
@@ -95,20 +103,22 @@ final class SignInViewModel: ObservableObject {
             onClickGuestEnter()
         case .clickDevSignIn:
             onClickDevSignIn()
-        case let .receiveOAuthCallback(accessToken, refreshToken):
-            onReceiveOAuthCallback(accessToken: accessToken, refreshToken: refreshToken)
+        case let .receiveGoogleIdToken(idToken):
+            onReceiveGoogleIdToken(idToken: idToken)
+        case .cancelGoogleSignIn:
+            onCancelGoogleSignIn()
+        case .failGoogleSignIn:
+            onFailGoogleSignIn()
         }
     }
 
     init(
-        buildGoogleSignInUrlUseCase: BuildGoogleSignInUrlUseCase,
-        completeSignInUseCase: CompleteSignInUseCase,
+        signInWithGoogleUseCase: SignInWithGoogleUseCase,
         completeGuestClaimUseCase: CompleteGuestClaimUseCase,
         devSignInUseCase: DevSignInUseCase,
         isDevSignInAvailableUseCase: IsDevSignInAvailableUseCase
     ) {
-        self.buildGoogleSignInUrlUseCase = buildGoogleSignInUrlUseCase
-        self.completeSignInUseCase = completeSignInUseCase
+        self.signInWithGoogleUseCase = signInWithGoogleUseCase
         self.completeGuestClaimUseCase = completeGuestClaimUseCase
         self.devSignInUseCase = devSignInUseCase
         self.uiState = SignInUiState(

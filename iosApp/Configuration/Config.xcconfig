@@ -1,5 +1,8 @@
 TEAM_ID=
 
+// 코드 서명 팀. 맥마다 다르므로 Local.xcconfig에서 덮어쓴다 (bundle id에 붙는 TEAM_ID와 별개다)
+DEVELOPMENT_TEAM_ID=W345THX6Y6
+
 PRODUCT_NAME=Passmate
 PRODUCT_BUNDLE_IDENTIFIER=org.sesacteamproject.passmate.Passmate$(TEAM_ID)
 
@@ -10,5 +13,11 @@ MARKETING_VERSION=1.0
 // 기본값은 시뮬레이터용. 실기기 테스트는 소스를 고치지 말고 Local.xcconfig(gitignore)에
 // `PASSMATE_SERVER_HOST=192.168.0.10:8080` 처럼 맥의 LAN 주소를 적어 덮어쓴다.
 PASSMATE_SERVER_HOST=localhost:8080
+
+// 구글 로그인 iOS 클라이언트 ID. `806...-xxxx.apps.googleusercontent.com` 형태이고,
+// REVERSED는 그 값을 점 기준으로 뒤집은 `com.googleusercontent.apps.806...-xxxx`다.
+// 클라이언트 ID는 비밀이 아니라 앱에 박히는 값이라 여기에 둔다(비밀은 백엔드의 client secret뿐이다).
+GOOGLE_IOS_CLIENT_ID=
+GOOGLE_IOS_CLIENT_ID_REVERSED=
 
 #include? "Local.xcconfig"

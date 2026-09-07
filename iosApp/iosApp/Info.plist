@@ -30,5 +30,18 @@
 	<!-- 백엔드 주소(호스트:포트) — Configuration/Config.xcconfig의 PASSMATE_SERVER_HOST에서 온다 -->
 	<key>PassmateServerHost</key>
 	<string>$(PASSMATE_SERVER_HOST)</string>
+	<!-- 구글 로그인 iOS 클라이언트 ID — GoogleSignIn SDK가 직접 읽는다 -->
+	<key>GIDClientID</key>
+	<string>$(GOOGLE_IOS_CLIENT_ID)</string>
+	<!-- 로그인 후 앱으로 돌아올 때 쓰는 스킴. iOS 클라이언트 ID를 점 기준으로 뒤집은 값이다 -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>$(GOOGLE_IOS_CLIENT_ID_REVERSED)</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

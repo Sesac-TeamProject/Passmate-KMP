@@ -1,3 +1,4 @@
+import GoogleSignIn
 import SwiftUI
 import Shared
 
@@ -18,15 +19,21 @@ struct iOSApp: App {
     var body: some Scene {
         WindowGroup {
             // 스플래시는 라우트가 아니라 셸이 소유하는 오버레이다 (규칙 §11-1)
-            if isSplashVisible {
-                PassmateSplashView(versionLabel: appVersionLabel)
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + splashDurationSeconds) {
-                            isSplashVisible = false
+            Group {
+                if isSplashVisible {
+                    PassmateSplashView(versionLabel: appVersionLabel)
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + splashDurationSeconds) {
+                                isSplashVisible = false
+                            }
                         }
-                    }
-            } else {
-                ContentView()
+                } else {
+                    ContentView()
+                }
+            }
+            // 구글 로그인이 사파리에서 앱으로 돌아올 때 결과를 SDK에 넘긴다
+            .onOpenURL { url in
+                GIDSignIn.sharedInstance.handle(url)
             }
         }
     }

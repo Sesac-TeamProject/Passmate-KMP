@@ -1,4 +1,3 @@
-import AuthenticationServices
 import SwiftUI
 import Shared
 
@@ -9,42 +8,25 @@ struct SignInView: View {
     var onGuestEnter: () -> Void = {}
 
     @StateObject private var viewModel = SignInViewModel(
-        buildGoogleSignInUrlUseCase: KoinHelper.shared.buildGoogleSignInUrlUseCase(),
-        completeSignInUseCase: KoinHelper.shared.completeSignInUseCase(),
+        signInWithGoogleUseCase: KoinHelper.shared.signInWithGoogleUseCase(),
         completeGuestClaimUseCase: KoinHelper.shared.completeGuestClaimUseCase(),
         devSignInUseCase: KoinHelper.shared.devSignInUseCase(),
         isDevSignInAvailableUseCase: KoinHelper.shared.isDevSignInAvailableUseCase()
     )
 
-    @State private var authSession: ASWebAuthenticationSession?
-
     @State private var noticeMessage: String?
 
-    private let authSessionCoordinator = AuthSessionCoordinator()
-
-    private func handleAuthCallback(callbackUrl: URL?) {
-        let components = callbackUrl.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false) }
-        let accessToken = components?.queryItems?.first(where: { $0.name == "accessToken" })?.value
-        let refreshToken = components?.queryItems?.first(where: { $0.name == "refreshToken" })?.value
-
-        if let accessToken, let refreshToken {
-            viewModel.action(.receiveOAuthCallback(accessToken: accessToken, refreshToken: refreshToken))
-        } else {
-            noticeMessage = "로그인에 실패했어요. 다시 시도해 주세요"
-        }
-    }
-
-    private func startAuthSession(url: String) {
-        guard let authUrl = URL(string: url) else { return }
-        let session = ASWebAuthenticationSession(url: authUrl, callbackURLScheme: "passmate") { callbackUrl, error in
-            if error == nil {
-                handleAuthCallback(callbackUrl: callbackUrl)
+    private func requestGoogleSignIn() {
+        GoogleSignInClient.requestIdToken { outcome in
+            switch outcome {
+            case let .idToken(idToken):
+                viewModel.action(.receiveGoogleIdToken(idToken: idToken))
+            case .cancelled:
+                viewModel.action(.cancelGoogleSignIn)
+            case .failed:
+                viewModel.action(.failGoogleSignIn)
             }
         }
-
-        session.presentationContextProvider = authSessionCoordinator
-        authSession = session
-        session.start()
     }
 
     var body: some View {
@@ -54,8 +36,8 @@ struct SignInView: View {
         )
         .onReceive(viewModel.event) { event in
             switch event {
-            case let .openSignInPage(url):
-                startAuthSession(url: url)
+            case .requestGoogleSignIn:
+                requestGoogleSignIn()
             case .signInCompleted:
                 onSignedIn()
             case .guestEnterRequested:
@@ -278,16 +260,6 @@ private struct RoundedCorner: Shape {
             cornerRadii: CGSize(width: radius, height: radius)
         )
         return Path(path.cgPath)
-    }
-}
-
-private final class AuthSessionCoordinator: NSObject, ASWebAuthenticationPresentationContextProviding {
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        let window = UIApplication.shared.connectedScenes
-            .compactMap { ($0 as? UIWindowScene)?.keyWindow }
-            .first
-
-        return window ?? ASPresentationAnchor()
     }
 }
 

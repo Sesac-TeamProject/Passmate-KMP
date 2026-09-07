@@ -3,10 +3,9 @@ package org.sesacteamproject.passmate.ui.auth
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.sesacteamproject.passmate.auth.domain.usecase.BuildGoogleSignInUrlUseCase
-import org.sesacteamproject.passmate.auth.domain.usecase.CompleteSignInUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.DevSignInUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.IsDevSignInAvailableUseCase
+import org.sesacteamproject.passmate.auth.domain.usecase.SignInWithGoogleUseCase
 import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
@@ -14,18 +13,31 @@ import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.user.domain.usecase.CompleteGuestClaimUseCase
 
 class SignInViewModel(
-    private val buildGoogleSignInUrlUseCase: BuildGoogleSignInUrlUseCase,
-    private val completeSignInUseCase: CompleteSignInUseCase,
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
     private val completeGuestClaimUseCase: CompleteGuestClaimUseCase,
     private val devSignInUseCase: DevSignInUseCase,
     private val isDevSignInAvailableUseCase: IsDevSignInAvailableUseCase
 ) : MviViewModel<SignInUiState, SignInAction, SignInEvent>(SignInUiState()) {
 
+    // 구글 로그인은 플랫폼 SDK 시트를 여는 것부터 시작한다 — ID 토큰은 액션으로 되돌아온다
     private fun onClickGoogleSignIn() {
-        val url = buildGoogleSignInUrlUseCase.invoke()
+        if (!_uiState.value.isSigningIn) {
+            _uiState.update { it.copy(isSigningIn = true) }
+            viewModelScope.launch {
+                _event.emit(SignInEvent.RequestGoogleSignIn)
+            }
+        }
+    }
 
+    // 시트를 닫은 것뿐이면 실패가 아니다 — 진행 표시만 걷는다
+    private fun onCancelGoogleSignIn() {
+        _uiState.update { it.copy(isSigningIn = false) }
+    }
+
+    private fun onFailGoogleSignIn() {
+        _uiState.update { it.copy(isSigningIn = false) }
         viewModelScope.launch {
-            _event.emit(SignInEvent.OpenSignInPage(url))
+            _event.emit(SignInEvent.ShowNotice("구글 로그인을 마치지 못했어요. 다시 시도해 주세요"))
         }
     }
 
@@ -60,17 +72,15 @@ class SignInViewModel(
             .onFailure { _event.emit(SignInEvent.ShowNotice("개발 로그인에 실패했어요. 로컬 백엔드가 떠 있는지 확인해 주세요")) }
     }
 
-    private fun onReceiveOAuthCallback(accessToken: String, refreshToken: String) {
-        if (!_uiState.value.isSigningIn) {
-            _uiState.update { it.copy(isSigningIn = true) }
-            viewModelScope.launch {
-                executeOAuthSignIn(accessToken, refreshToken)
-            }
+    private fun onReceiveGoogleIdToken(idToken: String) {
+        _uiState.update { it.copy(isSigningIn = true) }
+        viewModelScope.launch {
+            executeGoogleSignIn(idToken)
         }
     }
 
-    private suspend fun executeOAuthSignIn(accessToken: String, refreshToken: String) {
-        val result = completeSignInUseCase.invoke(accessToken, refreshToken)
+    private suspend fun executeGoogleSignIn(idToken: String) {
+        val result = signInWithGoogleUseCase.invoke(idToken)
 
         _uiState.update { it.copy(isSigningIn = false) }
         result
@@ -102,7 +112,9 @@ class SignInViewModel(
             is SignInAction.ClickAppleSignIn -> onClickAppleSignIn()
             is SignInAction.ClickGuestEnter -> onClickGuestEnter()
             is SignInAction.ClickDevSignIn -> onClickDevSignIn()
-            is SignInAction.ReceiveOAuthCallback -> onReceiveOAuthCallback(action.accessToken, action.refreshToken)
+            is SignInAction.ReceiveGoogleIdToken -> onReceiveGoogleIdToken(action.idToken)
+            is SignInAction.CancelGoogleSignIn -> onCancelGoogleSignIn()
+            is SignInAction.FailGoogleSignIn -> onFailGoogleSignIn()
         }
     }
 

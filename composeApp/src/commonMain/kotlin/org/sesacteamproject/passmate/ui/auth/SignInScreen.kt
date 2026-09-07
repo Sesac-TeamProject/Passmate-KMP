@@ -44,22 +44,20 @@ import org.sesacteamproject.passmate.theme.PassmateTheme
 @Composable
 fun SignInScreen(
     viewModel: SignInViewModel = koinScreenViewModel(),
-    oauthAccessToken: String? = null,
-    oauthRefreshToken: String? = null,
     onNavigate: (NavigationAction) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val requestGoogleSignIn = rememberGoogleSignInLauncher(
+        onIdToken = { viewModel.onAction(SignInAction.ReceiveGoogleIdToken(it)) },
+        onCancel = { viewModel.onAction(SignInAction.CancelGoogleSignIn) },
+        onFailure = { viewModel.onAction(SignInAction.FailGoogleSignIn) }
+    )
 
-    LaunchedEffect(oauthAccessToken, oauthRefreshToken) {
-        if (!oauthAccessToken.isNullOrBlank() && !oauthRefreshToken.isNullOrBlank()) {
-            viewModel.onAction(SignInAction.ReceiveOAuthCallback(oauthAccessToken, oauthRefreshToken))
-        }
-    }
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is SignInEvent.OpenSignInPage -> openSignInPage(event.url)
+                is SignInEvent.RequestGoogleSignIn -> requestGoogleSignIn()
                 is SignInEvent.SignInCompleted -> onNavigate(NavigationAction.NavigateAfterSignIn)
                 is SignInEvent.GuestEnterRequested -> onNavigate(NavigationAction.NavigateToJoin())
                 is SignInEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
