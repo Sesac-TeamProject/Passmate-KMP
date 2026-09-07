@@ -17,7 +17,7 @@ PASSMATE_SERVER_HOST=localhost:8080
 // 구글 로그인 iOS 클라이언트 ID. `806...-xxxx.apps.googleusercontent.com` 형태이고,
 // REVERSED는 그 값을 점 기준으로 뒤집은 `com.googleusercontent.apps.806...-xxxx`다.
 // 클라이언트 ID는 비밀이 아니라 앱에 박히는 값이라 여기에 둔다(비밀은 백엔드의 client secret뿐이다).
-GOOGLE_IOS_CLIENT_ID=
-GOOGLE_IOS_CLIENT_ID_REVERSED=
+GOOGLE_IOS_CLIENT_ID=806560773397-rg6k3fks585etkqec0jnks2cmg27poq3.apps.googleusercontent.com
+GOOGLE_IOS_CLIENT_ID_REVERSED=com.googleusercontent.apps.806560773397-rg6k3fks585etkqec0jnks2cmg27poq3
 
 #include? "Local.xcconfig"
