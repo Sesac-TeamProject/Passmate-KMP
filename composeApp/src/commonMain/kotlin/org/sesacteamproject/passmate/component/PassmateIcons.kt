@@ -11,6 +11,9 @@ enum class PassmateIcons(val resourceName: String) {
     // 왼쪽 화살표 (상세 화면 뒤로가기 헤더) — iOS 에셋 이름은 "ArrowLeft"
     ArrowLeft("ic_arrow_left"),
 
+    // 아래 셰브론 (v6 M-12-3 은행 select) — iOS 에셋 이름은 "ChevronDown"
+    ChevronDown("ic_chevron_down"),
+
     // 코인 마크 (v6 M-12-9 보유 코인 카드) — iOS 에셋 이름은 "Coin"
     Coin("ic_coin"),
 

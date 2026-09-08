@@ -8,10 +8,10 @@ import org.sesacteamproject.passmate.payment.data.dto.ConfirmChargeRequest
 import org.sesacteamproject.passmate.payment.data.dto.CreateChargeRequest
 import org.sesacteamproject.passmate.payment.data.dto.CreateEntryPaymentRequest
 import org.sesacteamproject.passmate.payment.data.dto.PaymentMethodRequest
-import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
 import org.sesacteamproject.passmate.payment.data.mapper.toDomain
 import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
 import org.sesacteamproject.passmate.payment.data.mapper.toSummary
+import org.sesacteamproject.passmate.payment.data.mapper.toRequest
 import org.sesacteamproject.passmate.payment.data.remote.PaymentRemoteDataSource
 import org.sesacteamproject.passmate.payment.domain.model.ChargeConfirm
 import org.sesacteamproject.passmate.payment.domain.model.CoinBalance
@@ -95,11 +95,7 @@ class PaymentRepositoryImpl(
     }
 
     override suspend fun saveSettlementAccount(account: SettlementAccount): AppResult<Unit> {
-        val request = SettlementAccountDto(
-            bankName = account.bankName.trim(),
-            accountNo = account.maskedAccountNumber.trim(),
-            holderName = account.holderName.trim()
-        )
+        val request = account.toRequest()
 
         return apiCall { remoteDataSource.putSettlementAccount(request) }
     }

@@ -34,6 +34,7 @@ class SettlementAccountViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+                            bankCode = account.bankCode,
                             bankName = account.bankName,
                             // 조회는 마스킹된 번호만 준다 — 그대로 저장하면 실제 번호가 덮인다.
                             // 편집 필드는 비우고 마스킹 값은 안내로만 보여준다.
@@ -62,6 +63,7 @@ class SettlementAccountViewModel(
         _uiState.update { it.copy(isSubmitting = true) }
         viewModelScope.launch {
             val account = SettlementAccount(
+                bankCode = state.bankCode,
                 bankName = state.bankName,
                 maskedAccountNumber = state.accountNumber,
                 holderName = state.holderName
@@ -93,7 +95,9 @@ class SettlementAccountViewModel(
     override fun onAction(action: SettlementAccountAction) {
         when (action) {
             is SettlementAccountAction.Enter -> onEnter()
-            is SettlementAccountAction.ChangeBankName -> _uiState.update { it.copy(bankName = action.text) }
+            is SettlementAccountAction.SelectBank -> _uiState.update {
+                it.copy(bankCode = action.bank.code, bankName = action.bank.displayName)
+            }
             is SettlementAccountAction.ChangeAccountNumber -> _uiState.update {
                 it.copy(accountNumber = action.text.filter { ch -> ch.isDigit() || ch == '-' }.take(20))
             }

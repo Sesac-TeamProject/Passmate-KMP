@@ -5,6 +5,7 @@ import org.sesacteamproject.passmate.core.model.PagedResult
 import org.sesacteamproject.passmate.payment.data.dto.ChargeCheckoutResponse
 import org.sesacteamproject.passmate.payment.data.dto.CoinBalanceResponse
 import org.sesacteamproject.passmate.payment.data.dto.EarningsResponse
+import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
 import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountResponse
 import org.sesacteamproject.passmate.payment.data.dto.CoinTransactionDto
 import org.sesacteamproject.passmate.payment.data.dto.CoinTransactionPageResponse
@@ -163,9 +164,21 @@ fun SettlementAccountResponse.toDomain(): SettlementAccount {
     val view = account
 
     return SettlementAccount(
+        bankCode = view?.bankCode ?: "",
         bankName = view?.bankName ?: "",
         maskedAccountNumber = view?.accountNoMasked ?: "",
         holderName = view?.holderName ?: ""
+    )
+}
+
+// PUT /users/me/settlement-account 요청 — 백엔드는 bankCode 필수, accountNo는 하이픈 없는 숫자 8~20자리만 받는다.
+// 입력 필드는 하이픈을 허용하므로(시안 "123456-01-234567") 여기서 숫자만 남긴다
+fun SettlementAccount.toRequest(): SettlementAccountDto {
+    return SettlementAccountDto(
+        bankCode = bankCode.trim(),
+        bankName = bankName.trim(),
+        accountNo = maskedAccountNumber.filter { it.isDigit() },
+        holderName = holderName.trim()
     )
 }
 

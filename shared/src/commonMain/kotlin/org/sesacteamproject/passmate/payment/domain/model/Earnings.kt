@@ -62,6 +62,8 @@ data class SettlementAccountSummary(
 // 조회는 마스킹된 번호만 준다(계약 `SettlementAccountView.accountNoMasked`) —
 // 그대로 다시 저장하면 실제 계좌번호가 마스킹 문자열로 덮인다. 저장은 별도 입력값으로 한다.
 data class SettlementAccount(
+    // 금융결제원 표준 은행 코드 — 저장 요청의 필수값. 드롭다운(Bank)에서 고른 값이 들어간다
+    val bankCode: String,
     val bankName: String,
     val maskedAccountNumber: String,
     val holderName: String
