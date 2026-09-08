@@ -14,7 +14,7 @@ import org.sesacteamproject.passmate.core.network.event.ServerEventFrame
 
 // STOMP 수신을 단일 Flow로 일원화한다 (규칙 §9). 재연결 시 Connected를 발행해
 // 세션 기능 계층이 스냅샷 조회(GET /rooms/{pin}/session/snapshot)를 트리거하게 한다.
-class SessionEventStream(
+open class SessionEventStream(
     private val stompClient: StompClient
 ) {
     sealed interface StreamEvent {
@@ -27,7 +27,7 @@ class SessionEventStream(
     }
 
     // isHost=true면 호스트 전용 토픽(/topic/rooms/{roomId}/host)도 함께 구독한다 (M-T2 리모컨)
-    fun events(roomId: Long, isHost: Boolean = false): Flow<StreamEvent> {
+    open fun events(roomId: Long, isHost: Boolean = false): Flow<StreamEvent> {
         return channelFlow {
             var attempt = 0
 

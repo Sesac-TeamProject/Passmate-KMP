@@ -67,11 +67,27 @@ class WaitingViewModel(
         eventsJob = viewModelScope.launch {
             sessionEventStream.events(roomId).collect { streamEvent ->
                 when (streamEvent) {
-                    is SessionEventStream.StreamEvent.Connected -> refreshParticipants(roomId)
+                    is SessionEventStream.StreamEvent.Connected -> onConnected(roomId)
                     is SessionEventStream.StreamEvent.Received -> handleServerEvent(streamEvent.frame.event)
-                    is SessionEventStream.StreamEvent.Disconnected -> Unit
+                    is SessionEventStream.StreamEvent.Disconnected -> _uiState.update { it.copy(isDisconnected = true) }
                 }
             }
+        }
+    }
+
+    // 연결(재연결) 직후 — M-07 오버레이를 내리고 명단을 REST로 다시 맞춘다
+    private suspend fun onConnected(roomId: Long) {
+        _uiState.update { it.copy(isDisconnected = false) }
+        refreshParticipants(roomId)
+    }
+
+    // M-07 "지금 다시 연결" — 재연결 백오프를 기다리지 않고 즉시 다시 구독한다.
+    // 스트림이 다시 붙으면 Connected가 와서 오버레이가 내려간다
+    private fun onReconnect() {
+        val currentRoomId = roomId
+
+        if (currentRoomId != null) {
+            observeRoomEvents(currentRoomId)
         }
     }
 
@@ -160,6 +176,7 @@ class WaitingViewModel(
         when (action) {
             is WaitingAction.Enter -> onEnter(action.pin)
             is WaitingAction.ClickLeave -> onClickLeave()
+            is WaitingAction.Reconnect -> onReconnect()
         }
     }
 }

@@ -9,5 +9,7 @@ data class WaitingUiState(
     val myParticipantId: Long? = null,
     val myNickname: String? = null,
     val participants: List<Participant> = emptyList(),
-    val totalCount: Int = 0
+    val totalCount: Int = 0,
+    // STOMP가 끊긴 동안 true — 컨테이너가 M-07 연결 끊김 오버레이를 띄운다
+    val isDisconnected: Boolean = false
 )

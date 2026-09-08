@@ -43,6 +43,9 @@ struct PlayUiState {
 
     var activeVoiceHint: VoiceHint?
 
+    // STOMP가 끊긴 동안 true — 컨테이너가 M-07 연결 끊김 오버레이를 띄운다
+    var isDisconnected: Bool = false
+
     // 화면 단계 — 전환은 전부 서버 이벤트·스냅샷으로만 일어난다 (규칙 §2-1-2)
     enum Phase {
         case idle

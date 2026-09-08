@@ -50,6 +50,12 @@ struct PlayView: View {
                 .padding(.bottom, 84)
             }
         }
+        // M-07 연결 끊김 — 최종 결과(finished)는 소켓 없이도 볼 수 있어 띄우지 않는다
+        .overlay {
+            if viewModel.uiState.isDisconnected && viewModel.uiState.phase != .finished {
+                PassmateDisconnectedOverlayView(onReconnect: { viewModel.action(.reconnect) })
+            }
+        }
         .onAppear {
             viewModel.action(.enter(pin: pin))
         }

@@ -28,7 +28,9 @@ data class PlayUiState(
     val myNickname: String? = null,
     val isGuest: Boolean = false,
     val isLocked: Boolean = false,
-    val activeVoiceHint: VoiceHint? = null
+    val activeVoiceHint: VoiceHint? = null,
+    // STOMP가 끊긴 동안 true — 컨테이너가 M-07 연결 끊김 오버레이를 띄운다
+    val isDisconnected: Boolean = false
 ) {
 
     // 화면 단계 — 전환은 전부 서버 이벤트·스냅샷으로만 일어난다 (규칙 §2-1-2)
