@@ -362,8 +362,15 @@ final class PlayViewModel: ObservableObject {
         }
     }
 
+    // 서버는 마감(QUESTION_NOT_RUNNING)·중복(ALREADY_SUBMITTED)·잠금(SCREEN_LOCKED)을 모두 409로 준다.
+    // code로 갈라야 문구가 맞고, 잠금은 풀리면 다시 낼 수 있으므로 hasSubmitted를 세우지 않는다 (규칙 §10)
     private func handleSubmitFailure(error: AppError?) {
-        if error is AppError.Gone {
+        let code = error?.serverCode
+        let isClosed = error is AppError.Gone || (error is AppError.Conflict && code == "QUESTION_NOT_RUNNING")
+
+        if error is AppError.Conflict && code == "SCREEN_LOCKED" {
+            event.send(.showNotice(message: "선생님이 화면을 잠갔어요"))
+        } else if isClosed {
             uiState.hasSubmitted = true
             event.send(.showNotice(message: "이미 마감된 문항이에요"))
         } else if error is AppError.Conflict {
@@ -421,11 +428,27 @@ final class PlayViewModel: ObservableObject {
         )
     }
 
+    // 방·문항·참가자를 서버가 전부 404로 준다 — code로 갈라야 무엇이 없는지 화면이 말해 줄 수 있다 (규칙 §10)
+    private func notFoundMessage(_ serverCode: String?) -> String {
+        switch serverCode {
+        case "PARTICIPANT_NOT_FOUND":
+            return "이 방에 입장한 기록이 없어요. 다시 입장해 주세요"
+        case "QUESTION_NOT_FOUND":
+            return "이 방에 없는 문항이에요"
+        case "QUESTION_SET_NOT_FOUND":
+            return "방의 문제 세트를 찾을 수 없어요"
+        default:
+            return "방을 찾을 수 없어요"
+        }
+    }
+
     private func errorMessage(_ error: AppError?) -> String {
         if error is AppError.NotFound {
-            return "방을 찾을 수 없어요"
+            return notFoundMessage(error?.serverCode)
         } else if error is AppError.Gone {
             return "이미 종료된 방이에요"
+        } else if error is AppError.PermissionDenied {
+            return "이 방에 입장한 사람만 답을 낼 수 있어요"
         } else if error is AppError.NetworkError {
             return "네트워크 연결을 확인해 주세요"
         } else {
