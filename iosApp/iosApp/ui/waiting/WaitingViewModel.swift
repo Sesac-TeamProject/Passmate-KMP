@@ -19,10 +19,20 @@ final class WaitingViewModel: ObservableObject {
 
     private var roomId: Int64?
 
+    // 풀이 화면으로 넘긴 뒤인가 — 넘긴 뒤라면 세션 종료로 사용자를 끌어내지 않는다
+    private var hasHandedOffToPlay = false
+
     private func onEnter(pin: String) {
-        if roomId != nil {
-            return
+        let isReturning = roomId != nil
+
+        if isReturning {
+            recheckStatus(pin: pin)
+        } else {
+            loadRoom(pin: pin)
         }
+    }
+
+    private func loadRoom(pin: String) {
         let my = getMyParticipationUseCase.invoke()
 
         uiState.pin = pin
@@ -34,16 +44,69 @@ final class WaitingViewModel: ObservableObject {
                 let success = result as? AppResultSuccess<AnyObject>
 
                 if error == nil, let room = success?.value as? RoomInfo {
-                    self.roomId = room.roomId
                     self.uiState.isLoading = false
                     self.uiState.roomTitle = room.title
-                    self.observeRoomEvents(roomId: room.roomId)
+                    self.routeByStatus(room: room, pin: pin)
                 } else {
                     self.uiState.isLoading = false
                     self.event.send(.roomClosed(message: self.roomErrorMessage((result as? AppResultFailure)?.error)))
                 }
             }
         }
+    }
+
+    // 풀이 화면에서 뒤로가기로 돌아온 경로다. 그 사이 끝난 세션이면 "입장 완료" 화면에 머무르면 안 된다.
+    // 이미 받아 둔 종료 신호가 있으면 즉시, 없으면 서버 상태를 다시 확인한다 (규칙 §2-1-2 재접속 복구).
+    // 진행 중(RUNNING)이면 다시 풀이로 밀어 넣지 않는다 — 뒤로가기가 영영 먹히지 않게 된다
+    private func recheckStatus(pin: String) {
+        hasHandedOffToPlay = false
+        if uiState.isSessionFinished, let knownRoomId = roomId {
+            emitSessionFinished(roomId: knownRoomId)
+        } else {
+            getRoomInfoUseCase.invoke(pin: pin) { [weak self] result, error in
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    let success = result as? AppResultSuccess<AnyObject>
+
+                    if error == nil, let room = success?.value as? RoomInfo {
+                        if room.status == RoomStatus.finished {
+                            self.emitSessionFinished(roomId: room.roomId)
+                        } else {
+                            self.observeRoomEvents(roomId: room.roomId)
+                        }
+                    } else {
+                        self.event.send(.roomClosed(message: self.roomErrorMessage((result as? AppResultFailure)?.error)))
+                    }
+                }
+            }
+        }
+    }
+
+    // 첫 진입의 라우트는 서버 상태가 정한다 (규칙 §2-1-2) —
+    // WAITING은 대기실 유지, RUNNING은 늦은 입장(FR-024), FINISHED는 결과 화면
+    private func routeByStatus(room: RoomInfo, pin: String) {
+        roomId = room.roomId
+
+        if room.status == RoomStatus.running {
+            emitSessionStarted(pin: pin)
+        } else if room.status == RoomStatus.finished {
+            emitSessionFinished(roomId: room.roomId)
+        } else {
+            observeRoomEvents(roomId: room.roomId)
+        }
+    }
+
+    private func emitSessionStarted(pin: String) {
+        hasHandedOffToPlay = true
+        event.send(.sessionStarted(pin: pin))
+    }
+
+    // 종료 사실을 상태로도 남긴다 — 대기실이 스택에 있는 동안 보낸 event는 아무도 받지 못하므로
+    // 되돌아오는 순간 recheckStatus가 이 값을 보고 다시 내보낸다
+    private func emitSessionFinished(roomId finishedRoomId: Int64) {
+        uiState.isLoading = false
+        uiState.isSessionFinished = true
+        event.send(.sessionFinished(roomId: finishedRoomId))
     }
 
     // 초기 목록·재접속 복구는 REST 조회, 이후 증분은 WS 이벤트 (규칙 §2-1-2)
@@ -79,10 +142,23 @@ final class WaitingViewModel: ObservableObject {
         } else if let left = serverEvent as? ServerEventParticipantLeft {
             onParticipantLeft(left)
         } else if serverEvent is ServerEventSessionStarted {
-            event.send(.sessionStarted(pin: uiState.pin))
+            emitSessionStarted(pin: uiState.pin)
+        } else if serverEvent is ServerEventSessionEnded {
+            // 대기실에 있는 동안 세션이 끝났다 (선생님이 시작 없이 종료한 경우 포함)
+            onSessionEnded()
         } else if serverEvent is ServerEventRoomCancelled {
             event.send(.roomClosed(message: "방이 취소됐어요"))
         }
+    }
+
+    private func onSessionEnded() {
+        guard let endedRoomId = roomId, !hasHandedOffToPlay else {
+            // 풀이 화면이 앞에 있다 — 사용자가 보고 있는 최종 순위(M-05)를 가로채지 않고 상태만 남긴다.
+            // 뒤로가기로 대기실에 돌아오는 순간 recheckStatus가 이 값을 보고 결과로 보낸다
+            uiState.isSessionFinished = true
+            return
+        }
+        emitSessionFinished(roomId: endedRoomId)
     }
 
     private func onParticipantJoined(_ joined: ServerEventParticipantJoined) {

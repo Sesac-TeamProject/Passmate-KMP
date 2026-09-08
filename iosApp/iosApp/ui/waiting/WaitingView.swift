@@ -7,6 +7,8 @@ struct WaitingView: View {
 
     var onSessionStarted: (String) -> Void = { _ in }
 
+    var onSessionFinished: (Int64) -> Void = { _ in }
+
     var onRoomClosed: () -> Void = {}
 
     var onLeft: () -> Void = {}
@@ -36,6 +38,8 @@ struct WaitingView: View {
             switch event {
             case let .sessionStarted(pin):
                 onSessionStarted(pin)
+            case let .sessionFinished(roomId):
+                onSessionFinished(roomId)
             case let .roomClosed(message):
                 noticeMessage = message
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {

@@ -58,6 +58,7 @@ import org.sesacteamproject.passmate.session.domain.model.ChoiceDistribution
 import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.session.domain.model.RankEntry
 import org.sesacteamproject.passmate.session.domain.model.SessionQuestion
+import org.sesacteamproject.passmate.component.PassmateBackHandler
 import org.sesacteamproject.passmate.component.PassmateTimerBar
 import org.sesacteamproject.passmate.theme.PassmateColors
 import org.sesacteamproject.passmate.theme.PassmateTheme
@@ -75,6 +76,15 @@ fun PlayScreen(
     val voiceHintPlayer = rememberVoiceHintPlayer()
     var isLeaveDialogVisible by remember { mutableStateOf(false) }
 
+    // 세션 플로우는 단방향이다 (규칙 §2-1-2) — 시스템 뒤로가기가 대기실로 떨어지면 안 된다.
+    // 진행 중이면 퇴장 확인을 거치고, 이미 끝났으면 나갈 세션이 없으니 결과로 보낸다
+    PassmateBackHandler {
+        if (uiState.phase == PlayUiState.Phase.FINISHED) {
+            viewModel.onAction(PlayAction.ClickViewReport)
+        } else {
+            isLeaveDialogVisible = true
+        }
+    }
     LaunchedEffect(pin) {
         viewModel.onAction(PlayAction.Enter(pin))
     }

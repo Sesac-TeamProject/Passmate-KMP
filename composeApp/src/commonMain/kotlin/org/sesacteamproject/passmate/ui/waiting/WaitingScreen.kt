@@ -65,6 +65,7 @@ fun WaitingScreen(
         viewModel.event.collect { event ->
             when (event) {
                 is WaitingEvent.SessionStarted -> onNavigate(NavigationAction.NavigateToPlay(event.pin))
+                is WaitingEvent.SessionFinished -> onNavigate(NavigationAction.NavigateToResult(event.roomId))
                 is WaitingEvent.RoomClosed -> {
                     snackbarHostState.showSnackbar(event.message)
                     onNavigate(NavigationAction.NavigateToHome)

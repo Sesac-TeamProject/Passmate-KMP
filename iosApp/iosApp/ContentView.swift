@@ -198,6 +198,11 @@ struct ContentView: View {
             WaitingView(
                 pin: pin,
                 onSessionStarted: { pin in path.wrappedValue.append(.play(pin: pin)) },
+                onSessionFinished: { roomId in
+                    // 세션 플로우 엔트리(Join·Payment·Waiting·Play)만 제거, 탭 루트 유지 (규칙 §2-1-2, 스펙 §1-5)
+                    path.wrappedValue.removeAll { $0.isSessionRoute }
+                    path.wrappedValue.append(.result(roomId: roomId))
+                },
                 onRoomClosed: { path.wrappedValue = [] },
                 onLeft: { popOnce(path) }
             )
