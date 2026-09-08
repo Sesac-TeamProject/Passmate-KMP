@@ -127,7 +127,7 @@ class WaitingViewModel(
         eventsJob = viewModelScope.launch {
             sessionEventStream.events(roomId).collect { streamEvent ->
                 when (streamEvent) {
-                    is SessionEventStream.StreamEvent.Connected -> refreshParticipants(roomId)
+                    is SessionEventStream.StreamEvent.Connected -> onConnected(roomId)
                     is SessionEventStream.StreamEvent.Received -> handleServerEvent(streamEvent.frame.event)
                     // 끊긴 동안은 참가·퇴장 증분이 오지 않아 화면의 인원이 사실과 달라진다.
                     // 재연결되면 Connected가 다시 조회한다 — 그전까지는 화면이 알 수 있게 표시한다
@@ -137,8 +137,26 @@ class WaitingViewModel(
         }
     }
 
+    // 연결(재연결) 직후 — M-07 오버레이를 내리고 명단을 REST로 다시 맞춘다
+    private suspend fun onConnected(roomId: Long) {
+        _uiState.update { it.copy(isDisconnected = false) }
+        refreshParticipants(roomId)
+    }
+
+    // M-07 오버레이를 띄우고, 명단이 낡았다는 표시도 함께 남긴다 —
+    // 오버레이는 재연결로만 내려가지만 그 뒤 조회가 실패하면 화면이 재시도를 걸어야 한다
     private fun onDisconnected() {
-        _uiState.update { it.copy(hasParticipantsError = true) }
+        _uiState.update { it.copy(isDisconnected = true, hasParticipantsError = true) }
+    }
+
+    // M-07 "지금 다시 연결" — 재연결 백오프를 기다리지 않고 즉시 다시 구독한다.
+    // 스트림이 다시 붙으면 Connected가 와서 오버레이가 내려간다
+    private fun onReconnect() {
+        val currentRoomId = roomId
+
+        if (currentRoomId != null) {
+            observeRoomEvents(currentRoomId)
+        }
     }
 
     private fun onRetryParticipants() {
@@ -257,6 +275,7 @@ class WaitingViewModel(
             is WaitingAction.Enter -> onEnter(action.pin)
             is WaitingAction.RetryParticipants -> onRetryParticipants()
             is WaitingAction.ClickLeave -> onClickLeave()
+            is WaitingAction.Reconnect -> onReconnect()
         }
     }
 }

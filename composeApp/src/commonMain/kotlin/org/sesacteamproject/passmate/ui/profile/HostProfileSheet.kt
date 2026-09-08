@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.LevelEmblem
 import org.sesacteamproject.passmate.component.ReputationBadge
+import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.payment.domain.model.PublicRoom
 import org.sesacteamproject.passmate.theme.PassmateColors
@@ -143,9 +144,14 @@ private fun LoadedProfile(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 시안 M-10 헤더 — 이름 왼쪽 선생님 캐릭터 64 (플레이트 원은 아바타 컴포넌트가 그린다)
+            StudentAvatar(
+                avatarId = profile.avatarId,
+                modifier = Modifier.size(HostAvatarSize)
+            )
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -523,6 +529,8 @@ private fun ErrorBox(onRetry: () -> Unit) {
         )
     }
 }
+
+private val HostAvatarSize = 64.dp
 
 private fun badgeGlyph(type: BadgeType): String {
     return when (type) {

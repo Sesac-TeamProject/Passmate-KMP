@@ -13,6 +13,7 @@ private fun PassmateIcons.drawableId(): Int {
     return when (this) {
         PassmateIcons.DoorOpen -> R.drawable.ic_door_open
         PassmateIcons.ArrowLeft -> R.drawable.ic_arrow_left
+        PassmateIcons.ChevronDown -> R.drawable.ic_chevron_down
         PassmateIcons.Coin -> R.drawable.ic_coin
         PassmateIcons.List -> R.drawable.ic_list
         PassmateIcons.Bookmark -> R.drawable.ic_bookmark

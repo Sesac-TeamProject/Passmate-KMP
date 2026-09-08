@@ -62,10 +62,26 @@ final class PlayViewModel: ObservableObject {
         eventWatcher.start(roomId: roomId) { [weak self] streamEvent in
             guard let self else { return }
             if streamEvent is SessionEventStreamStreamEventConnected {
-                self.loadSnapshot(roomId: roomId)
+                self.onConnected(roomId: roomId)
             } else if let received = streamEvent as? SessionEventStreamStreamEventReceived {
                 self.handleFrame(received.frame)
+            } else if streamEvent is SessionEventStreamStreamEventDisconnected {
+                self.uiState.isDisconnected = true
             }
+        }
+    }
+
+    // 연결(재연결) 직후 — M-07 오버레이를 내리고 스냅샷으로 진행 중인 문항에 복귀한다 (규칙 §2-1-2)
+    private func onConnected(roomId: Int64) {
+        uiState.isDisconnected = false
+        loadSnapshot(roomId: roomId)
+    }
+
+    // M-07 "지금 다시 연결" — 재연결 백오프를 기다리지 않고 즉시 다시 구독한다 (start가 이전 구독을 먼저 멈춘다).
+    // 스트림이 다시 붙으면 Connected가 와서 오버레이가 내려간다
+    private func onReconnect() {
+        if let roomId {
+            observeRoomEvents(roomId: roomId)
         }
     }
 
@@ -435,6 +451,8 @@ final class PlayViewModel: ObservableObject {
             onConfirmLeave()
         case .clickViewReport:
             onClickViewReport()
+        case .reconnect:
+            onReconnect()
         }
     }
 

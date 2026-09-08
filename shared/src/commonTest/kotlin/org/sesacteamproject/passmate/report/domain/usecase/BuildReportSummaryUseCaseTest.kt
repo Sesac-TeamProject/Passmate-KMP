@@ -29,7 +29,9 @@ class BuildReportSummaryUseCaseTest {
         val report = LearningReport(
             accuracyPercent = 75,
             weakTopics = listOf("JPA 영속성", "트랜잭션"),
-            improvementPoints = listOf("flush 시점 복습")
+            improvementPoints = listOf("flush 시점 복습"),
+            classAverageAccuracyPercent = 68,
+            topicAccuracies = emptyList()
         )
 
         val summary = useCase.invoke(result(), report)

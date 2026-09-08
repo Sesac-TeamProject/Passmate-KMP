@@ -84,7 +84,7 @@ private fun FeedbackBody(feedback: AiFeedback?) {
 private fun DoneFeedback(feedback: AiFeedback) {
     if (feedback.coveredConcepts.isNotEmpty()) {
         FeedbackPoint(
-            dotColor = PassmateColors.Primary,
+            dotColor = PassmateColors.FeedbackCoveredDot,
             text = "핵심 포함 — ${feedback.coveredConcepts.joinToString(", ")}"
         )
     }
@@ -92,13 +92,13 @@ private fun DoneFeedback(feedback: AiFeedback) {
 
     if (shortage != null) {
         FeedbackPoint(
-            dotColor = PassmateColors.WeakTopicText,
+            dotColor = PassmateColors.FeedbackShortageDot,
             text = "부족 — $shortage"
         )
     }
     if (!feedback.improvement.isNullOrBlank()) {
         FeedbackPoint(
-            dotColor = PassmateColors.TextPrimary,
+            dotColor = PassmateColors.FeedbackSuggestionDot,
             text = "제안 — ${feedback.improvement}"
         )
     }

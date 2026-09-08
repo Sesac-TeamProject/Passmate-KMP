@@ -58,15 +58,15 @@ struct FeedbackSectionView: View {
         if let feedback {
             if !feedback.coveredConcepts.isEmpty {
                 feedbackPoint(
-                    dotColor: PassmateColors.primary,
+                    dotColor: PassmateColors.feedbackCoveredDot,
                     text: "핵심 포함 — \(feedback.coveredConcepts.joined(separator: ", "))"
                 )
             }
             if let shortage = shortageText(feedback) {
-                feedbackPoint(dotColor: PassmateColors.weakTopicText, text: "부족 — \(shortage)")
+                feedbackPoint(dotColor: PassmateColors.feedbackShortageDot, text: "부족 — \(shortage)")
             }
             if let improvement = feedback.improvement, !improvement.isEmpty {
-                feedbackPoint(dotColor: PassmateColors.textPrimary, text: "제안 — \(improvement)")
+                feedbackPoint(dotColor: PassmateColors.feedbackSuggestionDot, text: "제안 — \(improvement)")
             }
         }
     }

@@ -28,6 +28,12 @@ struct WaitingView: View {
             uiState: viewModel.uiState,
             onAction: { viewModel.action($0) }
         )
+        // M-07 연결 끊김 — 오버레이 소유는 컨테이너 (규칙 §11-1)
+        .overlay {
+            if viewModel.uiState.isDisconnected {
+                PassmateDisconnectedOverlayView(onReconnect: { viewModel.action(.reconnect) })
+            }
+        }
         .onAppear {
             viewModel.action(.enter(pin: pin))
         }

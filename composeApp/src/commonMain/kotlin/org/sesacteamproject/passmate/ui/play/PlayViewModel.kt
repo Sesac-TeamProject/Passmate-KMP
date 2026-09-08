@@ -84,15 +84,31 @@ class PlayViewModel(
         eventsJob = viewModelScope.launch {
             sessionEventStream.events(roomId).collect { streamEvent ->
                 when (streamEvent) {
-                    is SessionEventStream.StreamEvent.Connected -> loadSnapshot(roomId)
+                    is SessionEventStream.StreamEvent.Connected -> onConnected(roomId)
                     is SessionEventStream.StreamEvent.Received -> handleFrame(streamEvent.frame)
-                    is SessionEventStream.StreamEvent.Disconnected -> Unit
+                    is SessionEventStream.StreamEvent.Disconnected -> _uiState.update { it.copy(isDisconnected = true) }
                 }
             }
         }
     }
 
     // 재접속·늦은 입장 복구 — 스냅샷 적용 후 이후 이벤트만 증분 반영 (규칙 §2-1-2)
+    // 연결(재연결) 직후 — M-07 오버레이를 내리고 스냅샷으로 진행 중인 문항에 복귀한다 (규칙 §2-1-2)
+    private suspend fun onConnected(roomId: Long) {
+        _uiState.update { it.copy(isDisconnected = false) }
+        loadSnapshot(roomId)
+    }
+
+    // M-07 "지금 다시 연결" — 재연결 백오프를 기다리지 않고 즉시 다시 구독한다.
+    // 스트림이 다시 붙으면 Connected가 와서 오버레이가 내려간다
+    private fun onReconnect() {
+        val currentRoomId = roomId
+
+        if (currentRoomId != null) {
+            observeRoomEvents(currentRoomId)
+        }
+    }
+
     private suspend fun loadSnapshot(roomId: Long) {
         getSessionSnapshotUseCase.invoke(roomId)
             .onSuccess { snapshot ->
@@ -431,6 +447,7 @@ class PlayViewModel(
             is PlayAction.ClickSignup -> onClickSignup()
             is PlayAction.ConfirmLeave -> onConfirmLeave()
             is PlayAction.ClickViewReport -> onClickViewReport()
+            is PlayAction.Reconnect -> onReconnect()
         }
     }
 

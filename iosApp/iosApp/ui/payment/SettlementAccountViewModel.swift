@@ -31,6 +31,7 @@ final class SettlementAccountViewModel: ObservableObject {
 
                 self.uiState.isLoading = false
                 if error == nil, let account {
+                    self.uiState.bankCode = account.bankCode
                     self.uiState.bankName = account.bankName
                     // 조회는 마스킹된 번호만 준다 — 그대로 저장하면 실제 번호가 덮인다.
                     // 편집 필드는 비우고 마스킹 값은 안내로만 보여준다.
@@ -54,6 +55,7 @@ final class SettlementAccountViewModel: ObservableObject {
         uiState.isSubmitting = true
 
         let account = SettlementAccount(
+            bankCode: state.bankCode,
             bankName: state.bankName,
             maskedAccountNumber: state.accountNumber,
             holderName: state.holderName
@@ -89,8 +91,9 @@ final class SettlementAccountViewModel: ObservableObject {
         switch action {
         case .enter:
             onEnter()
-        case let .changeBankName(text):
-            uiState.bankName = text
+        case let .selectBank(bank):
+            uiState.bankCode = bank.code
+            uiState.bankName = bank.displayName
         case let .changeAccountNumber(text):
             uiState.accountNumber = String(text.filter { $0.isNumber || $0 == "-" }.prefix(20))
         case let .changeHolderName(text):

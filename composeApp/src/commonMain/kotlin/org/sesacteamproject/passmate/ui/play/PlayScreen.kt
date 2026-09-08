@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateCard
+import org.sesacteamproject.passmate.component.PassmateDisconnectedOverlay
 import org.sesacteamproject.passmate.component.PassmateWaitingDots
 import org.sesacteamproject.passmate.component.PassmateMascot
 import org.sesacteamproject.passmate.component.PassmateMascots
@@ -133,6 +134,10 @@ fun PlayScreen(
                     .align(Alignment.BottomCenter)
                     .padding(start = 20.dp, end = 20.dp, bottom = 92.dp)
             )
+        }
+        // M-07 연결 끊김 — 최종 결과(FINISHED)는 소켓 없이도 볼 수 있어 띄우지 않는다
+        if (uiState.isDisconnected && uiState.phase != PlayUiState.Phase.FINISHED) {
+            PassmateDisconnectedOverlay(onClickReconnect = { viewModel.onAction(PlayAction.Reconnect) })
         }
         SnackbarHost(
             hostState = snackbarHostState,

@@ -1,6 +1,7 @@
 package org.sesacteamproject.passmate.report.data.mapper
 
 import kotlin.math.roundToInt
+import org.sesacteamproject.passmate.core.model.DisplayDate
 import org.sesacteamproject.passmate.report.data.dto.LearningReportResponse
 import org.sesacteamproject.passmate.report.data.dto.RoomReportResponse
 import org.sesacteamproject.passmate.report.data.dto.SessionResultResponse
@@ -9,6 +10,7 @@ import org.sesacteamproject.passmate.report.domain.model.AiFeedbackStatus
 import org.sesacteamproject.passmate.report.domain.model.AnswerVerdict
 import org.sesacteamproject.passmate.report.domain.model.HostReview
 import org.sesacteamproject.passmate.report.domain.model.LearningReport
+import org.sesacteamproject.passmate.report.domain.model.TopicAccuracy
 import org.sesacteamproject.passmate.report.domain.model.QuestionResult
 import org.sesacteamproject.passmate.report.domain.model.ReportQuestion
 import org.sesacteamproject.passmate.report.domain.model.ReportStudent
@@ -109,7 +111,18 @@ fun LearningReportResponse.toDomain(): LearningReport {
     return LearningReport(
         accuracyPercent = accuracy.roundToInt(),
         weakTopics = weakTopics,
-        improvementPoints = improvementPoints
+        improvementPoints = improvementPoints,
+        classAverageAccuracyPercent = classAvgAccuracy?.roundToInt(),
+        topicAccuracies = topicAccuracy.map { it.toDomain() }
+    )
+}
+
+private fun LearningReportResponse.TopicAccuracyDto.toDomain(): TopicAccuracy {
+    return TopicAccuracy(
+        topic = topic,
+        correctCount = correctCount,
+        totalCount = totalCount,
+        accuracyPercent = accuracy.roundToInt()
     )
 }
 
@@ -119,7 +132,8 @@ fun RoomReportResponse.toDomain(): RoomReport {
         // 서버가 pin을 주지 않는다 — 빈 값이면 화면이 PIN 조각을 생략한다 (백엔드 요청 중)
         pin = "",
         status = RoomStatus.from(status),
-        dateLabel = startedAt?.substringBefore('T'),
+        // 시안 M-14 "8/22(금) 진행" — 요일 괄호 앞 공백 없음
+        dateLabel = DisplayDate.formatWithWeekday(startedAt, isSpaced = false),
         summary = summary.toDomain(),
         questions = questions.map { it.toDomain() },
         students = participants.map { it.toDomain() }

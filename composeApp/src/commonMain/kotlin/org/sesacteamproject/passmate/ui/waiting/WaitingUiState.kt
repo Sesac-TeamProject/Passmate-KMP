@@ -15,5 +15,7 @@ data class WaitingUiState(
     val isParticipantsLoading: Boolean = true,
     val hasParticipantsError: Boolean = false,
     // 세션 종료는 상태로도 남긴다 — 대기실이 백스택에 있는 동안 발행한 event는 아무도 받지 못한다 (규칙 §7 replay=0)
-    val isSessionFinished: Boolean = false
+    val isSessionFinished: Boolean = false,
+    // STOMP가 끊긴 동안 true — 컨테이너가 M-07 연결 끊김 오버레이를 띄운다
+    val isDisconnected: Boolean = false
 )

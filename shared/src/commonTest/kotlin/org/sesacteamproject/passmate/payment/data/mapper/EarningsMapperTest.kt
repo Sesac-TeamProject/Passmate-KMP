@@ -6,6 +6,7 @@ import kotlin.test.assertNull
 import kotlinx.serialization.json.Json
 import org.sesacteamproject.passmate.payment.data.dto.EarningsResponse
 import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountResponse
+import org.sesacteamproject.passmate.payment.domain.model.SettlementAccount
 import org.sesacteamproject.passmate.payment.domain.model.SettlementStatus
 
 // GET /users/me/earnings — 백엔드 실제 응답(2026-09-03 로컬 확인) 기준.
@@ -94,6 +95,50 @@ class EarningsMapperTest {
 
         assertEquals("국민은행", summary?.bankName)
         assertEquals("1234-**-5678", summary?.maskedNumber)
+        // 마이(M-12) 정산 계좌 부제 "국민 ***-***-4821 · 준영"에 예금주가 들어간다
+        assertEquals("홍희표", summary?.holderName)
+    }
+
+    // M-12-3 편집 폼 — 조회 응답의 은행 코드를 도메인에 보존해 드롭다운 선택 상태를 복원한다
+    @Test
+    fun parsesSettlementAccountBankCodeIntoDomain() {
+        val raw = """
+            {
+              "registered": true,
+              "account": {
+                "bankCode": "004",
+                "bankName": "국민은행",
+                "accountNoMasked": "1234-**-5678",
+                "holderName": "홍희표",
+                "verified": true
+              }
+            }
+        """.trimIndent()
+
+        val account = json.decodeFromString<SettlementAccountResponse>(raw).toDomain()
+
+        assertEquals("004", account.bankCode)
+        assertEquals("국민은행", account.bankName)
+        assertEquals("1234-**-5678", account.maskedAccountNumber)
+        assertEquals("홍희표", account.holderName)
+    }
+
+    // PUT /users/me/settlement-account — 백엔드는 bankCode 필수·accountNo는 하이픈 없는 숫자 8~20자리만 받는다
+    @Test
+    fun buildsRequestWithBankCodeAndDigitsOnlyAccountNo() {
+        val account = SettlementAccount(
+            bankCode = "088",
+            bankName = "신한은행",
+            maskedAccountNumber = " 110-123-456789 ",
+            holderName = " 홍희표 "
+        )
+
+        val request = account.toRequest()
+
+        assertEquals("088", request.bankCode)
+        assertEquals("신한은행", request.bankName)
+        assertEquals("110123456789", request.accountNo)
+        assertEquals("홍희표", request.holderName)
     }
 
     @Test

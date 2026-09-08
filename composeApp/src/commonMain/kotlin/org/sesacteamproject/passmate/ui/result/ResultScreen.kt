@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,9 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.PassmateIcon
@@ -57,6 +60,7 @@ import org.sesacteamproject.passmate.report.domain.model.AnswerVerdict
 import org.sesacteamproject.passmate.report.domain.model.LearningReport
 import org.sesacteamproject.passmate.report.domain.model.QuestionResult
 import org.sesacteamproject.passmate.report.domain.model.SessionResult
+import org.sesacteamproject.passmate.report.domain.model.TopicAccuracy
 import org.sesacteamproject.passmate.session.domain.model.QuestionType
 import org.sesacteamproject.passmate.theme.PassmateColors
 import org.sesacteamproject.passmate.theme.PassmateTheme
@@ -381,11 +385,26 @@ private fun ColumnScope.LoadedResult(
             .fillMaxWidth()
             .weight(1f)
             .verticalScroll(rememberScrollState())
-            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 16.dp),
+            .padding(start = 20.dp, top = 14.dp, end = 20.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
+        val report = uiState.report
+        val classAverage = report?.classAverageAccuracyPercent
+        val topicAccuracies = report?.topicAccuracies.orEmpty()
+
+        // Result의 뒤로가기는 세션 플로우 엔트리를 지나 탭 루트로 돌아간다 (규칙 §2-1-2)
+        ReportHeader(onBack = onClickHome)
         ReportHeaderCard(result = result)
-        WeakTopicsRow(topics = uiState.report?.weakTopics.orEmpty())
+        if (report != null && classAverage != null) {
+            ClassAverageCard(
+                myPercent = report.accuracyPercent,
+                classPercent = classAverage
+            )
+        }
+        WeakTopicsRow(topics = report?.weakTopics.orEmpty())
+        if (topicAccuracies.isNotEmpty()) {
+            TopicAccuracyCard(topics = topicAccuracies)
+        }
         QuestionList(
             questions = result.questions,
             selectedQuestionNo = uiState.selectedQuestionNo,
@@ -514,6 +533,187 @@ private fun WeakTopicChip(topic: String) {
             fontWeight = FontWeight.Medium,
             letterSpacing = (-0.28).sp
         )
+    }
+}
+
+// 시안 M-06 헤더 — 뒤로가기 24 + "리포트" 20sp (에러 화면의 ErrorHeader와 별개: 그쪽은 "최종 결과" 문구를 쓴다)
+@Composable
+private fun ReportHeader(onBack: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        PassmateBackButton(onClick = onBack)
+        Text(
+            text = "리포트",
+            color = PassmateColors.TextPrimary,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.4).sp
+        )
+    }
+}
+
+// 시안 M-06 "card/반 평균 대비" — 반 막대(연민트 10) 위에 내 막대(초록 5)를 겹쳐 그린다. 값은 서버가 준 것만 쓴다
+@Composable
+private fun ClassAverageCard(
+    myPercent: Int,
+    classPercent: Int
+) {
+    val gap = myPercent - classPercent
+    val gapColor = when {
+        gap > 0 -> PassmateColors.PrimaryDeep
+        gap < 0 -> PassmateColors.WrongPinkText
+        else -> PassmateColors.TextSecondary
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
+            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
+            .padding(start = 16.dp, top = 10.dp, end = 16.dp, bottom = 14.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "반 평균",
+                color = PassmateColors.TextSecondary,
+                fontSize = 12.sp,
+                letterSpacing = (-0.12).sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(10.dp)
+                    .background(PassmateColors.ReportBarTrack, RoundedCornerShape(5.dp))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(barFraction(classPercent))
+                        .height(10.dp)
+                        .background(PassmateColors.ReportClassBar, RoundedCornerShape(5.dp))
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(barFraction(myPercent))
+                        .height(5.dp)
+                        .background(PassmateColors.Primary, RoundedCornerShape(3.dp))
+                )
+            }
+        }
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = "나 $myPercent% · 반 $classPercent%",
+                color = PassmateColors.TextPrimary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.12).sp
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = classGapLabel(gap),
+                color = gapColor,
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.125).sp
+            )
+        }
+    }
+}
+
+// 시안 M-06 "card/개념별 정답률" — 주제 84 · 막대 · "맞은/전체" 58, 행 간격 12
+@Composable
+private fun TopicAccuracyCard(topics: List<TopicAccuracy>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
+            .background(PassmateColors.Surface, RoundedCornerShape(16.dp))
+            .padding(start = 16.dp, top = 14.dp, end = 16.dp, bottom = 8.dp)
+    ) {
+        Text(
+            text = "개념별 정답률",
+            color = PassmateColors.TextPrimary,
+            fontSize = 13.5.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.135).sp
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            topics.forEach { topic ->
+                TopicAccuracyRow(topic = topic)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TopicAccuracyRow(topic: TopicAccuracy) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = topic.topic,
+            color = PassmateColors.TextPrimary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.12).sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.width(TopicLabelWidth)
+        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(9.dp)
+                .background(PassmateColors.ReportBarTrack, RoundedCornerShape(4.5.dp))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(barFraction(topic.accuracyPercent))
+                    .height(9.dp)
+                    .background(topicBarColor(topic.accuracyPercent), RoundedCornerShape(4.5.dp))
+            )
+        }
+        Text(
+            text = "${topic.correctCount}/${topic.totalCount}",
+            color = PassmateColors.TextSecondary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.12).sp,
+            textAlign = TextAlign.End,
+            modifier = Modifier.width(TopicCountWidth)
+        )
+    }
+}
+
+private val TopicLabelWidth = 84.dp
+
+private val TopicCountWidth = 58.dp
+
+private fun barFraction(percent: Int): Float {
+    return (percent.coerceIn(0, 100)) / 100f
+}
+
+// 시안 예시 33%→분홍 · 67%→노랑 · 100%→초록. 경계는 M-14 분포 막대와 같은 50·80으로 둔다
+private fun topicBarColor(percent: Int): Color {
+    return when {
+        percent < 50 -> PassmateColors.WrongPink
+        percent < 80 -> PassmateColors.AccuracyBandMid
+        else -> PassmateColors.Primary
+    }
+}
+
+private fun classGapLabel(gap: Int): String {
+    return when {
+        gap > 0 -> "+$gap%p"
+        gap < 0 -> "$gap%p"
+        else -> "0%p"
     }
 }
 
@@ -714,7 +914,13 @@ private fun ResultContentScreenPreview() {
                 report = LearningReport(
                     accuracyPercent = 75,
                     weakTopics = listOf("이차함수", "확률과 통계"),
-                    improvementPoints = listOf("판별식 부호 판정 연습이 필요해요")
+                    improvementPoints = listOf("판별식 부호 판정 연습이 필요해요"),
+                    classAverageAccuracyPercent = 68,
+                    topicAccuracies = listOf(
+                        TopicAccuracy("JPA 영속성", 1, 3, 33),
+                        TopicAccuracy("트랜잭션", 2, 3, 67),
+                        TopicAccuracy("DI · AOP", 2, 2, 100)
+                    )
                 ),
                 selectedQuestionNo = 3
             ),

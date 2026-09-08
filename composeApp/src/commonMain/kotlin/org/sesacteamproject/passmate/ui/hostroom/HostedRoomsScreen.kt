@@ -533,11 +533,11 @@ private fun HostedRoomsContentScreenPreview() {
                 grade = previewMyGrade,
                 ongoing = listOf(
                     HostedRoom(roomId = 301, pin = "482913", title = "8월 4주차 Spring 스터디", status = RoomStatus.RUNNING, participantCount = 12, scheduledAt = null, endedAtLabel = null, avgAccuracyPercent = null),
-                    HostedRoom(roomId = 302, pin = "115820", title = "확률과 통계 총정리", status = RoomStatus.WAITING, participantCount = 3, scheduledAt = "2026.09.02 20:00", endedAtLabel = null, avgAccuracyPercent = null)
+                    HostedRoom(roomId = 302, pin = "115820", title = "확률과 통계 총정리", status = RoomStatus.WAITING, participantCount = 3, scheduledAt = "2026-09-02T20:00:00", endedAtLabel = null, avgAccuracyPercent = null)
                 ),
                 ended = listOf(
-                    HostedRoom(roomId = 303, pin = "930447", title = "7월 3주차 미적분 특강", status = RoomStatus.FINISHED, participantCount = 24, scheduledAt = null, endedAtLabel = "2026.07.18", avgAccuracyPercent = 78),
-                    HostedRoom(roomId = 304, pin = "620118", title = "함수의 극한 퀴즈", status = RoomStatus.FINISHED, participantCount = 16, scheduledAt = null, endedAtLabel = "2026.06.28", avgAccuracyPercent = 65)
+                    HostedRoom(roomId = 303, pin = "930447", title = "7월 3주차 미적분 특강", status = RoomStatus.FINISHED, participantCount = 24, scheduledAt = null, endedAtLabel = "7/18", avgAccuracyPercent = 78),
+                    HostedRoom(roomId = 304, pin = "620118", title = "함수의 극한 퀴즈", status = RoomStatus.FINISHED, participantCount = 16, scheduledAt = null, endedAtLabel = "6/28", avgAccuracyPercent = 65)
                 )
             ),
             onAction = {}

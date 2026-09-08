@@ -682,7 +682,7 @@ private fun JoinedRoomsContentScreenPreview() {
                     participationCount = 12,
                     accuracyPercent = 78,
                     avgRank = 2.4,
-                    trendText = "지난주보다 +5%",
+                    trendText = "지난주보다 정답률이 8%p 올랐어요",
                     weakTopics = listOf("이차함수", "확률과 통계")
                 ),
                 ongoing = OngoingRoom(
@@ -693,9 +693,9 @@ private fun JoinedRoomsContentScreenPreview() {
                     progressLabel = "5 / 8 문항 진행 중"
                 ),
                 rooms = listOf(
-                    JoinedRoom(roomId = 401, title = "7월 3주차 미적분 특강", dateLabel = "2026.07.18", questionCount = 10, myScore = 890.0, myRank = 2, hasReport = true),
-                    JoinedRoom(roomId = 402, title = "확률과 통계 총정리", dateLabel = "2026.07.10", questionCount = 8, myScore = 720.0, myRank = 5, hasReport = true),
-                    JoinedRoom(roomId = 403, title = "함수의 극한 퀴즈", dateLabel = "2026.06.28", questionCount = 6, myScore = null, myRank = null, hasReport = false)
+                    JoinedRoom(roomId = 401, title = "7월 3주차 미적분 특강", dateLabel = "7/18 (토)", questionCount = 10, myScore = 890.0, myRank = 2, hasReport = true),
+                    JoinedRoom(roomId = 402, title = "확률과 통계 총정리", dateLabel = "7/10 (금)", questionCount = 8, myScore = 720.0, myRank = 5, hasReport = true),
+                    JoinedRoom(roomId = 403, title = "함수의 극한 퀴즈", dateLabel = "6/28 (일)", questionCount = 6, myScore = null, myRank = null, hasReport = false)
                 )
             ),
             onAction = {}

@@ -1,10 +1,12 @@
 package org.sesacteamproject.passmate.ui.payment
 
+import org.sesacteamproject.passmate.payment.domain.model.Bank
+
 sealed interface SettlementAccountAction {
 
     data object Enter : SettlementAccountAction
 
-    data class ChangeBankName(val text: String) : SettlementAccountAction
+    data class SelectBank(val bank: Bank) : SettlementAccountAction
 
     data class ChangeAccountNumber(val text: String) : SettlementAccountAction
 

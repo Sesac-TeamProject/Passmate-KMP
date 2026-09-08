@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateWaitingDots
 import org.sesacteamproject.passmate.component.PassmateCard
+import org.sesacteamproject.passmate.component.PassmateDisconnectedOverlay
 import org.sesacteamproject.passmate.component.PassmateMascot
 import org.sesacteamproject.passmate.component.PassmateMascots
 import org.sesacteamproject.passmate.component.StudentAvatar
@@ -80,6 +81,10 @@ fun WaitingScreen(
             uiState = uiState,
             onAction = viewModel::onAction
         )
+        // M-07 연결 끊김 — 오버레이 소유는 컨테이너 (규칙 §11-1)
+        if (uiState.isDisconnected) {
+            PassmateDisconnectedOverlay(onClickReconnect = { viewModel.onAction(WaitingAction.Reconnect) })
+        }
         SnackbarHost(
             hostState = snackbarHostState,
             // 탭바 없는 push 화면이라 스낵바가 시스템 내비게이션 바에 겹친다 — 여기서 직접 띄운다

@@ -5,6 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlinx.serialization.json.Json
 import org.sesacteamproject.passmate.report.data.dto.LearningReportResponse
+import org.sesacteamproject.passmate.report.domain.model.TopicAccuracy
 import org.sesacteamproject.passmate.report.data.dto.SessionResultResponse
 import org.sesacteamproject.passmate.report.domain.model.AiFeedbackStatus
 import org.sesacteamproject.passmate.report.domain.model.AnswerVerdict
@@ -135,5 +136,42 @@ class SessionResultMapperTest {
         assertEquals(75, report.accuracyPercent)
         assertEquals(listOf("트랜잭션"), report.weakTopics)
         assertEquals(listOf("예시를 더 들어보세요"), report.improvementPoints)
+        // 반 평균·주제별 정답률이 없는 옛 응답은 카드를 숨길 수 있게 null·빈 목록으로 온다
+        assertEquals(null, report.classAverageAccuracyPercent)
+        assertEquals(emptyList(), report.topicAccuracies)
+    }
+
+    // M-06 "반 평균 대비"·"개념별 정답률" 카드 — 서버가 준 값을 그대로 옮긴다 (규칙 §1 서버 권위)
+    @Test
+    fun mapsClassAverageAndTopicAccuracy() {
+        val raw = """
+            {
+              "roomId": 2,
+              "roomTitle": "8월 4주차 Spring 스터디",
+              "participantId": 5,
+              "nickname": "준영",
+              "totalQuestions": 8,
+              "correctCount": 6,
+              "accuracy": 75.0,
+              "totalScore": 780,
+              "finalRank": 3,
+              "weakTopics": ["JPA 영속성"],
+              "improvementPoints": [],
+              "classAvgAccuracy": 68.4,
+              "topAccuracy": 100.0,
+              "topicAccuracy": [
+                {"topic": "JPA 영속성", "correctCount": 1, "totalCount": 3, "accuracy": 33.3},
+                {"topic": "DI · AOP", "correctCount": 2, "totalCount": 2, "accuracy": 100.0}
+              ],
+              "generatedAt": "2026-09-03T03:31:00"
+            }
+        """.trimIndent()
+
+        val report = json.decodeFromString<LearningReportResponse>(raw).toDomain()
+
+        assertEquals(68, report.classAverageAccuracyPercent)
+        assertEquals(2, report.topicAccuracies.size)
+        assertEquals(TopicAccuracy("JPA 영속성", 1, 3, 33), report.topicAccuracies[0])
+        assertEquals(TopicAccuracy("DI · AOP", 2, 2, 100), report.topicAccuracies[1])
     }
 }

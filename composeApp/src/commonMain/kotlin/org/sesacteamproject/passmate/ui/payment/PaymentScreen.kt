@@ -40,6 +40,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PaidRoomChip
 import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.component.PassmateCard
@@ -298,20 +299,6 @@ private fun RoomPreview(room: RoomInfo) {
             )
         }
     }
-}
-
-@Composable
-private fun PaidRoomChip() {
-    Text(
-        text = "₩ 유료",
-        color = PassmateColors.WeakTopicText,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Medium,
-        letterSpacing = (-0.28).sp,
-        modifier = Modifier
-            .background(PassmateColors.WeakTopicBg, CircleShape)
-            .padding(horizontal = 8.dp, vertical = 3.dp)
-    )
 }
 
 @Composable
