@@ -5,7 +5,6 @@ enum MyInfoEvent {
     case requireSignIn
     case openReputation
     case openEditProfile
-    case openPaymentMethod
     case openCoinHistory
     // 코인 충전 화면 (M-12-4·M-12-6)
     case openCharge

@@ -2,7 +2,6 @@ package org.sesacteamproject.passmate.ui.mypage
 
 import org.sesacteamproject.passmate.payment.domain.model.CoinTransaction
 import org.sesacteamproject.passmate.payment.domain.model.NextPayout
-import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
 import org.sesacteamproject.passmate.payment.domain.model.SettlementAccountSummary
 import org.sesacteamproject.passmate.room.domain.model.HostLevel
 import org.sesacteamproject.passmate.user.domain.model.UserProfile
@@ -14,7 +13,6 @@ data class MyInfoUiState(
     val profile: UserProfile? = null,
     // 명성 등급 — 서버 /users/me가 등급을 주지 않아 /users/me/grade로 따로 받는다 (시안 M-12 닉네임 옆 배지)
     val level: HostLevel? = null,
-    val defaultMethod: PaymentMethod? = null,
     val recentTransaction: CoinTransaction? = null,
     val isCoinInfoFailed: Boolean = false,
     // 코인 카드 재시도 in-flight — 중복 요청 방지 (규칙 §9)

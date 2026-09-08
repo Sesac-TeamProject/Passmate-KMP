@@ -38,7 +38,6 @@ import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.payment.CoinChargeScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
 import org.sesacteamproject.passmate.ui.payment.EarningsScreen
-import org.sesacteamproject.passmate.ui.payment.PaymentMethodScreen
 import org.sesacteamproject.passmate.ui.payment.PaymentScreen
 import org.sesacteamproject.passmate.ui.payment.SettlementAccountScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
@@ -111,7 +110,6 @@ private fun NavigationAction.destinationTemplate(): String? {
         is NavigationAction.NavigateToEditProfile -> Route.EditProfile.route
         is NavigationAction.NavigateToCharacterEdit -> Route.CharacterEdit.route
         is NavigationAction.NavigateToSettlementAccount -> Route.SettlementAccount.route
-        is NavigationAction.NavigateToPaymentMethod -> Route.PaymentMethod.route
         is NavigationAction.NavigateToNotificationSettings -> Route.NotificationSettings.route
         // 복귀 대상이 될 수 없는 액션 — SignIn·로그인 성공 처리·뒤로가기 (스펙 §0)
         is NavigationAction.NavigateToSignIn -> null
@@ -161,7 +159,6 @@ private fun NavHostController.handleNavigationAction(action: NavigationAction) {
         is NavigationAction.NavigateToEditProfile -> navigate(Route.EditProfile.route)
         is NavigationAction.NavigateToCharacterEdit -> navigate(Route.CharacterEdit.route)
         is NavigationAction.NavigateToSettlementAccount -> navigate(Route.SettlementAccount.route)
-        is NavigationAction.NavigateToPaymentMethod -> navigate(Route.PaymentMethod.route)
         is NavigationAction.NavigateToNotificationSettings -> navigate(Route.NotificationSettings.route)
         is NavigationAction.NavigateBack -> popBackStack()
     }
@@ -332,9 +329,6 @@ actual fun AppNavHost() {
             }
             composable(Route.SettlementAccount.route) {
                 SettlementAccountScreen(onNavigate = onNavigate)
-            }
-            composable(Route.PaymentMethod.route) {
-                PaymentMethodScreen(onNavigate = onNavigate)
             }
             composable(Route.NotificationSettings.route) {
                 NotificationSettingsScreen(onNavigate = onNavigate)

@@ -65,7 +65,6 @@ struct ContentView: View {
                     onOpenEarnings: { path.append(.earnings) },
                     onOpenDeleteAccount: { path.append(.deleteAccount) },
                     onOpenEditProfile: { path.append(.editProfile) },
-                    onOpenPaymentMethod: { path.append(.paymentMethod) },
                     onOpenSettlementAccount: { path.append(.settlementAccount) },
                     onOpenNotifications: { path.append(.notificationSettings) },
                     onSignedOut: {
@@ -269,8 +268,6 @@ struct ContentView: View {
             CharacterEditView(onBack: { popOnce(path) })
         case .settlementAccount:
             SettlementAccountView(onBack: { popOnce(path) })
-        case .paymentMethod:
-            PaymentMethodView(onBack: { popOnce(path) })
         case .notificationSettings:
             NotificationSettingsView(onBack: { popOnce(path) })
         }

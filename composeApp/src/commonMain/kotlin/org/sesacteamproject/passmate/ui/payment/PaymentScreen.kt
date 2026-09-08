@@ -53,7 +53,6 @@ import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.component.StudentAvatars
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
-import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
 import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.room.domain.model.HostLevel
 import org.sesacteamproject.passmate.room.domain.model.RoomHost
@@ -78,8 +77,6 @@ fun PaymentScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coinShortageSheetState = rememberModalBottomSheetState()
-    // 결제 수단 드롭다운 펼침은 순수 UI 상태 — 컨테이너가 소유한다 (규칙 §11-1)
-    var isMethodExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(pin) {
         viewModel.onAction(PaymentAction.Start(pin))
@@ -98,14 +95,7 @@ fun PaymentScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         PaymentContentScreen(
             uiState = uiState,
-            onAction = { action ->
-                if (action is PaymentAction.SelectMethod) {
-                    isMethodExpanded = false
-                }
-                viewModel.onAction(action)
-            },
-            isMethodExpanded = isMethodExpanded,
-            onToggleMethodExpanded = { isMethodExpanded = !isMethodExpanded },
+            onAction = viewModel::onAction,
             onBack = { onNavigate(NavigationAction.NavigateBack) }
         )
         uiState.checkout?.let { request ->
@@ -141,8 +131,6 @@ fun PaymentScreen(
 private fun PaymentContentScreen(
     uiState: PaymentUiState,
     onAction: (PaymentAction) -> Unit,
-    isMethodExpanded: Boolean,
-    onToggleMethodExpanded: () -> Unit,
     onBack: () -> Unit
 ) {
     Column(
@@ -159,12 +147,7 @@ private fun PaymentContentScreen(
         when {
             uiState.isLoading -> CenterProgress()
             uiState.hasLoadError -> RetryState(onRetry = { onAction(PaymentAction.Retry) })
-            else -> LoadedPayment(
-                uiState = uiState,
-                onAction = onAction,
-                isMethodExpanded = isMethodExpanded,
-                onToggleMethodExpanded = onToggleMethodExpanded
-            )
+            else -> LoadedPayment(uiState = uiState, onAction = onAction)
         }
         Spacer(Modifier.height(24.dp))
     }
@@ -210,9 +193,7 @@ private fun PaymentHeader(onBack: () -> Unit) {
 @Composable
 private fun LoadedPayment(
     uiState: PaymentUiState,
-    onAction: (PaymentAction) -> Unit,
-    isMethodExpanded: Boolean,
-    onToggleMethodExpanded: () -> Unit
+    onAction: (PaymentAction) -> Unit
 ) {
     PassmateCard(modifier = Modifier.padding(horizontal = 20.dp)) {
         Column(
@@ -247,14 +228,7 @@ private fun LoadedPayment(
                 onSelect = { onAction(PaymentAction.SelectAvatar(it)) }
             )
             if (!uiState.hasEnough) {
-                MethodField(
-                    balance = uiState.balance,
-                    shortfall = uiState.shortfall,
-                    selected = uiState.selectedMethod,
-                    isExpanded = isMethodExpanded,
-                    onToggleExpanded = onToggleMethodExpanded,
-                    onSelect = { onAction(PaymentAction.SelectMethod(it)) }
-                )
+                ShortfallField(balance = uiState.balance, shortfall = uiState.shortfall)
             }
             uiState.errorMessage?.let {
                 Text(
@@ -478,14 +452,11 @@ private fun AvatarPickItem(
     }
 }
 
+// 부족분 안내만 한다 — 결제 수단은 포트원 결제창에서 고른다
 @Composable
-private fun MethodField(
+private fun ShortfallField(
     balance: Int,
-    shortfall: Int,
-    selected: PaymentMethod,
-    isExpanded: Boolean,
-    onToggleExpanded: () -> Unit,
-    onSelect: (PaymentMethod) -> Unit
+    shortfall: Int
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
@@ -495,50 +466,12 @@ private fun MethodField(
             fontWeight = FontWeight.Medium,
             letterSpacing = (-0.28).sp
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-                .background(PassmateColors.FieldGray, RoundedCornerShape(14.dp))
-                .clickable(onClick = onToggleExpanded)
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "${selected.label} ▾",
-                color = PassmateColors.TextPrimary,
-                fontSize = 14.sp,
-                letterSpacing = (-0.28).sp
-            )
-        }
-        if (isExpanded) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(PassmateColors.FieldGray, RoundedCornerShape(14.dp))
-                    .padding(vertical = 4.dp)
-            ) {
-                PaymentMethod.entries.forEach { method ->
-                    val color = if (method == selected) {
-                        PassmateColors.PrimaryDeep
-                    } else {
-                        PassmateColors.TextPrimary
-                    }
-
-                    Text(
-                        text = method.label,
-                        color = color,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = (-0.28).sp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onSelect(method) }
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                    )
-                }
-            }
-        }
+        Text(
+            text = "결제 수단은 포트원(PortOne) 결제창에서 선택해요",
+            color = PassmateColors.TextTertiary,
+            fontSize = 12.sp,
+            letterSpacing = (-0.24).sp
+        )
     }
 }
 
@@ -758,12 +691,9 @@ private fun PaymentContentScreenShortfallPreview() {
                 balance = 200,
                 shortfall = 300,
                 nickname = "민지",
-                avatarId = 3,
-                selectedMethod = PaymentMethod.KAKAO_PAY
+                avatarId = 3
             ),
             onAction = {},
-            isMethodExpanded = false,
-            onToggleMethodExpanded = {},
             onBack = {}
         )
     }
@@ -785,8 +715,6 @@ private fun PaymentContentScreenProcessingPreview() {
                 isProcessing = true
             ),
             onAction = {},
-            isMethodExpanded = false,
-            onToggleMethodExpanded = {},
             onBack = {}
         )
     }
@@ -799,8 +727,6 @@ private fun PaymentContentScreenErrorPreview() {
         PaymentContentScreen(
             uiState = PaymentUiState(isLoading = false, hasLoadError = true),
             onAction = {},
-            isMethodExpanded = false,
-            onToggleMethodExpanded = {},
             onBack = {}
         )
     }

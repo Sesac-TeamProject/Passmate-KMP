@@ -8,8 +8,6 @@ sealed interface MyInfoEvent {
 
     data object OpenEditProfile : MyInfoEvent
 
-    data object OpenPaymentMethod : MyInfoEvent
-
     data object OpenCoinHistory : MyInfoEvent
 
     // 코인 충전 화면 (M-12-4·M-12-6)

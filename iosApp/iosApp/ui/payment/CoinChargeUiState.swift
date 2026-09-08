@@ -13,8 +13,6 @@ struct CoinChargeUiState {
 
     var selectedAmount: Int = defaultAmount
 
-    var selectedMethod: PaymentMethod = .kakaoPay
-
     var isProcessing: Bool = false
 
     var checkout: PortOneRequest? = nil

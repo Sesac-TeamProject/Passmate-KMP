@@ -19,8 +19,6 @@ sealed interface MyInfoAction {
     // 코인 충전 화면 (M-12-4·M-12-6)
     data object ClickCharge : MyInfoAction
 
-    data object ClickPaymentMethod : MyInfoAction
-
     data object ClickCoinHistory : MyInfoAction
 
     data object ClickSettlementAccount : MyInfoAction

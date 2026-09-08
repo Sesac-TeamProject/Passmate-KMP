@@ -49,7 +49,6 @@ import org.sesacteamproject.passmate.navigation.AppTab
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.payment.domain.model.CoinTransaction
 import org.sesacteamproject.passmate.payment.domain.model.NextPayout
-import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
 import org.sesacteamproject.passmate.payment.domain.model.SettlementAccountSummary
 import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.room.domain.model.HostLevel
@@ -77,7 +76,6 @@ fun MyInfoScreen(onNavigate: (NavigationAction) -> Unit) {
                 )
                 is MyInfoEvent.OpenReputation -> onNavigate(NavigationAction.NavigateToReputation)
                 is MyInfoEvent.OpenEditProfile -> onNavigate(NavigationAction.NavigateToEditProfile)
-                is MyInfoEvent.OpenPaymentMethod -> onNavigate(NavigationAction.NavigateToPaymentMethod)
                 is MyInfoEvent.OpenCoinHistory -> onNavigate(NavigationAction.NavigateToCoinHistory)
                 is MyInfoEvent.OpenCharge -> onNavigate(NavigationAction.NavigateToCoinCharge)
                 is MyInfoEvent.OpenSettlementAccount -> onNavigate(NavigationAction.NavigateToSettlementAccount)
@@ -202,13 +200,6 @@ private fun LoadedMyInfo(
                     CoinRow(
                         coins = profile.coins,
                         onClickCharge = { onAction(MyInfoAction.ClickCharge) }
-                    )
-                    RowDivider()
-                    InfoRow(
-                        title = "결제 수단",
-                        subtitle = paymentMethodSubtitle(uiState),
-                        actionLabel = "관리",
-                        onClick = { onAction(MyInfoAction.ClickPaymentMethod) }
                     )
                     RowDivider()
                     InfoRow(
@@ -625,17 +616,6 @@ private fun ErrorBox(onRetry: () -> Unit) {
     }
 }
 
-// 실패는 카드 자체가 FailureCard로 대체되므로 여기서는 성공·빈 값만 다룬다
-private fun paymentMethodSubtitle(uiState: MyInfoUiState): String {
-    val method = uiState.defaultMethod
-
-    return if (method != null) {
-        "${method.label} · 포트원 안전결제"
-    } else {
-        "기본 결제 수단을 설정해 주세요"
-    }
-}
-
 private fun recentTransactionSubtitle(uiState: MyInfoUiState): String {
     val recent = uiState.recentTransaction
 
@@ -709,7 +689,6 @@ private fun MyInfoContentScreenPreview() {
                     joinedRoomCount = 32,
                     hostedRoomCount = 12
                 ),
-                defaultMethod = PaymentMethod.KAKAO_PAY,
                 settlementAccount = SettlementAccountSummary(
                     bankName = "국민",
                     maskedNumber = "***-***-4821",

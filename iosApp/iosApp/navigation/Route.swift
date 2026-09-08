@@ -25,8 +25,6 @@ enum Route: Hashable {
     case characterEdit
     // 정산 계좌 등록 (M-12-3) — 마이 · 정산(M-T4) 양쪽에서 진입
     case settlementAccount
-    // 결제 수단 관리 (M-12-8)
-    case paymentMethod
     // 알림 설정 (M-12-10)
     case notificationSettings
 
@@ -35,7 +33,7 @@ enum Route: Hashable {
     var tabBarOwner: AppTab? {
         switch self {
         case .editProfile, .characterEdit, .settlementAccount, .coinCharge,
-             .paymentMethod, .coinHistory, .notificationSettings, .deleteAccount:
+             .coinHistory, .notificationSettings, .deleteAccount:
             return .myInfo
         case .roomReport:
             return .hostedRooms

@@ -7,7 +7,6 @@ import org.sesacteamproject.passmate.core.network.apiCall
 import org.sesacteamproject.passmate.payment.data.dto.ConfirmChargeRequest
 import org.sesacteamproject.passmate.payment.data.dto.CreateChargeRequest
 import org.sesacteamproject.passmate.payment.data.dto.CreateEntryPaymentRequest
-import org.sesacteamproject.passmate.payment.data.dto.PaymentMethodRequest
 import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
 import org.sesacteamproject.passmate.payment.data.mapper.toDomain
 import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
@@ -27,6 +26,12 @@ import org.sesacteamproject.passmate.payment.domain.model.SettlementAccountSumma
 import org.sesacteamproject.passmate.payment.domain.model.RoomTypeFilter
 import org.sesacteamproject.passmate.payment.domain.repository.PaymentRepository
 
+// 앱은 결제 수단을 고르지 않는다 — 사용자는 포트원 결제창에서 고른다. 다만 계약
+// (POST /coins/charges)이 method를 필수로 요구해 대표값 하나를 보낸다. 실제 결제창은
+// 서버가 돌려주는 payMethod가 정하므로 이 값은 서버의 채널 선택 입력일 뿐이다.
+// 계약 갱신 제안: method를 optional로 두고 confirm 시 포트원 결과에서 서버가 확정한다
+private val CHARGE_METHOD = PaymentMethod.CARD
+
 class PaymentRepositoryImpl(
     private val remoteDataSource: PaymentRemoteDataSource
 ) : PaymentRepository {
@@ -39,8 +44,8 @@ class PaymentRepositoryImpl(
         return apiCall { remoteDataSource.fetchCoinTransactions(cursor) }.map { it.toDomain() }
     }
 
-    override suspend fun requestCharge(amount: Int, method: PaymentMethod, roomId: Long?): AppResult<CoinCheckout> {
-        val request = CreateChargeRequest(amount = amount, method = method.wireValue, roomId = roomId)
+    override suspend fun requestCharge(amount: Int, roomId: Long?): AppResult<CoinCheckout> {
+        val request = CreateChargeRequest(amount = amount, method = CHARGE_METHOD.wireValue, roomId = roomId)
 
         return apiCall { remoteDataSource.createCharge(request) }.map { it.toDomain() }
     }
@@ -102,9 +107,5 @@ class PaymentRepositoryImpl(
         )
 
         return apiCall { remoteDataSource.putSettlementAccount(request) }
-    }
-
-    override suspend fun setDefaultPaymentMethod(method: PaymentMethod): AppResult<Unit> {
-        return apiCall { remoteDataSource.putPaymentMethod(PaymentMethodRequest(method.wireValue)) }
     }
 }

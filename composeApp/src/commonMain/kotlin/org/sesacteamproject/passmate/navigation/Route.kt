@@ -60,9 +60,6 @@ sealed class Route(val route: String) {
     // 정산 계좌 등록 (M-12-3) — 마이 · 정산(M-T4) 양쪽에서 진입
     data object SettlementAccount : Route("settlementAccount")
 
-    // 결제 수단 관리 (M-12-8)
-    data object PaymentMethod : Route("paymentMethod")
-
     // 알림 설정 (M-12-10)
     data object NotificationSettings : Route("notificationSettings")
 }

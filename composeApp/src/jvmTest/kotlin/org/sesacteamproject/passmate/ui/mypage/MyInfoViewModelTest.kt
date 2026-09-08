@@ -129,7 +129,6 @@ class MyInfoViewModelTest {
         assertEquals(false, state.isLoading)
         assertEquals(false, state.loadFailed)
         assertEquals(profile, state.profile)
-        assertEquals(PaymentMethod.KAKAO_PAY, state.defaultMethod)
         assertEquals(coins.recent, state.recentTransaction)
         assertEquals(earnings.account, state.settlementAccount)
         assertEquals(earnings.nextPayout, state.nextPayout)

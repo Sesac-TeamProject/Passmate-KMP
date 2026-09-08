@@ -15,7 +15,6 @@ import org.sesacteamproject.passmate.ui.mypage.MyInfoViewModel
 import org.sesacteamproject.passmate.ui.payment.CoinChargeViewModel
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryViewModel
 import org.sesacteamproject.passmate.ui.payment.EarningsViewModel
-import org.sesacteamproject.passmate.ui.payment.PaymentMethodViewModel
 import org.sesacteamproject.passmate.ui.payment.PaymentViewModel
 import org.sesacteamproject.passmate.ui.payment.SettlementAccountViewModel
 import org.sesacteamproject.passmate.ui.mypage.CharacterEditViewModel
@@ -54,5 +53,4 @@ val viewModelModule = module {
     factory { EditProfileViewModel(get(), get()) }
     factory { CharacterEditViewModel(get(), get()) }
     factory { NotificationSettingsViewModel(get(), get()) }
-    factory { PaymentMethodViewModel(get(), get()) }
 }

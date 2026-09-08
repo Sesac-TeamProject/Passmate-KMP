@@ -10,7 +10,6 @@ import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.payment.domain.model.CoinCheckout
-import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
 import org.sesacteamproject.passmate.payment.domain.policy.CoinPolicy
 import org.sesacteamproject.passmate.payment.domain.usecase.ConfirmChargeUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.GetMyCoinsUseCase
@@ -21,7 +20,8 @@ import org.sesacteamproject.passmate.room.domain.policy.JoinInputPolicy
 import org.sesacteamproject.passmate.room.domain.usecase.GetRoomInfoUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.JoinRoomUseCase
 
-// 유료 방 결제 입장 (M-01 v2). 흐름: 보유 코인 확인 → 부족 시 포트원 충전 → 참가비 차감 → 입장.
+// 유료 방 결제 입장 (M-01 v2). 흐름: 보유 코인 확인 → 부족 시 바로 포트원 결제창 → 참가비 차감 → 입장.
+// 결제 수단은 앱에서 고르지 않는다 — 포트원 결제창이 담당한다.
 // 최종 차감·자격 판정은 서버(entry-payments 402 등)가 하며, 여기 계산은 UX용이다 (규칙 §8·§13).
 class PaymentViewModel(
     private val getRoomInfoUseCase: GetRoomInfoUseCase,
@@ -66,8 +66,7 @@ class PaymentViewModel(
                         hasLoadError = false,
                         room = room,
                         balance = coins.balance,
-                        shortfall = coinPolicy.shortfall(coins.balance, room.entryFee ?: 0),
-                        selectedMethod = coins.defaultMethod ?: it.selectedMethod
+                        shortfall = coinPolicy.shortfall(coins.balance, room.entryFee ?: 0)
                     )
                 }
             }
@@ -80,10 +79,6 @@ class PaymentViewModel(
 
     private fun onSelectAvatar(avatarId: Int) {
         _uiState.update { it.copy(avatarId = avatarId) }
-    }
-
-    private fun onSelectMethod(method: PaymentMethod) {
-        _uiState.update { it.copy(selectedMethod = method) }
     }
 
     private fun onClickPay() {
@@ -117,7 +112,7 @@ class PaymentViewModel(
     private suspend fun startCharge() {
         val amount = coinPolicy.suggestedChargeAmount(_uiState.value.shortfall)
 
-        requestChargeUseCase.invoke(amount, _uiState.value.selectedMethod, roomId = null)
+        requestChargeUseCase.invoke(amount, roomId = null)
             .onSuccess { checkout -> showPortOne(checkout) }
             .onFailure { error ->
                 _uiState.update { it.copy(isProcessing = false, errorMessage = chargeErrorMessage(error)) }
@@ -234,7 +229,6 @@ class PaymentViewModel(
             is PaymentAction.Start -> onStart(action.pin)
             is PaymentAction.ChangeNickname -> onChangeNickname(action.nickname)
             is PaymentAction.SelectAvatar -> onSelectAvatar(action.avatarId)
-            is PaymentAction.SelectMethod -> onSelectMethod(action.method)
             is PaymentAction.ClickPay -> onClickPay()
             is PaymentAction.ConfirmCharge -> onConfirmCharge()
             is PaymentAction.DismissCoinShortage -> _uiState.update { it.copy(isCoinShortageSheetVisible = false) }

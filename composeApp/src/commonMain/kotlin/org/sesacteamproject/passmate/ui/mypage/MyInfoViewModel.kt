@@ -78,7 +78,6 @@ class MyInfoViewModel(
                 .onSuccess { coins ->
                     _uiState.update {
                         it.copy(
-                            defaultMethod = coins.defaultMethod,
                             recentTransaction = coins.recent,
                             isCoinInfoFailed = false,
                             isCoinInfoLoading = false
@@ -142,7 +141,6 @@ class MyInfoViewModel(
             is MyInfoAction.ClickProfile -> emit(MyInfoEvent.OpenReputation)
             is MyInfoAction.ClickEditProfile -> emit(MyInfoEvent.OpenEditProfile)
             is MyInfoAction.ClickCharge -> emit(MyInfoEvent.OpenCharge)
-            is MyInfoAction.ClickPaymentMethod -> emit(MyInfoEvent.OpenPaymentMethod)
             is MyInfoAction.ClickCoinHistory -> emit(MyInfoEvent.OpenCoinHistory)
             is MyInfoAction.ClickSettlementAccount -> emit(MyInfoEvent.OpenSettlementAccount)
             is MyInfoAction.ClickEarnings -> emit(MyInfoEvent.OpenEarnings)
