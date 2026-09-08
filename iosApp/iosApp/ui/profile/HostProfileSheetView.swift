@@ -144,7 +144,10 @@ private struct HostProfileContentView: View {
     }
 
     private func header(_ profile: HostProfile) -> some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .center, spacing: 14) {
+            // 시안 M-10 헤더 — 이름 왼쪽 선생님 캐릭터 64 (플레이트 원은 아바타 뷰가 그린다)
+            StudentAvatarView(avatarId: profile.avatarId.map { Int(truncating: $0) } ?? StudentAvatars.defaultId)
+                .frame(width: 64, height: 64)
             VStack(alignment: .leading, spacing: 6) {
                 Text("\(profile.nickname) 선생님")
                     .font(.system(size: 22, weight: .bold))

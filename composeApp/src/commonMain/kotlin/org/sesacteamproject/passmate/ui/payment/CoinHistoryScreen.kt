@@ -475,10 +475,10 @@ private fun CoinHistoryContentScreenPreview() {
             uiState = CoinHistoryUiState(
                 isLoading = false,
                 items = listOf(
-                    CoinTransaction(id = 9001, type = CoinTransactionType.CHARGE, amount = 1000, balanceAfter = 1000, method = PaymentMethod.KAKAO_PAY, roomTitle = null, paymentNo = "PAY-20260810-01", createdAt = "2026.08.10"),
-                    CoinTransaction(id = 9002, type = CoinTransactionType.DEDUCT, amount = -500, balanceAfter = 500, method = null, roomTitle = "8월 4주차 Spring 스터디", paymentNo = null, createdAt = "2026.08.14"),
-                    CoinTransaction(id = 9003, type = CoinTransactionType.REFUND, amount = 500, balanceAfter = 1000, method = null, roomTitle = "확률과 통계 총정리", paymentNo = null, createdAt = "2026.08.16"),
-                    CoinTransaction(id = 9004, type = CoinTransactionType.DEDUCT, amount = -300, balanceAfter = 700, method = null, roomTitle = "함수의 극한 퀴즈", paymentNo = null, createdAt = "2026.08.20")
+                    CoinTransaction(id = 9001, type = CoinTransactionType.CHARGE, amount = 1000, balanceAfter = 1000, method = PaymentMethod.KAKAO_PAY, roomTitle = null, paymentNo = "PAY-20260810-01", createdAt = "2026-08-10T10:00:00Z"),
+                    CoinTransaction(id = 9002, type = CoinTransactionType.DEDUCT, amount = -500, balanceAfter = 500, method = null, roomTitle = "8월 4주차 Spring 스터디", paymentNo = null, createdAt = "2026-08-14T10:00:00Z"),
+                    CoinTransaction(id = 9003, type = CoinTransactionType.REFUND, amount = 500, balanceAfter = 1000, method = null, roomTitle = "확률과 통계 총정리", paymentNo = null, createdAt = "2026-08-16T10:00:00Z"),
+                    CoinTransaction(id = 9004, type = CoinTransactionType.DEDUCT, amount = -300, balanceAfter = 700, method = null, roomTitle = "함수의 극한 퀴즈", paymentNo = null, createdAt = "2026-08-20T10:00:00Z")
                 )
             ),
             onAction = {},

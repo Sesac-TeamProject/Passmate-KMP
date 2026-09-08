@@ -1,6 +1,7 @@
 package org.sesacteamproject.passmate.ui.mypage
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
@@ -102,7 +105,13 @@ private fun NotificationSettingsContentScreen(
                         .clickable { onAction(NotificationSettingsAction.Retry) }
                         .padding(vertical = 24.dp)
                 )
-                else -> {
+                // 시안 M-12-10 — 토글 행들은 테두리 카드(r16) 안에 구분선으로 나뉜다
+                else -> Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                        .border(1.dp, PassmateColors.Border, RoundedCornerShape(16.dp))
+                ) {
                     ToggleRow(
                         title = "세션 시작",
                         subtitle = "참여한 방이 시작되면 알려줘요",
@@ -110,6 +119,7 @@ private fun NotificationSettingsContentScreen(
                         enabled = !uiState.isSaving,
                         onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.SESSION_START)) }
                     )
+                    Divider(color = PassmateColors.Border, thickness = 1.dp)
                     ToggleRow(
                         title = "별점 요청",
                         subtitle = "방이 끝나면 선생님 평가를 요청해요",
@@ -117,6 +127,7 @@ private fun NotificationSettingsContentScreen(
                         enabled = !uiState.isSaving,
                         onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.RATING_REQUEST)) }
                     )
+                    Divider(color = PassmateColors.Border, thickness = 1.dp)
                     ToggleRow(
                         title = "정산 완료",
                         subtitle = "정산금이 입금되면 알려줘요",
@@ -149,7 +160,7 @@ private fun ToggleRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(

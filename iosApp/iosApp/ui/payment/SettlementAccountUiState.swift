@@ -1,6 +1,9 @@
 struct SettlementAccountUiState {
     var isLoading: Bool = true
 
+    // 드롭다운에서 고른 은행 — 코드는 저장 요청 필수값, 이름은 표시용 (M-12-3)
+    var bankCode: String = ""
+
     var bankName: String = ""
 
     var accountNumber: String = ""
@@ -15,7 +18,7 @@ struct SettlementAccountUiState {
 
     var canSubmit: Bool {
         !isSubmitting &&
-            !bankName.trimmingCharacters(in: .whitespaces).isEmpty &&
+            !bankCode.trimmingCharacters(in: .whitespaces).isEmpty &&
             !accountNumber.trimmingCharacters(in: .whitespaces).isEmpty &&
             !holderName.trimmingCharacters(in: .whitespaces).isEmpty
     }

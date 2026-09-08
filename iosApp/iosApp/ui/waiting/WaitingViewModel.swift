@@ -121,7 +121,7 @@ final class WaitingViewModel: ObservableObject {
         eventWatcher.start(roomId: roomId) { [weak self] streamEvent in
             guard let self else { return }
             if streamEvent is SessionEventStreamStreamEventConnected {
-                self.refreshParticipants(roomId: roomId)
+                self.onConnected(roomId: roomId)
             } else if let received = streamEvent as? SessionEventStreamStreamEventReceived {
                 self.handleServerEvent(received.frame.event)
             } else if streamEvent is SessionEventStreamStreamEventDisconnected {
@@ -132,8 +132,25 @@ final class WaitingViewModel: ObservableObject {
         }
     }
 
+    // 연결(재연결) 직후 — M-07 오버레이를 내리고 명단을 REST로 다시 맞춘다
+    private func onConnected(roomId: Int64) {
+        uiState.isDisconnected = false
+        refreshParticipants(roomId: roomId)
+    }
+
+    // M-07 오버레이를 띄우고, 명단이 낡았다는 표시도 함께 남긴다 —
+    // 오버레이는 재연결로만 내려가지만 그 뒤 조회가 실패하면 화면이 재시도를 걸어야 한다
     private func onDisconnected() {
+        uiState.isDisconnected = true
         uiState.hasParticipantsError = true
+    }
+
+    // M-07 "지금 다시 연결" — 재연결 백오프를 기다리지 않고 즉시 다시 구독한다 (start가 이전 구독을 먼저 멈춘다).
+    // 스트림이 다시 붙으면 Connected가 와서 오버레이가 내려간다
+    private func onReconnect() {
+        if let roomId {
+            observeRoomEvents(roomId: roomId)
+        }
     }
 
     private func onRetryParticipants() {
@@ -253,6 +270,8 @@ final class WaitingViewModel: ObservableObject {
             onRetryParticipants()
         case .clickLeave:
             onClickLeave()
+        case .reconnect:
+            onReconnect()
         }
     }
 

@@ -307,8 +307,19 @@ private struct ResultContentView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 14) {
+                    // Result의 뒤로가기는 세션 플로우 엔트리를 지나 탭 루트로 돌아간다 (규칙 §2-1-2)
+                    reportHeader
                     ReportHeaderCard(result: result)
+                    if let report = uiState.report, let classAverage = report.classAverageAccuracyPercent {
+                        ClassAverageCard(
+                            myPercent: Int(report.accuracyPercent),
+                            classPercent: Int(truncating: classAverage)
+                        )
+                    }
                     WeakTopicsRow(topics: uiState.report?.weakTopics ?? [])
+                    if let topics = uiState.report?.topicAccuracies, !topics.isEmpty {
+                        TopicAccuracyCard(topics: topics)
+                    }
                     QuestionList(
                         questions: result.questions,
                         selectedQuestionNo: uiState.selectedQuestionNo,
@@ -323,10 +334,22 @@ private struct ResultContentView: View {
                     }
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 32)
+                .padding(.top, 14)
                 .padding(.bottom, 16)
             }
             exportButton
+        }
+    }
+
+    // 시안 M-06 헤더 — 뒤로가기 24 + "리포트" 20 (에러 화면의 errorHeader와 별개: 그쪽은 "최종 결과" 문구를 쓴다)
+    private var reportHeader: some View {
+        HStack(spacing: 10) {
+            PassmateBackButton(onClick: onBack)
+            Text("리포트")
+                .font(.system(size: 20, weight: .bold))
+                .kerning(-0.4)
+                .foregroundColor(PassmateColors.textPrimary)
+            Spacer()
         }
     }
 
@@ -396,6 +419,150 @@ private struct ReportHeaderCard: View {
 
         return "\(result.roomTitle) · \(rankPart)\(Int(result.totalScore))점"
     }
+}
+
+// 시안 M-06 "card/반 평균 대비" — 반 막대(연민트 10) 위에 내 막대(초록 5)를 겹쳐 그린다. 값은 서버가 준 것만 쓴다
+private struct ClassAverageCard: View {
+    let myPercent: Int
+
+    let classPercent: Int
+
+    private var gap: Int {
+        myPercent - classPercent
+    }
+
+    private var gapColor: Color {
+        if gap > 0 {
+            return PassmateColors.primaryDeep
+        } else if gap < 0 {
+            return PassmateColors.wrongPinkText
+        } else {
+            return PassmateColors.textSecondary
+        }
+    }
+
+    private var gapLabel: String {
+        if gap > 0 {
+            return "+\(gap)%p"
+        } else if gap < 0 {
+            return "\(gap)%p"
+        } else {
+            return "0%p"
+        }
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("반 평균")
+                    .font(.system(size: 12))
+                    .kerning(-0.12)
+                    .foregroundColor(PassmateColors.textSecondary)
+                GeometryReader { geometry in
+                    ZStack(alignment: .topLeading) {
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(PassmateColors.reportBarTrack)
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(PassmateColors.reportClassBar)
+                            .frame(width: geometry.size.width * reportBarFraction(classPercent))
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(PassmateColors.primary)
+                            .frame(width: geometry.size.width * reportBarFraction(myPercent), height: 5)
+                    }
+                }
+                .frame(height: 10)
+            }
+            VStack(alignment: .trailing, spacing: 6) {
+                Text("나 \(myPercent)% · 반 \(classPercent)%")
+                    .font(.system(size: 12, weight: .bold))
+                    .kerning(-0.12)
+                    .foregroundColor(PassmateColors.textPrimary)
+                Text(gapLabel)
+                    .font(.system(size: 12.5, weight: .bold))
+                    .kerning(-0.125)
+                    .foregroundColor(gapColor)
+            }
+        }
+        .padding(.top, 10)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 14)
+        .background(PassmateColors.surface)
+        .cornerRadius(16)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
+    }
+}
+
+// 시안 M-06 "card/개념별 정답률" — 주제 84 · 막대 · "맞은/전체" 58, 행 간격 12
+private struct TopicAccuracyCard: View {
+    let topics: [TopicAccuracy]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("개념별 정답률")
+                .font(.system(size: 13.5, weight: .bold))
+                .kerning(-0.135)
+                .foregroundColor(PassmateColors.textPrimary)
+            VStack(spacing: 12) {
+                ForEach(Array(topics.enumerated()), id: \.offset) { _, topic in
+                    TopicAccuracyRow(topic: topic)
+                }
+            }
+        }
+        .padding(.top, 14)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(PassmateColors.surface)
+        .cornerRadius(16)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
+    }
+}
+
+private struct TopicAccuracyRow: View {
+    let topic: TopicAccuracy
+
+    // 시안 예시 33%→분홍 · 67%→노랑 · 100%→초록. 경계는 M-14 분포 막대와 같은 50·80으로 둔다
+    private var barColor: Color {
+        let percent = Int(topic.accuracyPercent)
+
+        if percent < 50 {
+            return PassmateColors.wrongPink
+        } else if percent < 80 {
+            return PassmateColors.accuracyBandMid
+        } else {
+            return PassmateColors.primary
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Text(topic.topic)
+                .font(.system(size: 12, weight: .medium))
+                .kerning(-0.12)
+                .foregroundColor(PassmateColors.textPrimary)
+                .lineLimit(1)
+                .frame(width: 84, alignment: .leading)
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4.5)
+                        .fill(PassmateColors.reportBarTrack)
+                    RoundedRectangle(cornerRadius: 4.5)
+                        .fill(barColor)
+                        .frame(width: geometry.size.width * reportBarFraction(Int(topic.accuracyPercent)))
+                }
+            }
+            .frame(height: 9)
+            Text("\(topic.correctCount)/\(topic.totalCount)")
+                .font(.system(size: 12, weight: .bold))
+                .kerning(-0.12)
+                .foregroundColor(PassmateColors.textSecondary)
+                .frame(width: 58, alignment: .trailing)
+        }
+    }
+}
+
+private func reportBarFraction(_ percent: Int) -> CGFloat {
+    CGFloat(min(max(percent, 0), 100)) / 100
 }
 
 private struct QuestionList: View {
@@ -582,7 +749,13 @@ private struct ShareSheet: UIViewControllerRepresentable {
             report: LearningReport(
                 accuracyPercent: 75,
                 weakTopics: ["이차함수", "확률과 통계"],
-                improvementPoints: ["판별식 부호 판정 연습이 필요해요"]
+                improvementPoints: ["판별식 부호 판정 연습이 필요해요"],
+                classAverageAccuracyPercent: 68,
+                topicAccuracies: [
+                    TopicAccuracy(topic: "JPA 영속성", correctCount: 1, totalCount: 3, accuracyPercent: 33),
+                    TopicAccuracy(topic: "트랜잭션", correctCount: 2, totalCount: 3, accuracyPercent: 67),
+                    TopicAccuracy(topic: "DI · AOP", correctCount: 2, totalCount: 2, accuracyPercent: 100)
+                ]
             ),
             selectedQuestionNo: 3
         ),

@@ -11,6 +11,9 @@ enum PassmateIcons: String {
     // 왼쪽 화살표 (상세 화면 뒤로가기 헤더)
     case arrowLeft = "ArrowLeft"
 
+    // 아래 셰브론 (v6 M-12-3 은행 select)
+    case chevronDown = "ChevronDown"
+
     // 코인 마크 (v6 M-12-9 보유 코인 카드)
     case coin = "Coin"
 

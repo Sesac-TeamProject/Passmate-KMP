@@ -42,6 +42,13 @@ class DisplayDateTest {
         assertEquals("3/1 (수)", DisplayDate.formatWithWeekday("2000-03-01"))
     }
 
+    // M-14 방 리포트는 "8/22(금) 진행"처럼 요일 괄호 앞에 공백이 없다 (M-08과 다르다)
+    @Test
+    fun formatsWithWeekdayWithoutSpaceWhenRequested() {
+        assertEquals("8/22(토)", DisplayDate.formatWithWeekday("2026-08-22T21:10:00", isSpaced = false))
+        assertEquals("9/4(금)", DisplayDate.formatWithWeekday("2026-09-04T07:50:25.554235", isSpaced = false))
+    }
+
     @Test
     fun weekdayFormatAlsoRejectsMalformedInput() {
         assertNull(DisplayDate.formatWithWeekday(null))

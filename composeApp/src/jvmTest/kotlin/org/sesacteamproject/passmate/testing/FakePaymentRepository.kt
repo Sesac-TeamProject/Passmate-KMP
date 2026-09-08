@@ -21,8 +21,13 @@ class FakePaymentRepository(
     var earningsResult: AppResult<Earnings> = AppResult.Failure(AppError.Unknown()),
     var chargeResult: AppResult<CoinCheckout> = AppResult.Failure(AppError.Unknown()),
     var confirmResult: AppResult<ChargeConfirm> = AppResult.Failure(AppError.Unknown()),
-    var transactionsResult: AppResult<PagedResult<CoinTransaction>> = AppResult.Failure(AppError.Unknown())
+    var transactionsResult: AppResult<PagedResult<CoinTransaction>> = AppResult.Failure(AppError.Unknown()),
+    // 미등록(404)이 기본 — 등록된 계좌 복원 테스트는 Success를 넣는다
+    var settlementAccountResult: AppResult<SettlementAccount> = AppResult.Failure(AppError.NotFound())
 ) : PaymentRepository {
+
+    var savedSettlementAccount: SettlementAccount? = null
+
 
     // 응답을 붙잡아 두는 게이트 — in-flight 가드 테스트용. null이면 즉시 반환한다
     var coinsGate: CompletableDeferred<Unit>? = null
@@ -77,10 +82,11 @@ class FakePaymentRepository(
     }
 
     override suspend fun getSettlementAccount(): AppResult<SettlementAccount> {
-        return AppResult.Failure(AppError.NotFound())
+        return settlementAccountResult
     }
 
     override suspend fun saveSettlementAccount(account: SettlementAccount): AppResult<Unit> {
+        savedSettlementAccount = account
         return AppResult.Success(Unit)
     }
 }

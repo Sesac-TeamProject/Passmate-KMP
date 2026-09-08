@@ -69,7 +69,7 @@ class MyInfoViewModelTest {
         items = emptyList(),
         nextCursor = null,
         hasNext = false,
-        account = SettlementAccountSummary(bankName = "국민", maskedNumber = "***-***-4821", payoutNote = null)
+        account = SettlementAccountSummary(bankName = "국민", maskedNumber = "***-***-4821", holderName = "준영", payoutNote = null)
     )
 
     private lateinit var authRepository: FakeAuthRepository

@@ -11,6 +11,7 @@ import org.sesacteamproject.passmate.payment.data.dto.SettlementAccountDto
 import org.sesacteamproject.passmate.payment.data.mapper.toDomain
 import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
 import org.sesacteamproject.passmate.payment.data.mapper.toSummary
+import org.sesacteamproject.passmate.payment.data.mapper.toRequest
 import org.sesacteamproject.passmate.payment.data.remote.PaymentRemoteDataSource
 import org.sesacteamproject.passmate.payment.domain.model.ChargeConfirm
 import org.sesacteamproject.passmate.payment.domain.model.CoinBalance
@@ -89,7 +90,7 @@ class PaymentRepositoryImpl(
 
             // 조회가 실패해도 등록은 된 상태다 — 은행 정보만 비운다
             (result as? AppResult.Success)?.value?.toSummary()
-                ?: SettlementAccountSummary(bankName = "", maskedNumber = "", payoutNote = null)
+                ?: SettlementAccountSummary(bankName = "", maskedNumber = "", holderName = "", payoutNote = null)
         } else {
             null
         }
@@ -100,11 +101,7 @@ class PaymentRepositoryImpl(
     }
 
     override suspend fun saveSettlementAccount(account: SettlementAccount): AppResult<Unit> {
-        val request = SettlementAccountDto(
-            bankName = account.bankName.trim(),
-            accountNo = account.maskedAccountNumber.trim(),
-            holderName = account.holderName.trim()
-        )
+        val request = account.toRequest()
 
         return apiCall { remoteDataSource.putSettlementAccount(request) }
     }

@@ -65,7 +65,7 @@ private struct SettlementAccountContentView: View {
                 onBack: onBack
             )
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 16) {
                     if uiState.isLoading {
                         HStack {
                             Spacer()
@@ -74,30 +74,8 @@ private struct SettlementAccountContentView: View {
                         }
                         .frame(height: 180)
                     } else {
-                        accountField(
-                            label: "은행",
-                            placeholder: "예: 신한은행",
-                            value: uiState.bankName,
-                            onChange: { onAction(.changeBankName(text: $0)) }
-                        )
-                        accountField(
-                            label: "계좌번호",
-                            placeholder: "숫자만 입력",
-                            value: uiState.accountNumber,
-                            keyboardType: .numberPad,
-                            onChange: { onAction(.changeAccountNumber(text: $0)) }
-                        )
-                        accountField(
-                            label: "예금주",
-                            placeholder: "예금주명",
-                            value: uiState.holderName,
-                            onChange: { onAction(.changeHolderName(text: $0)) }
-                        )
-                        Text("매월 5일 지급 · 사업소득 3.3% 원천징수(확정 전)")
-                            .font(.system(size: 12))
-                            .kerning(-0.24)
-                            .foregroundColor(PassmateColors.textTertiary)
-                        saveButton
+                        formCard
+                        registerButton
                     }
                 }
                 .padding(.horizontal, 20)
@@ -108,6 +86,65 @@ private struct SettlementAccountContentView: View {
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
+    // 시안 card — 필드 3개 + 안내문을 테두리 카드(r16, pad 16, gap 16)로 감싼다
+    private var formCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            bankSelectField
+            accountField(
+                label: "계좌번호",
+                placeholder: uiState.maskedAccountNumber.isEmpty ? "숫자만 입력" : uiState.maskedAccountNumber,
+                value: uiState.accountNumber,
+                keyboardType: .numberPad,
+                onChange: { onAction(.changeAccountNumber(text: $0)) }
+            )
+            accountField(
+                label: "예금주",
+                placeholder: "예금주명",
+                value: uiState.holderName,
+                onChange: { onAction(.changeHolderName(text: $0)) }
+            )
+            // 지급 주기는 시안끼리 어긋난다(M-12-3 "매주 월요일" vs M-T4 "매월 5일") — 앱은 매월 5일로 통일
+            Text("매월 5일 지급 · 사업소득 3.3% 원천징수(확정 전)")
+                .font(.system(size: 12))
+                .kerning(-0.24)
+                .foregroundColor(PassmateColors.textSecondary)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(PassmateColors.surface)
+        .cornerRadius(16)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(PassmateColors.border, lineWidth: 1))
+    }
+
+    // 시안 field/은행 select — 은행 목록(Bank)에서 고른다. 자유 입력이면 백엔드 필수값 bankCode를 못 채운다
+    private var bankSelectField: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            fieldLabel("은행")
+            Menu {
+                ForEach(Bank.companion.all, id: \.code) { bank in
+                    Button(bank.displayName) {
+                        onAction(.selectBank(bank: bank))
+                    }
+                }
+            } label: {
+                HStack(spacing: 0) {
+                    Text(uiState.bankName.isEmpty ? "은행 선택" : uiState.bankName)
+                        .font(.system(size: 14))
+                        .kerning(-0.28)
+                        .foregroundColor(uiState.bankName.isEmpty ? PassmateColors.textTertiary : PassmateColors.textPrimary)
+                    Spacer()
+                    PassmateIconView(icon: .chevronDown, tint: PassmateColors.textPrimary, size: 24)
+                }
+                .padding(.horizontal, 16)
+                .frame(height: 48)
+                .frame(maxWidth: .infinity)
+                .background(PassmateColors.fieldGray)
+                .cornerRadius(12)
+            }
+        }
+    }
+
+    // 시안 field input — 48 높이 · fieldGray · r12
     private func accountField(
         label: String,
         placeholder: String,
@@ -115,24 +152,30 @@ private struct SettlementAccountContentView: View {
         keyboardType: UIKeyboardType = .default,
         onChange: @escaping (String) -> Void
     ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(label)
-                .font(.system(size: 13, weight: .medium))
-                .kerning(-0.26)
-                .foregroundColor(PassmateColors.textSecondary)
+        VStack(alignment: .leading, spacing: 8) {
+            fieldLabel(label)
             TextField(placeholder, text: Binding(
                 get: { value },
                 set: { onChange($0) }
             ))
             .font(.system(size: 14))
             .keyboardType(keyboardType)
-            .padding(16)
+            .padding(.horizontal, 16)
+            .frame(height: 48)
             .background(PassmateColors.fieldGray)
-            .cornerRadius(14)
+            .cornerRadius(12)
         }
     }
 
-    private var saveButton: some View {
+    private func fieldLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 14, weight: .medium))
+            .kerning(-0.28)
+            .foregroundColor(PassmateColors.textPrimary)
+    }
+
+    // 시안 button/등록하기 — 48 높이 · r12 · 14 Medium. 등록/변경 모두 같은 문구를 쓴다
+    private var registerButton: some View {
         Button {
             onAction(.submit)
         } label: {
@@ -140,17 +183,31 @@ private struct SettlementAccountContentView: View {
                 if uiState.isSubmitting {
                     ProgressView().tint(PassmateColors.surface)
                 } else {
-                    Text("저장")
-                        .font(.system(size: 15, weight: .bold))
-                        .kerning(-0.3)
+                    Text("등록하기")
+                        .font(.system(size: 14, weight: .medium))
+                        .kerning(-0.28)
                         .foregroundColor(PassmateColors.surface)
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 52)
+            .frame(height: 48)
             .background(uiState.canSubmit ? PassmateColors.primary : PassmateColors.border)
-            .cornerRadius(16)
+            .cornerRadius(12)
         }
         .disabled(!uiState.canSubmit)
     }
+}
+
+#Preview("M-12-3 정산 계좌 등록") {
+    SettlementAccountContentView(
+        uiState: SettlementAccountUiState(
+            isLoading: false,
+            bankCode: "004",
+            bankName: "국민은행",
+            accountNumber: "123456-01-234567",
+            holderName: "이한결"
+        ),
+        onAction: { _ in },
+        onBack: {}
+    )
 }

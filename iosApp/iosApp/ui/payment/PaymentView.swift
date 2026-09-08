@@ -365,14 +365,7 @@ private struct RoomPreviewView: View {
                     .kerning(-0.32)
                     .foregroundColor(PassmateColors.textPrimary)
                 Spacer()
-                Text("₩ 유료")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.weakTopicText)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(PassmateColors.weakTopicBg)
-                    .clipShape(Capsule())
+                PaidRoomChipView()
             }
             if let host = room.host {
                 HStack(spacing: 8) {

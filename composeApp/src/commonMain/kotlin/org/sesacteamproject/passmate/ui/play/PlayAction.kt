@@ -17,4 +17,7 @@ sealed interface PlayAction {
     data object ClickViewReport : PlayAction
 
     data object ClickSignup : PlayAction
+
+    // M-07 "지금 다시 연결" — 백오프 대기를 건너뛰고 즉시 재구독한다
+    data object Reconnect : PlayAction
 }

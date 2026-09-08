@@ -51,16 +51,18 @@ struct ReputationBadgeView: View {
 }
 
 // T086(US12) 명성 레벨 엠블럼 — 육각형 배경 + 등급별 심볼(새싹·성장·체크·별·왕관).
-// Compose LevelEmblem.kt와 1:1. Lv.5는 골드 육각
+// 시안 LevelEmblem(M-09·M-10·M-13 실측, 48 기준): 바깥 육각 48은 위→아래 그라디언트(levelEmblemGradientTop→primary)에
+// 연민트 링 1.5, 안쪽 육각 37.5는 primary 15%→55% 그라디언트에 흰 28% 선 0.75, 위쪽에 흰 22% 광택 타원 30x13.5.
+// Lv.5는 골드 육각(시안 미실측 — 단색 유지). Compose LevelEmblem.kt와 1:1
 struct LevelEmblemView: View {
     let level: HostLevel
 
-    private var hexColor: Color {
-        level == .master ? PassmateColors.starGold : PassmateColors.primary
+    private var isMaster: Bool {
+        level == .master
     }
 
     private var symbolColor: Color {
-        level == .master ? PassmateColors.primaryDeep : PassmateColors.surface
+        isMaster ? PassmateColors.primaryDeep : PassmateColors.surface
     }
 
     var body: some View {
@@ -69,9 +71,31 @@ struct LevelEmblemView: View {
             let c = CGPoint(x: geo.size.width / 2, y: geo.size.height / 2)
 
             ZStack {
-                hexagon(center: c, radius: r).fill(hexColor)
+                if isMaster {
+                    hexagon(center: c, radius: r).fill(PassmateColors.starGold)
+                } else {
+                    gradientHexagon(center: c, radius: r)
+                }
                 symbol(center: c, radius: r)
             }
+        }
+    }
+
+    // 비율은 전부 시안 48 기준을 반지름(24)으로 나눈 값이다
+    private func gradientHexagon(center c: CGPoint, radius r: CGFloat) -> some View {
+        ZStack {
+            hexagon(center: c, radius: r)
+                .fill(LinearGradient(colors: [PassmateColors.levelEmblemGradientTop, PassmateColors.primary], startPoint: .top, endPoint: .bottom))
+            hexagon(center: c, radius: r)
+                .stroke(PassmateColors.achievementBadgeBorder, lineWidth: r * 0.0625)
+            hexagon(center: c, radius: r * 0.78)
+                .fill(LinearGradient(colors: [PassmateColors.primary.opacity(0.15), PassmateColors.primary.opacity(0.55)], startPoint: .top, endPoint: .bottom))
+            hexagon(center: c, radius: r * 0.78)
+                .stroke(PassmateColors.surface.opacity(0.28), lineWidth: r * 0.03125)
+            Ellipse()
+                .fill(PassmateColors.surface.opacity(0.22))
+                .frame(width: r * 1.25, height: r * 0.5625)
+                .position(x: c.x, y: c.y - r * 0.78 + r * 0.28125)
         }
     }
 

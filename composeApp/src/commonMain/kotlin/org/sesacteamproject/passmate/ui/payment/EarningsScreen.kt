@@ -35,8 +35,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PaidRoomChip
 import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.PassmateTopBar
 import org.sesacteamproject.passmate.component.PassmateTopBarStyle
@@ -284,13 +286,23 @@ private fun SettlementRow(item: SettlementItem) {
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
-            Text(
-                text = item.roomTitle,
-                color = PassmateColors.TextPrimary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.28).sp
-            )
+            // 정산 내역은 전부 유료 방이지만 시안(M-T4)이 행마다 "₩ 유료" 칩을 둔다
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = item.roomTitle,
+                    color = PassmateColors.TextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.28).sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
+                PaidRoomChip()
+            }
             Text(
                 text = "${item.participantCount}명 · 참가비 ₩${formatAmount(item.entryFeeTotal)} · 수수료 ₩${formatAmount(item.feeAmount)}",
                 color = PassmateColors.TextSecondary,
@@ -669,9 +681,9 @@ private fun formatAmount(amount: Long): String {
 // --- Preview ---
 
 private val previewSettlementItems = listOf(
-    SettlementItem(settlementId = 8001, dateLabel = "2026.08.28", roomTitle = "8월 4주차 Spring 스터디", participantCount = 24, entryFeeTotal = 12000L, feeAmount = 2400L, payoutAmount = 9600L, status = SettlementStatus.SCHEDULED),
-    SettlementItem(settlementId = 8002, dateLabel = "2026.08.14", roomTitle = "확률과 통계 총정리", participantCount = 18, entryFeeTotal = 9000L, feeAmount = 1800L, payoutAmount = 7200L, status = SettlementStatus.PAID),
-    SettlementItem(settlementId = 8003, dateLabel = "2026.08.02", roomTitle = "함수의 극한 퀴즈", participantCount = 11, entryFeeTotal = 5500L, feeAmount = 1100L, payoutAmount = 4400L, status = SettlementStatus.HELD)
+    SettlementItem(settlementId = 8001, dateLabel = "8/28", roomTitle = "8월 4주차 Spring 스터디", participantCount = 24, entryFeeTotal = 12000L, feeAmount = 2400L, payoutAmount = 9600L, status = SettlementStatus.SCHEDULED),
+    SettlementItem(settlementId = 8002, dateLabel = "8/14", roomTitle = "확률과 통계 총정리", participantCount = 18, entryFeeTotal = 9000L, feeAmount = 1800L, payoutAmount = 7200L, status = SettlementStatus.PAID),
+    SettlementItem(settlementId = 8003, dateLabel = "8/2", roomTitle = "함수의 극한 퀴즈", participantCount = 11, entryFeeTotal = 5500L, feeAmount = 1100L, payoutAmount = 4400L, status = SettlementStatus.HELD)
 )
 
 @PassmatePreview
@@ -690,7 +702,7 @@ private fun EarningsContentScreenPreview() {
                     items = previewSettlementItems,
                     nextCursor = null,
                     hasNext = false,
-                    account = SettlementAccountSummary(bankName = "국민", maskedNumber = "***-***-4821", payoutNote = "매월 5일 지급")
+                    account = SettlementAccountSummary(bankName = "국민", maskedNumber = "***-***-4821", holderName = "준영", payoutNote = "매월 5일 지급")
                 ),
                 items = previewSettlementItems
             ),
@@ -746,6 +758,7 @@ private fun EarningsContentScreenNoSettlementsPreview() {
                     account = SettlementAccountSummary(
                         bankName = "국민",
                         maskedNumber = "***-***-4821",
+                        holderName = "준영",
                         payoutNote = "매월 5일 지급"
                     )
                 ),

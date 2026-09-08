@@ -113,7 +113,8 @@ class RoomReportMapperTest {
         // 서버는 title이고 앱 도메인은 roomTitle이다 — 이름이 어긋나면 제목이 빈칸으로 그려진다
         assertEquals("별점 시트 실기기 확인", report.roomTitle)
         assertEquals(RoomStatus.FINISHED, report.status)
-        assertEquals("2026-09-04", report.dateLabel)
+        // 시안 M-14 "8/22(금) 진행" — 연도 없이 월/일(요일)
+        assertEquals("9/4(금)", report.dateLabel)
         assertEquals(2, report.summary.studentCount)
         assertEquals(2, report.summary.questionCount)
         assertEquals(0, report.summary.aiAnalysisCount)
