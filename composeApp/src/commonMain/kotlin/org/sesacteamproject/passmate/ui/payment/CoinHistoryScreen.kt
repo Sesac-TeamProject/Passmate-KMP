@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateIcon
+import org.sesacteamproject.passmate.component.PassmateTopBar
 import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -90,39 +91,14 @@ private fun CoinHistoryContentScreen(
             // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다 — 시안이 이 화면에 탭바를 유지한다
             .statusBarsPadding()
     ) {
-        Spacer(Modifier.height(16.dp))
-        TopBar(onBack = onBack)
+        // 앱바는 스크롤 밖 — 본문(HistoryBody)을 내려도 따라 올라가지 않는다
+        PassmateTopBar(title = "코인 내역", onBack = onBack)
         when {
             uiState.isLoading -> CenterProgress()
             uiState.hasError -> LoadFailureBody(onAction = onAction, onBack = onBack)
             uiState.isEmpty -> EmptyBody(onAction = onAction)
             else -> HistoryBody(uiState = uiState, onAction = onAction)
         }
-    }
-}
-
-@Composable
-private fun TopBar(onBack: () -> Unit) {
-    Row(
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        PassmateIcon(
-            icon = PassmateIcons.ArrowLeft,
-            contentDescription = "뒤로 가기",
-            tint = PassmateColors.TextPrimary,
-            modifier = Modifier
-                .clickable { onBack() }
-                .padding(end = 12.dp, top = 4.dp, bottom = 4.dp)
-                .size(22.dp)
-        )
-        Text(
-            text = "코인 내역",
-            color = PassmateColors.TextPrimary,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.4).sp
-        )
     }
 }
 

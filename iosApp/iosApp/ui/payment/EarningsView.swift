@@ -154,13 +154,8 @@ private struct EarningsContentView: View {
     }
 
     private var loadFailedHeader: some View {
-        HStack(spacing: LoadFailedSpec.backEndPadding) {
-            Button(action: onClickBack) {
-                Text(LoadFailedText.back)
-                    .font(.system(size: LoadFailedSpec.backFontSize))
-                    .foregroundColor(PassmateColors.textPrimary)
-                    .padding(.vertical, LoadFailedSpec.backVerticalPadding)
-            }
+        HStack(spacing: 12) {
+            PassmateBackButton(onClick: onClickBack)
             Text(LoadFailedText.headerTitle)
                 .font(.system(size: LoadFailedSpec.headerTitleFontSize, weight: .bold))
                 .kerning(LoadFailedSpec.headerTitleKerning)
@@ -172,22 +167,22 @@ private struct EarningsContentView: View {
     }
 
     private func loadedView(_ earnings: Earnings) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 12) {
-                    PassmateBackButton(onClick: onClickBack)
-                    Text("정산")
-                        .font(.system(size: 24, weight: .bold))
-                        .kerning(-0.48)
-                        .foregroundColor(PassmateColors.textPrimary)
-                    Spacer()
-                    Button(action: { onAction(.clickManageAccount) }) {
-                        Text("계좌 관리")
-                            .font(.system(size: 14, weight: .medium))
-                            .kerning(-0.28)
-                            .foregroundColor(PassmateColors.primaryDeep)
-                    }
+        VStack(spacing: 0) {
+            // 앱바는 스크롤 밖 — 정산 내역을 내려도 따라 올라가지 않는다
+            PassmateTopBar(
+                title: "정산",
+                onBack: onClickBack,
+                style: .root
+            ) {
+                Button(action: { onAction(.clickManageAccount) }) {
+                    Text("계좌 관리")
+                        .font(.system(size: 14, weight: .medium))
+                        .kerning(-0.28)
+                        .foregroundColor(PassmateColors.primaryDeep)
                 }
+            }
+            ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
                 summaryCard(earnings)
                 historySectionHeader
                 if uiState.items.isEmpty {
@@ -224,8 +219,8 @@ private struct EarningsContentView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 32)
             .padding(.bottom, 24)
+        }
         }
     }
 
@@ -431,8 +426,6 @@ private enum EmptyStateText {
 private enum LoadFailedText {
     static let headerTitle = "정산"
 
-    static let back = "\u{2190}"
-
     static let title = "목록을 불러오지 못했어요"
 
     static let guide = "연결이 잠시 끊겼어요.\n정산 금액은 사라지지 않아요."
@@ -452,13 +445,6 @@ private enum LoadFailedSpec {
     static let headerPaddingHorizontal: CGFloat = 20
 
     static let headerPaddingVertical: CGFloat = 14
-
-    static let backFontSize: CGFloat = 20
-
-    static let backEndPadding: CGFloat = 12
-
-    // Compose BackVerticalPadding 4dp와 같은 탭 영역 확장
-    static let backVerticalPadding: CGFloat = 4
 
     static let headerTitleFontSize: CGFloat = 15
 

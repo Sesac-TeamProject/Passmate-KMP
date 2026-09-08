@@ -35,7 +35,8 @@ import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.LevelEmblem
-import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTopBar
+import org.sesacteamproject.passmate.component.PassmateTopBarStyle
 import org.sesacteamproject.passmate.component.ReputationBadge
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
@@ -97,32 +98,17 @@ private fun ReputationContentScreen(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
-        ReputationHeader(onClickBack = onClickBack)
+        // 앱바는 스크롤 밖 — 본문(LoadedReputation)을 내려도 따라 올라가지 않는다
+        PassmateTopBar(
+            title = "명성 · 뱃지",
+            onBack = onClickBack,
+            style = PassmateTopBarStyle.Root
+        )
         when {
             uiState.isLoading -> LoadingBox()
             uiState.loadFailed -> ErrorBox(onRetry = { onAction(ReputationAction.Retry) })
             else -> LoadedReputation(uiState = uiState)
         }
-    }
-}
-
-@Composable
-private fun ReputationHeader(onClickBack: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 20.dp, top = 52.dp, end = 20.dp, bottom = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        PassmateBackButton(onClick = onClickBack)
-        Text(
-            text = "명성 · 뱃지",
-            color = PassmateColors.TextPrimary,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.48).sp
-        )
     }
 }
 

@@ -66,20 +66,9 @@ private struct CoinHistoryContentView: View {
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
+    // 앱바는 스크롤 밖 — 본문(historyBody)을 내려도 따라 올라가지 않는다
     private var topBar: some View {
-        HStack(spacing: 12) {
-            Button(action: onBack) {
-                PassmateIconView(icon: .arrowLeft, tint: PassmateColors.textPrimary, size: 22)
-            }
-            .accessibilityLabel("뒤로 가기")
-            Text("코인 내역")
-                .font(.system(size: 20, weight: .bold))
-                .kerning(-0.4)
-                .foregroundColor(PassmateColors.textPrimary)
-        }
-        .padding(.top, 16)
-        .padding(.horizontal, 20)
-        .padding(.bottom, 16)
+        PassmateTopBar(title: "코인 내역", onBack: onBack)
     }
 
     @ViewBuilder

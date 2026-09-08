@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTopBar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.theme.PassmateColors
@@ -80,63 +80,57 @@ private fun SettlementAccountContentScreen(
             .background(PassmateColors.Surface)
             // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다
             .statusBarsPadding()
-            .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 28.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+        // 앱바는 여백을 스스로 가진다 — 본문 여백은 아래 Column이 따로 준다
+        PassmateTopBar(
+            title = "정산 계좌 등록",
+            onBack = onBack
+        )
+        Column(
+            modifier = Modifier.fillMaxSize().padding(start = 20.dp, end = 20.dp, bottom = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            PassmateBackButton(onClick = onBack)
-            Text(
-                text = "정산 계좌 등록",
-                color = PassmateColors.TextPrimary,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.4).sp
-            )
-        }
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = PassmateColors.Primary)
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = PassmateColors.Primary)
+                }
+            } else {
+                AccountField(
+                    label = "은행",
+                    value = uiState.bankName,
+                    placeholder = "예: 신한은행",
+                    onChange = { onAction(SettlementAccountAction.ChangeBankName(it)) }
+                )
+                AccountField(
+                    label = "계좌번호",
+                    value = uiState.accountNumber,
+                    placeholder = "숫자만 입력",
+                    keyboardType = KeyboardType.Number,
+                    onChange = { onAction(SettlementAccountAction.ChangeAccountNumber(it)) }
+                )
+                AccountField(
+                    label = "예금주",
+                    value = uiState.holderName,
+                    placeholder = "예금주명",
+                    onChange = { onAction(SettlementAccountAction.ChangeHolderName(it)) }
+                )
+                Text(
+                    text = "매월 5일 지급 · 사업소득 3.3% 원천징수(확정 전)",
+                    color = PassmateColors.TextTertiary,
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.24).sp
+                )
+                SaveButton(
+                    enabled = uiState.canSubmit,
+                    isSubmitting = uiState.isSubmitting,
+                    onClick = { onAction(SettlementAccountAction.Submit) }
+                )
             }
-        } else {
-            AccountField(
-                label = "은행",
-                value = uiState.bankName,
-                placeholder = "예: 신한은행",
-                onChange = { onAction(SettlementAccountAction.ChangeBankName(it)) }
-            )
-            AccountField(
-                label = "계좌번호",
-                value = uiState.accountNumber,
-                placeholder = "숫자만 입력",
-                keyboardType = KeyboardType.Number,
-                onChange = { onAction(SettlementAccountAction.ChangeAccountNumber(it)) }
-            )
-            AccountField(
-                label = "예금주",
-                value = uiState.holderName,
-                placeholder = "예금주명",
-                onChange = { onAction(SettlementAccountAction.ChangeHolderName(it)) }
-            )
-            Text(
-                text = "매월 5일 지급 · 사업소득 3.3% 원천징수(확정 전)",
-                color = PassmateColors.TextTertiary,
-                fontSize = 12.sp,
-                letterSpacing = (-0.24).sp
-            )
-            SaveButton(
-                enabled = uiState.canSubmit,
-                isSubmitting = uiState.isSubmitting,
-                onClick = { onAction(SettlementAccountAction.Submit) }
-            )
         }
     }
 }

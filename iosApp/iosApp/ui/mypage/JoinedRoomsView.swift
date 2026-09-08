@@ -60,13 +60,21 @@ private struct JoinedRoomsContentView: View {
     let onAction: (JoinedRoomsAction) -> Void
 
     var body: some View {
-        Group {
-            if uiState.isLoading {
-                skeletonView
-            } else if uiState.loadFailed {
-                loadFailureView
-            } else {
-                loadedView
+        VStack(spacing: 0) {
+            // 앱바는 스크롤 밖 — 본문을 내려도 제목이 따라 올라가지 않는다.
+            // 상단 32·하단 14는 기존 스크롤 VStack이 주던 값 그대로다
+            PassmateTopBar(
+                title: "참여한 방",
+                style: .root
+            )
+            Group {
+                if uiState.isLoading {
+                    skeletonView
+                } else if uiState.loadFailed {
+                    loadFailureView
+                } else {
+                    loadedView
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -195,10 +203,6 @@ private struct JoinedRoomsContentView: View {
     private var loadedView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                Text("참여한 방")
-                    .font(.system(size: 24, weight: .bold))
-                    .kerning(-0.48)
-                    .foregroundColor(PassmateColors.textPrimary)
                 if let ongoing = uiState.ongoing {
                     OngoingCard(ongoing: ongoing, onClickRejoin: { onAction(.clickRejoin(pin: ongoing.pin)) })
                 }
@@ -218,7 +222,6 @@ private struct JoinedRoomsContentView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 32)
             .padding(.bottom, 96)
         }
     }

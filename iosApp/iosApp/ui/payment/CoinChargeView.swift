@@ -68,22 +68,18 @@ private struct CoinChargeContentView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             topBar
-            content.padding(.top, 20)
+            content.padding(.horizontal, 20)
         }
-        .padding(.horizontal, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
+    // 앱바는 스크롤 밖 — 본문(amountBody)을 내려도 따라 올라가지 않는다
     private var topBar: some View {
-        HStack(spacing: 12) {
-            PassmateBackButton(onClick: onBack)
-            Text("코인 충전")
-                .font(.system(size: 20, weight: .bold))
-                .kerning(-0.4)
-                .foregroundColor(PassmateColors.textPrimary)
-        }
-        .padding(.top, 16)
+        PassmateTopBar(
+            title: "코인 충전",
+            onBack: onBack
+        )
     }
 
     @ViewBuilder

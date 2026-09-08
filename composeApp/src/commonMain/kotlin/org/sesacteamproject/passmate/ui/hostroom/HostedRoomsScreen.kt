@@ -37,6 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.LevelEmblem
+import org.sesacteamproject.passmate.component.PassmateTopBar
+import org.sesacteamproject.passmate.component.PassmateTopBarStyle
 import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.AppTab
@@ -101,7 +103,7 @@ fun HostedRoomsScreen(onNavigate: (NavigationAction) -> Unit) {
     if (isCreateSheetVisible) {
         PassmateBottomSheet(
             onDismissRequest = { isCreateSheetVisible = false },
-            sheetState = createSheetState,
+            sheetState = createSheetState
         ) {
             CreateRoomSheet(
                 onCreated = { pin ->
@@ -129,6 +131,12 @@ private fun HostedRoomsContentScreen(
             // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
             .statusBarsPadding()
     ) {
+        // 앱바는 스크롤 밖 — 본문을 내려도 제목이 따라 올라가지 않는다.
+        // 상단 60·하단 14는 기존 스크롤 Column이 주던 값 그대로다
+        PassmateTopBar(
+            title = "내가 만든 방",
+            style = PassmateTopBarStyle.Root
+        )
         when {
             uiState.isLoading -> LoadingBox()
             uiState.loadFailed -> ErrorBox(onRetry = { onAction(HostedRoomsAction.Retry) })
@@ -149,16 +157,9 @@ private fun LoadedHostedRooms(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 96.dp),
+            .padding(start = 20.dp, end = 20.dp, bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text(
-            text = "내가 만든 방",
-            color = PassmateColors.TextPrimary,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.48).sp
-        )
         val grade = uiState.grade
 
         if (grade != null) {

@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTopBar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.preview.PassmatePreview
@@ -80,44 +80,27 @@ private fun DeleteAccountContentScreen(
             .background(PassmateColors.Surface)
             // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다 — 시안이 이 화면에 탭바를 유지한다
             .statusBarsPadding()
-            .padding(horizontal = 20.dp)
     ) {
-        Spacer(Modifier.height(16.dp))
-        TopBar(onBack = onBack)
-        Spacer(Modifier.height(20.dp))
-        DeletionNoticeCard(coins = uiState.coins)
-        Spacer(Modifier.height(14.dp))
-        Text(
-            text = "정산 예정 금액이 있으면 지급이 끝난 뒤 탈퇴할 수 있어요.",
-            color = PassmateColors.TextTertiary,
-            fontSize = 12.sp,
-            letterSpacing = (-0.24).sp
-        )
-        Spacer(Modifier.height(16.dp))
-        ConfirmRow(
-            isConfirmed = uiState.isConfirmed,
-            onToggle = { onAction(DeleteAccountAction.ToggleConfirm) }
-        )
-        Spacer(Modifier.weight(1f))
-        DeleteButton(uiState = uiState, onClick = { onAction(DeleteAccountAction.ClickDelete) })
-        Spacer(Modifier.height(24.dp))
-    }
-}
-
-@Composable
-private fun TopBar(onBack: () -> Unit) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        PassmateBackButton(onClick = onBack)
-        Text(
-            text = "회원 탈퇴",
-            color = PassmateColors.TextPrimary,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.4).sp
-        )
+        // 앱바는 스크롤 밖 — 본문을 내려도 따라 올라가지 않는다
+        PassmateTopBar(title = "회원 탈퇴", onBack = onBack)
+        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
+            DeletionNoticeCard(coins = uiState.coins)
+            Spacer(Modifier.height(14.dp))
+            Text(
+                text = "정산 예정 금액이 있으면 지급이 끝난 뒤 탈퇴할 수 있어요.",
+                color = PassmateColors.TextTertiary,
+                fontSize = 12.sp,
+                letterSpacing = (-0.24).sp
+            )
+            Spacer(Modifier.height(16.dp))
+            ConfirmRow(
+                isConfirmed = uiState.isConfirmed,
+                onToggle = { onAction(DeleteAccountAction.ToggleConfirm) }
+            )
+            Spacer(Modifier.weight(1f))
+            DeleteButton(uiState = uiState, onClick = { onAction(DeleteAccountAction.ClickDelete) })
+            Spacer(Modifier.height(24.dp))
+        }
     }
 }
 

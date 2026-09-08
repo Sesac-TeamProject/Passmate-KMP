@@ -58,41 +58,39 @@ private struct CharacterEditContentView: View {
     private let columns = 4
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 0) {
             topBar
-            Text("대기실 · 결과 화면에서 닉네임과 함께 보여요")
-                .font(.system(size: 14))
-                .kerning(-0.28)
-                .foregroundColor(PassmateColors.textSecondary)
-            if uiState.isLoading {
-                loadingBox
-            } else if uiState.hasLoadError {
-                retryBox
-            } else {
-                avatarGrid
-                Text("선택: \(StudentAvatars.nameOf(uiState.avatarId ?? StudentAvatars.defaultId))")
-                    .font(.system(size: 14, weight: .bold))
+            VStack(alignment: .leading, spacing: 16) {
+                Text("대기실 · 결과 화면에서 닉네임과 함께 보여요")
+                    .font(.system(size: 14))
                     .kerning(-0.28)
-                    .foregroundColor(PassmateColors.primary)
-                saveButton
+                    .foregroundColor(PassmateColors.textSecondary)
+                if uiState.isLoading {
+                    loadingBox
+                } else if uiState.hasLoadError {
+                    retryBox
+                } else {
+                    avatarGrid
+                    Text("선택: \(StudentAvatars.nameOf(uiState.avatarId ?? StudentAvatars.defaultId))")
+                        .font(.system(size: 14, weight: .bold))
+                        .kerning(-0.28)
+                        .foregroundColor(PassmateColors.primary)
+                    saveButton
+                }
+                Spacer()
             }
-            Spacer()
+            .padding(.horizontal, 20)
         }
-        .padding(.horizontal, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
+    // 앱바는 여백을 스스로 가진다 — 본문 여백은 아래 VStack이 따로 준다
     private var topBar: some View {
-        HStack(spacing: 12) {
-            PassmateBackButton(onClick: onBack)
-            Text("내 캐릭터")
-                .font(.system(size: 20, weight: .bold))
-                .kerning(-0.4)
-                .foregroundColor(PassmateColors.textPrimary)
-            Spacer()
-        }
-        .padding(.top, 16)
+        PassmateTopBar(
+            title: "내 캐릭터",
+            onBack: onBack
+        )
     }
 
     private var avatarGrid: some View {

@@ -33,7 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTopBar
+import org.sesacteamproject.passmate.component.PassmateTopBarStyle
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.preview.PassmatePreview
@@ -127,28 +128,13 @@ private fun LoadedReport(
     onAction: (RoomReportAction) -> Unit,
     onClickBack: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+    Column(modifier = Modifier.fillMaxSize()) {
+        // 앱바는 스크롤 밖 — 리포트를 내려도 따라 올라가지 않는다
+        PassmateTopBar(
+            title = "방 리포트",
+            onBack = onClickBack,
+            style = PassmateTopBarStyle.Detail
         ) {
-            PassmateBackButton(onClick = onClickBack)
-            Text(
-                text = "방 리포트",
-                color = PassmateColors.TextPrimary,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.36).sp,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 12.dp)
-            )
             Text(
                 text = "내보내기",
                 color = PassmateColors.PrimaryDeep,
@@ -160,37 +146,45 @@ private fun LoadedReport(
                     .padding(4.dp)
             )
         }
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(
-                text = report.roomTitle,
-                color = PassmateColors.TextPrimary,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.44).sp
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(start = 20.dp, end = 20.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = report.roomTitle,
+                    color = PassmateColors.TextPrimary,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.44).sp
+                )
+                Text(
+                    text = reportSubtitle(report),
+                    color = PassmateColors.TextSecondary,
+                    fontSize = 13.sp,
+                    letterSpacing = (-0.26).sp
+                )
+            }
+            StatCardsGrid(report = report)
+            TabChips(
+                selectedTab = selectedTab,
+                onSelect = { onAction(RoomReportAction.SelectTab(it)) }
             )
-            Text(
-                text = reportSubtitle(report),
-                color = PassmateColors.TextSecondary,
-                fontSize = 13.sp,
-                letterSpacing = (-0.26).sp
-            )
-        }
-        StatCardsGrid(report = report)
-        TabChips(
-            selectedTab = selectedTab,
-            onSelect = { onAction(RoomReportAction.SelectTab(it)) }
-        )
-        when (selectedTab) {
-            ReportTab.OVERVIEW -> OverviewTab(
-                report = report,
-                onClickQuestionsLink = { onAction(RoomReportAction.SelectTab(ReportTab.QUESTIONS)) }
-            )
-            ReportTab.QUESTIONS -> QuestionsTab(questions = report.questions)
-            ReportTab.STUDENTS -> StudentsTab(
-                report = report,
-                studentSort = studentSort,
-                onSelectSort = { onAction(RoomReportAction.SelectStudentSort(it)) }
-            )
+            when (selectedTab) {
+                ReportTab.OVERVIEW -> OverviewTab(
+                    report = report,
+                    onClickQuestionsLink = { onAction(RoomReportAction.SelectTab(ReportTab.QUESTIONS)) }
+                )
+                ReportTab.QUESTIONS -> QuestionsTab(questions = report.questions)
+                ReportTab.STUDENTS -> StudentsTab(
+                    report = report,
+                    studentSort = studentSort,
+                    onSelectSort = { onAction(RoomReportAction.SelectStudentSort(it)) }
+                )
+            }
         }
     }
 }

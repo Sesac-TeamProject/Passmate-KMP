@@ -168,18 +168,15 @@ private fun LoadedControl(
     onAction: (SessionControlAction) -> Unit,
     onClickEndSession: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(start = 20.dp, top = 52.dp, end = 20.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        // 헤더(방 제목·PIN)는 스크롤 밖 — 문항 카드를 내려도 따라 올라가지 않는다.
+        // 시안 M-T2 header(349:10124)에는 뒤로가기 버튼이 없어 PassmateTopBar를 쓰지 않는다
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, top = 12.dp, end = 20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 시안 M-T2에는 뒤로가기 버튼이 없다 — 시스템 뒤로가기로만 나간다
             Text(
                 text = uiState.roomTitle,
                 color = PassmateColors.TextPrimary,
@@ -196,6 +193,13 @@ private fun LoadedControl(
                 letterSpacing = (-0.28).sp
             )
         }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(start = 20.dp, top = 12.dp, end = 20.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
         ProjectorChip(isConnected = uiState.isProjectorConnected)
         if (uiState.status == RoomStatus.WAITING) {
             WaitingPanel(
@@ -219,6 +223,7 @@ private fun LoadedControl(
             onToggleLock = { onAction(SessionControlAction.ToggleLock) },
             onClickEndSession = onClickEndSession
         )
+        }
     }
 }
 

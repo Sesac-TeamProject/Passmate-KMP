@@ -61,33 +61,31 @@ private struct EditProfileContentView: View {
     let onOpenCharacterEdit: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 0) {
             topBar
-            if uiState.isLoading {
-                loadingBox
-            } else if uiState.hasLoadError {
-                retryBox
-            } else {
-                profileCard
-                saveButton
+            VStack(alignment: .leading, spacing: 16) {
+                if uiState.isLoading {
+                    loadingBox
+                } else if uiState.hasLoadError {
+                    retryBox
+                } else {
+                    profileCard
+                    saveButton
+                }
+                Spacer()
             }
-            Spacer()
+            .padding(.horizontal, 20)
         }
-        .padding(.horizontal, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
+    // 앱바는 여백을 스스로 가진다 — 본문 여백은 아래 VStack이 따로 준다
     private var topBar: some View {
-        HStack(spacing: 12) {
-            PassmateBackButton(onClick: onBack)
-            Text("계정 정보 변경")
-                .font(.system(size: 20, weight: .bold))
-                .kerning(-0.4)
-                .foregroundColor(PassmateColors.textPrimary)
-            Spacer()
-        }
-        .padding(.top, 16)
+        PassmateTopBar(
+            title: "계정 정보 변경",
+            onBack: onBack
+        )
     }
 
     private var profileCard: some View {

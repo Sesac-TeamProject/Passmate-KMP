@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTopBar
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.component.StudentAvatars
 import org.sesacteamproject.passmate.di.koinScreenViewModel
@@ -81,50 +81,44 @@ private fun CharacterEditContentScreen(
             .background(PassmateColors.Surface)
             // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다
             .statusBarsPadding()
-            .padding(start = 20.dp, end = 20.dp, top = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            PassmateBackButton(onClick = onBack)
-            Text(
-                text = "내 캐릭터",
-                color = PassmateColors.TextPrimary,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.4).sp
-            )
-        }
-        Text(
-            text = "대기실 · 결과 화면에서 닉네임과 함께 보여요",
-            color = PassmateColors.TextSecondary,
-            fontSize = 14.sp,
-            letterSpacing = (-0.28).sp
+        // 앱바는 여백을 스스로 가진다 — 본문 여백은 아래 Column이 따로 준다
+        PassmateTopBar(
+            title = "내 캐릭터",
+            onBack = onBack
         )
-        if (uiState.isLoading) {
-            LoadingBox()
-        } else if (uiState.hasLoadError) {
-            RetryBox(onRetry = { onAction(CharacterEditAction.Retry) })
-        } else {
-            AvatarGrid(
-                selectedId = uiState.avatarId,
-                onSelect = { onAction(CharacterEditAction.SelectAvatar(it)) }
-            )
+        Column(
+            modifier = Modifier.fillMaxSize().padding(start = 20.dp, end = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             Text(
-                text = "선택: ${StudentAvatars.nameOf(uiState.avatarId ?: StudentAvatars.DEFAULT_ID)}",
-                color = PassmateColors.Primary,
+                text = "대기실 · 결과 화면에서 닉네임과 함께 보여요",
+                color = PassmateColors.TextSecondary,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.28).sp
             )
-            SaveButton(
-                enabled = uiState.canSubmit,
-                isSubmitting = uiState.isSubmitting,
-                onClick = { onAction(CharacterEditAction.Submit) }
-            )
+            if (uiState.isLoading) {
+                LoadingBox()
+            } else if (uiState.hasLoadError) {
+                RetryBox(onRetry = { onAction(CharacterEditAction.Retry) })
+            } else {
+                AvatarGrid(
+                    selectedId = uiState.avatarId,
+                    onSelect = { onAction(CharacterEditAction.SelectAvatar(it)) }
+                )
+                Text(
+                    text = "선택: ${StudentAvatars.nameOf(uiState.avatarId ?: StudentAvatars.DEFAULT_ID)}",
+                    color = PassmateColors.Primary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.28).sp
+                )
+                SaveButton(
+                    enabled = uiState.canSubmit,
+                    isSubmitting = uiState.isSubmitting,
+                    onClick = { onAction(CharacterEditAction.Submit) }
+                )
+            }
         }
     }
 }

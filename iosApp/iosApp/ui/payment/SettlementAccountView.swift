@@ -58,54 +58,52 @@ private struct SettlementAccountContentView: View {
     let onBack: () -> Void
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 12) {
-                    PassmateBackButton(onClick: onBack)
-                    Text("정산 계좌 등록")
-                        .font(.system(size: 20, weight: .bold))
-                        .kerning(-0.4)
-                        .foregroundColor(PassmateColors.textPrimary)
-                    Spacer()
-                }
-                .padding(.top, 16)
-                if uiState.isLoading {
-                    HStack {
-                        Spacer()
-                        ProgressView().tint(PassmateColors.primary)
-                        Spacer()
+        VStack(alignment: .leading, spacing: 0) {
+            // 앱바는 스크롤 밖 — 폼을 내려도 따라 올라가지 않는다 (Compose는 이 화면에 스크롤이 없다)
+            PassmateTopBar(
+                title: "정산 계좌 등록",
+                onBack: onBack
+            )
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    if uiState.isLoading {
+                        HStack {
+                            Spacer()
+                            ProgressView().tint(PassmateColors.primary)
+                            Spacer()
+                        }
+                        .frame(height: 180)
+                    } else {
+                        accountField(
+                            label: "은행",
+                            placeholder: "예: 신한은행",
+                            value: uiState.bankName,
+                            onChange: { onAction(.changeBankName(text: $0)) }
+                        )
+                        accountField(
+                            label: "계좌번호",
+                            placeholder: "숫자만 입력",
+                            value: uiState.accountNumber,
+                            keyboardType: .numberPad,
+                            onChange: { onAction(.changeAccountNumber(text: $0)) }
+                        )
+                        accountField(
+                            label: "예금주",
+                            placeholder: "예금주명",
+                            value: uiState.holderName,
+                            onChange: { onAction(.changeHolderName(text: $0)) }
+                        )
+                        Text("매월 5일 지급 · 사업소득 3.3% 원천징수(확정 전)")
+                            .font(.system(size: 12))
+                            .kerning(-0.24)
+                            .foregroundColor(PassmateColors.textTertiary)
+                        saveButton
                     }
-                    .frame(height: 180)
-                } else {
-                    accountField(
-                        label: "은행",
-                        placeholder: "예: 신한은행",
-                        value: uiState.bankName,
-                        onChange: { onAction(.changeBankName(text: $0)) }
-                    )
-                    accountField(
-                        label: "계좌번호",
-                        placeholder: "숫자만 입력",
-                        value: uiState.accountNumber,
-                        keyboardType: .numberPad,
-                        onChange: { onAction(.changeAccountNumber(text: $0)) }
-                    )
-                    accountField(
-                        label: "예금주",
-                        placeholder: "예금주명",
-                        value: uiState.holderName,
-                        onChange: { onAction(.changeHolderName(text: $0)) }
-                    )
-                    Text("매월 5일 지급 · 사업소득 3.3% 원천징수(확정 전)")
-                        .font(.system(size: 12))
-                        .kerning(-0.24)
-                        .foregroundColor(PassmateColors.textTertiary)
-                    saveButton
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 14)
+                .padding(.bottom, 28)
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 24)
-            .padding(.bottom, 28)
         }
         .background(PassmateColors.surface.ignoresSafeArea())
     }

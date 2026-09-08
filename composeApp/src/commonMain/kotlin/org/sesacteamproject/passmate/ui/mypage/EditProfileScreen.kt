@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTopBar
 import org.sesacteamproject.passmate.component.StudentAvatar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -85,38 +85,32 @@ private fun EditProfileContentScreen(
             .background(PassmateColors.Surface)
             // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다
             .statusBarsPadding()
-            .padding(start = 20.dp, end = 20.dp, top = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+        // 앱바는 여백을 스스로 가진다 — 본문 여백은 아래 Column이 따로 준다
+        PassmateTopBar(
+            title = "계정 정보 변경",
+            onBack = onBack
+        )
+        Column(
+            modifier = Modifier.fillMaxSize().padding(start = 20.dp, end = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            PassmateBackButton(onClick = onBack)
-            Text(
-                text = "계정 정보 변경",
-                color = PassmateColors.TextPrimary,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.4).sp
-            )
-        }
-        if (uiState.isLoading) {
-            LoadingBox()
-        } else if (uiState.hasLoadError) {
-            RetryBox(onRetry = { onAction(EditProfileAction.Retry) })
-        } else {
-            ProfileCard(
-                uiState = uiState,
-                onAction = onAction,
-                onClickChangeCharacter = onClickChangeCharacter
-            )
-            SaveButton(
-                enabled = uiState.canSubmit,
-                isSubmitting = uiState.isSubmitting,
-                onClick = { onAction(EditProfileAction.Submit) }
-            )
+            if (uiState.isLoading) {
+                LoadingBox()
+            } else if (uiState.hasLoadError) {
+                RetryBox(onRetry = { onAction(EditProfileAction.Retry) })
+            } else {
+                ProfileCard(
+                    uiState = uiState,
+                    onAction = onAction,
+                    onClickChangeCharacter = onClickChangeCharacter
+                )
+                SaveButton(
+                    enabled = uiState.canSubmit,
+                    isSubmitting = uiState.isSubmitting,
+                    onClick = { onAction(EditProfileAction.Submit) }
+                )
+            }
         }
     }
 }

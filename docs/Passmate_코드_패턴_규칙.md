@@ -140,6 +140,11 @@
 ## 11. UI 컴포넌트 규칙
 
 - 공통 UI 컴포넌트(`PassmateCard`, `PassmateTopBar`, `PassmateTimerBar` 등)를 우선 재사용한다.
+- **상단 앱바는 `PassmateTopBar`(iOS `PassmateTopBar.swift`)만 쓴다.** 시안 `header` 프레임이 기준이며 확인한 화면이 전부 같은 규격이다 — M-12 마이(`349:9684`)·M-09 명성(`349:9771`)·M-T4 정산(`349:10200`)·M-12-1 계정 정보(`437:5425`)·M-14 방 리포트(`432:5367`). 구성은 `[뒤로가기 24] gap12 [타이틀] spacer [우측 액션]`이고 **여백은 컴포넌트가 고정한다 — 좌우 20 · 상단 12 · 하단 16.** 화면이 따로 여백을 주지 않는다(주면 시안과 어긋난다).
+- 상단 12는 시안 실측에서 온다: 타이틀이 화면 최상단에서 `y=56`이고 상태바(iPhone 47)는 `statusBarsPadding()`(iOS는 세이프에어리어)이 이미 먹으므로 그 아래 여백만 남긴 값이다.
+- 뒤로가기는 `PassmateBackButton`(시안 `icon/arrow-left` 223:2826 — 24px 그리드·선 2px·라운드 캡·ink #1B1F24)만 쓴다. 텍스트 글리프(`←`)나 화면에서 직접 그린 `PassmateIcon`을 쓰지 않는다.
+- 타이틀 크기는 `PassmateTopBarStyle` 둘뿐이다 — `Root` 24(탭 루트·명성·정산) · `Detail` 20(시안 heading-md, 그 밖의 상세). 임의의 크기를 쓰지 않는다.
+- **앱바는 스크롤 컨테이너 밖에 둔다.** 본문을 내려도 앱바는 제자리에 남아야 한다 — `Column { PassmateTopBar(...); Body(Modifier.verticalScroll(...)) }` / `VStack { PassmateTopBar(...); ScrollView { ... } }` 형태다 (2026-09-08 결정).
 - 화면별 중복 컴포넌트는 공통 컴포넌트로 승격한다 (`component` 패키지).
 - 빈 상태/에러 상태 컴포넌트를 항상 제공한다.
 - 접근성(콘텐츠 설명, 클릭 영역, 색 대비)을 기본 준수한다.

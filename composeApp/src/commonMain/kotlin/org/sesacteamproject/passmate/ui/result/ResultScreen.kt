@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.PassmateIcon
@@ -286,16 +287,10 @@ private fun ErrorHeader(onBack: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 14.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "←",
-            color = PassmateColors.TextPrimary,
-            fontSize = 20.sp,
-            modifier = Modifier
-                .clickable(onClick = onBack)
-                .padding(end = 12.dp, top = 4.dp, bottom = 4.dp)
-        )
+        PassmateBackButton(onClick = onBack)
         Text(
             text = "최종 결과",
             color = PassmateColors.TextPrimary,

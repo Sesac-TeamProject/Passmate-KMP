@@ -60,30 +60,29 @@ private struct DeleteAccountContentView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             topBar
-            noticeCard.padding(.top, 20)
-            Text("정산 예정 금액이 있으면 지급이 끝난 뒤 탈퇴할 수 있어요.")
-                .font(.system(size: 12))
-                .kerning(-0.24)
-                .foregroundColor(PassmateColors.textTertiary)
-                .padding(.top, 14)
-            confirmRow.padding(.top, 16)
-            Spacer()
-            deleteButton.padding(.bottom, 24)
+            VStack(alignment: .leading, spacing: 0) {
+                noticeCard.padding(.top, 20)
+                Text("정산 예정 금액이 있으면 지급이 끝난 뒤 탈퇴할 수 있어요.")
+                    .font(.system(size: 12))
+                    .kerning(-0.24)
+                    .foregroundColor(PassmateColors.textTertiary)
+                    .padding(.top, 14)
+                confirmRow.padding(.top, 16)
+                Spacer()
+                deleteButton.padding(.bottom, 24)
+            }
+            .padding(.horizontal, 20)
         }
-        .padding(.horizontal, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
+    // 앱바는 여백을 스스로 가진다 — 본문 여백은 아래 VStack이 따로 준다
     private var topBar: some View {
-        HStack(spacing: 12) {
-            PassmateBackButton(onClick: onBack)
-            Text("회원 탈퇴")
-                .font(.system(size: 20, weight: .bold))
-                .kerning(-0.4)
-                .foregroundColor(PassmateColors.textPrimary)
-        }
-        .padding(.top, 16)
+        PassmateTopBar(
+            title: "회원 탈퇴",
+            onBack: onBack
+        )
     }
 
     private var noticeCard: some View {

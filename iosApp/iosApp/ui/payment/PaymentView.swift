@@ -110,17 +110,20 @@ private struct PaymentContentView: View {
     let onBack: () -> Void
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                header
-                if uiState.isLoading {
-                    centerProgress
-                } else if uiState.hasLoadError {
-                    retryState
-                } else {
-                    loaded
+        VStack(alignment: .leading, spacing: 0) {
+            // 헤더(뒤로가기·마스코트·제목)는 스크롤 밖 — 폼을 내려도 따라 올라가지 않는다
+            header
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    if uiState.isLoading {
+                        centerProgress
+                    } else if uiState.hasLoadError {
+                        retryState
+                    } else {
+                        loaded
+                    }
+                    Spacer().frame(height: 24)
                 }
-                Spacer().frame(height: 24)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -129,9 +132,10 @@ private struct PaymentContentView: View {
 
     private var header: some View {
         ZStack(alignment: .topLeading) {
+            // 앱바와 같은 상단 여백 12 (시안: 화면 최상단에서 y=56, 상태바는 세이프에어리어가 먹는다)
             PassmateBackButton(onClick: onBack)
                 .padding(.leading, 20)
-                .padding(.top, 14)
+                .padding(.top, 12)
             HStack {
                 Spacer()
                 PassmateMascotView(mascot: .enter, width: 68, height: 75)
@@ -147,9 +151,9 @@ private struct PaymentContentView: View {
                     .kerning(-0.28)
                     .foregroundColor(PassmateColors.textSecondary)
             }
-            .padding(.leading, 60)
+            .padding(.leading, 56)
             .padding(.trailing, 24)
-            .padding(.top, 12)
+            .padding(.top, 10)
             .padding(.bottom, 24)
         }
     }

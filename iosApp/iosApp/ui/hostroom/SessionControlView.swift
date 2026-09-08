@@ -134,33 +134,38 @@ private struct SessionControlContentView: View {
     }
 
     private var loadedView: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 12) {
-                    // 시안 M-T2에는 뒤로가기 버튼이 없다 — 시스템 뒤로가기로만 나간다
-                    Text(uiState.roomTitle)
-                        .font(.system(size: 17, weight: .bold))
-                        .kerning(-0.34)
-                        .foregroundColor(PassmateColors.textPrimary)
-                    Spacer()
-                    Text("PIN \(formatPin(uiState.pin))")
-                        .font(.system(size: 14, weight: .bold))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.primaryDeep)
-                }
-                projectorChip
-                if uiState.status == RoomStatus.waiting {
-                    waitingPanel
-                } else {
-                    questionCard
-                    pttButton
-                    controlButtons
-                }
-                bottomControls
+        VStack(spacing: 0) {
+            // 헤더(방 제목·PIN)는 스크롤 밖 — 문항 카드를 내려도 따라 올라가지 않는다.
+            // 시안 M-T2 header(349:10124)에는 뒤로가기 버튼이 없어 PassmateTopBar를 쓰지 않는다
+            HStack(spacing: 12) {
+                Text(uiState.roomTitle)
+                    .font(.system(size: 17, weight: .bold))
+                    .kerning(-0.34)
+                    .foregroundColor(PassmateColors.textPrimary)
+                Spacer()
+                Text("PIN \(formatPin(uiState.pin))")
+                    .font(.system(size: 14, weight: .bold))
+                    .kerning(-0.28)
+                    .foregroundColor(PassmateColors.primaryDeep)
             }
             .padding(.horizontal, 20)
-            .padding(.top, 20)
-            .padding(.bottom, 24)
+            .padding(.top, 12)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    projectorChip
+                    if uiState.status == RoomStatus.waiting {
+                        waitingPanel
+                    } else {
+                        questionCard
+                        pttButton
+                        controlButtons
+                    }
+                    bottomControls
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
+                .padding(.bottom, 24)
+            }
         }
     }
 

@@ -56,62 +56,60 @@ private struct NotificationSettingsContentView: View {
     let onBack: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 12) {
-                PassmateBackButton(onClick: onBack)
-                Text("알림 설정")
-                    .font(.system(size: 20, weight: .bold))
-                    .kerning(-0.4)
-                    .foregroundColor(PassmateColors.textPrimary)
-                Spacer()
-            }
-            .padding(.top, 16)
-            if uiState.isLoading {
-                HStack {
-                    Spacer()
-                    ProgressView().tint(PassmateColors.primary)
-                    Spacer()
+        VStack(alignment: .leading, spacing: 0) {
+            // 앱바는 여백을 스스로 가진다 — 본문 여백은 아래 VStack이 따로 준다
+            PassmateTopBar(
+                title: "알림 설정",
+                onBack: onBack
+            )
+            VStack(alignment: .leading, spacing: 4) {
+                if uiState.isLoading {
+                    HStack {
+                        Spacer()
+                        ProgressView().tint(PassmateColors.primary)
+                        Spacer()
+                    }
+                    .frame(height: 160)
+                } else if uiState.loadFailed {
+                    Button(action: { onAction(.retry) }) {
+                        Text("설정을 불러오지 못했어요 · 다시 시도")
+                            .font(.system(size: 14))
+                            .kerning(-0.28)
+                            .foregroundColor(PassmateColors.weakTopicText)
+                            .padding(.vertical, 24)
+                    }
+                } else {
+                    toggleRow(
+                        title: "세션 시작",
+                        subtitle: "참여한 방이 시작되면 알려줘요",
+                        isOn: uiState.sessionStart,
+                        kind: .sessionStart
+                    )
+                    toggleRow(
+                        title: "별점 요청",
+                        subtitle: "방이 끝나면 선생님 평가를 요청해요",
+                        isOn: uiState.ratingRequest,
+                        kind: .ratingRequest
+                    )
+                    toggleRow(
+                        title: "정산 완료",
+                        subtitle: "정산금이 입금되면 알려줘요",
+                        isOn: uiState.settlementDone,
+                        kind: .settlementDone
+                    )
                 }
-                .frame(height: 160)
-            } else if uiState.loadFailed {
-                Button(action: { onAction(.retry) }) {
-                    Text("설정을 불러오지 못했어요 · 다시 시도")
-                        .font(.system(size: 14))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.weakTopicText)
-                        .padding(.vertical, 24)
-                }
-            } else {
-                toggleRow(
-                    title: "세션 시작",
-                    subtitle: "참여한 방이 시작되면 알려줘요",
-                    isOn: uiState.sessionStart,
-                    kind: .sessionStart
-                )
-                toggleRow(
-                    title: "별점 요청",
-                    subtitle: "방이 끝나면 선생님 평가를 요청해요",
-                    isOn: uiState.ratingRequest,
-                    kind: .ratingRequest
-                )
-                toggleRow(
-                    title: "정산 완료",
-                    subtitle: "정산금이 입금되면 알려줘요",
-                    isOn: uiState.settlementDone,
-                    kind: .settlementDone
-                )
+                // 시안 M-12-10 각주 — 앱 설정만으로는 못 켜는 경우를 안내한다
+                Text("기기 알림이 꺼져 있으면 휴대폰 설정에서 패스메이트 알림을 켜주세요.")
+                    .font(.system(size: 12))
+                    .kerning(-0.24)
+                    .foregroundColor(PassmateColors.textTertiary)
+                    .padding(.top, 12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            // 시안 M-12-10 각주 — 앱 설정만으로는 못 켜는 경우를 안내한다
-            Text("기기 알림이 꺼져 있으면 휴대폰 설정에서 패스메이트 알림을 켜주세요.")
-                .font(.system(size: 12))
-                .kerning(-0.24)
-                .foregroundColor(PassmateColors.textTertiary)
-                .padding(.top, 12)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 28)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 24)
-        .padding(.bottom, 28)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 

@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTopBar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
 import org.sesacteamproject.passmate.theme.PassmateColors
@@ -74,73 +74,67 @@ private fun NotificationSettingsContentScreen(
             .background(PassmateColors.Surface)
             // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다
             .statusBarsPadding()
-            .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 28.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            PassmateBackButton(onClick = onBack)
-            Text(
-                text = "알림 설정",
-                color = PassmateColors.TextPrimary,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.4).sp
-            )
-        }
-        when {
-            uiState.isLoading -> Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(160.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = PassmateColors.Primary)
-            }
-            uiState.loadFailed -> Text(
-                text = "설정을 불러오지 못했어요 · 다시 시도",
-                color = PassmateColors.WeakTopicText,
-                fontSize = 14.sp,
-                letterSpacing = (-0.28).sp,
-                modifier = Modifier
-                    .clickable { onAction(NotificationSettingsAction.Retry) }
-                    .padding(vertical = 24.dp)
-            )
-            else -> {
-                ToggleRow(
-                    title = "세션 시작",
-                    subtitle = "참여한 방이 시작되면 알려줘요",
-                    checked = uiState.sessionStart,
-                    enabled = !uiState.isSaving,
-                    onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.SESSION_START)) }
-                )
-                ToggleRow(
-                    title = "별점 요청",
-                    subtitle = "방이 끝나면 선생님 평가를 요청해요",
-                    checked = uiState.ratingRequest,
-                    enabled = !uiState.isSaving,
-                    onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.RATING_REQUEST)) }
-                )
-                ToggleRow(
-                    title = "정산 완료",
-                    subtitle = "정산금이 입금되면 알려줘요",
-                    checked = uiState.settlementDone,
-                    enabled = !uiState.isSaving,
-                    onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.SETTLEMENT_DONE)) }
-                )
-            }
-        }
-        // 시안 M-12-10 각주 — 앱 설정만으로는 못 켜는 경우를 안내한다
-        Text(
-            text = "기기 알림이 꺼져 있으면 휴대폰 설정에서 패스메이트 알림을 켜주세요.",
-            color = PassmateColors.TextTertiary,
-            fontSize = 12.sp,
-            letterSpacing = (-0.24).sp,
-            modifier = Modifier.padding(start = 20.dp, top = 12.dp, end = 20.dp)
+        // 앱바는 여백을 스스로 가진다 — 본문 여백은 아래 Column이 따로 준다
+        PassmateTopBar(
+            title = "알림 설정",
+            onBack = onBack
         )
+        Column(
+            modifier = Modifier.fillMaxSize().padding(start = 20.dp, end = 20.dp, bottom = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            when {
+                uiState.isLoading -> Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = PassmateColors.Primary)
+                }
+                uiState.loadFailed -> Text(
+                    text = "설정을 불러오지 못했어요 · 다시 시도",
+                    color = PassmateColors.WeakTopicText,
+                    fontSize = 14.sp,
+                    letterSpacing = (-0.28).sp,
+                    modifier = Modifier
+                        .clickable { onAction(NotificationSettingsAction.Retry) }
+                        .padding(vertical = 24.dp)
+                )
+                else -> {
+                    ToggleRow(
+                        title = "세션 시작",
+                        subtitle = "참여한 방이 시작되면 알려줘요",
+                        checked = uiState.sessionStart,
+                        enabled = !uiState.isSaving,
+                        onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.SESSION_START)) }
+                    )
+                    ToggleRow(
+                        title = "별점 요청",
+                        subtitle = "방이 끝나면 선생님 평가를 요청해요",
+                        checked = uiState.ratingRequest,
+                        enabled = !uiState.isSaving,
+                        onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.RATING_REQUEST)) }
+                    )
+                    ToggleRow(
+                        title = "정산 완료",
+                        subtitle = "정산금이 입금되면 알려줘요",
+                        checked = uiState.settlementDone,
+                        enabled = !uiState.isSaving,
+                        onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.SETTLEMENT_DONE)) }
+                    )
+                }
+            }
+            // 시안 M-12-10 각주 — 앱 설정만으로는 못 켜는 경우를 안내한다
+            Text(
+                text = "기기 알림이 꺼져 있으면 휴대폰 설정에서 패스메이트 알림을 켜주세요.",
+                color = PassmateColors.TextTertiary,
+                fontSize = 12.sp,
+                letterSpacing = (-0.24).sp,
+                modifier = Modifier.padding(start = 20.dp, top = 12.dp, end = 20.dp)
+            )
+        }
     }
 }
 

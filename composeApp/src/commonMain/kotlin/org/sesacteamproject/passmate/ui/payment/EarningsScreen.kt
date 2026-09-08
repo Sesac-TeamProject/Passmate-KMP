@@ -38,6 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTopBar
+import org.sesacteamproject.passmate.component.PassmateTopBarStyle
 import org.sesacteamproject.passmate.component.PassmateEmptyState
 import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.PassmateIcons
@@ -133,31 +135,13 @@ private fun LoadedEarnings(
     onAction: (EarningsAction) -> Unit,
     onClickBack: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+    Column(modifier = Modifier.fillMaxSize()) {
+        // 앱바는 스크롤 밖 — 정산 내역을 내려도 따라 올라가지 않는다
+        PassmateTopBar(
+            title = "정산",
+            onBack = onClickBack,
+            style = PassmateTopBarStyle.Root
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                PassmateBackButton(onClick = onClickBack)
-                Text(
-                    text = "정산",
-                    color = PassmateColors.TextPrimary,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.48).sp
-                )
-            }
             Text(
                 text = "계좌 관리",
                 color = PassmateColors.PrimaryDeep,
@@ -169,37 +153,45 @@ private fun LoadedEarnings(
                     .padding(4.dp)
             )
         }
-        SummaryCard(earnings = earnings)
-        HistorySectionHeader(onClickViewAll = { onAction(EarningsAction.ClickViewAllHistory) })
-        if (uiState.items.isEmpty()) {
-            // 빈 상태는 두 갈래다 — 계좌가 없으면 계좌 등록이 먼저다(정산 금액이 쌓여도 지급되지 않는다).
-            // 계좌가 있으면 "정산 내역이 없어요" + 유료 방 개설 유도 (v6 M-T4 빈 상태 2종)
-            if (earnings.account == null) {
-                EmptyAccountUnregistered(
-                    onClickRegister = { onAction(EarningsAction.ClickManageAccount) }
-                )
-            } else {
-                EmptySettlements(
-                    onClickCreateRoom = { onAction(EarningsAction.ClickCreatePaidRoom) }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(start = 20.dp, end = 20.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            SummaryCard(earnings = earnings)
+            HistorySectionHeader(onClickViewAll = { onAction(EarningsAction.ClickViewAllHistory) })
+            if (uiState.items.isEmpty()) {
+                // 빈 상태는 두 갈래다 — 계좌가 없으면 계좌 등록이 먼저다(정산 금액이 쌓여도 지급되지 않는다).
+                // 계좌가 있으면 "정산 내역이 없어요" + 유료 방 개설 유도 (v6 M-T4 빈 상태 2종)
+                if (earnings.account == null) {
+                    EmptyAccountUnregistered(
+                        onClickRegister = { onAction(EarningsAction.ClickManageAccount) }
+                    )
+                } else {
+                    EmptySettlements(
+                        onClickCreateRoom = { onAction(EarningsAction.ClickCreatePaidRoom) }
+                    )
+                }
+            }
+            uiState.items.forEach { item ->
+                SettlementRow(item = item)
+            }
+            if (uiState.nextCursor != null) {
+                LoadMoreRow(
+                    isLoadingMore = uiState.isLoadingMore,
+                    onClick = { onAction(EarningsAction.LoadMore) }
                 )
             }
-        }
-        uiState.items.forEach { item ->
-            SettlementRow(item = item)
-        }
-        if (uiState.nextCursor != null) {
-            LoadMoreRow(
-                isLoadingMore = uiState.isLoadingMore,
-                onClick = { onAction(EarningsAction.LoadMore) }
-            )
-        }
-        earnings.account?.let { account ->
-            AccountRow(
-                bankName = account.bankName,
-                maskedNumber = account.maskedNumber,
-                payoutNote = account.payoutNote,
-                onClick = { onAction(EarningsAction.ClickManageAccount) }
-            )
+            earnings.account?.let { account ->
+                AccountRow(
+                    bankName = account.bankName,
+                    maskedNumber = account.maskedNumber,
+                    payoutNote = account.payoutNote,
+                    onClick = { onAction(EarningsAction.ClickManageAccount) }
+                )
+            }
         }
     }
 }
@@ -482,8 +474,6 @@ private object LoadFailedText {
 
     const val HEADER_TITLE = "정산"
 
-    const val BACK = "\u2190"
-
     const val TITLE = "목록을 불러오지 못했어요"
 
     const val GUIDE = "연결이 잠시 끊겼어요.\n정산 금액은 사라지지 않아요."
@@ -506,12 +496,6 @@ private object LoadFailedSpec {
     val HeaderPaddingTop = 60.dp
 
     val HeaderPaddingBottom = 14.dp
-
-    val BackFontSize = 20.sp
-
-    val BackEndPadding = 12.dp
-
-    val BackVerticalPadding = 4.dp
 
     val HeaderTitleFontSize = 15.sp
 
@@ -654,20 +638,10 @@ private fun LoadFailedHeader(onClickBack: () -> Unit) {
                 end = LoadFailedSpec.HeaderPaddingHorizontal,
                 bottom = LoadFailedSpec.HeaderPaddingBottom
             ),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = LoadFailedText.BACK,
-            color = PassmateColors.TextPrimary,
-            fontSize = LoadFailedSpec.BackFontSize,
-            modifier = Modifier
-                .clickable(onClick = onClickBack)
-                .padding(
-                    end = LoadFailedSpec.BackEndPadding,
-                    top = LoadFailedSpec.BackVerticalPadding,
-                    bottom = LoadFailedSpec.BackVerticalPadding
-                )
-        )
+        PassmateBackButton(onClick = onClickBack)
         Text(
             text = LoadFailedText.HEADER_TITLE,
             color = PassmateColors.TextPrimary,

@@ -141,15 +141,21 @@ private fun PaymentContentScreen(
             // 탭바 없는 push 화면은 Scaffold가 하단 인셋을 주지 않으므로(contentWindowInsets=0) 여기서 직접 준다
             .statusBarsPadding()
             .navigationBarsPadding()
-            .verticalScroll(rememberScrollState())
     ) {
+        // 헤더(뒤로가기·마스코트·제목)는 스크롤 밖 — 폼을 내려도 따라 올라가지 않는다
         PaymentHeader(onBack = onBack)
-        when {
-            uiState.isLoading -> CenterProgress()
-            uiState.hasLoadError -> RetryState(onRetry = { onAction(PaymentAction.Retry) })
-            else -> LoadedPayment(uiState = uiState, onAction = onAction)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            when {
+                uiState.isLoading -> CenterProgress()
+                uiState.hasLoadError -> RetryState(onRetry = { onAction(PaymentAction.Retry) })
+                else -> LoadedPayment(uiState = uiState, onAction = onAction)
+            }
+            Spacer(Modifier.height(24.dp))
         }
-        Spacer(Modifier.height(24.dp))
     }
 }
 
@@ -158,7 +164,8 @@ private fun PaymentHeader(onBack: () -> Unit) {
     Box(modifier = Modifier.fillMaxWidth()) {
         PassmateBackButton(
             onClick = onBack,
-            modifier = Modifier.padding(start = 20.dp, top = 58.dp)
+            // 앱바와 같은 상단 여백 12 (시안: 화면 최상단에서 y=56, 상태바는 statusBarsPadding이 먹는다)
+            modifier = Modifier.padding(start = 20.dp, top = 12.dp)
         )
         PassmateMascot(
             mascot = PassmateMascots.Enter,
@@ -166,10 +173,10 @@ private fun PaymentHeader(onBack: () -> Unit) {
             height = 75.dp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 44.dp, end = 28.dp)
+                .padding(top = 0.dp, end = 28.dp)
         )
         Column(
-            modifier = Modifier.padding(start = 60.dp, top = 56.dp, end = 24.dp, bottom = 24.dp),
+            modifier = Modifier.padding(start = 56.dp, top = 10.dp, end = 24.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(

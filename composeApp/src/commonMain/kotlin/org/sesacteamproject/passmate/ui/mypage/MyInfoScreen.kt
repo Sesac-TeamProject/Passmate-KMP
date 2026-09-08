@@ -39,6 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PassmateConfirmDialog
+import org.sesacteamproject.passmate.component.PassmateTopBar
+import org.sesacteamproject.passmate.component.PassmateTopBarStyle
 import org.sesacteamproject.passmate.component.PassmateIcon
 import org.sesacteamproject.passmate.component.PassmateIcons
 import org.sesacteamproject.passmate.component.ReputationBadge
@@ -126,6 +128,12 @@ private fun MyInfoContentScreen(
             // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
             .statusBarsPadding()
     ) {
+        // 앱바는 스크롤 밖 — 본문을 내려도 제목이 따라 올라가지 않는다.
+        // 상단 60·하단 14는 기존 스크롤 Column이 주던 값 그대로다
+        PassmateTopBar(
+            title = "마이",
+            style = PassmateTopBarStyle.Root
+        )
         when {
             uiState.isLoading -> LoadingBox()
             uiState.loadFailed -> ErrorBox(onRetry = { onAction(MyInfoAction.Retry) })
@@ -148,22 +156,9 @@ private fun LoadedMyInfo(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(start = 20.dp, top = 60.dp, end = 20.dp, bottom = 24.dp),
+            .padding(start = 20.dp, end = 20.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "마이",
-                color = PassmateColors.TextPrimary,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.48).sp
-            )
-        }
         if (uiState.hasPartialFailure) {
             PartialFailureBanner()
         }

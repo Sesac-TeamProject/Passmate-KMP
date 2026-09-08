@@ -114,15 +114,23 @@ private struct HostedRoomsContentView: View {
     let onAction: (HostedRoomsAction) -> Void
 
     var body: some View {
-        Group {
-            if uiState.isLoading {
-                ProgressView()
-                    .tint(PassmateColors.primary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if uiState.loadFailed {
-                errorView
-            } else {
-                loadedView
+        VStack(spacing: 0) {
+            // 앱바는 스크롤 밖 — 본문을 내려도 제목이 따라 올라가지 않는다.
+            // 상단 32·하단 14는 기존 스크롤 VStack이 주던 값 그대로다
+            PassmateTopBar(
+                title: "내가 만든 방",
+                style: .root
+            )
+            Group {
+                if uiState.isLoading {
+                    ProgressView()
+                        .tint(PassmateColors.primary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if uiState.loadFailed {
+                    errorView
+                } else {
+                    loadedView
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -150,10 +158,6 @@ private struct HostedRoomsContentView: View {
     private var loadedView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                Text("내가 만든 방")
-                    .font(.system(size: 24, weight: .bold))
-                    .kerning(-0.48)
-                    .foregroundColor(PassmateColors.textPrimary)
                 if let grade = uiState.grade {
                     GradeSummaryCardView(grade: grade, onClick: { onAction(.clickReputation) })
                 }
@@ -181,7 +185,6 @@ private struct HostedRoomsContentView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 32)
             .padding(.bottom, 96)
         }
     }

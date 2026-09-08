@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateTopBar
 import org.sesacteamproject.passmate.component.PortOnePaymentView
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
@@ -91,34 +91,17 @@ private fun CoinChargeContentScreen(
             .background(PassmateColors.Surface)
             // 배경은 상태바 뒤까지, 하단 인셋은 탭바(PassmateBottomTabBar)가 준다 — 시안이 이 화면에 탭바를 유지한다
             .statusBarsPadding()
-            .padding(horizontal = 20.dp)
     ) {
-        Spacer(Modifier.height(16.dp))
-        TopBar(onBack = onBack)
-        Spacer(Modifier.height(20.dp))
-        when {
-            uiState.isLoading -> CenterProgress()
-            uiState.hasLoadError -> RetryState(onRetry = { onAction(CoinChargeAction.Retry) })
-            uiState.isCompleted -> CompletedBody(uiState = uiState, onAction = onAction)
-            else -> AmountBody(uiState = uiState, onAction = onAction)
+        // 앱바는 스크롤 밖 — 본문(AmountBody)을 내려도 따라 올라가지 않는다
+        PassmateTopBar(title = "코인 충전", onBack = onBack)
+        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
+            when {
+                uiState.isLoading -> CenterProgress()
+                uiState.hasLoadError -> RetryState(onRetry = { onAction(CoinChargeAction.Retry) })
+                uiState.isCompleted -> CompletedBody(uiState = uiState, onAction = onAction)
+                else -> AmountBody(uiState = uiState, onAction = onAction)
+            }
         }
-    }
-}
-
-@Composable
-private fun TopBar(onBack: () -> Unit) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        PassmateBackButton(onClick = onBack)
-        Text(
-            text = "코인 충전",
-            color = PassmateColors.TextPrimary,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.4).sp
-        )
     }
 }
 

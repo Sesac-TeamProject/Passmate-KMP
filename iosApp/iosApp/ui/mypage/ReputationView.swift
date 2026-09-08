@@ -59,18 +59,13 @@ private struct ReputationContentView: View {
         .background(PassmateColors.surface.ignoresSafeArea())
     }
 
+    // 앱바는 스크롤 밖 — 본문(loadedView)을 내려도 따라 올라가지 않는다
     private var header: some View {
-        HStack(spacing: 12) {
-            PassmateBackButton(onClick: onClickBack)
-            Text("명성 · 뱃지")
-                .font(.system(size: 24, weight: .bold))
-                .kerning(-0.48)
-                .foregroundColor(PassmateColors.textPrimary)
-            Spacer()
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 12)
-        .padding(.bottom, 12)
+        PassmateTopBar(
+            title: "명성 · 뱃지",
+            onBack: onClickBack,
+            style: .root
+        )
     }
 
     private var errorView: some View {

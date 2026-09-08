@@ -246,11 +246,7 @@ private struct ResultContentView: View {
 
     private var errorHeader: some View {
         HStack(spacing: 12) {
-            Button(action: onBack) {
-                Text("←")
-                    .font(.system(size: 20))
-                    .foregroundColor(PassmateColors.textPrimary)
-            }
+            PassmateBackButton(onClick: onBack)
             Text("최종 결과")
                 .font(.system(size: 15, weight: .bold))
                 .kerning(-0.3)

@@ -120,22 +120,22 @@ private struct RoomReportContentView: View {
     }
 
     private func loadedView(_ report: RoomReport) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 12) {
-                    PassmateBackButton(onClick: onClickBack)
-                    Text("방 리포트")
-                        .font(.system(size: 18, weight: .bold))
-                        .kerning(-0.36)
-                        .foregroundColor(PassmateColors.textPrimary)
-                    Spacer()
-                    Button(action: { onAction(.clickExport) }) {
-                        Text("내보내기")
-                            .font(.system(size: 14, weight: .medium))
-                            .kerning(-0.28)
-                            .foregroundColor(PassmateColors.primaryDeep)
-                    }
+        VStack(spacing: 0) {
+            // 앱바는 스크롤 밖 — 리포트를 내려도 따라 올라가지 않는다
+            PassmateTopBar(
+                title: "방 리포트",
+                onBack: onClickBack,
+                style: .detail
+            ) {
+                Button(action: { onAction(.clickExport) }) {
+                    Text("내보내기")
+                        .font(.system(size: 14, weight: .medium))
+                        .kerning(-0.28)
+                        .foregroundColor(PassmateColors.primaryDeep)
                 }
+            }
+            ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(report.roomTitle)
                         .font(.system(size: 22, weight: .bold))
@@ -158,8 +158,8 @@ private struct RoomReportContentView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 24)
             .padding(.bottom, 24)
+            }
         }
     }
 
