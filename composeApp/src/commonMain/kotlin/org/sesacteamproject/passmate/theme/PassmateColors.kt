@@ -116,6 +116,12 @@ object PassmateColors {
 
     val FeedbackSuggestionDot = Color(0xFF82828B)
 
+    // 리포트 막대 트랙 (v6 M-06 반 평균 대비 · 개념별 정답률)
+    val ReportBarTrack = Color(0xFFEDEEF0)
+
+    // 반 평균 막대 — 내 막대(Primary) 아래 깔리는 연민트 (v6 M-06 반 평균 대비)
+    val ReportClassBar = Color(0xFFD6F3E6)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     val BrandGoogleBlue = Color(0xFF4285F4)
 

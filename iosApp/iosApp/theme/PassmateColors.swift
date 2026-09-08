@@ -113,6 +113,12 @@ enum PassmateColors {
 
     static let feedbackSuggestionDot = Color(hex: 0x82828B)
 
+    // 리포트 막대 트랙 (v6 M-06 반 평균 대비 · 개념별 정답률)
+    static let reportBarTrack = Color(hex: 0xEDEEF0)
+
+    // 반 평균 막대 — 내 막대(primary) 아래 깔리는 연민트 (v6 M-06 반 평균 대비)
+    static let reportClassBar = Color(hex: 0xD6F3E6)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     static let brandGoogleBlue = Color(hex: 0x4285F4)
 

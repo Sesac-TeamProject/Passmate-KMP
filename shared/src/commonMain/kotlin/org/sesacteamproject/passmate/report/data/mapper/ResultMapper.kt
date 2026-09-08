@@ -10,6 +10,7 @@ import org.sesacteamproject.passmate.report.domain.model.AiFeedbackStatus
 import org.sesacteamproject.passmate.report.domain.model.AnswerVerdict
 import org.sesacteamproject.passmate.report.domain.model.HostReview
 import org.sesacteamproject.passmate.report.domain.model.LearningReport
+import org.sesacteamproject.passmate.report.domain.model.TopicAccuracy
 import org.sesacteamproject.passmate.report.domain.model.QuestionResult
 import org.sesacteamproject.passmate.report.domain.model.ReportQuestion
 import org.sesacteamproject.passmate.report.domain.model.ReportStudent
@@ -110,7 +111,18 @@ fun LearningReportResponse.toDomain(): LearningReport {
     return LearningReport(
         accuracyPercent = accuracy.roundToInt(),
         weakTopics = weakTopics,
-        improvementPoints = improvementPoints
+        improvementPoints = improvementPoints,
+        classAverageAccuracyPercent = classAvgAccuracy?.roundToInt(),
+        topicAccuracies = topicAccuracy.map { it.toDomain() }
+    )
+}
+
+private fun LearningReportResponse.TopicAccuracyDto.toDomain(): TopicAccuracy {
+    return TopicAccuracy(
+        topic = topic,
+        correctCount = correctCount,
+        totalCount = totalCount,
+        accuracyPercent = accuracy.roundToInt()
     )
 }
 
