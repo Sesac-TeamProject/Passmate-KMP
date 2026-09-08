@@ -107,13 +107,11 @@ private struct CoinChargeContentView: View {
                 balanceCard
                 sectionTitle("충전 금액").padding(.top, 24)
                 amountGrid.padding(.top, 10)
-                sectionTitle("결제 수단").padding(.top, 22)
-                methodList.padding(.top, 10)
-                Text("1 C = ₩1 · 포트원(PortOne) 안전 결제 · 충전 후 7일 내 미사용 시 환불 가능")
+                Text("1 C = ₩1 · 결제 수단은 포트원(PortOne) 결제창에서 선택해요 · 충전 후 7일 내 미사용 시 환불 가능")
                     .font(.system(size: 12))
                     .kerning(-0.24)
                     .foregroundColor(PassmateColors.textTertiary)
-                    .padding(.top, 12)
+                    .padding(.top, 16)
                 if let errorMessage = uiState.errorMessage {
                     Text(errorMessage)
                         .font(.system(size: 13))
@@ -197,52 +195,6 @@ private struct CoinChargeContentView: View {
         }
     }
 
-    private var methodList: some View {
-        VStack(spacing: 10) {
-            ForEach(paymentMethods, id: \.self) { method in
-                methodRow(method: method)
-            }
-        }
-    }
-
-    private var paymentMethods: [PaymentMethod] {
-        [.kakaoPay, .naverPay, .tossPay, .card, .transfer]
-    }
-
-    private func methodRow(method: PaymentMethod) -> some View {
-        let isSelected = method == uiState.selectedMethod
-
-        return Button {
-            onAction(.selectMethod(method: method))
-        } label: {
-            HStack(spacing: 12) {
-                radioMark(isSelected: isSelected)
-                Text(method.label)
-                    .font(.system(size: 15, weight: isSelected ? .bold : .regular))
-                    .foregroundColor(isSelected ? PassmateColors.textPrimary : PassmateColors.textSecondary)
-                Spacer()
-            }
-            .padding(.horizontal, 18)
-            .padding(.vertical, 16)
-            .overlay(
-                RoundedRectangle(cornerRadius: 14).stroke(
-                    isSelected ? PassmateColors.primary : PassmateColors.border,
-                    lineWidth: isSelected ? 1.5 : 1
-                )
-            )
-        }
-    }
-
-    private func radioMark(isSelected: Bool) -> some View {
-        ZStack {
-            Circle().stroke(isSelected ? PassmateColors.primary : PassmateColors.border, lineWidth: 1.5)
-            if isSelected {
-                Circle().fill(PassmateColors.primary).frame(width: 10, height: 10)
-            }
-        }
-        .frame(width: 20, height: 20)
-    }
-
     private var chargeButton: some View {
         Button {
             onAction(.clickCharge)
@@ -279,7 +231,8 @@ private struct CoinChargeContentView: View {
                 .kerning(-0.44)
                 .foregroundColor(PassmateColors.textPrimary)
                 .padding(.top, 20)
-            Text("보유 코인 \(formatNumber(uiState.balance)) C · \(uiState.selectedMethod.label) ₩\(formatNumber(uiState.chargedAmount))")
+            // 실제 결제 수단은 포트원 결제창에서 고르므로 앱이 알지 못한다 — 금액만 적는다
+            Text("보유 코인 \(formatNumber(uiState.balance)) C · 결제 ₩\(formatNumber(uiState.chargedAmount))")
                 .font(.system(size: 14))
                 .kerning(-0.28)
                 .foregroundColor(PassmateColors.textSecondary)
@@ -360,8 +313,7 @@ private struct CoinChargeContentView: View {
             isLoading: false,
             balance: 1200,
             presets: [5_000, 10_000, 30_000, 50_000],
-            selectedAmount: 10_000,
-            selectedMethod: .kakaoPay
+            selectedAmount: 10_000
         ),
         onAction: { _ in },
         onBack: {}
@@ -373,7 +325,6 @@ private struct CoinChargeContentView: View {
         uiState: CoinChargeUiState(
             isLoading: false,
             balance: 11_200,
-            selectedMethod: .kakaoPay,
             isCompleted: true,
             chargedAmount: 10_000
         ),

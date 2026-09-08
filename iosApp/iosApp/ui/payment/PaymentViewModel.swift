@@ -2,7 +2,8 @@ import Combine
 import Foundation
 import Shared
 
-// Compose PaymentViewModel.kt 미러 — 보유 코인 확인 → 부족 시 포트원 충전 → 참가비 차감 → 입장.
+// Compose PaymentViewModel.kt 미러 — 보유 코인 확인 → 부족 시 바로 포트원 결제창 → 참가비 차감 → 입장.
+// 결제 수단은 앱에서 고르지 않는다 — 포트원 결제창이 담당한다.
 // 최종 차감·자격 판정은 서버가 하며 여기 계산은 UX용이다 (규칙 §8·§13).
 final class PaymentViewModel: ObservableObject {
     private let getRoomInfoUseCase: GetRoomInfoUseCase
@@ -66,9 +67,6 @@ final class PaymentViewModel: ObservableObject {
                     self.uiState.room = room
                     self.uiState.balance = balance
                     self.uiState.shortfall = Int(self.coinPolicy.shortfall(balance: Int32(balance), entryFee: Int32(entryFee)))
-                    if let method = coins.defaultMethod {
-                        self.uiState.selectedMethod = method
-                    }
                 } else {
                     self.uiState.isLoading = false
                     self.uiState.hasLoadError = true
@@ -114,7 +112,7 @@ final class PaymentViewModel: ObservableObject {
     private func startCharge() {
         let amount = coinPolicy.suggestedChargeAmount(shortfall: Int32(uiState.shortfall))
 
-        requestChargeUseCase.invoke(amount: amount, method: uiState.selectedMethod, roomId: nil) { [weak self] result, error in
+        requestChargeUseCase.invoke(amount: amount, roomId: nil) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
                 if let checkout = (result as? AppResultSuccess<AnyObject>)?.value as? CoinCheckout {
@@ -257,8 +255,6 @@ final class PaymentViewModel: ObservableObject {
             onChangeNickname(nickname: nickname)
         case let .selectAvatar(avatarId):
             uiState.avatarId = avatarId
-        case let .selectMethod(method):
-            uiState.selectedMethod = method
         case .clickPay:
             onClickPay()
         case .confirmCharge:

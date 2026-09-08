@@ -36,7 +36,6 @@ import org.sesacteamproject.passmate.component.PassmateBackButton
 import org.sesacteamproject.passmate.component.PortOnePaymentView
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.navigation.NavigationAction
-import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
 import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.theme.PassmateColors
 import org.sesacteamproject.passmate.theme.PassmateTheme
@@ -123,7 +122,7 @@ private fun TopBar(onBack: () -> Unit) {
     }
 }
 
-// M-12-4 — 보유 코인 · 충전 금액 · 결제 수단 · CTA
+// M-12-4 — 보유 코인 · 충전 금액 · CTA (결제 수단은 포트원 결제창에서 고른다)
 @Composable
 private fun AmountBody(
     uiState: CoinChargeUiState,
@@ -139,16 +138,9 @@ private fun AmountBody(
             selected = uiState.selectedAmount,
             onSelect = { onAction(CoinChargeAction.SelectAmount(it)) }
         )
-        Spacer(Modifier.height(22.dp))
-        Text("결제 수단", color = PassmateColors.TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(10.dp))
-        MethodList(
-            selected = uiState.selectedMethod,
-            onSelect = { onAction(CoinChargeAction.SelectMethod(it)) }
-        )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp))
         Text(
-            text = "1 C = ₩1 · 포트원(PortOne) 안전 결제 · 충전 후 7일 내 미사용 시 환불 가능",
+            text = "1 C = ₩1 · 결제 수단은 포트원(PortOne) 결제창에서 선택해요 · 충전 후 7일 내 미사용 시 환불 가능",
             color = PassmateColors.TextTertiary,
             fontSize = 12.sp,
             letterSpacing = (-0.24).sp
@@ -250,64 +242,6 @@ private fun AmountCell(
 }
 
 @Composable
-private fun MethodList(
-    selected: PaymentMethod,
-    onSelect: (PaymentMethod) -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        PaymentMethod.entries.forEach { method ->
-            MethodRow(
-                method = method,
-                isSelected = method == selected,
-                onSelect = onSelect
-            )
-        }
-    }
-}
-
-@Composable
-private fun MethodRow(
-    method: PaymentMethod,
-    isSelected: Boolean,
-    onSelect: (PaymentMethod) -> Unit
-) {
-    val borderColor = if (isSelected) PassmateColors.Primary else PassmateColors.Border
-    val textColor = if (isSelected) PassmateColors.TextPrimary else PassmateColors.TextSecondary
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(if (isSelected) 1.5.dp else 1.dp, borderColor, RoundedCornerShape(14.dp))
-            .clickable { onSelect(method) }
-            .padding(horizontal = 18.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioMark(isSelected = isSelected)
-        Spacer(Modifier.size(12.dp))
-        Text(
-            text = method.label,
-            color = textColor,
-            fontSize = 15.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-        )
-    }
-}
-
-@Composable
-private fun RadioMark(isSelected: Boolean) {
-    Box(
-        modifier = Modifier
-            .size(20.dp)
-            .border(1.5.dp, if (isSelected) PassmateColors.Primary else PassmateColors.Border, CircleShape),
-        contentAlignment = Alignment.Center
-    ) {
-        if (isSelected) {
-            Box(modifier = Modifier.size(10.dp).background(PassmateColors.Primary, CircleShape))
-        }
-    }
-}
-
-@Composable
 private fun ChargeButton(
     uiState: CoinChargeUiState,
     onClick: () -> Unit
@@ -367,8 +301,9 @@ private fun CompletedBody(
         )
         Spacer(Modifier.height(10.dp))
         Text(
+            // 실제 결제 수단은 포트원 결제창에서 고르므로 앱이 알지 못한다 — 금액만 적는다
             text = "보유 코인 ${formatNumber(uiState.balance)} C · " +
-                "${uiState.selectedMethod.label} ₩${formatNumber(uiState.chargedAmount)}",
+                "결제 ₩${formatNumber(uiState.chargedAmount)}",
             color = PassmateColors.TextSecondary,
             fontSize = 14.sp,
             letterSpacing = (-0.28).sp

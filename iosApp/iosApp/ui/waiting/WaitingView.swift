@@ -7,6 +7,8 @@ struct WaitingView: View {
 
     var onSessionStarted: (String) -> Void = { _ in }
 
+    var onSessionFinished: (Int64) -> Void = { _ in }
+
     var onRoomClosed: () -> Void = {}
 
     var onLeft: () -> Void = {}
@@ -42,6 +44,8 @@ struct WaitingView: View {
             switch event {
             case let .sessionStarted(pin):
                 onSessionStarted(pin)
+            case let .sessionFinished(roomId):
+                onSessionFinished(roomId)
             case let .roomClosed(message):
                 noticeMessage = message
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
@@ -144,15 +148,38 @@ private struct WaitingContentView: View {
                     .kerning(-0.28)
                     .foregroundColor(PassmateColors.textSecondary)
                 participantAvatarRow
-                Text("학생 \(uiState.totalCount)명이 함께해요")
-                    .font(.system(size: 14))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.textSecondary)
+                participantSummary
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 30)
         }
         .padding(.horizontal, 20)
+    }
+
+    // 목록을 못 불러온 것과 정말 아무도 없는 것을 구분한다 — 조회 실패가 "학생 0명이 함께해요"로
+    // 둔갑하면 사용자는 방이 빈 줄 안다. 실패·연결 끊김은 눌러서 다시 불러올 수 있게 한다.
+    // 목록을 이미 받아 뒀다면 재연결 중에도 인원수를 계속 보여준다 — 잠깐의 끊김에 문구가 깜빡이지 않는다
+    @ViewBuilder
+    private var participantSummary: some View {
+        if uiState.hasParticipantsError && uiState.participants.isEmpty {
+            Button(action: { onAction(.retryParticipants) }) {
+                Text("참가자를 불러오지 못했어요 · 다시 시도")
+                    .font(.system(size: 14, weight: .medium))
+                    .kerning(-0.28)
+                    .foregroundColor(PassmateColors.wrongPinkText)
+                    .padding(4)
+            }
+        } else if uiState.isParticipantsLoading && uiState.participants.isEmpty {
+            Text("참가자를 불러오는 중이에요")
+                .font(.system(size: 14))
+                .kerning(-0.28)
+                .foregroundColor(PassmateColors.textTertiary)
+        } else {
+            Text("학생 \(uiState.totalCount)명이 함께해요")
+                .font(.system(size: 14))
+                .kerning(-0.28)
+                .foregroundColor(PassmateColors.textSecondary)
+        }
     }
 
     private var waitingMessage: String {
@@ -219,7 +246,8 @@ private struct WaitingNoticeToast: View {
                 Participant(participantId: 9002, nickname: "준영", avatarId: KotlinInt(int: 2), isGuest: false, isConnected: true),
                 Participant(participantId: 9003, nickname: "혜림", avatarId: KotlinInt(int: 5), isGuest: false, isConnected: true)
             ],
-            totalCount: 3
+            totalCount: 3,
+            isParticipantsLoading: false
         ),
         onAction: { _ in }
     )
@@ -234,7 +262,26 @@ private struct WaitingNoticeToast: View {
             myParticipantId: 9001,
             myNickname: "민지",
             participants: [],
-            totalCount: 0
+            totalCount: 0,
+            isParticipantsLoading: false
+        ),
+        onAction: { _ in }
+    )
+}
+
+// 참가자 조회 실패·연결 끊김 — "학생 0명"으로 둔갑하지 않고 재시도를 내민다
+#Preview("참가자 조회 실패") {
+    WaitingContentView(
+        uiState: WaitingUiState(
+            isLoading: false,
+            roomTitle: "8월 4주차 Spring 스터디",
+            pin: "482913",
+            myParticipantId: 9001,
+            myNickname: "민지",
+            participants: [],
+            totalCount: 0,
+            isParticipantsLoading: false,
+            hasParticipantsError: true
         ),
         onAction: { _ in }
     )

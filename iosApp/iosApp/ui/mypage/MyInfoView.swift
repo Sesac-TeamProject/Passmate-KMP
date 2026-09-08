@@ -17,8 +17,6 @@ struct MyInfoView: View {
 
     var onOpenEditProfile: () -> Void = {}
 
-    var onOpenPaymentMethod: () -> Void = {}
-
     var onOpenSettlementAccount: () -> Void = {}
 
     var onOpenNotifications: () -> Void = {}
@@ -55,8 +53,6 @@ struct MyInfoView: View {
                 onOpenReputation()
             case .openEditProfile:
                 onOpenEditProfile()
-            case .openPaymentMethod:
-                onOpenPaymentMethod()
             case .openCoinHistory:
                 onOpenCoinHistory()
             case .openCharge:
@@ -236,8 +232,6 @@ private struct MyInfoContentView: View {
                         sectionCard {
                             coinRow(coins: profile.coins?.int64Value ?? 0) { onAction(.clickCharge) }
                             rowDivider
-                            infoRow(title: "결제 수단", subtitle: paymentMethodSubtitle, actionLabel: "관리") { onAction(.clickPaymentMethod) }
-                            rowDivider
                             infoRow(title: "코인 내역", subtitle: recentTransactionSubtitle, actionLabel: "보기") { onAction(.clickCoinHistory) }
                         }
                     }
@@ -332,14 +326,6 @@ private struct MyInfoContentView: View {
     }
 
     // 실패는 카드 자체가 failureCard로 대체되므로 여기서는 성공·빈 값만 다룬다
-    private var paymentMethodSubtitle: String {
-        if let method = uiState.defaultMethod {
-            return "\(method.label) · 포트원 안전결제"
-        } else {
-            return "기본 결제 수단을 설정해 주세요"
-        }
-    }
-
     private var recentTransactionSubtitle: String {
         if let recent = uiState.recentTransaction {
             return "최근 \(shortDate(recent.createdAt)) \(signedCoins(Int(recent.amount))) C"
@@ -541,7 +527,6 @@ private struct ProfileCardView: View {
                 joinedRoomCount: KotlinInt(int: 32),
                 hostedRoomCount: KotlinInt(int: 12)
             ),
-            defaultMethod: PaymentMethod.kakaoPay,
             settlementAccount: SettlementAccountSummary(bankName: "국민", maskedNumber: "***-***-4821", holderName: "준영", payoutNote: nil),
             nextPayout: NextPayout(dateLabel: "9/5", amount: 64000)
         ),

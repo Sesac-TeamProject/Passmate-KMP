@@ -2,7 +2,8 @@ import Combine
 import Foundation
 import Shared
 
-// Compose CoinChargeViewModel.kt 미러 — 보유 코인 확인 → 금액·수단 선택 → 포트원 충전 → 완료 표시.
+// Compose CoinChargeViewModel.kt 미러 — 보유 코인 확인 → 금액 선택 → 포트원 결제창 → 완료 표시.
+// 결제 수단은 앱에서 고르지 않는다 — 포트원 결제창이 담당한다.
 // 최종 잔액은 서버 confirm 응답을 그대로 쓴다 — 클라이언트가 더하지 않는다 (규칙 §1 서버 권위)
 final class CoinChargeViewModel: ObservableObject {
     private let getMyCoinsUseCase: GetMyCoinsUseCase
@@ -30,7 +31,6 @@ final class CoinChargeViewModel: ObservableObject {
                 if let coins = (result as? AppResultSuccess<AnyObject>)?.value as? CoinBalance {
                     self.uiState.hasLoadError = false
                     self.uiState.balance = Int(coins.balance)
-                    self.uiState.selectedMethod = coins.defaultMethod ?? self.uiState.selectedMethod
                 } else {
                     self.uiState.hasLoadError = true
                 }
@@ -50,7 +50,6 @@ final class CoinChargeViewModel: ObservableObject {
     private func startCharge(amount: Int) {
         requestChargeUseCase.invoke(
             amount: Int32(amount),
-            method: uiState.selectedMethod,
             roomId: nil
         ) { [weak self] result, error in
             DispatchQueue.main.async {
@@ -133,8 +132,6 @@ final class CoinChargeViewModel: ObservableObject {
             load()
         case let .selectAmount(amount):
             uiState.selectedAmount = amount
-        case let .selectMethod(method):
-            uiState.selectedMethod = method
         case .clickCharge:
             onClickCharge()
         case let .receivePortOneResult(result):

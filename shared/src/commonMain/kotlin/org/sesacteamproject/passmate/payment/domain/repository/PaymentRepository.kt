@@ -8,7 +8,6 @@ import org.sesacteamproject.passmate.payment.domain.model.CoinCheckout
 import org.sesacteamproject.passmate.payment.domain.model.CoinTransaction
 import org.sesacteamproject.passmate.payment.domain.model.Earnings
 import org.sesacteamproject.passmate.payment.domain.model.EntryPayment
-import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
 import org.sesacteamproject.passmate.payment.domain.model.PublicRoom
 import org.sesacteamproject.passmate.payment.domain.model.RoomSort
 import org.sesacteamproject.passmate.payment.domain.model.SettlementAccount
@@ -20,8 +19,9 @@ interface PaymentRepository {
 
     suspend fun getCoinTransactions(cursor: String?): AppResult<PagedResult<CoinTransaction>>
 
+    // 결제 수단은 받지 않는다 — 사용자는 포트원 결제창에서 고른다.
     // roomId를 넘기면 충전 후 바로 참가비 차감(원스텝 입장) 대상 방을 지정한다
-    suspend fun requestCharge(amount: Int, method: PaymentMethod, roomId: Long?): AppResult<CoinCheckout>
+    suspend fun requestCharge(amount: Int, roomId: Long?): AppResult<CoinCheckout>
 
     suspend fun confirmCharge(chargeId: String, paymentId: String, roomId: Long?): AppResult<ChargeConfirm>
 
@@ -42,7 +42,4 @@ interface PaymentRepository {
     suspend fun getSettlementAccount(): AppResult<SettlementAccount>
 
     suspend fun saveSettlementAccount(account: SettlementAccount): AppResult<Unit>
-
-    // 기본 결제 수단 설정 (M-12-8, PUT /users/me/payment-method)
-    suspend fun setDefaultPaymentMethod(method: PaymentMethod): AppResult<Unit>
 }

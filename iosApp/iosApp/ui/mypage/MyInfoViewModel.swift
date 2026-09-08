@@ -85,7 +85,6 @@ final class MyInfoViewModel: ObservableObject {
                 let coins = (result as? AppResultSuccess<AnyObject>)?.value as? CoinBalance
                 self.uiState.isCoinInfoLoading = false
                 if error == nil, let coins {
-                    self.uiState.defaultMethod = coins.defaultMethod
                     self.uiState.recentTransaction = coins.recent
                     self.uiState.isCoinInfoFailed = false
                 } else {
@@ -151,8 +150,6 @@ final class MyInfoViewModel: ObservableObject {
             onClickEditProfile()
         case .clickCharge:
             event.send(.openCharge)
-        case .clickPaymentMethod:
-            event.send(.openPaymentMethod)
         case .clickCoinHistory:
             event.send(.openCoinHistory)
         case .clickSettlementAccount:

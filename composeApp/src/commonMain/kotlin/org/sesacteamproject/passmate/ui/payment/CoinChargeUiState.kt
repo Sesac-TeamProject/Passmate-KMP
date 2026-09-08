@@ -1,7 +1,6 @@
 package org.sesacteamproject.passmate.ui.payment
 
 import org.sesacteamproject.passmate.component.PortOneRequest
-import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
 
 // 코인 충전 (M-12-4·M-12-6) — 금액·결제 수단 선택과 충전 완료 표시.
 // 완료 화면은 별도 라우트가 아니라 isCompleted 전환으로 같은 라우트 안에서 그린다
@@ -11,7 +10,6 @@ data class CoinChargeUiState(
     val balance: Int = 0,
     val presets: List<Int> = emptyList(),
     val selectedAmount: Int = DEFAULT_AMOUNT,
-    val selectedMethod: PaymentMethod = PaymentMethod.KAKAO_PAY,
     val isProcessing: Boolean = false,
     val checkout: PortOneRequest? = null,
     val isCompleted: Boolean = false,

@@ -19,7 +19,6 @@ enum class AppTab(
             Route.CharacterEdit.route to MY_INFO,
             Route.SettlementAccount.route to MY_INFO,
             Route.CoinCharge.route to MY_INFO,
-            Route.PaymentMethod.route to MY_INFO,
             Route.CoinHistory.route to MY_INFO,
             Route.NotificationSettings.route to MY_INFO,
             Route.DeleteAccount.route to MY_INFO,

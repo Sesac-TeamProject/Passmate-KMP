@@ -61,9 +61,6 @@ sealed interface NavigationAction {
     // 정산 계좌 등록 (M-12-3) — 마이 · 정산(M-T4) 양쪽에서 진입
     data object NavigateToSettlementAccount : NavigationAction
 
-    // 결제 수단 관리 (M-12-8)
-    data object NavigateToPaymentMethod : NavigationAction
-
     // 알림 설정 (M-12-10)
     data object NavigateToNotificationSettings : NavigationAction
 

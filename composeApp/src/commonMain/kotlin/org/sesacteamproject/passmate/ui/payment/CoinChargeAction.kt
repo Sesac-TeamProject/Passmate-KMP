@@ -1,7 +1,6 @@
 package org.sesacteamproject.passmate.ui.payment
 
 import org.sesacteamproject.passmate.component.PortOneResult
-import org.sesacteamproject.passmate.payment.domain.model.PaymentMethod
 
 sealed interface CoinChargeAction {
 
@@ -11,9 +10,7 @@ sealed interface CoinChargeAction {
 
     data class SelectAmount(val amount: Int) : CoinChargeAction
 
-    data class SelectMethod(val method: PaymentMethod) : CoinChargeAction
-
-    // 주 CTA — 충전 요청 후 포트원 결제창을 띄운다
+    // 주 CTA — 충전 요청 후 바로 포트원 결제창을 띄운다 (결제 수단은 결제창에서 고른다)
     data object ClickCharge : CoinChargeAction
 
     data class ReceivePortOneResult(val result: PortOneResult) : CoinChargeAction

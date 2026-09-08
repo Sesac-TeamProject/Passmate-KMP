@@ -36,16 +36,11 @@ struct PaymentView: View {
 
     @State private var notice: String? = nil
 
-    // 결제 수단 드롭다운 펼침은 순수 UI 상태 — 컨테이너가 소유한다 (규칙 §11-1)
-    @State private var isMethodExpanded = false
-
     var body: some View {
         ZStack {
             PaymentContentView(
                 uiState: viewModel.uiState,
-                onAction: handleAction,
-                isMethodExpanded: isMethodExpanded,
-                onToggleMethodExpanded: { isMethodExpanded.toggle() },
+                onAction: viewModel.action,
                 onBack: onBack
             )
             if let request = viewModel.uiState.checkout {
@@ -97,13 +92,6 @@ struct PaymentView: View {
         }
     }
 
-    private func handleAction(_ action: PaymentAction) {
-        if case .selectMethod = action {
-            isMethodExpanded = false
-        }
-        viewModel.action(action)
-    }
-
     private func showNotice(_ message: String) {
         notice = message
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -118,10 +106,6 @@ private struct PaymentContentView: View {
     let uiState: PaymentUiState
 
     let onAction: (PaymentAction) -> Void
-
-    let isMethodExpanded: Bool
-
-    let onToggleMethodExpanded: () -> Void
 
     let onBack: () -> Void
 
@@ -190,7 +174,7 @@ private struct PaymentContentView: View {
                 nicknameField
                 avatarField
                 if !uiState.hasEnough {
-                    methodField
+                    shortfallField
                 }
                 if let error = uiState.errorMessage {
                     Text(error)
@@ -280,51 +264,17 @@ private struct PaymentContentView: View {
         }
     }
 
-    private var methodField: some View {
+    // 부족분 안내만 한다 — 결제 수단은 포트원 결제창에서 고른다
+    private var shortfallField: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("보유 코인 \(formatNumber(uiState.balance)) C · 부족 \(formatNumber(uiState.shortfall)) C")
                 .font(.system(size: 14, weight: .medium))
                 .kerning(-0.28)
                 .foregroundColor(PassmateColors.textSecondary)
-            Button(action: onToggleMethodExpanded) {
-                HStack {
-                    Text("\(uiState.selectedMethod.label) ▾")
-                        .font(.system(size: 14))
-                        .kerning(-0.28)
-                        .foregroundColor(PassmateColors.textPrimary)
-                    Spacer()
-                }
-                .padding(.horizontal, 16)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(PassmateColors.fieldGray)
-                .cornerRadius(14)
-            }
-            if isMethodExpanded {
-                VStack(spacing: 0) {
-                    ForEach(paymentMethods, id: \.name) { method in
-                        Button(action: { onAction(.selectMethod(method: method)) }) {
-                            HStack {
-                                Text(method.label)
-                                    .font(.system(size: 14, weight: .medium))
-                                    .kerning(-0.28)
-                                    .foregroundColor(
-                                        method == uiState.selectedMethod
-                                            ? PassmateColors.primaryDeep
-                                            : PassmateColors.textPrimary
-                                    )
-                                Spacer()
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                        }
-                    }
-                }
-                .padding(.vertical, 4)
-                .frame(maxWidth: .infinity)
-                .background(PassmateColors.fieldGray)
-                .cornerRadius(14)
-            }
+            Text("결제 수단은 포트원(PortOne) 결제창에서 선택해요")
+                .font(.system(size: 12))
+                .kerning(-0.24)
+                .foregroundColor(PassmateColors.textTertiary)
         }
     }
 
@@ -356,10 +306,6 @@ private struct PaymentContentView: View {
         stride(from: 0, to: StudentAvatars.ids.count, by: avatarsPerRow).map { start in
             Array(StudentAvatars.ids[start..<min(start + avatarsPerRow, StudentAvatars.ids.count)])
         }
-    }
-
-    private var paymentMethods: [PaymentMethod] {
-        [.kakaoPay, .naverPay, .tossPay, .card, .transfer]
     }
 
     private var centerProgress: some View {
@@ -555,12 +501,9 @@ private let previewPaidRoom = RoomInfo(
             balance: 200,
             shortfall: 300,
             nickname: "민지",
-            avatarId: 3,
-            selectedMethod: .kakaoPay
+            avatarId: 3
         ),
         onAction: { _ in },
-        isMethodExpanded: false,
-        onToggleMethodExpanded: {},
         onBack: {}
     )
 }
@@ -577,8 +520,6 @@ private let previewPaidRoom = RoomInfo(
             isProcessing: true
         ),
         onAction: { _ in },
-        isMethodExpanded: false,
-        onToggleMethodExpanded: {},
         onBack: {}
     )
 }
@@ -587,8 +528,6 @@ private let previewPaidRoom = RoomInfo(
     PaymentContentView(
         uiState: PaymentUiState(isLoading: false, hasLoadError: true),
         onAction: { _ in },
-        isMethodExpanded: false,
-        onToggleMethodExpanded: {},
         onBack: {}
     )
 }

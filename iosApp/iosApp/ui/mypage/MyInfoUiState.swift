@@ -12,8 +12,6 @@ struct MyInfoUiState {
     // 명성 등급 — 서버 /users/me가 등급을 주지 않아 /users/me/grade로 따로 받는다 (시안 M-12 닉네임 옆 배지)
     var level: Shared.HostLevel?
 
-    var defaultMethod: PaymentMethod?
-
     var recentTransaction: CoinTransaction?
 
     var isCoinInfoFailed: Bool = false

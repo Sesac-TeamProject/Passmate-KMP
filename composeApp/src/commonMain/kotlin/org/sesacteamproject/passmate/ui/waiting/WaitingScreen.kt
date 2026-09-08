@@ -66,6 +66,7 @@ fun WaitingScreen(
         viewModel.event.collect { event ->
             when (event) {
                 is WaitingEvent.SessionStarted -> onNavigate(NavigationAction.NavigateToPlay(event.pin))
+                is WaitingEvent.SessionFinished -> onNavigate(NavigationAction.NavigateToResult(event.roomId))
                 is WaitingEvent.RoomClosed -> {
                     snackbarHostState.showSnackbar(event.message)
                     onNavigate(NavigationAction.NavigateToHome)
@@ -120,7 +121,7 @@ private fun WaitingContentScreen(
                 CircularProgressIndicator(color = PassmateColors.Primary)
             }
         } else {
-            EnteredCard(uiState = uiState)
+            EnteredCard(uiState = uiState, onAction = onAction)
             Spacer(modifier = Modifier.weight(1f))
             PassmateWaitingDots(
                 modifier = Modifier
@@ -172,7 +173,10 @@ private fun WaitingHeader(
 }
 
 @Composable
-private fun EnteredCard(uiState: WaitingUiState) {
+private fun EnteredCard(
+    uiState: WaitingUiState,
+    onAction: (WaitingAction) -> Unit
+) {
     PassmateCard(modifier = Modifier.padding(horizontal = 20.dp)) {
         Column(
             modifier = Modifier
@@ -211,13 +215,49 @@ private fun EnteredCard(uiState: WaitingUiState) {
                 participants = uiState.participants,
                 myParticipantId = uiState.myParticipantId
             )
-            Text(
-                text = "학생 ${uiState.totalCount}명이 함께해요",
-                color = PassmateColors.TextSecondary,
-                fontSize = 14.sp,
-                letterSpacing = (-0.28).sp
+            ParticipantSummary(
+                uiState = uiState,
+                onRetry = { onAction(WaitingAction.RetryParticipants) }
             )
         }
+    }
+}
+
+// 목록을 못 불러온 것과 정말 아무도 없는 것을 구분한다 — 조회 실패가 "학생 0명이 함께해요"로
+// 둔갑하면 사용자는 방이 빈 줄 안다. 실패·연결 끊김은 눌러서 다시 불러올 수 있게 한다.
+// 목록을 이미 받아 뒀다면 재연결 중에도 인원수를 계속 보여준다 — 잠깐의 끊김에 문구가 깜빡이지 않는다
+@Composable
+private fun ParticipantSummary(
+    uiState: WaitingUiState,
+    onRetry: () -> Unit
+) {
+    val hasNoData = uiState.participants.isEmpty()
+
+    if (uiState.hasParticipantsError && hasNoData) {
+        Text(
+            text = "참가자를 불러오지 못했어요 · 다시 시도",
+            color = PassmateColors.WrongPinkText,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = (-0.28).sp,
+            modifier = Modifier
+                .clickable(onClick = onRetry)
+                .padding(4.dp)
+        )
+    } else if (uiState.isParticipantsLoading && hasNoData) {
+        Text(
+            text = "참가자를 불러오는 중이에요",
+            color = PassmateColors.TextTertiary,
+            fontSize = 14.sp,
+            letterSpacing = (-0.28).sp
+        )
+    } else {
+        Text(
+            text = "학생 ${uiState.totalCount}명이 함께해요",
+            color = PassmateColors.TextSecondary,
+            fontSize = 14.sp,
+            letterSpacing = (-0.28).sp
+        )
     }
 }
 
@@ -293,7 +333,8 @@ private fun WaitingContentScreenPreview() {
                     Participant(participantId = 9002, nickname = "준영", avatarId = 2, isGuest = false, isConnected = true),
                     Participant(participantId = 9003, nickname = "혜림", avatarId = 5, isGuest = true, isConnected = false)
                 ),
-                totalCount = 3
+                totalCount = 3,
+                isParticipantsLoading = false
             ),
             onAction = {}
         )
@@ -313,7 +354,30 @@ private fun WaitingContentScreenEmptyPreview() {
                 myParticipantId = 9001,
                 myNickname = "민지",
                 participants = emptyList(),
-                totalCount = 0
+                totalCount = 0,
+                isParticipantsLoading = false
+            ),
+            onAction = {}
+        )
+    }
+}
+
+// 참가자 조회 실패·연결 끊김 — "학생 0명"으로 둔갑하지 않고 재시도를 내민다
+@PassmatePreview
+@Composable
+private fun WaitingContentScreenParticipantsErrorPreview() {
+    PassmateTheme {
+        WaitingContentScreen(
+            uiState = WaitingUiState(
+                isLoading = false,
+                roomTitle = "8월 4주차 Spring 스터디",
+                pin = "482913",
+                myParticipantId = 9001,
+                myNickname = "민지",
+                participants = emptyList(),
+                totalCount = 0,
+                isParticipantsLoading = false,
+                hasParticipantsError = true
             ),
             onAction = {}
         )

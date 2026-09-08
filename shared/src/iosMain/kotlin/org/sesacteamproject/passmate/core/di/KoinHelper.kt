@@ -15,7 +15,6 @@ import org.sesacteamproject.passmate.payment.domain.usecase.GetMyCoinsUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.GetPublicRoomsUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.GetSettlementAccountUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.SaveSettlementAccountUseCase
-import org.sesacteamproject.passmate.payment.domain.usecase.SetPaymentMethodUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.PayEntryFeeUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.RequestChargeUseCase
 import org.sesacteamproject.passmate.rating.domain.usecase.SubmitRatingUseCase
@@ -68,7 +67,6 @@ object KoinHelper {
     }
 
     fun signInWithGoogleUseCase(): SignInWithGoogleUseCase = KoinPlatform.getKoin().get()
-
 
     fun devSignInUseCase(): DevSignInUseCase = KoinPlatform.getKoin().get()
 
@@ -149,8 +147,6 @@ object KoinHelper {
     fun getNotificationSettingsUseCase(): GetNotificationSettingsUseCase = KoinPlatform.getKoin().get()
 
     fun updateNotificationSettingsUseCase(): UpdateNotificationSettingsUseCase = KoinPlatform.getKoin().get()
-
-    fun setPaymentMethodUseCase(): SetPaymentMethodUseCase = KoinPlatform.getKoin().get()
 
     fun getHostedRoomsUseCase(): GetHostedRoomsUseCase = KoinPlatform.getKoin().get()
 

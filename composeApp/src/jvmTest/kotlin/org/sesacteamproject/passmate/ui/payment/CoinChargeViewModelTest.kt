@@ -60,7 +60,6 @@ class CoinChargeViewModelTest {
         val state = viewModel.uiState.value
 
         assertEquals(1200, state.balance)
-        assertEquals(PaymentMethod.NAVER_PAY, state.selectedMethod)
         assertEquals(10_000, state.selectedAmount)
         assertEquals(false, state.isLoading)
     }
@@ -75,16 +74,7 @@ class CoinChargeViewModelTest {
     }
 
     @Test
-    fun selectMethodUpdatesSelection() = runTest {
-        val viewModel = viewModel(FakePaymentRepository())
-
-        viewModel.onAction(CoinChargeAction.SelectMethod(PaymentMethod.TOSS_PAY))
-
-        assertEquals(PaymentMethod.TOSS_PAY, viewModel.uiState.value.selectedMethod)
-    }
-
-    @Test
-    fun clickChargeOpensPortOneWithSelectedAmountAndMethod() = runTest {
+    fun clickChargeOpensPortOneWithSelectedAmount() = runTest {
         val repository = FakePaymentRepository(
             coinsResult = AppResult.Success(CoinBalance(1200, PaymentMethod.KAKAO_PAY, null)),
             chargeResult = AppResult.Success(checkout)
@@ -93,11 +83,9 @@ class CoinChargeViewModelTest {
 
         viewModel.onAction(CoinChargeAction.Enter)
         viewModel.onAction(CoinChargeAction.SelectAmount(30_000))
-        viewModel.onAction(CoinChargeAction.SelectMethod(PaymentMethod.TOSS_PAY))
         viewModel.onAction(CoinChargeAction.ClickCharge)
 
         assertEquals(30_000, repository.chargedAmount)
-        assertEquals(PaymentMethod.TOSS_PAY, repository.chargedMethod)
         assertNotNull(viewModel.uiState.value.checkout)
     }
 

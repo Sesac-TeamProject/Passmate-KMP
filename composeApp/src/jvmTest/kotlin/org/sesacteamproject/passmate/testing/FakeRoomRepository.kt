@@ -20,6 +20,10 @@ class FakeRoomRepository(
 
     var pinByRoomId: Map<Long, String> = emptyMap()
 
+    var participantsResult: AppResult<List<Participant>> = AppResult.Success(emptyList())
+
+    var participantsCallCount: Int = 0
+
     override suspend fun getRoomPin(roomId: Long): AppResult<String> {
         val pin = pinByRoomId[roomId]
 
@@ -50,7 +54,8 @@ class FakeRoomRepository(
     }
 
     override suspend fun getParticipants(roomId: Long): AppResult<List<Participant>> {
-        return AppResult.Success(emptyList())
+        participantsCallCount += 1
+        return participantsResult
     }
 
     override suspend fun leaveRoom(roomId: Long): AppResult<Unit> {

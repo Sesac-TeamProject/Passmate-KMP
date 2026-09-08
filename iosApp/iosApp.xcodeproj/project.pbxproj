@@ -129,11 +129,6 @@
 		A1010001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift */; };
 		A1010001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift */; };
 		A1010001139AABBCCDDEEFF0139 /* NotificationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001139AABBCCDDEEFF0139 /* NotificationSettingsView.swift */; };
-		A1010001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift */; };
-		A1010001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift */; };
-		A1010001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */; };
-		A1010001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */; };
-		A1010001144AABBCCDDEEFF0144 /* PaymentMethodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001144AABBCCDDEEFF0144 /* PaymentMethodView.swift */; };
 		A1010001145AABBCCDDEEFF0145 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001145AABBCCDDEEFF0145 /* AppTab.swift */; };
 		A1010001146AABBCCDDEEFF0146 /* AppShellUiState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001146AABBCCDDEEFF0146 /* AppShellUiState.swift */; };
 		A1010001147AABBCCDDEEFF0147 /* AppShellAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */; };
@@ -297,11 +292,6 @@
 		A1011001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsEvent.swift; sourceTree = "<group>"; };
 		A1011001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsViewModel.swift; sourceTree = "<group>"; };
 		A1011001139AABBCCDDEEFF0139 /* NotificationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsView.swift; sourceTree = "<group>"; };
-		A1011001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodUiState.swift; sourceTree = "<group>"; };
-		A1011001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodAction.swift; sourceTree = "<group>"; };
-		A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodEvent.swift; sourceTree = "<group>"; };
-		A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodViewModel.swift; sourceTree = "<group>"; };
-		A1011001144AABBCCDDEEFF0144 /* PaymentMethodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodView.swift; sourceTree = "<group>"; };
 		A1011001145AABBCCDDEEFF0145 /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		A1011001146AABBCCDDEEFF0146 /* AppShellUiState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellUiState.swift; sourceTree = "<group>"; };
 		A1011001147AABBCCDDEEFF0147 /* AppShellAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellAction.swift; sourceTree = "<group>"; };
@@ -566,11 +556,6 @@
 				A1011001121AABBCCDDEEFF0121 /* SettlementAccountEvent.swift */,
 				A1011001122AABBCCDDEEFF0122 /* SettlementAccountViewModel.swift */,
 				A1011001123AABBCCDDEEFF0123 /* SettlementAccountView.swift */,
-				A1011001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift */,
-				A1011001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift */,
-				A1011001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift */,
-				A1011001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift */,
-				A1011001144AABBCCDDEEFF0144 /* PaymentMethodView.swift */,
 			);
 			path = payment;
 			sourceTree = "<group>";
@@ -888,11 +873,6 @@
 				A1010001137AABBCCDDEEFF0137 /* NotificationSettingsEvent.swift in Sources */,
 				A1010001138AABBCCDDEEFF0138 /* NotificationSettingsViewModel.swift in Sources */,
 				A1010001139AABBCCDDEEFF0139 /* NotificationSettingsView.swift in Sources */,
-				A1010001140AABBCCDDEEFF0140 /* PaymentMethodUiState.swift in Sources */,
-				A1010001141AABBCCDDEEFF0141 /* PaymentMethodAction.swift in Sources */,
-				A1010001142AABBCCDDEEFF0142 /* PaymentMethodEvent.swift in Sources */,
-				A1010001143AABBCCDDEEFF0143 /* PaymentMethodViewModel.swift in Sources */,
-				A1010001144AABBCCDDEEFF0144 /* PaymentMethodView.swift in Sources */,
 				A1010001145AABBCCDDEEFF0145 /* AppTab.swift in Sources */,
 				A1010001146AABBCCDDEEFF0146 /* AppShellUiState.swift in Sources */,
 				A1010001147AABBCCDDEEFF0147 /* AppShellAction.swift in Sources */,

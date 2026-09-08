@@ -27,7 +27,6 @@ import org.sesacteamproject.passmate.ui.mypage.ReputationScreen
 import org.sesacteamproject.passmate.ui.payment.CoinChargeScreen
 import org.sesacteamproject.passmate.ui.payment.CoinHistoryScreen
 import org.sesacteamproject.passmate.ui.payment.EarningsScreen
-import org.sesacteamproject.passmate.ui.payment.PaymentMethodScreen
 import org.sesacteamproject.passmate.ui.payment.PaymentScreen
 import org.sesacteamproject.passmate.ui.payment.SettlementAccountScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
@@ -57,7 +56,6 @@ private sealed interface JvmDestination {
     data object EditProfile : JvmDestination
     data object CharacterEdit : JvmDestination
     data object SettlementAccount : JvmDestination
-    data object PaymentMethod : JvmDestination
     data object NotificationSettings : JvmDestination
 }
 
@@ -79,7 +77,6 @@ private fun JvmDestination.toTabBarOwner(): AppTab? {
         is JvmDestination.CharacterEdit,
         is JvmDestination.SettlementAccount,
         is JvmDestination.CoinCharge,
-        is JvmDestination.PaymentMethod,
         is JvmDestination.CoinHistory,
         is JvmDestination.NotificationSettings,
         is JvmDestination.DeleteAccount -> AppTab.MY_INFO
@@ -155,7 +152,6 @@ actual fun AppNavHost() {
             is NavigationAction.NavigateToEditProfile -> routeStack.add(JvmDestination.EditProfile)
             is NavigationAction.NavigateToCharacterEdit -> routeStack.add(JvmDestination.CharacterEdit)
             is NavigationAction.NavigateToSettlementAccount -> routeStack.add(JvmDestination.SettlementAccount)
-            is NavigationAction.NavigateToPaymentMethod -> routeStack.add(JvmDestination.PaymentMethod)
             is NavigationAction.NavigateToNotificationSettings ->
                 routeStack.add(JvmDestination.NotificationSettings)
             is NavigationAction.NavigateBack -> {
@@ -204,7 +200,6 @@ actual fun AppNavHost() {
                 is JvmDestination.EditProfile -> EditProfileScreen(onNavigate = onNavigate)
                 is JvmDestination.CharacterEdit -> CharacterEditScreen(onNavigate = onNavigate)
                 is JvmDestination.SettlementAccount -> SettlementAccountScreen(onNavigate = onNavigate)
-                is JvmDestination.PaymentMethod -> PaymentMethodScreen(onNavigate = onNavigate)
                 is JvmDestination.NotificationSettings -> NotificationSettingsScreen(onNavigate = onNavigate)
                 is JvmDestination.Waiting -> WaitingScreen(
                     pin = currentDestination.pin,

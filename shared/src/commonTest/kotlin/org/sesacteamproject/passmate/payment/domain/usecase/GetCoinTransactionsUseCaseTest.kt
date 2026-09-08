@@ -28,7 +28,7 @@ private class FakePaymentRepository(
 
     override suspend fun getCoinTransactions(cursor: String?): AppResult<PagedResult<CoinTransaction>> = AppResult.Success(page)
 
-    override suspend fun requestCharge(amount: Int, method: PaymentMethod, roomId: Long?): AppResult<CoinCheckout> = AppResult.Failure(AppError.NotFound())
+    override suspend fun requestCharge(amount: Int, roomId: Long?): AppResult<CoinCheckout> = AppResult.Failure(AppError.NotFound())
 
     override suspend fun confirmCharge(chargeId: String, paymentId: String, roomId: Long?): AppResult<ChargeConfirm> = AppResult.Failure(AppError.NotFound())
 
@@ -46,8 +46,6 @@ private class FakePaymentRepository(
     override suspend fun getSettlementAccount(): AppResult<SettlementAccount> = AppResult.Failure(AppError.NotFound())
 
     override suspend fun saveSettlementAccount(account: SettlementAccount): AppResult<Unit> = AppResult.Failure(AppError.NotFound())
-
-    override suspend fun setDefaultPaymentMethod(method: PaymentMethod): AppResult<Unit> = AppResult.Failure(AppError.NotFound())
 }
 
 private fun transaction(id: Long, createdAt: String?): CoinTransaction {

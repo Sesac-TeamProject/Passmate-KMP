@@ -12,7 +12,6 @@ enum MyInfoAction {
     case clickEditProfile
     // 코인 충전 (M-12-4~6) — 전용 화면은 후속 작업, 지금은 안내만
     case clickCharge
-    case clickPaymentMethod
     case clickCoinHistory
     case clickSettlementAccount
     case clickEarnings

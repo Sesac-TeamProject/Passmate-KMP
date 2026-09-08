@@ -15,7 +15,8 @@ import org.sesacteamproject.passmate.payment.domain.usecase.ConfirmChargeUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.GetMyCoinsUseCase
 import org.sesacteamproject.passmate.payment.domain.usecase.RequestChargeUseCase
 
-// 코인 충전 (M-12-4·M-12-6). 흐름: 보유 코인 확인 → 금액·수단 선택 → 포트원 충전 → 완료 표시.
+// 코인 충전 (M-12-4·M-12-6). 흐름: 보유 코인 확인 → 금액 선택 → 포트원 결제창 → 완료 표시.
+// 결제 수단은 앱에서 고르지 않는다 — 포트원 결제창이 담당한다.
 // 최종 잔액은 서버 confirm 응답을 그대로 쓴다 — 클라이언트가 더하지 않는다 (규칙 §1 서버 권위)
 class CoinChargeViewModel(
     private val getMyCoinsUseCase: GetMyCoinsUseCase,
@@ -35,8 +36,7 @@ class CoinChargeViewModel(
                         it.copy(
                             isLoading = false,
                             hasLoadError = false,
-                            balance = coins.balance,
-                            selectedMethod = coins.defaultMethod ?: it.selectedMethod
+                            balance = coins.balance
                         )
                     }
                 }
@@ -55,7 +55,7 @@ class CoinChargeViewModel(
     }
 
     private suspend fun startCharge(amount: Int) {
-        requestChargeUseCase.invoke(amount, _uiState.value.selectedMethod, roomId = null)
+        requestChargeUseCase.invoke(amount, roomId = null)
             .onSuccess { checkout -> showPortOne(checkout) }
             .onFailure { error ->
                 _uiState.update { it.copy(isProcessing = false, errorMessage = chargeErrorMessage(error)) }
@@ -127,7 +127,6 @@ class CoinChargeViewModel(
             is CoinChargeAction.Enter -> load()
             is CoinChargeAction.Retry -> load()
             is CoinChargeAction.SelectAmount -> _uiState.update { it.copy(selectedAmount = action.amount) }
-            is CoinChargeAction.SelectMethod -> _uiState.update { it.copy(selectedMethod = action.method) }
             is CoinChargeAction.ClickCharge -> onClickCharge()
             is CoinChargeAction.ReceivePortOneResult -> onReceivePortOneResult(action.result)
             is CoinChargeAction.ClickConfirmDone -> viewModelScope.launch { _event.emit(CoinChargeEvent.Done) }

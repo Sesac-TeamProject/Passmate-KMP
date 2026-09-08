@@ -29,15 +29,22 @@ class ServerHostTest {
         assertEquals(DEFAULT_SERVER_HOST, resolveServerHost("\$(PASSMATE_SERVER_HOST)"))
     }
 
-    // 기본값은 플랫폼마다 다르다 — 안드로이드 에뮬레이터만 호스트 PC를 10.0.2.2로 본다
+    // 설정이 있으면 세 타깃 모두 그 값을 쓴다 — 로컬 백엔드로 되돌리는 경로가 살아 있어야 한다
     @Test
-    fun fallsBackToPlatformDefaultWhenGiven() {
-        val emulatorHost = "10.0.2.2:8080"
+    fun prefersConfiguredHostOverDefault() {
+        assertEquals("10.0.2.2:8080", resolveServerHost("10.0.2.2:8080"))
+        assertEquals("172.31.98.123:8080", resolveServerHost("172.31.98.123:8080"))
+    }
 
-        assertEquals(emulatorHost, resolveServerHost(null, emulatorHost))
-        assertEquals(emulatorHost, resolveServerHost("", emulatorHost))
-        assertEquals(emulatorHost, resolveServerHost("\$(PASSMATE_SERVER_HOST)", emulatorHost))
-        assertEquals("172.31.98.123:8080", resolveServerHost("172.31.98.123:8080", emulatorHost))
+    // 설정이 없으면 운영 서버로 간다 — 기본 접속 대상이 로컬 백엔드가 아니다
+    @Test
+    fun defaultsToProductionServer() {
+        val defaultHost = resolveServerHost(null)
+
+        assertEquals("api.passmate.kr", defaultHost)
+        assertEquals("https://api.passmate.kr", apiBaseUrlOf(defaultHost))
+        assertEquals("wss://api.passmate.kr/ws", wsUrlOf(defaultHost))
+        assertFalse(isLocalDevServer(apiBaseUrlOf(defaultHost)), "기본 주소는 개발 서버가 아니다")
     }
 
     @Test
