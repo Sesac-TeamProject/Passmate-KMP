@@ -151,6 +151,7 @@ fun SettlementAccountResponse.toSummary(): SettlementAccountSummary? {
         SettlementAccountSummary(
             bankName = view.bankName,
             maskedNumber = view.accountNoMasked,
+            holderName = view.holderName,
             payoutNote = null
         )
     } else {

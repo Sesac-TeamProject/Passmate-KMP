@@ -94,6 +94,8 @@ class EarningsMapperTest {
 
         assertEquals("국민은행", summary?.bankName)
         assertEquals("1234-**-5678", summary?.maskedNumber)
+        // 마이(M-12) 정산 계좌 부제 "국민 ***-***-4821 · 준영"에 예금주가 들어간다
+        assertEquals("홍희표", summary?.holderName)
     }
 
     @Test

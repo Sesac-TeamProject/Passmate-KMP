@@ -351,10 +351,15 @@ private struct SettlementRowView: View {
                 .background(PassmateColors.backgroundMint)
                 .cornerRadius(10)
             VStack(alignment: .leading, spacing: 3) {
-                Text(item.roomTitle)
-                    .font(.system(size: 14, weight: .bold))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.textPrimary)
+                // 정산 내역은 전부 유료 방이지만 시안(M-T4)이 행마다 "₩ 유료" 칩을 둔다
+                HStack(spacing: 6) {
+                    Text(item.roomTitle)
+                        .font(.system(size: 14, weight: .bold))
+                        .kerning(-0.28)
+                        .foregroundColor(PassmateColors.textPrimary)
+                        .lineLimit(1)
+                    PaidRoomChipView()
+                }
                 Text("\(item.participantCount)명 · 참가비 ₩\(formatAmount(item.entryFeeTotal)) · 수수료 ₩\(formatAmount(item.feeAmount))")
                     .font(.system(size: 12))
                     .kerning(-0.24)

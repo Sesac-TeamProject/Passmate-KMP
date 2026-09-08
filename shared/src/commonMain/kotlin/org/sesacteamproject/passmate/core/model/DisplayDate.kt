@@ -48,15 +48,17 @@ object DisplayDate {
         }
     }
 
-    fun formatWithWeekday(raw: String?): String? {
+    // isSpaced=true → "8/22 (금)"(M-08 참여한 방) · false → "8/22(금)"(M-14 방 리포트). 시안이 화면마다 다르다
+    fun formatWithWeekday(raw: String?, isSpaced: Boolean = true): String? {
         val parts = partsOf(raw)
 
         return if (parts == null) {
             null
         } else {
             val weekday = weekdayNames[weekdayIndexOf(parts.first, parts.second, parts.third)]
+            val separator = if (isSpaced) " " else ""
 
-            "${parts.second}/${parts.third} ($weekday)"
+            "${parts.second}/${parts.third}$separator($weekday)"
         }
     }
 }

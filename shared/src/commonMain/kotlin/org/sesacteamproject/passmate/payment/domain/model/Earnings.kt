@@ -53,6 +53,8 @@ enum class SettlementStatus {
 data class SettlementAccountSummary(
     val bankName: String,
     val maskedNumber: String,
+    // 마이(M-12) 부제 "국민 ***-***-4821 · 준영"의 예금주
+    val holderName: String,
     val payoutNote: String?
 )
 

@@ -103,6 +103,16 @@ enum PassmateColors {
     // 업적 뱃지 타일 테두리 (v6 M-09 명성 · 뱃지 컬렉션)
     static let achievementBadgeBorder = Color(hex: 0xBFEBD8)
 
+    // 명성 레벨 엠블럼 육각형 그라디언트 윗색 — 아랫색은 primary (v6 M-09·M-10·M-13 LevelEmblem)
+    static let levelEmblemGradientTop = Color(hex: 0x4FCF97)
+
+    // AI 분석 카드 불릿 (v6 M-06) — 핵심 포함 · 부족 · 제안
+    static let feedbackCoveredDot = Color(hex: 0x4CC687)
+
+    static let feedbackShortageDot = Color(hex: 0xF3B440)
+
+    static let feedbackSuggestionDot = Color(hex: 0x82828B)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     static let brandGoogleBlue = Color(hex: 0x4285F4)
 

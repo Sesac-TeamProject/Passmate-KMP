@@ -106,6 +106,16 @@ object PassmateColors {
     // 업적 뱃지 타일 테두리 (v6 M-09 명성 · 뱃지 컬렉션)
     val AchievementBadgeBorder = Color(0xFFBFEBD8)
 
+    // 명성 레벨 엠블럼 육각형 그라디언트 윗색 — 아랫색은 Primary (v6 M-09·M-10·M-13 LevelEmblem)
+    val LevelEmblemGradientTop = Color(0xFF4FCF97)
+
+    // AI 분석 카드 불릿 (v6 M-06) — 핵심 포함 · 부족 · 제안
+    val FeedbackCoveredDot = Color(0xFF4CC687)
+
+    val FeedbackShortageDot = Color(0xFFF3B440)
+
+    val FeedbackSuggestionDot = Color(0xFF82828B)
+
     // 서드파티 브랜드 색상 (규칙 §11-2 예외 허용 대상을 토큰으로 관리)
     val BrandGoogleBlue = Color(0xFF4285F4)
 

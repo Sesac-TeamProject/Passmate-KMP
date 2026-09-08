@@ -650,7 +650,10 @@ private fun settlementAccountSubtitle(uiState: MyInfoUiState): String {
     val account = uiState.settlementAccount
 
     return if (account != null) {
-        "${account.bankName} ${account.maskedNumber}"
+        // 시안 M-12 "국민 ***-***-4821 · 준영" — 예금주가 비어 오면 계좌만
+        listOf("${account.bankName} ${account.maskedNumber}", account.holderName)
+            .filter { it.isNotBlank() }
+            .joinToString(" · ")
     } else {
         "계좌를 등록해 주세요"
     }
@@ -713,6 +716,7 @@ private fun MyInfoContentScreenPreview() {
                 settlementAccount = SettlementAccountSummary(
                     bankName = "국민",
                     maskedNumber = "***-***-4821",
+                    holderName = "준영",
                     payoutNote = null
                 ),
                 nextPayout = NextPayout(dateLabel = "9/5", amount = 64000L)

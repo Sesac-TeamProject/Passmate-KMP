@@ -84,7 +84,7 @@ class PaymentRepositoryImpl(
 
             // 조회가 실패해도 등록은 된 상태다 — 은행 정보만 비운다
             (result as? AppResult.Success)?.value?.toSummary()
-                ?: SettlementAccountSummary(bankName = "", maskedNumber = "", payoutNote = null)
+                ?: SettlementAccountSummary(bankName = "", maskedNumber = "", holderName = "", payoutNote = null)
         } else {
             null
         }

@@ -350,7 +350,10 @@ private struct MyInfoContentView: View {
 
     private var settlementAccountSubtitle: String {
         if let account = uiState.settlementAccount {
-            return "\(account.bankName) \(account.maskedNumber)"
+            // 시안 M-12 "국민 ***-***-4821 · 준영" — 예금주가 비어 오면 계좌만
+            return ["\(account.bankName) \(account.maskedNumber)", account.holderName]
+                .filter { !$0.isEmpty }
+                .joined(separator: " · ")
         } else {
             return "계좌를 등록해 주세요"
         }
@@ -539,7 +542,7 @@ private struct ProfileCardView: View {
                 hostedRoomCount: KotlinInt(int: 12)
             ),
             defaultMethod: PaymentMethod.kakaoPay,
-            settlementAccount: SettlementAccountSummary(bankName: "국민", maskedNumber: "***-***-4821", payoutNote: nil),
+            settlementAccount: SettlementAccountSummary(bankName: "국민", maskedNumber: "***-***-4821", holderName: "준영", payoutNote: nil),
             nextPayout: NextPayout(dateLabel: "9/5", amount: 64000)
         ),
         onAction: { _ in },
