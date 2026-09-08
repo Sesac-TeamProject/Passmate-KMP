@@ -72,7 +72,7 @@ final class WaitingViewModel: ObservableObject {
                         if room.status == RoomStatus.finished {
                             self.emitSessionFinished(roomId: room.roomId)
                         } else {
-                            self.observeRoomEvents(roomId: room.roomId)
+                            self.enterWaitingRoom(roomId: room.roomId)
                         }
                     } else {
                         self.event.send(.roomClosed(message: self.roomErrorMessage((result as? AppResultFailure)?.error)))
@@ -92,8 +92,15 @@ final class WaitingViewModel: ObservableObject {
         } else if room.status == RoomStatus.finished {
             emitSessionFinished(roomId: room.roomId)
         } else {
-            observeRoomEvents(roomId: room.roomId)
+            enterWaitingRoom(roomId: room.roomId)
         }
+    }
+
+    // 구독을 먼저 걸어 증분을 놓치지 않고, 초기 목록은 REST로 곧바로 불러온다 (규칙 §2-1-2).
+    // 조회를 WS 연결 성공에 묶어 두면 연결이 늦거나 실패할 때 "학생 0명"이 그대로 남는다
+    private func enterWaitingRoom(roomId: Int64) {
+        observeRoomEvents(roomId: roomId)
+        refreshParticipants(roomId: roomId)
     }
 
     private func emitSessionStarted(pin: String) {
@@ -117,20 +124,43 @@ final class WaitingViewModel: ObservableObject {
                 self.refreshParticipants(roomId: roomId)
             } else if let received = streamEvent as? SessionEventStreamStreamEventReceived {
                 self.handleServerEvent(received.frame.event)
+            } else if streamEvent is SessionEventStreamStreamEventDisconnected {
+                // 끊긴 동안은 참가·퇴장 증분이 오지 않아 화면의 인원이 사실과 달라진다.
+                // 재연결되면 Connected가 다시 조회한다 — 그전까지는 화면이 알 수 있게 표시한다
+                self.onDisconnected()
             }
         }
     }
 
+    private func onDisconnected() {
+        uiState.hasParticipantsError = true
+    }
+
+    private func onRetryParticipants() {
+        let currentRoomId = roomId
+
+        if let currentRoomId {
+            refreshParticipants(roomId: currentRoomId)
+        }
+    }
+
     private func refreshParticipants(roomId: Int64) {
+        uiState.isParticipantsLoading = true
+        uiState.hasParticipantsError = false
         getParticipantsUseCase.invoke(roomId: roomId) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }
                 let success = result as? AppResultSuccess<AnyObject>
 
+                self.uiState.isParticipantsLoading = false
                 if error == nil, let participants = success?.value as? [Participant] {
                     self.uiState.isLoading = false
+                    self.uiState.hasParticipantsError = false
                     self.uiState.participants = participants
                     self.uiState.totalCount = participants.count
+                } else {
+                    // 조용히 0명으로 두면 조회 실패가 "학생 0명이 함께해요"로 보인다 — 화면이 재시도를 걸게 알린다
+                    self.uiState.hasParticipantsError = true
                 }
             }
         }
@@ -219,6 +249,8 @@ final class WaitingViewModel: ObservableObject {
         switch action {
         case let .enter(pin):
             onEnter(pin: pin)
+        case .retryParticipants:
+            onRetryParticipants()
         case .clickLeave:
             onClickLeave()
         }

@@ -82,7 +82,7 @@ class WaitingViewModel(
                         if (room.status == RoomStatus.FINISHED) {
                             emitSessionFinished(room.roomId)
                         } else {
-                            observeRoomEvents(room.roomId)
+                            enterWaitingRoom(room.roomId)
                         }
                     }
                     .onFailure { error -> _event.emit(WaitingEvent.RoomClosed(roomErrorMessage(error))) }
@@ -98,8 +98,15 @@ class WaitingViewModel(
         when (room.status) {
             RoomStatus.RUNNING -> emitSessionStarted(pin)
             RoomStatus.FINISHED -> emitSessionFinished(room.roomId)
-            else -> observeRoomEvents(room.roomId)
+            else -> enterWaitingRoom(room.roomId)
         }
+    }
+
+    // 구독을 먼저 걸어 증분을 놓치지 않고, 초기 목록은 REST로 곧바로 불러온다 (규칙 §2-1-2).
+    // 조회를 WS 연결 성공에 묶어 두면 연결이 늦거나 실패할 때 "학생 0명"이 그대로 남는다
+    private suspend fun enterWaitingRoom(roomId: Long) {
+        observeRoomEvents(roomId)
+        refreshParticipants(roomId)
     }
 
     private suspend fun emitSessionStarted(pin: String) {
@@ -122,22 +129,44 @@ class WaitingViewModel(
                 when (streamEvent) {
                     is SessionEventStream.StreamEvent.Connected -> refreshParticipants(roomId)
                     is SessionEventStream.StreamEvent.Received -> handleServerEvent(streamEvent.frame.event)
-                    is SessionEventStream.StreamEvent.Disconnected -> Unit
+                    // 끊긴 동안은 참가·퇴장 증분이 오지 않아 화면의 인원이 사실과 달라진다.
+                    // 재연결되면 Connected가 다시 조회한다 — 그전까지는 화면이 알 수 있게 표시한다
+                    is SessionEventStream.StreamEvent.Disconnected -> onDisconnected()
                 }
             }
         }
     }
 
-    private suspend fun refreshParticipants(roomId: Long) {
-        getParticipantsUseCase.invoke(roomId).onSuccess { participants ->
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    participants = participants,
-                    totalCount = participants.size
-                )
-            }
+    private fun onDisconnected() {
+        _uiState.update { it.copy(hasParticipantsError = true) }
+    }
+
+    private fun onRetryParticipants() {
+        val currentRoomId = roomId
+
+        if (currentRoomId != null) {
+            viewModelScope.launch { refreshParticipants(currentRoomId) }
         }
+    }
+
+    private suspend fun refreshParticipants(roomId: Long) {
+        _uiState.update { it.copy(isParticipantsLoading = true, hasParticipantsError = false) }
+        getParticipantsUseCase.invoke(roomId)
+            .onSuccess { participants ->
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isParticipantsLoading = false,
+                        hasParticipantsError = false,
+                        participants = participants,
+                        totalCount = participants.size
+                    )
+                }
+            }
+            .onFailure {
+                // 조용히 0명으로 두면 조회 실패가 "학생 0명이 함께해요"로 보인다 — 화면이 재시도를 걸게 알린다
+                _uiState.update { it.copy(isParticipantsLoading = false, hasParticipantsError = true) }
+            }
     }
 
     private suspend fun handleServerEvent(event: ServerEvent) {
@@ -226,6 +255,7 @@ class WaitingViewModel(
     override fun onAction(action: WaitingAction) {
         when (action) {
             is WaitingAction.Enter -> onEnter(action.pin)
+            is WaitingAction.RetryParticipants -> onRetryParticipants()
             is WaitingAction.ClickLeave -> onClickLeave()
         }
     }
