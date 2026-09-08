@@ -1,8 +1,7 @@
 package org.sesacteamproject.passmate.core.di
 
 import org.koin.mp.KoinPlatform
-import org.sesacteamproject.passmate.auth.domain.usecase.BuildGoogleSignInUrlUseCase
-import org.sesacteamproject.passmate.auth.domain.usecase.CompleteSignInUseCase
+import org.sesacteamproject.passmate.auth.domain.usecase.SignInWithGoogleUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.DevSignInUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.IsDevSignInAvailableUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
@@ -68,9 +67,8 @@ object KoinHelper {
         initKoin()
     }
 
-    fun buildGoogleSignInUrlUseCase(): BuildGoogleSignInUrlUseCase = KoinPlatform.getKoin().get()
+    fun signInWithGoogleUseCase(): SignInWithGoogleUseCase = KoinPlatform.getKoin().get()
 
-    fun completeSignInUseCase(): CompleteSignInUseCase = KoinPlatform.getKoin().get()
 
     fun devSignInUseCase(): DevSignInUseCase = KoinPlatform.getKoin().get()
 

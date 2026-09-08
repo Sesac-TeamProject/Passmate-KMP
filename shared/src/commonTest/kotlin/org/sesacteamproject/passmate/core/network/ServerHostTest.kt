@@ -2,6 +2,7 @@ package org.sesacteamproject.passmate.core.network
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 // 서버 주소를 빌드 설정에서 받는 경로 — 기기 테스트가 추적 파일을 건드리지 않게 하는 장치
@@ -28,6 +29,17 @@ class ServerHostTest {
         assertEquals(DEFAULT_SERVER_HOST, resolveServerHost("\$(PASSMATE_SERVER_HOST)"))
     }
 
+    // 기본값은 플랫폼마다 다르다 — 안드로이드 에뮬레이터만 호스트 PC를 10.0.2.2로 본다
+    @Test
+    fun fallsBackToPlatformDefaultWhenGiven() {
+        val emulatorHost = "10.0.2.2:8080"
+
+        assertEquals(emulatorHost, resolveServerHost(null, emulatorHost))
+        assertEquals(emulatorHost, resolveServerHost("", emulatorHost))
+        assertEquals(emulatorHost, resolveServerHost("\$(PASSMATE_SERVER_HOST)", emulatorHost))
+        assertEquals("172.31.98.123:8080", resolveServerHost("172.31.98.123:8080", emulatorHost))
+    }
+
     @Test
     fun trimsSurroundingWhitespace() {
         assertEquals("192.168.45.4:8080", resolveServerHost("  192.168.45.4:8080  "))
@@ -39,5 +51,31 @@ class ServerHostTest {
         val lanUrl = apiBaseUrlOf(resolveServerHost("192.168.45.4:8080"))
 
         assertTrue(isLocalDevServer(lanUrl), "LAN 주소는 개발 서버로 봐야 한다: $lanUrl")
+    }
+
+    // 운영 도메인은 TLS로 가야 한다 — 평문으로 붙으면 iOS ATS·안드로이드 평문 정책에 막힌다
+    @Test
+    fun usesTlsForRemoteHost() {
+        val host = "api.passmate.kr"
+
+        assertEquals("https://api.passmate.kr", apiBaseUrlOf(host))
+        assertEquals("wss://api.passmate.kr/ws", wsUrlOf(host))
+    }
+
+    // 로컬·에뮬레이터 별칭은 인증서가 없으므로 평문을 유지한다
+    @Test
+    fun keepsCleartextForLocalHosts() {
+        assertEquals("http://localhost:8080", apiBaseUrlOf("localhost:8080"))
+        assertEquals("ws://10.0.2.2:8080/ws", wsUrlOf("10.0.2.2:8080"))
+        assertEquals("http://[::1]:8080", apiBaseUrlOf("[::1]:8080"))
+    }
+
+    // 운영 서버에는 dev-login이 배포되지 않는다 — 버튼도 함께 사라져야 한다
+    @Test
+    fun hidesDevLoginForRemoteHost() {
+        val remoteUrl = apiBaseUrlOf(resolveServerHost("api.passmate.kr"))
+
+        assertEquals("https://api.passmate.kr", remoteUrl)
+        assertFalse(isLocalDevServer(remoteUrl), "운영 주소는 개발 서버가 아니다: $remoteUrl")
     }
 }

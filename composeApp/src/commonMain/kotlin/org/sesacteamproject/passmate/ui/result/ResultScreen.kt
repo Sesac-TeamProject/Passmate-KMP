@@ -72,7 +72,8 @@ fun ResultScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val shareReport = rememberReportSharer()
-    val ratingSheetState = rememberModalBottomSheetState()
+    // 시안 M-06 v2는 시트가 처음부터 다 펼쳐진 모습이다 — 절반 높이 단계를 건너뛴다
+    val ratingSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(roomId) {
         viewModel.onAction(ResultAction.Enter(roomId))
@@ -97,7 +98,8 @@ fun ResultScreen(
         )
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
+            // 탭바 없는 push 화면이라 스낵바가 시스템 내비게이션 바에 겹친다 — 여기서 직접 띄운다
+            modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding()
         )
     }
     // 평가 시트는 컨테이너가 소유 (규칙 §11-1) — 오버레이/모달은 콘텐츠 뷰에 두지 않는다

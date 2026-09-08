@@ -243,8 +243,7 @@ struct ContentView: View {
                 roomId: roomId,
                 pin: pin,
                 onRequireSignIn: { pushSignIn(pendingRoute: .sessionControl(roomId: roomId, pin: pin), path: path) },
-                onSessionEnded: { roomId in path.wrappedValue.append(.roomReport(roomId: roomId)) },
-                onBack: { popOnce(path) }
+                onSessionEnded: { roomId in path.wrappedValue.append(.roomReport(roomId: roomId)) }
             )
         case let .roomReport(roomId):
             RoomReportView(

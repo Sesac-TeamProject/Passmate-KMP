@@ -34,4 +34,19 @@ enum PassmateIcons: String {
 
     // 시계 (v6 M-03 풀이 · M-T2 진행 리모컨 남은 시간)
     case clock = "Clock"
+
+    // 빈 별 (v6 M-06 v2 별점 미선택)
+    case star = "Star"
+
+    // 채운 별 (v6 M-06 v2 별점 선택)
+    case starFilled = "StarFilled"
+
+    // M-09 업적 뱃지 마크 — 시안이 채워진 도형이라 채움만 쓴다
+    case badgeFlag = "BadgeFlag"
+
+    case badgeUsers = "BadgeUsers"
+
+    case badgeDroplet = "BadgeDroplet"
+
+    case badgeSparkles = "BadgeSparkles"
 }

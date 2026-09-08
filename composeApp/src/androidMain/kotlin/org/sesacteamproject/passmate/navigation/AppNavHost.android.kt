@@ -20,7 +20,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import org.sesacteamproject.passmate.component.PassmateBottomTabBar
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.ui.auth.SignInScreen
@@ -45,10 +44,6 @@ import org.sesacteamproject.passmate.ui.payment.SettlementAccountScreen
 import org.sesacteamproject.passmate.ui.play.PlayScreen
 import org.sesacteamproject.passmate.ui.result.ResultScreen
 import org.sesacteamproject.passmate.ui.waiting.WaitingScreen
-
-// OAuth 콜백 딥링크 — 백엔드가 ?client=mobile 인가 완료 시 이 URI로 리다이렉트한다 (contracts §Auth)
-private const val OAUTH_CALLBACK_DEEP_LINK =
-    "passmate://oauth/callback?accessToken={accessToken}&refreshToken={refreshToken}"
 
 private fun Context.findComponentActivity(): ComponentActivity? {
     var current: Context? = this
@@ -251,25 +246,8 @@ actual fun AppNavHost() {
             composable(Route.RoomList.route) {
                 RoomListScreen(onNavigate = onNavigate)
             }
-            composable(
-                route = "${Route.SignIn.route}?accessToken={accessToken}&refreshToken={refreshToken}",
-                arguments = listOf(
-                    navArgument("accessToken") {
-                        nullable = true
-                        defaultValue = null
-                    },
-                    navArgument("refreshToken") {
-                        nullable = true
-                        defaultValue = null
-                    }
-                ),
-                deepLinks = listOf(navDeepLink { uriPattern = OAUTH_CALLBACK_DEEP_LINK })
-            ) { backStackEntry ->
-                SignInScreen(
-                    oauthAccessToken = backStackEntry.arguments?.getString("accessToken"),
-                    oauthRefreshToken = backStackEntry.arguments?.getString("refreshToken"),
-                    onNavigate = onNavigate
-                )
+            composable(Route.SignIn.route) {
+                SignInScreen(onNavigate = onNavigate)
             }
             composable(
                 route = Route.Join.route,

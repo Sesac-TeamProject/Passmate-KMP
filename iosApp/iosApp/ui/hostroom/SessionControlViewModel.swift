@@ -154,10 +154,11 @@ final class SessionControlViewModel: ObservableObject {
             refreshSubmissions()
         } else if let locked = serverEvent as? ServerEventScreenLocked {
             uiState.isLocked = locked.locked
-        } else if let joined = serverEvent as? ServerEventParticipantJoined {
-            uiState.participantCount = Int(joined.count)
-        } else if let left = serverEvent as? ServerEventParticipantLeft {
-            uiState.participantCount = Int(left.count)
+        } else if serverEvent is ServerEventParticipantJoined {
+            // 서버가 현재 인원을 안 실어 준다 — 이 화면은 명단이 없으므로 증감으로 센다
+            uiState.participantCount += 1
+        } else if serverEvent is ServerEventParticipantLeft {
+            uiState.participantCount = max(0, uiState.participantCount - 1)
         } else if serverEvent is ServerEventProjectorConnected {
             uiState.isProjectorConnected = true
         } else if serverEvent is ServerEventProjectorDisconnected {

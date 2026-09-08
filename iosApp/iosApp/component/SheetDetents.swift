@@ -12,13 +12,34 @@ enum PassmateSheetDetent {
 }
 
 extension View {
-    func passmateDetents(_ detents: [PassmateSheetDetent]) -> some View {
-        modifier(PassmateSheetDetentsModifier(detents: detents))
+    // selection을 주면 시트가 열린 상태에서도 높이를 바꿀 수 있다
+    // (M-13a: 유료 탭을 누르면 입력칸이 늘어 반높이로는 다 안 보인다)
+    func passmateDetents(
+        _ detents: [PassmateSheetDetent],
+        selection: Binding<PassmateSheetDetent>? = nil
+    ) -> some View {
+        modifier(PassmateSheetDetentsModifier(detents: detents, selection: selection))
     }
 }
 
 private struct PassmateSheetDetentsModifier: ViewModifier {
     let detents: [PassmateSheetDetent]
+
+    let selection: Binding<PassmateSheetDetent>?
+
+    @available(iOS 16.0, *)
+    private var nativeSelection: Binding<PresentationDetent>? {
+        selection.map { bound in
+            Binding(
+                get: { bound.wrappedValue.nativeDetent },
+                set: { newValue in
+                    if let matched = detents.first(where: { $0.nativeDetent == newValue }) {
+                        bound.wrappedValue = matched
+                    }
+                }
+            )
+        }
+    }
 
     @available(iOS 16.0, *)
     private var nativeDetents: Set<PresentationDetent> {
@@ -32,13 +53,20 @@ private struct PassmateSheetDetentsModifier: ViewModifier {
         })
     }
 
+    @ViewBuilder
     func body(content: Content) -> some View {
         if #available(iOS 16.0, *) {
-            content
-                .presentationDetents(nativeDetents)
-                .presentationDragIndicator(.visible)
+            if let nativeSelection {
+                content
+                    .presentationDetents(nativeDetents, selection: nativeSelection)
+                    .presentationDragIndicator(.visible)
+            } else {
+                content
+                    .presentationDetents(nativeDetents)
+                    .presentationDragIndicator(.visible)
+            }
         } else {
-            content.background(SheetDetentsBridge(detents: detents))
+            content.background(SheetDetentsBridge(detents: detents, selection: selection))
         }
     }
 }
@@ -48,12 +76,15 @@ private struct PassmateSheetDetentsModifier: ViewModifier {
 private struct SheetDetentsBridge: UIViewControllerRepresentable {
     let detents: [PassmateSheetDetent]
 
+    var selection: Binding<PassmateSheetDetent>? = nil
+
     func makeUIViewController(context: Context) -> SheetDetentsController {
         SheetDetentsController(detents: detents.map(\.uiKitDetent))
     }
 
     func updateUIViewController(_ uiViewController: SheetDetentsController, context: Context) {
         uiViewController.detents = detents.map(\.uiKitDetent)
+        uiViewController.selectedIdentifier = selection?.wrappedValue.uiKitIdentifier
         uiViewController.applyDetents()
     }
 }
@@ -61,10 +92,19 @@ private struct SheetDetentsBridge: UIViewControllerRepresentable {
 private final class SheetDetentsController: UIViewController {
     var detents: [UISheetPresentationController.Detent]
 
+    var selectedIdentifier: UISheetPresentationController.Detent.Identifier?
+
     func applyDetents() {
-        sheetPresentationController?.detents = detents
+        let sheet = sheetPresentationController
+
+        sheet?.detents = detents
         // 시안 v6의 시트는 모두 손잡이를 보여준다 (iOS 16+는 presentationDragIndicator)
-        sheetPresentationController?.prefersGrabberVisible = true
+        sheet?.prefersGrabberVisible = true
+        if let selectedIdentifier, sheet?.selectedDetentIdentifier != selectedIdentifier {
+            sheet?.animateChanges {
+                sheet?.selectedDetentIdentifier = selectedIdentifier
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -83,6 +123,23 @@ private final class SheetDetentsController: UIViewController {
 }
 
 private extension PassmateSheetDetent {
+    @available(iOS 16.0, *)
+    var nativeDetent: PresentationDetent {
+        switch self {
+        case .medium: return .medium
+        case .large: return .large
+        case let .contentHeight(height): return height > 0 ? .height(height) : .medium
+        }
+    }
+
+    var uiKitIdentifier: UISheetPresentationController.Detent.Identifier {
+        switch self {
+        case .medium: return .medium
+        case .large: return .large
+        case .contentHeight: return .medium
+        }
+    }
+
     var uiKitDetent: UISheetPresentationController.Detent {
         switch self {
         case .medium: return .medium()

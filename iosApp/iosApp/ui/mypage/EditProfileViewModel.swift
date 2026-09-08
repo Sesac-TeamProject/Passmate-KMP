@@ -12,8 +12,7 @@ final class EditProfileViewModel: ObservableObject {
 
     let event = PassthroughSubject<EditProfileEvent, Never>()
 
-    private var hasEntered = false
-
+    // 캐릭터 저장 결과가 M-12-7에서 이 화면으로 돌아온다 — 진입할 때마다 다시 조회한다 (hasEntered 가드 없음)
     private func loadProfile() {
         uiState.isLoading = true
         uiState.hasLoadError = false
@@ -32,15 +31,6 @@ final class EditProfileViewModel: ObservableObject {
                 }
             }
         }
-    }
-
-    private func onEnter() {
-        if hasEntered {
-            return
-        }
-        hasEntered = true
-
-        loadProfile()
     }
 
     private func onSubmit() {
@@ -80,7 +70,7 @@ final class EditProfileViewModel: ObservableObject {
     func action(_ action: EditProfileAction) {
         switch action {
         case .enter:
-            onEnter()
+            loadProfile()
         case .retry:
             loadProfile()
         case let .changeNickname(text):

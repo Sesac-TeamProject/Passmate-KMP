@@ -20,6 +20,8 @@ struct HostedRoomsView: View {
 
     @State private var isCreateSheetVisible = false
 
+    @State private var createSheetDetent: PassmateSheetDetent = .medium
+
     @State private var noticeMessage: String?
 
     var body: some View {
@@ -49,7 +51,7 @@ struct HostedRoomsView: View {
                 noticeMessage = message
             }
         }
-        .sheet(isPresented: $isCreateSheetVisible) {
+        .sheet(isPresented: $isCreateSheetVisible, onDismiss: { createSheetDetent = .medium }) {
             CreateRoomSheetView(
                 onCreated: { pin in
                     isCreateSheetVisible = false
@@ -58,9 +60,11 @@ struct HostedRoomsView: View {
                 onNotice: { message in
                     viewModel.action(.notice(message: message))
                 },
-                onClose: { isCreateSheetVisible = false }
+                onClose: { isCreateSheetVisible = false },
+                // 유료 탭은 입력칸이 늘어 반높이로는 다 안 보인다 — 시트를 끝까지 올린다
+                onPaidChanged: { isPaid in createSheetDetent = isPaid ? .large : .medium }
             )
-            .passmateDetents([.medium, .large])
+            .passmateDetents([.medium, .large], selection: $createSheetDetent)
         }
         .overlay(alignment: .bottom) {
             if let noticeMessage {

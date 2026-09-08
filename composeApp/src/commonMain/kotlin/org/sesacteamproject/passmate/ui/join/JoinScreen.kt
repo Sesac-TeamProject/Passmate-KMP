@@ -114,6 +114,8 @@ private fun JoinContentScreen(
             // 화면 배경은 상태바 뒤까지 깔고 콘텐츠만 내린다 (iOS의 background(...).ignoresSafeArea() 미러)
             .statusBarsPadding()
             .verticalScroll(rememberScrollState())
+            // 카드가 탭바에 붙지 않게 한다 (시안은 카드 아래 여백을 둔다)
+            .padding(bottom = 16.dp)
     ) {
         JoinHeader()
         JoinCard(
@@ -121,9 +123,6 @@ private fun JoinContentScreen(
             isQrScanAvailable = isQrScanAvailable,
             onAction = onAction
         )
-        if (!uiState.isSignedIn) {
-            SignInLinkRow(onClickSignIn = { onAction(JoinAction.ClickSignIn) })
-        }
     }
 }
 
@@ -135,7 +134,8 @@ private fun JoinHeader() {
             .padding(horizontal = 24.dp)
     ) {
         Column(
-            modifier = Modifier.padding(top = 64.dp, bottom = 24.dp),
+            // 시안 M-01은 제목이 y=64, 카드가 y=179에서 시작한다. iOS 미러와 같은 값으로 맞춘다
+            modifier = Modifier.padding(top = 40.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
@@ -159,7 +159,7 @@ private fun JoinHeader() {
             height = 75.dp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 44.dp, end = 4.dp)
+                .padding(top = 20.dp, end = 4.dp)
         )
     }
 }
@@ -469,32 +469,6 @@ private fun JoinButton(
                 letterSpacing = (-0.32).sp
             )
         }
-    }
-}
-
-@Composable
-private fun SignInLinkRow(onClickSignIn: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "기록을 남기려면",
-            color = PassmateColors.TextSecondary,
-            fontSize = 14.sp,
-            letterSpacing = (-0.28).sp
-        )
-        Text(
-            text = "로그인",
-            color = PassmateColors.PrimaryDeep,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.28).sp,
-            modifier = Modifier.clickable(onClick = onClickSignIn)
-        )
     }
 }
 

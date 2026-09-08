@@ -21,11 +21,21 @@ class FakeAuthRepository(
 
     var devSignInCount: Int = 0
 
-    override fun googleSignInUrl(): String {
-        return "https://example.test/oauth"
+    var googleSignInResult: AppResult<Unit> = AppResult.Success(Unit)
+
+    var googleIdToken: String? = null
+
+    override suspend fun signInWithGoogle(idToken: String): AppResult<Unit> {
+        googleIdToken = idToken
+
+        return if (googleSignInResult is AppResult.Success) {
+            completeSignIn()
+        } else {
+            googleSignInResult
+        }
     }
 
-    override suspend fun completeSignIn(accessToken: String, refreshToken: String): AppResult<Unit> {
+    private fun completeSignIn(): AppResult<Unit> {
         isSignedIn = true
         return AppResult.Success(Unit)
     }
@@ -38,7 +48,7 @@ class FakeAuthRepository(
         devSignInCount += 1
 
         return if (devSignInResult is AppResult.Success) {
-            completeSignIn("dev-access", "dev-refresh")
+            completeSignIn()
         } else {
             devSignInResult
         }

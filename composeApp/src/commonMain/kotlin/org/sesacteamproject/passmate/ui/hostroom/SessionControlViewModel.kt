@@ -189,8 +189,9 @@ class SessionControlViewModel(
             is ServerEvent.AnswerSubmitted -> refreshSubmissions()
             is ServerEvent.SubmissionUpdated -> refreshSubmissions()
             is ServerEvent.ScreenLocked -> _uiState.update { it.copy(isLocked = event.locked) }
-            is ServerEvent.ParticipantJoined -> _uiState.update { it.copy(participantCount = event.count) }
-            is ServerEvent.ParticipantLeft -> _uiState.update { it.copy(participantCount = event.count) }
+            // 서버가 현재 인원을 안 실어 준다 — 이 화면은 명단이 없으므로 증감으로 센다
+            is ServerEvent.ParticipantJoined -> _uiState.update { it.copy(participantCount = it.participantCount + 1) }
+            is ServerEvent.ParticipantLeft -> _uiState.update { it.copy(participantCount = (it.participantCount - 1).coerceAtLeast(0)) }
             is ServerEvent.ProjectorConnected -> _uiState.update { it.copy(isProjectorConnected = true) }
             is ServerEvent.ProjectorDisconnected -> _uiState.update { it.copy(isProjectorConnected = false) }
             is ServerEvent.SessionEnded -> {

@@ -112,27 +112,35 @@ private fun NotificationSettingsContentScreen(
             else -> {
                 ToggleRow(
                     title = "세션 시작",
-                    subtitle = "참여한 방의 세션이 시작되면 알려드려요",
+                    subtitle = "참여한 방이 시작되면 알려줘요",
                     checked = uiState.sessionStart,
                     enabled = !uiState.isSaving,
                     onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.SESSION_START)) }
                 )
                 ToggleRow(
                     title = "별점 요청",
-                    subtitle = "세션 종료 후 평가 요청을 알려드려요",
+                    subtitle = "방이 끝나면 선생님 평가를 요청해요",
                     checked = uiState.ratingRequest,
                     enabled = !uiState.isSaving,
                     onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.RATING_REQUEST)) }
                 )
                 ToggleRow(
                     title = "정산 완료",
-                    subtitle = "유료 방 정산이 지급되면 알려드려요",
+                    subtitle = "정산금이 입금되면 알려줘요",
                     checked = uiState.settlementDone,
                     enabled = !uiState.isSaving,
                     onToggle = { onAction(NotificationSettingsAction.Toggle(NotificationKind.SETTLEMENT_DONE)) }
                 )
             }
         }
+        // 시안 M-12-10 각주 — 앱 설정만으로는 못 켜는 경우를 안내한다
+        Text(
+            text = "기기 알림이 꺼져 있으면 휴대폰 설정에서 패스메이트 알림을 켜주세요.",
+            color = PassmateColors.TextTertiary,
+            fontSize = 12.sp,
+            letterSpacing = (-0.24).sp,
+            modifier = Modifier.padding(start = 20.dp, top = 12.dp, end = 20.dp)
+        )
     }
 }
 

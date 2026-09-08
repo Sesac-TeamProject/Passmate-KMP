@@ -44,22 +44,20 @@ import org.sesacteamproject.passmate.theme.PassmateTheme
 @Composable
 fun SignInScreen(
     viewModel: SignInViewModel = koinScreenViewModel(),
-    oauthAccessToken: String? = null,
-    oauthRefreshToken: String? = null,
     onNavigate: (NavigationAction) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val requestGoogleSignIn = rememberGoogleSignInLauncher(
+        onIdToken = { viewModel.onAction(SignInAction.ReceiveGoogleIdToken(it)) },
+        onCancel = { viewModel.onAction(SignInAction.CancelGoogleSignIn) },
+        onFailure = { viewModel.onAction(SignInAction.FailGoogleSignIn) }
+    )
 
-    LaunchedEffect(oauthAccessToken, oauthRefreshToken) {
-        if (!oauthAccessToken.isNullOrBlank() && !oauthRefreshToken.isNullOrBlank()) {
-            viewModel.onAction(SignInAction.ReceiveOAuthCallback(oauthAccessToken, oauthRefreshToken))
-        }
-    }
     LaunchedEffect(viewModel) {
         viewModel.event.collect { event ->
             when (event) {
-                is SignInEvent.OpenSignInPage -> openSignInPage(event.url)
+                is SignInEvent.RequestGoogleSignIn -> requestGoogleSignIn()
                 is SignInEvent.SignInCompleted -> onNavigate(NavigationAction.NavigateAfterSignIn)
                 is SignInEvent.GuestEnterRequested -> onNavigate(NavigationAction.NavigateToJoin())
                 is SignInEvent.ShowNotice -> snackbarHostState.showSnackbar(event.message)
@@ -73,7 +71,8 @@ fun SignInScreen(
         )
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
+            // 탭바 없는 push 화면이라 스낵바가 시스템 내비게이션 바에 겹친다 — 여기서 직접 띄운다
+            modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding()
         )
     }
 }

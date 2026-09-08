@@ -106,12 +106,14 @@ class WaitingViewModel(
             isConnected = true
         )
 
+        // 서버가 현재 인원을 안 실어 준다 — 명단 길이로 센다
         _uiState.update { state ->
             val others = state.participants.filter { it.participantId != joined.participantId }
+            val participants = others + joined
 
             state.copy(
-                participants = others + joined,
-                totalCount = event.count
+                participants = participants,
+                totalCount = participants.size
             )
         }
     }
@@ -123,9 +125,11 @@ class WaitingViewModel(
             _event.emit(WaitingEvent.RoomClosed("선생님이 내보냈어요"))
         } else {
             _uiState.update { state ->
+                val participants = state.participants.filter { it.participantId != event.participantId }
+
                 state.copy(
-                    participants = state.participants.filter { it.participantId != event.participantId },
-                    totalCount = event.count
+                    participants = participants,
+                    totalCount = participants.size
                 )
             }
         }

@@ -84,23 +84,30 @@ private struct NotificationSettingsContentView: View {
             } else {
                 toggleRow(
                     title: "세션 시작",
-                    subtitle: "참여한 방의 세션이 시작되면 알려드려요",
+                    subtitle: "참여한 방이 시작되면 알려줘요",
                     isOn: uiState.sessionStart,
                     kind: .sessionStart
                 )
                 toggleRow(
                     title: "별점 요청",
-                    subtitle: "세션 종료 후 평가 요청을 알려드려요",
+                    subtitle: "방이 끝나면 선생님 평가를 요청해요",
                     isOn: uiState.ratingRequest,
                     kind: .ratingRequest
                 )
                 toggleRow(
                     title: "정산 완료",
-                    subtitle: "유료 방 정산이 지급되면 알려드려요",
+                    subtitle: "정산금이 입금되면 알려줘요",
                     isOn: uiState.settlementDone,
                     kind: .settlementDone
                 )
             }
+            // 시안 M-12-10 각주 — 앱 설정만으로는 못 켜는 경우를 안내한다
+            Text("기기 알림이 꺼져 있으면 휴대폰 설정에서 패스메이트 알림을 켜주세요.")
+                .font(.system(size: 12))
+                .kerning(-0.24)
+                .foregroundColor(PassmateColors.textTertiary)
+                .padding(.top, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 20)
         .padding(.top, 24)

@@ -82,10 +82,9 @@ private struct JoinContentView: View {
             VStack(spacing: 0) {
                 header
                 card
-                if !uiState.isSignedIn {
-                    signInLinkRow
-                }
             }
+            // 카드가 탭바에 붙지 않게 한다 (시안은 카드 아래 여백을 둔다) — Compose 미러와 같은 값
+            .padding(.bottom, 16)
         }
         .background(PassmateColors.surface.ignoresSafeArea())
     }
@@ -250,24 +249,6 @@ private struct JoinContentView: View {
             .cornerRadius(16)
         }
         .disabled(uiState.isJoining)
-    }
-
-    private var signInLinkRow: some View {
-        HStack(spacing: 4) {
-            Text("기록을 남기려면")
-                .font(.system(size: 14))
-                .kerning(-0.28)
-                .foregroundColor(PassmateColors.textSecondary)
-            Button {
-                onAction(.clickSignIn)
-            } label: {
-                Text("로그인")
-                    .font(.system(size: 14, weight: .medium))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.primaryDeep)
-            }
-        }
-        .padding(.vertical, 20)
     }
 }
 

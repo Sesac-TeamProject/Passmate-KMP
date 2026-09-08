@@ -1,0 +1,16 @@
+<!-- badge-sparkles — AI 세트 50개 (큰 별 + 작은 별)
+     시안 M-09 AchievementBadge 도형 구성을 24 뷰포트로 옮긴 Passmate 자체 제작 마크다.
+     채움만 쓰고 색은 중립 검정이다 — 표시 색은 호출부에서 (규칙 §11-2).
+     Desktop 사본: composeApp/src/jvmMain/resources/drawable/ic_badge_sparkles.xml (텍스트 동일) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M10.6,2.4c0.7,4.1 2.8,6.2 6.9,6.9 -4.1,0.7 -6.2,2.8 -6.9,6.9 -0.7,-4.1 -2.8,-6.2 -6.9,-6.9 4.1,-0.7 6.2,-2.8 6.9,-6.9z"
+        android:fillColor="#FF000000" />
+    <path
+        android:pathData="M18.4,15.2c0.3,1.8 1.2,2.7 3,3 -1.8,0.3 -2.7,1.2 -3,3 -0.3,-1.8 -1.2,-2.7 -3,-3 1.8,-0.3 2.7,-1.2 3,-3z"
+        android:fillColor="#FF000000" />
+</vector>
