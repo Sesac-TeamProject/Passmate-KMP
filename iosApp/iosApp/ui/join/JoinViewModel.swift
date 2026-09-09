@@ -145,16 +145,39 @@ final class JoinViewModel: ObservableObject {
                         self.uiState.roomInfo = nil
                         self.event.send(.joinCompleted(pin: room.pin))
                     } else {
-                        self.handleJoinFailure(error: (result as? AppResultFailure)?.error)
+                        self.handleJoinFailure(room: room, error: (result as? AppResultFailure)?.error)
                     }
                 }
             }
         }
     }
 
-    private func handleJoinFailure(error: AppError?) {
-        if error is AppError.Conflict {
+    // 회원은 이미 자기 참가자 행이 살아 있어 두 번째 입장이 막힌다(게스트는 매번 새 행이라 안 걸린다).
+    // 막을 일이 아니라 이미 들어와 있는 것이므로 그대로 들여보낸다 (규칙 §2-1-2 재접속 복구)
+    private func enterAlreadyJoinedRoom(pin: String) {
+        uiState.pin = ""
+        uiState.roomInfo = nil
+        event.send(.showNotice(message: "이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"))
+        event.send(.joinCompleted(pin: pin))
+    }
+
+    // 서버는 409를 닉네임 중복·기입장·입장 불가·정원 초과 네 가지로 준다.
+    // code로 갈라야 문구가 맞고, 닉네임을 바꿔도 안 들어가지는 상태가 안 생긴다 (규칙 §10)
+    private func handleJoinConflict(room: RoomInfo, code: String?) {
+        if code == Self.alreadyJoined {
+            enterAlreadyJoinedRoom(pin: room.pin)
+        } else if code == Self.roomNotJoinable {
+            event.send(.showNotice(message: "이미 시작했거나 끝난 방이라 입장할 수 없어요"))
+        } else if code == Self.roomFull {
+            event.send(.showNotice(message: "정원이 가득 찼어요"))
+        } else {
             event.send(.showNotice(message: "이미 사용 중인 닉네임이에요. 다른 이름을 입력해 주세요"))
+        }
+    }
+
+    private func handleJoinFailure(room: RoomInfo, error: AppError?) {
+        if let conflict = error as? AppError.Conflict {
+            handleJoinConflict(room: room, code: conflict.serverCode)
         } else if error is AppError.LoginRequired {
             event.send(.showNotice(message: "유료 방은 로그인 후 입장할 수 있어요"))
             event.send(.signInRequiredForPaidRoom(pin: uiState.pin))
@@ -208,4 +231,11 @@ final class JoinViewModel: ObservableObject {
         self.joinInputPolicy = joinInputPolicy
         self.uiState = JoinUiState(isSignedIn: isSignedInUseCase.invoke())
     }
+
+    // 입장 409의 서버 코드 (contracts/rest-api.md)
+    private static let alreadyJoined = "ALREADY_JOINED"
+
+    private static let roomNotJoinable = "ROOM_NOT_JOINABLE"
+
+    private static let roomFull = "ROOM_FULL"
 }

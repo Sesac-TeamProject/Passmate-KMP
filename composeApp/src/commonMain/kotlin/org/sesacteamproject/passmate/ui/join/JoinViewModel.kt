@@ -135,14 +135,36 @@ class JoinViewModel(
                 }
                 .onFailure { error ->
                     _uiState.update { it.copy(isJoining = false) }
-                    handleJoinFailure(error)
+                    handleJoinFailure(room, error)
                 }
         }
     }
 
-    private suspend fun handleJoinFailure(error: AppError) {
+    // 회원은 이미 자기 참가자 행이 살아 있어 두 번째 입장이 막힌다(게스트는 매번 새 행이라 안 걸린다).
+    // 막을 일이 아니라 이미 들어와 있는 것이므로 그대로 들여보낸다 (규칙 §2-1-2 재접속 복구)
+    private suspend fun enterAlreadyJoinedRoom(pin: String) {
+        _uiState.update { it.copy(pin = "", roomInfo = null) }
+        _event.emit(JoinEvent.ShowNotice("이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"))
+        _event.emit(JoinEvent.JoinCompleted(pin))
+    }
+
+    // 서버는 409를 닉네임 중복·기입장·입장 불가·정원 초과 네 가지로 준다.
+    // code로 갈라야 문구가 맞고, 닉네임을 바꿔도 안 들어가지는 상태가 안 생긴다 (규칙 §10)
+    private suspend fun handleJoinConflict(room: RoomInfo, code: String?) {
+        if (code == ALREADY_JOINED) {
+            enterAlreadyJoinedRoom(room.pin)
+        } else if (code == ROOM_NOT_JOINABLE) {
+            _event.emit(JoinEvent.ShowNotice("이미 시작했거나 끝난 방이라 입장할 수 없어요"))
+        } else if (code == ROOM_FULL) {
+            _event.emit(JoinEvent.ShowNotice("정원이 가득 찼어요"))
+        } else {
+            _event.emit(JoinEvent.ShowNotice("이미 사용 중인 닉네임이에요. 다른 이름을 입력해 주세요"))
+        }
+    }
+
+    private suspend fun handleJoinFailure(room: RoomInfo, error: AppError) {
         when (error) {
-            is AppError.Conflict -> _event.emit(JoinEvent.ShowNotice("이미 사용 중인 닉네임이에요. 다른 이름을 입력해 주세요"))
+            is AppError.Conflict -> handleJoinConflict(room, error.serverCode)
             is AppError.LoginRequired -> {
                 _event.emit(JoinEvent.ShowNotice("유료 방은 로그인 후 입장할 수 있어요"))
                 _event.emit(JoinEvent.SignInRequiredForPaidRoom(_uiState.value.pin))
@@ -175,5 +197,14 @@ class JoinViewModel(
 
     init {
         _uiState.update { it.copy(isSignedIn = isSignedInUseCase.invoke()) }
+    }
+
+    companion object {
+        // 입장 409의 서버 코드 (contracts/rest-api.md)
+        private const val ALREADY_JOINED = "ALREADY_JOINED"
+
+        private const val ROOM_NOT_JOINABLE = "ROOM_NOT_JOINABLE"
+
+        private const val ROOM_FULL = "ROOM_FULL"
     }
 }

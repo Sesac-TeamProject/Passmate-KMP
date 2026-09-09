@@ -9,6 +9,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
+import org.sesacteamproject.passmate.core.model.AppError
+import org.sesacteamproject.passmate.core.model.AppResult
 import org.sesacteamproject.passmate.room.domain.model.RoomInfo
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.room.domain.policy.JoinInputPolicy
@@ -38,6 +40,17 @@ class JoinViewModelTest {
             isGuestAllowed = true,
             host = null
         )
+    }
+
+    private fun freeRoom(): RoomInfo {
+        return paidRoom().copy(title = "무료 방", isPaid = false, entryFee = null)
+    }
+
+    private fun joinFailingWith(error: AppError): FakeRoomRepository {
+        val roomRepository = FakeRoomRepository(roomInfo = freeRoom())
+
+        roomRepository.joinResult = AppResult.Failure(error)
+        return roomRepository
     }
 
     private fun viewModel(roomRepository: FakeRoomRepository, isSignedIn: Boolean): JoinViewModel {
@@ -90,5 +103,75 @@ class JoinViewModelTest {
         viewModel.onAction(JoinAction.ClickSignIn)
 
         assertEquals(listOf<JoinEvent>(JoinEvent.SignInRequested), events)
+    }
+
+    // 서버는 409를 네 가지 이유로 준다 — code로 갈라야 문구가 맞다 (규칙 §10)
+    // 회원이 이미 들어와 있는 방이면 막지 않고 그대로 들여보낸다 (규칙 §2-1-2 재접속 복구)
+    @Test
+    fun alreadyJoinedMemberEntersRoomInsteadOfBeingBlocked() = runTest {
+        val roomRepository = joinFailingWith(AppError.Conflict(serverCode = "ALREADY_JOINED"))
+        val viewModel = viewModel(roomRepository, isSignedIn = true)
+        val events = mutableListOf<JoinEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(JoinEvent.JoinCompleted("123456"), events.last())
+        assertEquals(false, viewModel.uiState.value.isJoining)
+    }
+
+    @Test
+    fun roomNotJoinableIsNotReportedAsNicknameClash() = runTest {
+        val roomRepository = joinFailingWith(AppError.Conflict(serverCode = "ROOM_NOT_JOINABLE"))
+        val viewModel = viewModel(roomRepository, isSignedIn = true)
+        val events = mutableListOf<JoinEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(JoinEvent.ShowNotice("이미 시작했거나 끝난 방이라 입장할 수 없어요"), events.last())
+    }
+
+    @Test
+    fun roomFullIsNotReportedAsNicknameClash() = runTest {
+        val roomRepository = joinFailingWith(AppError.Conflict(serverCode = "ROOM_FULL"))
+        val viewModel = viewModel(roomRepository, isSignedIn = true)
+        val events = mutableListOf<JoinEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(JoinEvent.ShowNotice("정원이 가득 찼어요"), events.last())
+    }
+
+    @Test
+    fun nicknameDuplicatedKeepsNicknameGuidance() = runTest {
+        val roomRepository = joinFailingWith(AppError.Conflict(serverCode = "NICKNAME_DUPLICATED"))
+        val viewModel = viewModel(roomRepository, isSignedIn = true)
+        val events = mutableListOf<JoinEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(
+            JoinEvent.ShowNotice("이미 사용 중인 닉네임이에요. 다른 이름을 입력해 주세요"),
+            events.last()
+        )
     }
 }
