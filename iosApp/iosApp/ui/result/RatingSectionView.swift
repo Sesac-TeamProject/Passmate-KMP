@@ -35,7 +35,10 @@ struct RatingSectionView: View {
             FlowLayout(RatingTag.companion.all, id: \.self, spacing: 8) { tag in
                 tagChip(tag)
             }
-            commentField
+            CommentField(
+                comment: uiState.ratingComment,
+                onChange: { onAction(.changeRatingComment(comment: $0)) }
+            )
             submitButton
             Button {
                 onAction(.skipRating)
@@ -117,30 +120,6 @@ struct RatingSectionView: View {
         }
     }
 
-    private var commentField: some View {
-        ZStack(alignment: .topLeading) {
-            TextEditor(
-                text: Binding(
-                    get: { uiState.ratingComment },
-                    set: { onAction(.changeRatingComment(comment: $0)) }
-                )
-            )
-            .font(.system(size: 14))
-            .frame(height: 72)
-            .padding(6)
-            if uiState.ratingComment.isEmpty {
-                Text("한 줄 후기 (선택) — 선생님에게만 보여요")
-                    .font(.system(size: 14))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.textTertiary)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 14)
-            }
-        }
-        .background(PassmateColors.fieldGray)
-        .cornerRadius(14)
-    }
-
     private var submitButton: some View {
         let enabled = uiState.ratingStars > 0
 
@@ -173,6 +152,49 @@ struct RatingSectionView: View {
         case 4: return "4점 · 좋았어요"
         case 5: return "5점 · 최고예요"
         default: return "별점을 선택해 주세요"
+        }
+    }
+}
+
+// 한글 자소분리 방지가 걸린 후기 입력창.
+//
+// 두 가지를 같이 지켜야 조합이 안 끊긴다.
+// 1. 조합 중인 글자는 로컬 상태가 들고 있는다 — uiState로 왕복시키면 조합 도중 텍스트 뷰가 다시 그려진다
+// 2. 자리표시자를 `if`로 넣고 빼지 않는다 — 첫 글자에서 ZStack 자식 수가 바뀌면 텍스트 뷰가 새로 만들어져
+//    조합 중이던 글자가 끊어진다. 그래서 항상 그려 두고 투명도만 바꾼다
+private struct CommentField: View {
+    let comment: String
+
+    let onChange: (String) -> Void
+
+    @State private var text: String = ""
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            TextEditor(text: $text)
+                .font(.system(size: 14))
+                .frame(height: 72)
+                .padding(6)
+            Text("한 줄 후기 (선택) — 선생님에게만 보여요")
+                .font(.system(size: 14))
+                .kerning(-0.28)
+                .foregroundColor(PassmateColors.textTertiary)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 14)
+                .opacity(text.isEmpty ? 1 : 0)
+                .allowsHitTesting(false)
+        }
+        .background(PassmateColors.fieldGray)
+        .cornerRadius(14)
+        .onAppear { text = comment }
+        .onChange(of: text) { newValue in
+            onChange(newValue)
+        }
+        // 밖에서 값이 달라졌을 때만 되맞춘다(길이 제한·초기화). 같은 값이면 조합을 건드리지 않는다
+        .onChange(of: comment) { newValue in
+            if newValue != text {
+                text = newValue
+            }
         }
     }
 }

@@ -333,32 +333,45 @@ private struct ChoiceRow: View {
     }
 }
 
+// 한글 자소분리 방지가 걸린 서술형 답안 입력창.
+//
+// 두 가지를 같이 지켜야 조합이 안 끊긴다.
+// 1. 조합 중인 글자는 로컬 상태가 들고 있는다 — uiState로 왕복시키면 조합 도중 텍스트 뷰가 다시 그려진다
+// 2. 자리표시자를 `if`로 넣고 빼지 않는다 — 첫 글자에서 ZStack 자식 수가 바뀌면 텍스트 뷰가 새로 만들어져
+//    조합 중이던 글자가 끊어진다. 그래서 항상 그려 두고 투명도만 바꾼다
 private struct EssayField: View {
     let essayAnswer: String
 
     let onChange: (String) -> Void
 
+    @State private var text: String = ""
+
     var body: some View {
         ZStack(alignment: .topLeading) {
-            TextEditor(
-                text: Binding(
-                    get: { essayAnswer },
-                    set: { onChange($0) }
-                )
-            )
-            .font(.system(size: 14))
-            .frame(minHeight: 140)
-            .padding(8)
-            if essayAnswer.isEmpty {
-                Text("답변을 입력해 주세요")
-                    .font(.system(size: 14))
-                    .kerning(-0.28)
-                    .foregroundColor(PassmateColors.textSecondary)
-                    .padding(16)
-            }
+            TextEditor(text: $text)
+                .font(.system(size: 14))
+                .frame(minHeight: 140)
+                .padding(8)
+            Text("답변을 입력해 주세요")
+                .font(.system(size: 14))
+                .kerning(-0.28)
+                .foregroundColor(PassmateColors.textSecondary)
+                .padding(16)
+                .opacity(text.isEmpty ? 1 : 0)
+                .allowsHitTesting(false)
         }
         .background(PassmateColors.fieldGray)
         .cornerRadius(14)
+        .onAppear { text = essayAnswer }
+        .onChange(of: text) { newValue in
+            onChange(newValue)
+        }
+        // 밖에서 값이 달라졌을 때만 되맞춘다(문항 전환·초기화). 같은 값이면 조합을 건드리지 않는다
+        .onChange(of: essayAnswer) { newValue in
+            if newValue != text {
+                text = newValue
+            }
+        }
     }
 }
 

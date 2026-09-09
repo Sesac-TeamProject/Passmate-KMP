@@ -17,10 +17,17 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -151,9 +158,23 @@ private fun CommentField(
     comment: String,
     onChange: (String) -> Unit
 ) {
+    // 한글 자소분리 방지 — BasicTextField의 String 오버로드는 글자는 밖에서(uiState), 조합 구간은
+    // 내부 상태에서 가져와 합친다(foundation BasicTextField.kt). uiState는 한 프레임 늦게 오므로
+    // "옛 글자 + 새 조합 구간"이 IME로 내려가 조합이 깨진다. 조합 중인 값을 여기서 직접 들고 있는다
+    var fieldValue by remember { mutableStateOf(TextFieldValue(comment)) }
+
+    // 밖에서 값이 달라졌을 때만 되맞춘다(길이 제한·초기화). 같은 값이면 조합을 건드리지 않는다
+    LaunchedEffect(comment) {
+        if (comment != fieldValue.text) {
+            fieldValue = TextFieldValue(comment, TextRange(comment.length))
+        }
+    }
     BasicTextField(
-        value = comment,
-        onValueChange = onChange,
+        value = fieldValue,
+        onValueChange = { newValue ->
+            fieldValue = newValue
+            onChange(newValue.text)
+        },
         textStyle = TextStyle(
             color = PassmateColors.TextPrimary,
             fontSize = 14.sp,
@@ -167,7 +188,7 @@ private fun CommentField(
                     .background(PassmateColors.FieldGray, RoundedCornerShape(14.dp))
                     .padding(horizontal = 14.dp, vertical = 12.dp)
             ) {
-                if (comment.isEmpty()) {
+                if (fieldValue.text.isEmpty()) {
                     Text(
                         text = "한 줄 후기 (선택) — 선생님에게만 보여요",
                         color = PassmateColors.TextTertiary,
