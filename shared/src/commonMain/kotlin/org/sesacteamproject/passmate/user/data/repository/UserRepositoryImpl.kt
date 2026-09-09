@@ -8,7 +8,7 @@ import org.sesacteamproject.passmate.user.data.dto.ClaimGuestRecordRequest
 import org.sesacteamproject.passmate.user.data.dto.NotificationSettingsDto
 import org.sesacteamproject.passmate.user.data.dto.ReportRequest
 import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
-import org.sesacteamproject.passmate.user.data.dto.UpdateProfileRequest
+import org.sesacteamproject.passmate.user.data.dto.UserProfileResponse
 import org.sesacteamproject.passmate.user.data.mapper.toDomain
 import org.sesacteamproject.passmate.user.data.remote.UserRemoteDataSource
 import org.sesacteamproject.passmate.user.domain.model.Badge
@@ -63,26 +63,30 @@ class UserRepositoryImpl(
         return apiCall { remoteDataSource.fetchMyProfile() }.map { it.toDomain() }
     }
 
-    // 캐릭터만 바꿀 때 쓸 현재 닉네임 — 실패하면 null로 두고 호출부가 검증 실패로 접는다
-    private suspend fun currentNicknameOrNull(): String? {
+    // 이번에 바꾸지 않는 값을 채울 현재 프로필 — 실패하면 null로 두고 호출부가 검증 실패로 접는다
+    private suspend fun currentProfileOrNull(): UserProfileResponse? {
         val result = apiCall { remoteDataSource.fetchMyProfile() }
 
-        return (result as? AppResult.Success)?.value?.nickname?.trim()?.ifEmpty { null }
+        return (result as? AppResult.Success)?.value
     }
 
-    // 서버는 nickname을 필수로 받는다 — 캐릭터만 바꾸는 M-12-7에서는 현재 닉네임을 실어 보낸다
+    // 서버 PUT은 전체 교체다 — 생략한 필드가 null로 덮이므로 안 바꾸는 값도 현재 값을 실어 보낸다
+    // (§resolveProfileUpdate). 둘 다 주어졌으면 현재 프로필을 조회하지 않는다.
     override suspend fun updateMyProfile(nickname: String?, avatarId: Int?): AppResult<Unit> {
-        val requested = nickname?.trim()?.ifEmpty { null }
-        val resolved = requested ?: currentNicknameOrNull()
+        val requestedNickname = nickname?.trim()?.ifEmpty { null }
+        val requestedAvatarKey = StudentAvatarKeys.toKey(avatarId)
+        val needsCurrent = requestedNickname == null || requestedAvatarKey == null
+        val current = if (needsCurrent) currentProfileOrNull() else null
+        val request = resolveProfileUpdate(
+            requestedNickname = requestedNickname,
+            requestedAvatarKey = requestedAvatarKey,
+            currentNickname = current?.nickname,
+            currentAvatarKey = current?.defaultAvatarId
+        )
 
-        return if (resolved == null) {
+        return if (request == null) {
             AppResult.Failure(AppError.ValidationFailed("닉네임을 확인하지 못했어요"))
         } else {
-            val request = UpdateProfileRequest(
-                nickname = resolved,
-                defaultAvatarId = StudentAvatarKeys.toKey(avatarId)
-            )
-
             apiCall { remoteDataSource.updateMyProfile(request) }
         }
     }

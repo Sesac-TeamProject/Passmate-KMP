@@ -48,7 +48,8 @@ final class CharacterEditViewModel: ObservableObject {
             return
         }
         uiState.isSubmitting = true
-        // 닉네임은 M-12-1이 담당한다 — nil이면 전송에서 생략돼(explicitNulls=false) 값이 보존된다
+        // 닉네임은 M-12-1이 담당한다 — nil이면 Repository가 현재 닉네임을 채워 보낸다
+        // (서버 PUT은 전체 교체라 빼고 보내면 지워진다)
         updateMyProfileUseCase.invoke(
             nickname: nil,
             avatarId: state.avatarId.map { KotlinInt(value: Int32($0)) }

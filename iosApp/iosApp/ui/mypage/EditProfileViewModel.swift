@@ -40,7 +40,8 @@ final class EditProfileViewModel: ObservableObject {
             return
         }
         uiState.isSubmitting = true
-        // 캐릭터는 M-12-7이 담당한다 — nil이면 전송에서 생략돼(explicitNulls=false) 값이 보존된다
+        // 캐릭터는 M-12-7이 담당한다 — nil이면 Repository가 현재 캐릭터를 채워 보낸다
+        // (서버 PUT은 전체 교체라 빼고 보내면 지워진다)
         updateMyProfileUseCase.invoke(nickname: state.nickname, avatarId: nil) { [weak self] result, error in
             DispatchQueue.main.async {
                 guard let self else { return }

@@ -47,7 +47,8 @@ class CharacterEditViewModel(
         }
         _uiState.update { it.copy(isSubmitting = true) }
         viewModelScope.launch {
-            // 닉네임은 M-12-1이 담당한다 — null이면 전송에서 생략돼(explicitNulls=false) 값이 보존된다
+            // 닉네임은 M-12-1이 담당한다 — null이면 Repository가 현재 닉네임을 채워 보낸다
+            // (서버 PUT은 전체 교체라 빼고 보내면 지워진다)
             updateMyProfileUseCase.invoke(null, state.avatarId)
                 .onSuccess {
                     _uiState.update { it.copy(isSubmitting = false) }
