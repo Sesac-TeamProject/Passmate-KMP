@@ -28,6 +28,9 @@ class FakeRoomRepository(
 
     var participantsCallCount: Int = 0
 
+    // 화면이 "나"를 알아보는 기준 — 퇴장 이벤트가 내 것인지 가를 때 쓴다
+    var currentParticipation: MyParticipation? = null
+
     override suspend fun getRoomPin(roomId: Long): AppResult<String> {
         val pin = pinByRoomId[roomId]
 
@@ -76,7 +79,7 @@ class FakeRoomRepository(
     }
 
     override fun myParticipation(): MyParticipation? {
-        return null
+        return currentParticipation
     }
 
     override suspend fun getHostedRooms(cursor: String?): AppResult<PagedResult<HostedRoom>> {

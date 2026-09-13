@@ -16,6 +16,7 @@ import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.network.SessionEventStream
 import org.sesacteamproject.passmate.core.network.event.ServerEvent
 import org.sesacteamproject.passmate.core.network.event.ServerEventFrame
+import org.sesacteamproject.passmate.room.domain.model.MyParticipation
 import org.sesacteamproject.passmate.room.domain.model.RoomInfo
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.room.domain.usecase.GetMyParticipationUseCase
@@ -56,12 +57,32 @@ class PlayViewModelTest {
         )
     }
 
+    private fun myParticipation(): MyParticipation {
+        return MyParticipation(
+            participantId = 11L,
+            roomId = 1L,
+            pin = "123456",
+            nickname = "포카리",
+            avatarId = 1,
+            isGuest = true
+        )
+    }
+
+    // 배포 서버가 실제로 보내는 모양 — reason이 없다
+    private fun participantLeftFrame(participantId: Long): SessionEventStream.StreamEvent.Received {
+        val event = ServerEvent.ParticipantLeft(participantId = participantId, reason = null)
+
+        return SessionEventStream.StreamEvent.Received(ServerEventFrame(ts = "2026-09-13T10:00:00", event = event))
+    }
+
     private fun viewModel(
         stream: FakeSessionEventStream,
-        sessionRepository: FakeSessionRepository = FakeSessionRepository()
+        sessionRepository: FakeSessionRepository = FakeSessionRepository(),
+        participation: MyParticipation? = null
     ): PlayViewModel {
         val roomRepository = FakeRoomRepository(roomInfo = runningRoom())
 
+        roomRepository.currentParticipation = participation
         return PlayViewModel(
             getRoomInfoUseCase = GetRoomInfoUseCase(roomRepository),
             getSessionSnapshotUseCase = GetSessionSnapshotUseCase(sessionRepository),
@@ -221,5 +242,33 @@ class PlayViewModelTest {
 
         assertEquals(PlayEvent.ShowNotice("이미 마감된 문항이에요"), events.last())
         assertTrue(viewModel.uiState.value.hasSubmitted)
+    }
+
+    // 풀이 중 강퇴도 같다 — reason이 없어도 구독 중에 받은 내 퇴장이면 방을 닫는다 (실기기 A-6)
+    @Test
+    fun myParticipantLeftWithoutReasonClosesRoom() = runTest {
+        val stream = FakeSessionEventStream()
+        val viewModel = viewModel(stream, participation = myParticipation())
+        val events = mutableListOf<PlayEvent>()
+
+        backgroundScope.launch(Dispatchers.Main) { viewModel.event.toList(events) }
+        viewModel.onAction(PlayAction.Enter("123456"))
+        stream.emit(participantLeftFrame(participantId = 11L))
+
+        assertEquals(1, events.filterIsInstance<PlayEvent.RoomClosed>().size)
+    }
+
+    // 남이 나간 것으로 풀이 중인 내 화면을 닫으면 안 된다
+    @Test
+    fun otherParticipantLeftKeepsPlaying() = runTest {
+        val stream = FakeSessionEventStream()
+        val viewModel = viewModel(stream, participation = myParticipation())
+        val events = mutableListOf<PlayEvent>()
+
+        backgroundScope.launch(Dispatchers.Main) { viewModel.event.toList(events) }
+        viewModel.onAction(PlayAction.Enter("123456"))
+        stream.emit(participantLeftFrame(participantId = 12L))
+
+        assertTrue(events.filterIsInstance<PlayEvent.RoomClosed>().isEmpty())
     }
 }
