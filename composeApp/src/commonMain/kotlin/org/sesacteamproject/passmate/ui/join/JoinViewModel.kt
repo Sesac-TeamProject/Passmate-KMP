@@ -14,10 +14,12 @@ import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.room.domain.policy.JoinInputPolicy
 import org.sesacteamproject.passmate.room.domain.usecase.GetRoomInfoUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.JoinRoomUseCase
+import org.sesacteamproject.passmate.room.domain.usecase.RejoinRoomUseCase
 
 class JoinViewModel(
     private val getRoomInfoUseCase: GetRoomInfoUseCase,
     private val joinRoomUseCase: JoinRoomUseCase,
+    private val rejoinRoomUseCase: RejoinRoomUseCase,
     private val isSignedInUseCase: IsSignedInUseCase,
     private val joinInputPolicy: JoinInputPolicy
 ) : MviViewModel<JoinUiState, JoinAction, JoinEvent>(JoinUiState()) {
@@ -140,21 +142,39 @@ class JoinViewModel(
         }
     }
 
-    // 회원은 이미 자기 참가자 행이 살아 있어 두 번째 입장이 막힌다(게스트는 매번 새 행이라 안 걸린다).
-    // 막을 일이 아니라 이미 들어와 있는 것이므로 그대로 들여보낸다 (규칙 §2-1-2 재접속 복구)
-    private suspend fun enterAlreadyJoinedRoom(pin: String) {
-        _uiState.update { it.copy(pin = "", roomInfo = null) }
-        _event.emit(JoinEvent.ShowNotice("이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"))
-        _event.emit(JoinEvent.JoinCompleted(pin))
+    // 재입장 실패는 원인별로 갈라야 한다 — 강퇴는 다시 눌러도 안 되고, 끝난 방은 결과로 가야 한다 (규칙 §10)
+    private fun rejoinErrorMessage(error: AppError, fallbackMessage: String): String {
+        return when (error) {
+            is AppError.PermissionDenied -> "내보내진 방에는 다시 들어올 수 없어요"
+            is AppError.Gone -> "이미 종료된 방이에요"
+            is AppError.NetworkError -> "네트워크 연결을 확인해 주세요"
+            else -> fallbackMessage
+        }
+    }
+
+    // 새 입장이 막힌 방(기입장·진행 중)은 재입장으로 원래 참가자 행을 되살려 들어간다.
+    // 새 행을 만들지 않아야 참가자 id가 채워지고 점수·답안이 갈라지지 않는다 (규칙 §2-1-2 재접속 복구)
+    private suspend fun enterAlreadyJoinedRoom(room: RoomInfo, fallbackMessage: String) {
+        rejoinRoomUseCase.invoke(room)
+            .onSuccess {
+                _uiState.update { it.copy(pin = "", roomInfo = null) }
+                _event.emit(JoinEvent.ShowNotice("이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"))
+                _event.emit(JoinEvent.JoinCompleted(room.pin))
+            }
+            .onFailure { error ->
+                _event.emit(JoinEvent.ShowNotice(rejoinErrorMessage(error, fallbackMessage)))
+            }
     }
 
     // 서버는 409를 닉네임 중복·기입장·입장 불가·정원 초과 네 가지로 준다.
     // code로 갈라야 문구가 맞고, 닉네임을 바꿔도 안 들어가지는 상태가 안 생긴다 (규칙 §10)
     private suspend fun handleJoinConflict(room: RoomInfo, code: String?) {
         if (code == ALREADY_JOINED) {
-            enterAlreadyJoinedRoom(room.pin)
+            enterAlreadyJoinedRoom(room, "이미 입장해 있는 방인데 다시 들어가지 못했어요. 잠시 후 다시 시도해 주세요")
         } else if (code == ROOM_NOT_JOINABLE) {
-            _event.emit(JoinEvent.ShowNotice("이미 시작했거나 끝난 방이라 입장할 수 없어요"))
+            // 진행 중인 방은 새로 입장할 수 없지만, 전에 들어갔던 사람은 돌아올 수 있다.
+            // 들어간 적이 없으면 서버가 404를 주고 원래 문구로 돌아간다
+            enterAlreadyJoinedRoom(room, "이미 시작했거나 끝난 방이라 입장할 수 없어요")
         } else if (code == ROOM_FULL) {
             _event.emit(JoinEvent.ShowNotice("정원이 가득 찼어요"))
         } else {

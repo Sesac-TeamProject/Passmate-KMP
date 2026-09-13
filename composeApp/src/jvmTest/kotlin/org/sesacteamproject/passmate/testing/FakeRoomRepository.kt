@@ -18,6 +18,10 @@ class FakeRoomRepository(
 
     var joinCallCount: Int = 0
 
+    var rejoinResult: AppResult<MyParticipation> = AppResult.Failure(AppError.Unknown())
+
+    var rejoinCallCount: Int = 0
+
     var pinByRoomId: Map<Long, String> = emptyMap()
 
     var participantsResult: AppResult<List<Participant>> = AppResult.Success(emptyList())
@@ -51,6 +55,11 @@ class FakeRoomRepository(
     override suspend fun joinRoom(room: RoomInfo, nickname: String, avatarId: Int?): AppResult<MyParticipation> {
         joinCallCount += 1
         return joinResult
+    }
+
+    override suspend fun rejoinRoom(room: RoomInfo): AppResult<MyParticipation> {
+        rejoinCallCount += 1
+        return rejoinResult
     }
 
     override suspend fun getParticipants(roomId: Long): AppResult<List<Participant>> {

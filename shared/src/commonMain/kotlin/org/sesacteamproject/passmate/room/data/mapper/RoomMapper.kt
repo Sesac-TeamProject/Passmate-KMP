@@ -6,9 +6,11 @@ import org.sesacteamproject.passmate.core.model.DisplayDate
 import org.sesacteamproject.passmate.core.model.PagedResult
 import org.sesacteamproject.passmate.room.data.dto.CreateRoomResponse
 import org.sesacteamproject.passmate.room.data.dto.HostedRoomsResponse
+import org.sesacteamproject.passmate.room.data.dto.JoinRoomResponse
 import org.sesacteamproject.passmate.room.data.dto.RoomInfoResponse
 import org.sesacteamproject.passmate.room.domain.model.CreatedRoom
 import org.sesacteamproject.passmate.room.domain.model.HostedRoom
+import org.sesacteamproject.passmate.room.domain.model.MyParticipation
 import org.sesacteamproject.passmate.room.domain.model.Participant
 import org.sesacteamproject.passmate.room.domain.model.RoomInfo
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
@@ -32,6 +34,25 @@ fun RoomInfoResponse.toDomain(pin: String): RoomInfo {
         entryFee = fee,
         isGuestAllowed = guestAllowed,
         host = null
+    )
+}
+
+// 입장·재입장 응답이 같은 모양이라 한 곳에서 바꾼다.
+// 재입장은 처음 입장한 닉네임·캐릭터가 돌아오므로 서버 값이 우선이고(§1 서버 권위),
+// 서버가 비워 준 값만 입력값으로 채운다.
+fun JoinRoomResponse.toMyParticipation(
+    roomId: Long,
+    pin: String,
+    fallbackNickname: String = "",
+    fallbackAvatarId: Int? = null
+): MyParticipation {
+    return MyParticipation(
+        participantId = participant.id,
+        roomId = roomId,
+        pin = pin,
+        nickname = participant.nickname.ifBlank { fallbackNickname },
+        avatarId = StudentAvatarKeys.toIndex(participant.avatarId) ?: fallbackAvatarId,
+        isGuest = participant.isGuest
     )
 }
 

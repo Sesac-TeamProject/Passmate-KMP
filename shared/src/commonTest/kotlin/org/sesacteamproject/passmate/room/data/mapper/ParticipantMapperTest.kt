@@ -66,4 +66,38 @@ class ParticipantMapperTest {
         assertEquals("guest-jwt-token", response.accessToken)
         assertEquals(1, response.participant.toDomain().avatarId)
     }
+
+    // 재입장은 처음 입장한 닉네임·캐릭터가 돌아온다 — 서버 값이 이긴다 (규칙 §1 서버 권위).
+    // 참가자 id가 채워지는 것이 핵심이다: 비면 대기실에서 내 칸 강조와 강퇴 안내가 죽는다
+    @Test
+    fun rejoinResponseCarriesOriginalParticipantOverInput() {
+        val raw = """
+            {
+              "participant": {"id": 77, "nickname": "처음이름", "avatarId": "owl", "isGuest": false},
+              "accessToken": null
+            }
+        """.trimIndent()
+
+        val participation = json.decodeFromString<JoinRoomResponse>(raw)
+            .toMyParticipation(roomId = 1L, pin = "123456", fallbackNickname = "새로친이름", fallbackAvatarId = 1)
+
+        assertEquals(77L, participation.participantId)
+        assertEquals(1L, participation.roomId)
+        assertEquals("123456", participation.pin)
+        assertEquals("처음이름", participation.nickname)
+        assertEquals(9, participation.avatarId)
+        assertEquals(false, participation.isGuest)
+    }
+
+    // 서버가 비워 준 값만 입력값으로 접는다 — 빈 닉네임을 그대로 쓰면 대기실 카드가 빈칸이 된다
+    @Test
+    fun blankServerValuesFallBackToInput() {
+        val response = JoinRoomResponse(participant = ParticipantDto(id = 5L, nickname = "", avatarId = null))
+
+        val participation = response
+            .toMyParticipation(roomId = 1L, pin = "123456", fallbackNickname = "입력이름", fallbackAvatarId = 4)
+
+        assertEquals("입력이름", participation.nickname)
+        assertEquals(4, participation.avatarId)
+    }
 }

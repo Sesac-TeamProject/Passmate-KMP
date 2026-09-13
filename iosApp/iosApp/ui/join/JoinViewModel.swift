@@ -7,6 +7,8 @@ final class JoinViewModel: ObservableObject {
 
     private let joinRoomUseCase: JoinRoomUseCase
 
+    private let rejoinRoomUseCase: RejoinRoomUseCase
+
     private let isSignedInUseCase: IsSignedInUseCase
 
     private let joinInputPolicy: JoinInputPolicy
@@ -152,22 +154,53 @@ final class JoinViewModel: ObservableObject {
         }
     }
 
-    // 회원은 이미 자기 참가자 행이 살아 있어 두 번째 입장이 막힌다(게스트는 매번 새 행이라 안 걸린다).
-    // 막을 일이 아니라 이미 들어와 있는 것이므로 그대로 들여보낸다 (규칙 §2-1-2 재접속 복구)
-    private func enterAlreadyJoinedRoom(pin: String) {
-        uiState.pin = ""
-        uiState.roomInfo = nil
-        event.send(.showNotice(message: "이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"))
-        event.send(.joinCompleted(pin: pin))
+    // 재입장 실패는 원인별로 갈라야 한다 — 강퇴는 다시 눌러도 안 되고, 끝난 방은 결과로 가야 한다 (규칙 §10)
+    private func rejoinErrorMessage(_ error: AppError?, fallbackMessage: String) -> String {
+        if error is AppError.PermissionDenied {
+            return "내보내진 방에는 다시 들어올 수 없어요"
+        } else if error is AppError.Gone {
+            return "이미 종료된 방이에요"
+        } else if error is AppError.NetworkError {
+            return "네트워크 연결을 확인해 주세요"
+        } else {
+            return fallbackMessage
+        }
+    }
+
+    // 새 입장이 막힌 방(기입장·진행 중)은 재입장으로 원래 참가자 행을 되살려 들어간다.
+    // 새 행을 만들지 않아야 참가자 id가 채워지고 점수·답안이 갈라지지 않는다 (규칙 §2-1-2 재접속 복구)
+    private func enterAlreadyJoinedRoom(room: RoomInfo, fallbackMessage: String) {
+        rejoinRoomUseCase.invoke(room: room) { [weak self] result, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if error == nil, result is AppResultSuccess<AnyObject> {
+                    self.uiState.pin = ""
+                    self.uiState.roomInfo = nil
+                    self.event.send(.showNotice(message: "이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"))
+                    self.event.send(.joinCompleted(pin: room.pin))
+                } else {
+                    let failure = (result as? AppResultFailure)?.error
+                    self.event.send(.showNotice(message: self.rejoinErrorMessage(failure, fallbackMessage: fallbackMessage)))
+                }
+            }
+        }
     }
 
     // 서버는 409를 닉네임 중복·기입장·입장 불가·정원 초과 네 가지로 준다.
     // code로 갈라야 문구가 맞고, 닉네임을 바꿔도 안 들어가지는 상태가 안 생긴다 (규칙 §10)
     private func handleJoinConflict(room: RoomInfo, code: String?) {
         if code == Self.alreadyJoined {
-            enterAlreadyJoinedRoom(pin: room.pin)
+            enterAlreadyJoinedRoom(
+                room: room,
+                fallbackMessage: "이미 입장해 있는 방인데 다시 들어가지 못했어요. 잠시 후 다시 시도해 주세요"
+            )
         } else if code == Self.roomNotJoinable {
-            event.send(.showNotice(message: "이미 시작했거나 끝난 방이라 입장할 수 없어요"))
+            // 진행 중인 방은 새로 입장할 수 없지만, 전에 들어갔던 사람은 돌아올 수 있다.
+            // 들어간 적이 없으면 서버가 404를 주고 원래 문구로 돌아간다
+            enterAlreadyJoinedRoom(
+                room: room,
+                fallbackMessage: "이미 시작했거나 끝난 방이라 입장할 수 없어요"
+            )
         } else if code == Self.roomFull {
             event.send(.showNotice(message: "정원이 가득 찼어요"))
         } else {
@@ -234,11 +267,13 @@ final class JoinViewModel: ObservableObject {
     init(
         getRoomInfoUseCase: GetRoomInfoUseCase,
         joinRoomUseCase: JoinRoomUseCase,
+        rejoinRoomUseCase: RejoinRoomUseCase,
         isSignedInUseCase: IsSignedInUseCase,
         joinInputPolicy: JoinInputPolicy
     ) {
         self.getRoomInfoUseCase = getRoomInfoUseCase
         self.joinRoomUseCase = joinRoomUseCase
+        self.rejoinRoomUseCase = rejoinRoomUseCase
         self.isSignedInUseCase = isSignedInUseCase
         self.joinInputPolicy = joinInputPolicy
         self.uiState = JoinUiState(isSignedIn: isSignedInUseCase.invoke())

@@ -11,11 +11,13 @@ import kotlinx.coroutines.test.runTest
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
 import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.AppResult
+import org.sesacteamproject.passmate.room.domain.model.MyParticipation
 import org.sesacteamproject.passmate.room.domain.model.RoomInfo
 import org.sesacteamproject.passmate.room.domain.model.RoomStatus
 import org.sesacteamproject.passmate.room.domain.policy.JoinInputPolicy
 import org.sesacteamproject.passmate.room.domain.usecase.GetRoomInfoUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.JoinRoomUseCase
+import org.sesacteamproject.passmate.room.domain.usecase.RejoinRoomUseCase
 import org.sesacteamproject.passmate.testing.FakeAuthRepository
 import org.sesacteamproject.passmate.testing.FakeRoomRepository
 import org.sesacteamproject.passmate.testing.TestMainDispatcher
@@ -53,10 +55,23 @@ class JoinViewModelTest {
         return roomRepository
     }
 
+    // 재입장이 돌려주는 원래 참가자 행 — 참가자 id가 채워져야 대기실 강조·강퇴 안내가 산다
+    private fun myParticipation(): MyParticipation {
+        return MyParticipation(
+            participantId = 77L,
+            roomId = 1L,
+            pin = "123456",
+            nickname = "처음이름",
+            avatarId = 3,
+            isGuest = false
+        )
+    }
+
     private fun viewModel(roomRepository: FakeRoomRepository, isSignedIn: Boolean): JoinViewModel {
         return JoinViewModel(
             getRoomInfoUseCase = GetRoomInfoUseCase(roomRepository),
             joinRoomUseCase = JoinRoomUseCase(roomRepository),
+            rejoinRoomUseCase = RejoinRoomUseCase(roomRepository),
             isSignedInUseCase = IsSignedInUseCase(FakeAuthRepository(isSignedIn)),
             joinInputPolicy = JoinInputPolicy()
         )
@@ -113,6 +128,7 @@ class JoinViewModelTest {
         val viewModel = viewModel(roomRepository, isSignedIn = true)
         val events = mutableListOf<JoinEvent>()
 
+        roomRepository.rejoinResult = AppResult.Success(myParticipation())
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.event.collect { events.add(it) }
         }
@@ -120,8 +136,47 @@ class JoinViewModelTest {
         viewModel.onAction(JoinAction.ChangeNickname("테스터"))
         viewModel.onAction(JoinAction.ClickJoin)
 
+        // 새 입장이 아니라 재입장으로 들어가야 참가자 id가 채워진다
+        assertEquals(1, roomRepository.rejoinCallCount)
         assertEquals(JoinEvent.JoinCompleted("123456"), events.last())
         assertEquals(false, viewModel.uiState.value.isJoining)
+    }
+
+    // 강퇴당한 사람은 재입장이 403이다 — 다시 눌러도 안 되는 상황이라 원인을 말해야 한다
+    @Test
+    fun kickedParticipantIsToldRejoinIsImpossible() = runTest {
+        val roomRepository = joinFailingWith(AppError.Conflict(serverCode = "ALREADY_JOINED"))
+        val viewModel = viewModel(roomRepository, isSignedIn = true)
+        val events = mutableListOf<JoinEvent>()
+
+        roomRepository.rejoinResult = AppResult.Failure(AppError.PermissionDenied(serverCode = "ACCESS_DENIED"))
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(JoinEvent.ShowNotice("내보내진 방에는 다시 들어올 수 없어요"), events.last())
+    }
+
+    // 진행 중인 방은 새 입장이 막히지만(409 ROOM_NOT_JOINABLE) 전에 들어갔던 사람은 돌아올 수 있다
+    @Test
+    fun runningRoomLetsPreviousParticipantBackInThroughRejoin() = runTest {
+        val roomRepository = joinFailingWith(AppError.Conflict(serverCode = "ROOM_NOT_JOINABLE"))
+        val viewModel = viewModel(roomRepository, isSignedIn = true)
+        val events = mutableListOf<JoinEvent>()
+
+        roomRepository.rejoinResult = AppResult.Success(myParticipation())
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(1, roomRepository.rejoinCallCount)
+        assertEquals(JoinEvent.JoinCompleted("123456"), events.last())
     }
 
     @Test
@@ -130,6 +185,8 @@ class JoinViewModelTest {
         val viewModel = viewModel(roomRepository, isSignedIn = true)
         val events = mutableListOf<JoinEvent>()
 
+        // 들어간 적이 없으면 재입장도 404다 — 원래 문구로 돌아간다
+        roomRepository.rejoinResult = AppResult.Failure(AppError.NotFound(serverCode = "PARTICIPANT_NOT_FOUND"))
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.event.collect { events.add(it) }
         }

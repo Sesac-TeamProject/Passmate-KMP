@@ -8,7 +8,9 @@ import org.sesacteamproject.passmate.core.network.apiCall
 import org.sesacteamproject.passmate.core.storage.TokenStorage
 import org.sesacteamproject.passmate.room.data.dto.CreateRoomRequest
 import org.sesacteamproject.passmate.room.data.dto.JoinRoomRequest
+import org.sesacteamproject.passmate.room.data.dto.JoinRoomResponse
 import org.sesacteamproject.passmate.room.data.mapper.toDomain
+import org.sesacteamproject.passmate.room.data.mapper.toMyParticipation
 import org.sesacteamproject.passmate.room.data.remote.RoomRemoteDataSource
 import org.sesacteamproject.passmate.room.domain.model.CreatedRoom
 import org.sesacteamproject.passmate.room.domain.model.HostedRoom
@@ -24,6 +26,19 @@ class RoomRepositoryImpl(
 ) : RoomRepository {
 
     private var myParticipation: MyParticipation? = null
+
+    // 입장·재입장이 똑같이 남겨야 하는 것 — 세션 스코프 참가 정보와 게스트 토큰 (규칙 §8)
+    private fun rememberParticipation(
+        response: JoinRoomResponse,
+        participation: MyParticipation
+    ): MyParticipation {
+        if (participation.isGuest && response.accessToken != null) {
+            tokenStorage.guestToken = response.accessToken
+        }
+        myParticipation = participation
+
+        return participation
+    }
 
     override suspend fun getRoomInfo(pin: String): AppResult<RoomInfo> {
         return apiCall { remoteDataSource.fetchRoomByPin(pin) }.map { it.toDomain(pin) }
@@ -41,22 +56,21 @@ class RoomRepositoryImpl(
         val request = JoinRoomRequest(nickname = nickname, avatarId = StudentAvatarKeys.toKey(avatarId))
 
         return apiCall { remoteDataSource.join(room.roomId, request) }.map { response ->
-            val participant = response.participant
-            val participation = MyParticipation(
-                participantId = participant.id,
-                roomId = room.roomId,
-                pin = room.pin,
-                nickname = nickname,
-                avatarId = StudentAvatarKeys.toIndex(participant.avatarId) ?: avatarId,
-                isGuest = participant.isGuest
+            rememberParticipation(
+                response = response,
+                participation = response.toMyParticipation(room.roomId, room.pin, nickname, avatarId)
             )
+        }
+    }
 
-            // 게스트 입장이면 서버가 게스트 토큰을 함께 준다 (규칙 §8)
-            if (participant.isGuest && response.accessToken != null) {
-                tokenStorage.guestToken = response.accessToken
-            }
-            myParticipation = participation
-            participation
+    // 이미 들어갔던 방은 새로 입장하지 않고 원래 참가자 행으로 돌아간다 —
+    // 참가자 id가 채워져야 대기실에서 내 칸을 강조하고 강퇴 안내를 받을 수 있다
+    override suspend fun rejoinRoom(room: RoomInfo): AppResult<MyParticipation> {
+        return apiCall { remoteDataSource.rejoin(room.roomId) }.map { response ->
+            rememberParticipation(
+                response = response,
+                participation = response.toMyParticipation(room.roomId, room.pin)
+            )
         }
     }
 

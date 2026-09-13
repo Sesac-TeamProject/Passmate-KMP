@@ -39,6 +39,10 @@ private class FakeRoomRepository(
         return joinResult
     }
 
+    override suspend fun rejoinRoom(room: RoomInfo): AppResult<MyParticipation> {
+        return joinResult
+    }
+
     override suspend fun getParticipants(roomId: Long): AppResult<List<Participant>> {
         return AppResult.Success(emptyList())
     }
