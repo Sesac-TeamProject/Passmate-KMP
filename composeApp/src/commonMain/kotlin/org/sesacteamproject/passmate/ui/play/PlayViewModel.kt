@@ -92,7 +92,6 @@ class PlayViewModel(
         }
     }
 
-    // 재접속·늦은 입장 복구 — 스냅샷 적용 후 이후 이벤트만 증분 반영 (규칙 §2-1-2)
     // 연결(재연결) 직후 — M-07 오버레이를 내리고 스냅샷으로 진행 중인 문항에 복귀한다 (규칙 §2-1-2)
     private suspend fun onConnected(roomId: Long) {
         _uiState.update { it.copy(isDisconnected = false) }
@@ -109,6 +108,7 @@ class PlayViewModel(
         }
     }
 
+    // 재접속·늦은 입장 복구 — 스냅샷 적용 후 이후 이벤트만 증분 반영 (규칙 §2-1-2)
     private suspend fun loadSnapshot(roomId: Long) {
         getSessionSnapshotUseCase.invoke(roomId)
             .onSuccess { snapshot ->

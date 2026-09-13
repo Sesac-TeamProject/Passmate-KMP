@@ -166,6 +166,21 @@ class PlayViewModelTest {
         assertEquals(2, stream.subscribeCount)
     }
 
+    // 재구독은 이전 구독을 끊어야 한다 — 안 끊으면 같은 프레임을 두 수집기가 각각 처리한다.
+    // 구독 횟수만 세는 검증은 eventsJob?.cancel()을 지워도 통과하므로 살아 있는 수집기를 본다
+    @Test
+    fun reconnectCancelsPreviousSubscription() = runTest {
+        val stream = FakeSessionEventStream()
+        val viewModel = viewModel(stream)
+
+        viewModel.onAction(PlayAction.Enter("123456"))
+        stream.emit(SessionEventStream.StreamEvent.Disconnected)
+        viewModel.onAction(PlayAction.Reconnect)
+
+        assertEquals(2, stream.subscribeCount)
+        assertEquals(1, stream.activeCollectorCount)
+    }
+
     // 방 정보를 아직 못 받았으면 구독할 roomId가 없다 — 아무것도 하지 않는다
     @Test
     fun reconnectBeforeRoomLoadedDoesNothing() = runTest {
