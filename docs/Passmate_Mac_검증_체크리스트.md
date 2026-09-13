@@ -180,3 +180,15 @@
 - [ ] **육안(안드로이드 스튜디오 프리뷰)**: `JoinedRoomsContentScreenEmptyPreview`에서 아이콘이 원형 배경 위에 회색으로 렌더 — 이 프리뷰는 develop(#24)에만 있고 develop은 #30 병합 전까지 컴파일되지 않는다. **#30 병합 후 develop을 병합하고 확인할 것**
 - [ ] **육안(Xcode 캔버스)**: `JoinedRoomsView.swift`의 `#Preview("참여한 방 없음")`에서 아이콘이 `textSecondary`로 28pt 렌더(검정으로 보이면 템플릿 렌더링 누락)
 - [ ] `[백엔드]` 참여 이력 0건 계정으로 로그인 → 「참여한 방」 탭에서 빈 상태 육안 확인(Android·iOS)
+
+## 13. iOS 15 루트 내비바 빈 띠 (2026-09-14)
+
+> 신규 Swift 1개 `component/NativeNavigationBarHidden.swift` — pbxproj idx **203**(`NativeTabBarHidden` 202 다음). 그룹 ID 신규 없음.
+> 증상: iOS 15 실기기에서 앱 첫 진입 시 상단에 시스템 내비바 높이(44)만큼 빈 띠 → 다른 화면 push 후 pop하면 사라짐. 원인은 `.navigationBarHidden(true)`(SwiftUI preference)가 NavigationView **루트의 첫 표시**에 늦게 전달되는 iOS 15 동작이라, 탭바와 같은 방식(UIKit 브리지)으로 첫 프레임 전에 직접 숨긴다. 내비바 숨김은 이제 `passmateHidesNativeNavigationBar()` 하나로만 한다(루트 `ContentView` + `RouteStackLevel`).
+
+- [ ] 컴파일: `xcodebuild … build` 오류 0 · `grep -rn "navigationBarHidden" iosApp/iosApp --include='*.swift'`이 `component/NativeNavigationBarHidden.swift` 안에서만 매치
+- [ ] 시뮬(iOS 26, 회귀): 홈 첫 진입 상단 여백이 이전과 동일(제목 y=56 규격, §7-1) · 각 탭 루트 → push(SignIn·명성·코인 내역) → pop에서 시스템 내비바가 어느 화면에도 보이지 않음
+- [ ] **실기기(iOS 15)**: 앱 첫 진입(스플래시 직후) 홈 상단에 빈 띠 없음 — `패스메이트` 타이틀이 상태바 바로 아래 시안 위치
+  - [ ] 마이·참여한 방·내가 만든 방 탭으로 전환해도 상단이 그대로(띠 재등장 없음)
+  - [ ] push(SignIn·설정 상세) 화면 상단에도 빈 띠 없음 → pop 후 루트 상단 위치가 첫 진입과 동일(위로 튀지 않음)
+  - [ ] 로그인/로그아웃(`sessionGeneration` 재생성) 직후에도 홈 상단에 빈 띠 없음

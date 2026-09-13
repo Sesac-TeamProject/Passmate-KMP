@@ -61,7 +61,7 @@ struct RouteStackLevel<Destination: View>: View {
                 EmptyView()
             }
         }
-        .navigationBarHidden(true)
+        .passmateHidesNativeNavigationBar()
         .navigationBarBackButtonHidden(true)
         .background(nextLevelLink)
         .onAppear { syncShownRoute(path) }
