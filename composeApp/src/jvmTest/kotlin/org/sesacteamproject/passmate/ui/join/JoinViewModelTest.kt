@@ -174,4 +174,40 @@ class JoinViewModelTest {
             events.last()
         )
     }
+
+    // 403도 code로 갈라야 한다 — 방장이 자기 방에 들어오려는 것과 일반 권한 거부는 원인이 다르다 (규칙 §10)
+    @Test
+    fun hostCannotJoinExplainsOwnRoomInsteadOfGenericFailure() = runTest {
+        val roomRepository = joinFailingWith(AppError.PermissionDenied(serverCode = "HOST_CANNOT_JOIN"))
+        val viewModel = viewModel(roomRepository, isSignedIn = true)
+        val events = mutableListOf<JoinEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(
+            JoinEvent.ShowNotice("내가 만든 방에는 참가자로 입장할 수 없어요"),
+            events.last()
+        )
+    }
+
+    @Test
+    fun otherForbiddenKeepsPermissionGuidance() = runTest {
+        val roomRepository = joinFailingWith(AppError.PermissionDenied(serverCode = "ACCESS_DENIED"))
+        val viewModel = viewModel(roomRepository, isSignedIn = true)
+        val events = mutableListOf<JoinEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(JoinEvent.ShowNotice("이 방에 입장할 권한이 없어요"), events.last())
+    }
 }

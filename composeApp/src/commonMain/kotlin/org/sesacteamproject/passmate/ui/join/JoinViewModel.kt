@@ -162,9 +162,20 @@ class JoinViewModel(
         }
     }
 
+    // 방장이 자기 방에 참가자로 들어오려 하면 403 HOST_CANNOT_JOIN이다.
+    // 일반 권한 거부와 문구가 갈려야 왜 막혔는지 알 수 있다 (규칙 §10)
+    private suspend fun handleJoinForbidden(code: String?) {
+        if (code == HOST_CANNOT_JOIN) {
+            _event.emit(JoinEvent.ShowNotice("내가 만든 방에는 참가자로 입장할 수 없어요"))
+        } else {
+            _event.emit(JoinEvent.ShowNotice("이 방에 입장할 권한이 없어요"))
+        }
+    }
+
     private suspend fun handleJoinFailure(room: RoomInfo, error: AppError) {
         when (error) {
             is AppError.Conflict -> handleJoinConflict(room, error.serverCode)
+            is AppError.PermissionDenied -> handleJoinForbidden(error.serverCode)
             is AppError.LoginRequired -> {
                 _event.emit(JoinEvent.ShowNotice("유료 방은 로그인 후 입장할 수 있어요"))
                 _event.emit(JoinEvent.SignInRequiredForPaidRoom(_uiState.value.pin))
@@ -200,11 +211,13 @@ class JoinViewModel(
     }
 
     companion object {
-        // 입장 409의 서버 코드 (contracts/rest-api.md)
+        // 입장 실패의 서버 코드 (contracts/rest-api.md)
         private const val ALREADY_JOINED = "ALREADY_JOINED"
 
         private const val ROOM_NOT_JOINABLE = "ROOM_NOT_JOINABLE"
 
         private const val ROOM_FULL = "ROOM_FULL"
+
+        private const val HOST_CANNOT_JOIN = "HOST_CANNOT_JOIN"
     }
 }
