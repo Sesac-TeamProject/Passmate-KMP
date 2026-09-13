@@ -21,6 +21,9 @@ interface RoomRepository {
 
     suspend fun joinRoom(room: RoomInfo, nickname: String, avatarId: Int?): AppResult<MyParticipation>
 
+    // 이 방에 이어갈 게스트 기록(세션 스코프 토큰)이 있는가 — 도메인은 토큰 자체를 알지 않는다
+    fun hasGuestSession(roomId: Long): Boolean
+
     // PIN 없는 재입장 — 이미 들어갔던 방으로 돌아간다(진행 중인 방도 된다).
     // 성공 시 joinRoom과 같이 MyParticipation·게스트 토큰을 채운다
     suspend fun rejoinRoom(room: RoomInfo): AppResult<MyParticipation>

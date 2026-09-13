@@ -57,6 +57,10 @@ class FakeRoomRepository(
         return joinResult
     }
 
+    override fun hasGuestSession(roomId: Long): Boolean {
+        return false
+    }
+
     override suspend fun rejoinRoom(room: RoomInfo): AppResult<MyParticipation> {
         rejoinCallCount += 1
         return rejoinResult

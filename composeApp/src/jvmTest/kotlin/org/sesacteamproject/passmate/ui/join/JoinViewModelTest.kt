@@ -267,4 +267,46 @@ class JoinViewModelTest {
 
         assertEquals(JoinEvent.ShowNotice("이 방에 입장할 권한이 없어요"), events.last())
     }
+
+    // 재입장으로 들어오면 입력한 이름이 아니라 처음 이름으로 들어간다 — 말없이 바뀌면 혼란스럽다
+    @Test
+    fun rejoinedEntryTellsUserTheyResumedOriginalSeat() = runTest {
+        val roomRepository = FakeRoomRepository(roomInfo = freeRoom())
+        val viewModel = viewModel(roomRepository, isSignedIn = false)
+        val events = mutableListOf<JoinEvent>()
+
+        roomRepository.joinResult = AppResult.Success(myParticipation().copy(isRejoined = true))
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("감귤에이드"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(
+            listOf<JoinEvent>(
+                JoinEvent.ShowNotice("이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"),
+                JoinEvent.JoinCompleted("123456")
+            ),
+            events
+        )
+    }
+
+    // 평범한 첫 입장에는 안내를 띄우지 않는다
+    @Test
+    fun freshEntryShowsNoResumeNotice() = runTest {
+        val roomRepository = FakeRoomRepository(roomInfo = freeRoom())
+        val viewModel = viewModel(roomRepository, isSignedIn = false)
+        val events = mutableListOf<JoinEvent>()
+
+        roomRepository.joinResult = AppResult.Success(myParticipation())
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("감귤에이드"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(listOf<JoinEvent>(JoinEvent.JoinCompleted("123456")), events)
+    }
 }

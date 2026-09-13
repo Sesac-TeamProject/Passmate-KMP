@@ -1,8 +1,10 @@
 package org.sesacteamproject.passmate.room.data.repository
 
+import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.AppResult
 import org.sesacteamproject.passmate.core.model.PagedResult
 import org.sesacteamproject.passmate.core.model.map
+import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.core.network.apiCall
 import org.sesacteamproject.passmate.core.storage.TokenStorage
@@ -20,6 +22,11 @@ import org.sesacteamproject.passmate.room.domain.model.RoomInfo
 import org.sesacteamproject.passmate.room.domain.model.StudentAvatarKeys
 import org.sesacteamproject.passmate.room.domain.repository.RoomRepository
 
+// 게스트 토큰은 방 하나에 묶인다 — 다른 방 토큰으로 재입장하면 남의 방에서 내 기록을 찾는 꼴이다
+internal fun hasGuestSessionFor(roomId: Long, guestToken: String?, guestRoomId: Long?): Boolean {
+    return guestToken != null && guestRoomId == roomId
+}
+
 class RoomRepositoryImpl(
     private val remoteDataSource: RoomRemoteDataSource,
     private val tokenStorage: TokenStorage
@@ -33,7 +40,7 @@ class RoomRepositoryImpl(
         participation: MyParticipation
     ): MyParticipation {
         if (participation.isGuest && response.accessToken != null) {
-            tokenStorage.guestToken = response.accessToken
+            tokenStorage.saveGuestSession(response.accessToken, participation.roomId)
         }
         myParticipation = participation
 
@@ -65,12 +72,23 @@ class RoomRepositoryImpl(
 
     // 이미 들어갔던 방은 새로 입장하지 않고 원래 참가자 행으로 돌아간다 —
     // 참가자 id가 채워져야 대기실에서 내 칸을 강조하고 강퇴 안내를 받을 수 있다
+    override fun hasGuestSession(roomId: Long): Boolean {
+        return hasGuestSessionFor(roomId, tokenStorage.guestToken, tokenStorage.guestRoomId)
+    }
+
     override suspend fun rejoinRoom(room: RoomInfo): AppResult<MyParticipation> {
-        return apiCall { remoteDataSource.rejoin(room.roomId) }.map { response ->
+        val result = apiCall { remoteDataSource.rejoin(room.roomId) }.map { response ->
             rememberParticipation(
                 response = response,
-                participation = response.toMyParticipation(room.roomId, room.pin)
+                participation = response.toMyParticipation(room.roomId, room.pin).copy(isRejoined = true)
             )
+        }
+
+        // 토큰이 만료됐거나 그 방 기록이 없으면 더 쓸 데가 없다 — 다음 입장이 깨끗이 새로 가도록 버린다
+        return result.onFailure { error ->
+            if (error !is AppError.PermissionDenied && tokenStorage.guestRoomId == room.roomId) {
+                tokenStorage.clearGuestSession()
+            }
         }
     }
 
@@ -84,7 +102,7 @@ class RoomRepositoryImpl(
             .onSuccess {
                 if (myParticipation?.roomId == roomId) {
                     myParticipation = null
-                    tokenStorage.guestToken = null
+                    tokenStorage.clearGuestSession()
                 }
             }
     }

@@ -140,11 +140,16 @@ final class JoinViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     guard let self else { return }
                     self.uiState.isJoining = false
-                    if error == nil, result is AppResultSuccess<AnyObject> {
+                    if error == nil, let success = result as? AppResultSuccess<AnyObject> {
                         // 입장에 성공하면 폼의 PIN을 비운다 — 대기실에서 나와 홈으로 돌아왔을 때
                         // 지난 방의 PIN이 남아 있으면 안 된다. 닉네임·캐릭터는 다음 입장에도 쓰므로 남긴다
                         self.uiState.pin = ""
                         self.uiState.roomInfo = nil
+                        // 새 입장이 아니라 원래 자리로 돌아간 경우 — 입력한 이름이 아닌 처음 이름으로
+                        // 들어가므로 말없이 바뀌면 혼란스럽다
+                        if (success.value as? MyParticipation)?.isRejoined == true {
+                            self.event.send(.showNotice(message: Self.resumedNotice))
+                        }
                         self.event.send(.joinCompleted(pin: room.pin))
                     } else {
                         self.handleJoinFailure(room: room, error: (result as? AppResultFailure)?.error)
@@ -176,7 +181,7 @@ final class JoinViewModel: ObservableObject {
                 if error == nil, result is AppResultSuccess<AnyObject> {
                     self.uiState.pin = ""
                     self.uiState.roomInfo = nil
-                    self.event.send(.showNotice(message: "이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"))
+                    self.event.send(.showNotice(message: Self.resumedNotice))
                     self.event.send(.joinCompleted(pin: room.pin))
                 } else {
                     let failure = (result as? AppResultFailure)?.error
@@ -278,6 +283,8 @@ final class JoinViewModel: ObservableObject {
         self.joinInputPolicy = joinInputPolicy
         self.uiState = JoinUiState(isSignedIn: isSignedInUseCase.invoke())
     }
+
+    private static let resumedNotice = "이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"
 
     // 입장 실패의 서버 코드 (contracts/rest-api.md)
     private static let alreadyJoined = "ALREADY_JOINED"

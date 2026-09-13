@@ -129,10 +129,15 @@ class JoinViewModel(
             _event.emit(JoinEvent.PaymentRequired(room.pin))
         } else {
             joinRoomUseCase.invoke(room, nickname, avatarId)
-                .onSuccess {
+                .onSuccess { participation ->
                     // 입장에 성공하면 폼의 PIN을 비운다 — 대기실에서 나와 홈으로 돌아왔을 때
                     // 지난 방의 PIN이 남아 있으면 안 된다. 닉네임·캐릭터는 다음 입장에도 쓰므로 남긴다
                     _uiState.update { it.copy(isJoining = false, pin = "", roomInfo = null) }
+                    // 새 입장이 아니라 원래 자리로 돌아간 경우 — 입력한 이름이 아닌 처음 이름으로
+                    // 들어가므로 말없이 바뀌면 혼란스럽다
+                    if (participation.isRejoined) {
+                        _event.emit(JoinEvent.ShowNotice(RESUMED_NOTICE))
+                    }
                     _event.emit(JoinEvent.JoinCompleted(room.pin))
                 }
                 .onFailure { error ->
@@ -158,7 +163,7 @@ class JoinViewModel(
         rejoinRoomUseCase.invoke(room)
             .onSuccess {
                 _uiState.update { it.copy(pin = "", roomInfo = null) }
-                _event.emit(JoinEvent.ShowNotice("이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"))
+                _event.emit(JoinEvent.ShowNotice(RESUMED_NOTICE))
                 _event.emit(JoinEvent.JoinCompleted(room.pin))
             }
             .onFailure { error ->
@@ -231,6 +236,8 @@ class JoinViewModel(
     }
 
     companion object {
+        private const val RESUMED_NOTICE = "이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"
+
         // 입장 실패의 서버 코드 (contracts/rest-api.md)
         private const val ALREADY_JOINED = "ALREADY_JOINED"
 
