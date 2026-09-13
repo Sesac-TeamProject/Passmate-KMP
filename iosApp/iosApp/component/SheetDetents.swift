@@ -20,6 +20,13 @@ extension View {
     ) -> some View {
         modifier(PassmateSheetDetentsModifier(detents: detents, selection: selection))
     }
+
+    // .contentHeight detent에 넣을 내용 높이를 잰다. 시트 높이는 되먹임 고리다 — 잰 높이로 detent를 바꾸면
+    // 시트가 다시 배치되고 그 배치가 다시 높이를 바꾼다. 키보드가 올라오는 동안 이 고리가 끝나지 않아
+    // 앱이 멈췄다(실기기 B-6, 0x8BADF00D). 그래서 눌린 높이가 아니라 본래 높이를 재고, 작은 흔들림은 무시한다
+    func passmateMeasureSheetHeight(into height: Binding<CGFloat>) -> some View {
+        modifier(SheetContentHeightReader(height: height))
+    }
 }
 
 private struct PassmateSheetDetentsModifier: ViewModifier {
@@ -146,5 +153,42 @@ private extension PassmateSheetDetent {
         case .large: return .large()
         case .contentHeight: return .medium()
         }
+    }
+}
+
+private struct SheetContentHeightReader: ViewModifier {
+    @Binding var height: CGFloat
+
+    // 커질 때는 곧바로 따르고, 줄어듦은 허용 오차보다 클 때만 따른다.
+    // 픽셀 반올림으로 생기는 1pt 미만의 흔들림(실측 519.17 ↔ 519.33)이 detent를 계속 바꾸지 못하게 끊는다
+    private func update(measured: CGFloat) {
+        let needsMoreRoom = measured > height
+        let hasShrunk = measured < height - Self.shrinkTolerance
+
+        if needsMoreRoom || hasShrunk {
+            height = measured.rounded(.up)
+        }
+    }
+
+    func body(content: Content) -> some View {
+        content
+            // 제안받은 높이(키보드에 눌린 공간)와 상관없이 내용 본래 높이로 그리고 잰다
+            .fixedSize(horizontal: false, vertical: true)
+            .background(
+                GeometryReader { geometry in
+                    Color.clear.preference(key: SheetContentHeightKey.self, value: geometry.size.height)
+                }
+            )
+            .onPreferenceChange(SheetContentHeightKey.self) { update(measured: $0) }
+    }
+
+    private static let shrinkTolerance: CGFloat = 2
+}
+
+private struct SheetContentHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
