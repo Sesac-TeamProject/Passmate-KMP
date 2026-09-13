@@ -111,9 +111,12 @@ struct ResultView: View {
                     uiState: viewModel.uiState,
                     onAction: { viewModel.action($0) }
                 )
-                // 잰 높이로 detent를 바꾸는 되먹임이 키보드가 올라오는 동안 끝나지 않아 앱이 멈췄다(실기기 B-6).
-                // 본래 높이 측정·흔들림 무시는 공통 컴포넌트가 맡는다
-                .passmateMeasureSheetHeight(into: $ratingSheetHeight)
+                .background(
+                    GeometryReader { geometry in
+                        Color.clear.preference(key: RatingSheetHeightKey.self, value: geometry.size.height)
+                    }
+                )
+                .onPreferenceChange(RatingSheetHeightKey.self) { ratingSheetHeight = $0 }
                 // 시트가 내용보다 높을 때 내용이 세로 가운데로 밀리지 않게 위로 붙인다
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 // 시트 바탕은 흰색이다 — 안 주면 iOS 기본 회색이 깔려 회색 카드·입력창이 묻힌다
@@ -775,4 +778,13 @@ private struct ShareSheet: UIViewControllerRepresentable {
         onAction: { _ in },
         onBack: {}
     )
+}
+
+// 평가 시트 내용 높이 — 시트 detent를 내용에 맞추기 위해 되읽는다
+private struct RatingSheetHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
 }
