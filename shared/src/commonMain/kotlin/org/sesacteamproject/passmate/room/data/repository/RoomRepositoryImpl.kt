@@ -27,6 +27,13 @@ internal fun hasGuestSessionFor(roomId: Long, guestToken: String?, guestRoomId: 
     return guestToken != null && guestRoomId == roomId
 }
 
+// 재입장이 실패했을 때 게스트 세션을 버리는 경우 — 서버가 그 기록을 더는 받아 주지 않을 때뿐이다:
+// 토큰 만료·위조(401), 방·참가 기록 없음(404), 끝난 방(410) (규칙 §8).
+// 강퇴(403)는 남겨야 새 입장을 막을 수 있고, 네트워크·서버 오류는 기록이 살아 있어 다시 시도하면 된다
+internal fun shouldDiscardGuestSession(error: AppError): Boolean {
+    return error is AppError.Unauthorized || error is AppError.NotFound || error is AppError.Gone
+}
+
 class RoomRepositoryImpl(
     private val remoteDataSource: RoomRemoteDataSource,
     private val tokenStorage: TokenStorage
@@ -84,9 +91,9 @@ class RoomRepositoryImpl(
             )
         }
 
-        // 토큰이 만료됐거나 그 방 기록이 없으면 더 쓸 데가 없다 — 다음 입장이 깨끗이 새로 가도록 버린다
+        // 서버가 기록을 거부했을 때만 버린다 — 다음 입장이 깨끗이 새로 가도록
         return result.onFailure { error ->
-            if (error !is AppError.PermissionDenied && tokenStorage.guestRoomId == room.roomId) {
+            if (shouldDiscardGuestSession(error) && tokenStorage.guestRoomId == room.roomId) {
                 tokenStorage.clearGuestSession()
             }
         }

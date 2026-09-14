@@ -19,7 +19,9 @@ import org.sesacteamproject.passmate.room.domain.repository.RoomRepository
 private class FakeRoomRepository(
     private val joinResult: AppResult<MyParticipation>,
     private val rejoinResult: AppResult<MyParticipation> = AppResult.Failure(AppError.NotFound()),
-    private val hasGuestSession: Boolean = false
+    private var hasGuestSession: Boolean = false,
+    // 재입장이 실패했을 때 저장소가 게스트 세션을 버리는가 — 실제 저장소는 401·404·410에서만 버린다
+    private val rejoinDiscardsSession: Boolean = true
 ) : RoomRepository {
 
     var lastNickname: String? = null
@@ -47,6 +49,9 @@ private class FakeRoomRepository(
 
     override suspend fun rejoinRoom(room: RoomInfo): AppResult<MyParticipation> {
         calls.add("rejoin")
+        if (rejoinResult is AppResult.Failure && rejoinDiscardsSession) {
+            hasGuestSession = false
+        }
         return rejoinResult
     }
 
@@ -161,13 +166,15 @@ class JoinRoomUseCaseTest {
         assertEquals(joined, (result as AppResult.Success).value)
     }
 
-    // 강퇴는 새로 들어오는 것도 막아야 한다 — join으로 우회하면 내보낸 의미가 없다
+    // 강퇴는 새로 들어오는 것도 막아야 한다 — join으로 우회하면 내보낸 의미가 없다.
+    // 저장소는 강퇴(403)에 게스트 세션을 버리지 않는다
     @Test
     fun kickedGuestIsNotLetBackInThroughNormalJoin() = runTest {
         val repository = FakeRoomRepository(
             joinResult = AppResult.Success(MyParticipation(12L, 1L, "482913", "감귤에이드", 3, true)),
             rejoinResult = AppResult.Failure(AppError.PermissionDenied(serverCode = "ACCESS_DENIED")),
-            hasGuestSession = true
+            hasGuestSession = true,
+            rejoinDiscardsSession = false
         )
         val useCase = JoinRoomUseCase(repository)
 
@@ -176,6 +183,25 @@ class JoinRoomUseCaseTest {
 
         assertEquals(listOf("rejoin"), repository.calls)
         assertEquals("ACCESS_DENIED", failure.error.serverCode)
+    }
+
+    // 재입장이 네트워크 오류로 실패해도 기록은 살아 있다 — 곧바로 새로 입장하면 연결이 돌아온 순간
+    // 같은 사람이 새 참가자로 또 들어간다. 실패를 그대로 돌려 다시 시도하게 한다
+    @Test
+    fun networkFailureOnRejoinDoesNotFallBackToNewJoin() = runTest {
+        val repository = FakeRoomRepository(
+            joinResult = AppResult.Success(MyParticipation(12L, 1L, "482913", "감귤에이드", 3, true)),
+            rejoinResult = AppResult.Failure(AppError.NetworkError()),
+            hasGuestSession = true,
+            rejoinDiscardsSession = false
+        )
+        val useCase = JoinRoomUseCase(repository)
+
+        val result = useCase.invoke(roomInfo(), "감귤에이드", 3)
+        val failure = assertIs<AppResult.Failure>(result)
+
+        assertEquals(listOf("rejoin"), repository.calls)
+        assertIs<AppError.NetworkError>(failure.error)
     }
 
     // 백엔드가 닉네임 중복을 기입장보다 먼저 검사하고, 그 검사는 내 옛 행도 센다.
