@@ -194,19 +194,19 @@ final class JoinViewModel: ObservableObject {
     // 서버는 409를 닉네임 중복·기입장·입장 불가·정원 초과 네 가지로 준다.
     // code로 갈라야 문구가 맞고, 닉네임을 바꿔도 안 들어가지는 상태가 안 생긴다 (규칙 §10)
     private func handleJoinConflict(room: RoomInfo, code: String?) {
-        if code == Self.alreadyJoined {
+        if code == ServerErrorCode.shared.ALREADY_JOINED {
             enterAlreadyJoinedRoom(
                 room: room,
                 fallbackMessage: "이미 입장해 있는 방인데 다시 들어가지 못했어요. 잠시 후 다시 시도해 주세요"
             )
-        } else if code == Self.roomNotJoinable {
+        } else if code == ServerErrorCode.shared.ROOM_NOT_JOINABLE {
             // 진행 중인 방은 새로 입장할 수 없지만, 전에 들어갔던 사람은 돌아올 수 있다.
             // 들어간 적이 없으면 서버가 404를 주고 원래 문구로 돌아간다
             enterAlreadyJoinedRoom(
                 room: room,
                 fallbackMessage: "이미 시작했거나 끝난 방이라 입장할 수 없어요"
             )
-        } else if code == Self.roomFull {
+        } else if code == ServerErrorCode.shared.ROOM_FULL {
             event.send(.showNotice(message: "정원이 가득 찼어요"))
         } else {
             event.send(.showNotice(message: "이미 사용 중인 닉네임이에요. 다른 이름을 입력해 주세요"))
@@ -216,7 +216,7 @@ final class JoinViewModel: ObservableObject {
     // 방장이 자기 방에 참가자로 들어오려 하면 403 HOST_CANNOT_JOIN이다.
     // 일반 권한 거부와 문구가 갈려야 왜 막혔는지 알 수 있다 (규칙 §10)
     private func handleJoinForbidden(code: String?) {
-        if code == Self.hostCannotJoin {
+        if code == ServerErrorCode.shared.HOST_CANNOT_JOIN {
             event.send(.showNotice(message: "내가 만든 방에는 참가자로 입장할 수 없어요"))
         } else {
             event.send(.showNotice(message: "이 방에 입장할 권한이 없어요"))
@@ -285,13 +285,4 @@ final class JoinViewModel: ObservableObject {
     }
 
     private static let resumedNotice = "이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"
-
-    // 입장 실패의 서버 코드 (contracts/rest-api.md)
-    private static let alreadyJoined = "ALREADY_JOINED"
-
-    private static let roomNotJoinable = "ROOM_NOT_JOINABLE"
-
-    private static let roomFull = "ROOM_FULL"
-
-    private static let hostCannotJoin = "HOST_CANNOT_JOIN"
 }

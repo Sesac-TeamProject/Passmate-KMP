@@ -77,7 +77,7 @@ final class CreateRoomViewModel: ObservableObject {
 
     // 서버 code 기반 문구 분기 (규칙 §10) — 최종 권위는 서버 검증
     private func createFailMessage(_ error: AppError?) -> String {
-        if error?.serverCode == "HOST_LEVEL_REQUIRED" {
+        if error?.serverCode == ServerErrorCode.shared.HOST_LEVEL_REQUIRED {
             return "유료 방은 Lv.3(검증된 운영자)부터 열 수 있어요"
         } else if let validation = error as? AppError.ValidationFailed {
             return validation.serverMessage ?? "입력값을 확인해 주세요"

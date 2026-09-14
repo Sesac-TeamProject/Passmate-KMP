@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.sesacteamproject.passmate.core.model.AppError
+import org.sesacteamproject.passmate.core.model.ServerErrorCode
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.core.network.SessionEventStream
@@ -364,9 +365,9 @@ class PlayViewModel(
     // code로 갈라야 문구가 맞고, 잠금은 풀리면 다시 낼 수 있으므로 hasSubmitted를 세우지 않는다 (규칙 §10)
     private suspend fun handleSubmitFailure(error: AppError) {
         val code = error.serverCode
-        val isClosed = error is AppError.Gone || (error is AppError.Conflict && code == "QUESTION_NOT_RUNNING")
+        val isClosed = error is AppError.Gone || (error is AppError.Conflict && code == ServerErrorCode.QUESTION_NOT_RUNNING)
 
-        if (error is AppError.Conflict && code == "SCREEN_LOCKED") {
+        if (error is AppError.Conflict && code == ServerErrorCode.SCREEN_LOCKED) {
             _event.emit(PlayEvent.ShowNotice("선생님이 화면을 잠갔어요"))
         } else if (isClosed) {
             _uiState.update { it.copy(hasSubmitted = true) }
@@ -438,9 +439,9 @@ class PlayViewModel(
     // 방·문항·참가자를 서버가 전부 404로 준다 — code로 갈라야 무엇이 없는지 화면이 말해 줄 수 있다 (규칙 §10)
     private fun notFoundMessage(serverCode: String?): String {
         return when (serverCode) {
-            "PARTICIPANT_NOT_FOUND" -> "이 방에 입장한 기록이 없어요. 다시 입장해 주세요"
-            "QUESTION_NOT_FOUND" -> "이 방에 없는 문항이에요"
-            "QUESTION_SET_NOT_FOUND" -> "방의 문제 세트를 찾을 수 없어요"
+            ServerErrorCode.PARTICIPANT_NOT_FOUND -> "이 방에 입장한 기록이 없어요. 다시 입장해 주세요"
+            ServerErrorCode.QUESTION_NOT_FOUND -> "이 방에 없는 문항이에요"
+            ServerErrorCode.QUESTION_SET_NOT_FOUND -> "방의 문제 세트를 찾을 수 없어요"
             else -> "방을 찾을 수 없어요"
         }
     }

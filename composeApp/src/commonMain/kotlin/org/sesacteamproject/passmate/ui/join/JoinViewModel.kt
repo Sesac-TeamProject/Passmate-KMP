@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sesacteamproject.passmate.auth.domain.usecase.IsSignedInUseCase
 import org.sesacteamproject.passmate.core.model.AppError
+import org.sesacteamproject.passmate.core.model.ServerErrorCode
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.mvi.MviViewModel
@@ -174,13 +175,13 @@ class JoinViewModel(
     // 서버는 409를 닉네임 중복·기입장·입장 불가·정원 초과 네 가지로 준다.
     // code로 갈라야 문구가 맞고, 닉네임을 바꿔도 안 들어가지는 상태가 안 생긴다 (규칙 §10)
     private suspend fun handleJoinConflict(room: RoomInfo, code: String?) {
-        if (code == ALREADY_JOINED) {
+        if (code == ServerErrorCode.ALREADY_JOINED) {
             enterAlreadyJoinedRoom(room, "이미 입장해 있는 방인데 다시 들어가지 못했어요. 잠시 후 다시 시도해 주세요")
-        } else if (code == ROOM_NOT_JOINABLE) {
+        } else if (code == ServerErrorCode.ROOM_NOT_JOINABLE) {
             // 진행 중인 방은 새로 입장할 수 없지만, 전에 들어갔던 사람은 돌아올 수 있다.
             // 들어간 적이 없으면 서버가 404를 주고 원래 문구로 돌아간다
             enterAlreadyJoinedRoom(room, "이미 시작했거나 끝난 방이라 입장할 수 없어요")
-        } else if (code == ROOM_FULL) {
+        } else if (code == ServerErrorCode.ROOM_FULL) {
             _event.emit(JoinEvent.ShowNotice("정원이 가득 찼어요"))
         } else {
             _event.emit(JoinEvent.ShowNotice("이미 사용 중인 닉네임이에요. 다른 이름을 입력해 주세요"))
@@ -190,7 +191,7 @@ class JoinViewModel(
     // 방장이 자기 방에 참가자로 들어오려 하면 403 HOST_CANNOT_JOIN이다.
     // 일반 권한 거부와 문구가 갈려야 왜 막혔는지 알 수 있다 (규칙 §10)
     private suspend fun handleJoinForbidden(code: String?) {
-        if (code == HOST_CANNOT_JOIN) {
+        if (code == ServerErrorCode.HOST_CANNOT_JOIN) {
             _event.emit(JoinEvent.ShowNotice("내가 만든 방에는 참가자로 입장할 수 없어요"))
         } else {
             _event.emit(JoinEvent.ShowNotice("이 방에 입장할 권한이 없어요"))
@@ -237,14 +238,5 @@ class JoinViewModel(
 
     companion object {
         private const val RESUMED_NOTICE = "이미 입장해 있는 방이에요. 처음 입장한 이름으로 이어서 들어갈게요"
-
-        // 입장 실패의 서버 코드 (contracts/rest-api.md)
-        private const val ALREADY_JOINED = "ALREADY_JOINED"
-
-        private const val ROOM_NOT_JOINABLE = "ROOM_NOT_JOINABLE"
-
-        private const val ROOM_FULL = "ROOM_FULL"
-
-        private const val HOST_CANNOT_JOIN = "HOST_CANNOT_JOIN"
     }
 }
