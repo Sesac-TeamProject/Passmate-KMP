@@ -106,6 +106,7 @@ struct RouteStackLevel<Destination: View>: View {
 - `.isDetailLink(false)` 모든 숨은 링크에 적용.
 - 숨은 링크는 `.background`에 둔다. iOS 15에서 `.background` 속 링크가 트리거되지 않는 보고가 있으므로, 실기기에서 재현되면 `ZStack { content; NavigationLink(...) { EmptyView() }.hidden() }` 형태로 전환한다(동작 규칙은 동일).
 - 한 번의 상태 변경으로 **push 2단계 이상**을 만들지 않는다(현재 코드는 전부 1단계 push). 향후 `pendingRoute`(로그인 후 원래 화면 복귀)는 **최상단 교체**(`path[path.count - 1] = target`, 같은 레벨 내용 교체)로 구현해 pop+push 동시 변경을 피한다.
+- (2026-09-14 추가) 시스템 내비바 숨김은 `.navigationBarHidden(true)`를 직접 쓰지 않고 공통 modifier `passmateHidesNativeNavigationBar()`(`component/NativeNavigationBarHidden.swift`)로 한다. iOS 15는 NavigationView **루트의 첫 표시**에서 preference 전달이 늦어 내비바 높이만큼 빈 띠가 생기고 push→pop 뒤에야 사라지므로, 탭바(`NativeTabBarHidden`)와 같은 UIKit 브리지로 첫 프레임 전에 직접 숨긴다. 적용 위치는 루트 콘텐츠(`ContentView`의 `VStack`)와 `RouteStackLevel` 두 곳.
 
 ## 3. `FlowLayout` · `WeakTopicsRow`
 
