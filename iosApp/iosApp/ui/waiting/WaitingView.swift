@@ -31,16 +31,10 @@ struct WaitingView: View {
         // M-07 연결 끊김 — 오버레이 소유는 컨테이너 (규칙 §11-1)
         .overlay {
             if viewModel.uiState.isDisconnected {
-                PassmateDisconnectedOverlayView(onReconnect: { viewModel.action(.reconnect) })
-            }
-        }
-        // M-07이 본문을 덮으면 "나가기"가 가려진다. 안드로이드는 시스템 뒤로가기로 빠져나가지만
-        // iOS 셸은 내비게이션 바를 숨겨(RouteStackLevel) 그 길이 없다 — 오버레이 위에 뒤로가기를 남긴다
-        .overlay(alignment: .topLeading) {
-            if viewModel.uiState.isDisconnected {
-                PassmateBackButton(onClick: { viewModel.action(.clickLeave) })
-                    .padding(.leading, 20)
-                    .padding(.top, 12)
+                PassmateDisconnectedOverlayView(
+                    onReconnect: { viewModel.action(.reconnect) },
+                    onBack: { viewModel.action(.clickLeave) }
+                )
             }
         }
         .onAppear {

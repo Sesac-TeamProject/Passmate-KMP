@@ -50,20 +50,14 @@ struct PlayView: View {
                 .padding(.bottom, 84)
             }
         }
-        // M-07 연결 끊김 — 최종 결과(finished)는 소켓 없이도 볼 수 있어 띄우지 않는다
+        // M-07 연결 끊김 — 최종 결과(finished)는 소켓 없이도 볼 수 있어 띄우지 않는다.
+        // 오버레이 위 뒤로가기의 퇴장 경로는 "나가기"와 같다(확인 다이얼로그 → confirmLeave) (규칙 §2-1-2)
         .overlay {
             if viewModel.uiState.isDisconnected && viewModel.uiState.phase != .finished {
-                PassmateDisconnectedOverlayView(onReconnect: { viewModel.action(.reconnect) })
-            }
-        }
-        // M-07이 본문을 덮으면 헤더의 "나가기"가 가려진다. 안드로이드는 시스템 뒤로가기로 빠져나가지만
-        // iOS 셸은 내비게이션 바를 숨겨(RouteStackLevel) 그 길이 없다 — 오버레이 위에 뒤로가기를 남긴다.
-        // 퇴장 경로는 "나가기"와 같다(확인 다이얼로그 → confirmLeave) (규칙 §2-1-2)
-        .overlay(alignment: .topLeading) {
-            if viewModel.uiState.isDisconnected && viewModel.uiState.phase != .finished {
-                PassmateBackButton(onClick: { isLeaveDialogVisible = true })
-                    .padding(.leading, 20)
-                    .padding(.top, 12)
+                PassmateDisconnectedOverlayView(
+                    onReconnect: { viewModel.action(.reconnect) },
+                    onBack: { isLeaveDialogVisible = true }
+                )
             }
         }
         .onAppear {

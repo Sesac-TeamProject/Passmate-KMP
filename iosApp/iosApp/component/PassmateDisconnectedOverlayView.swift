@@ -6,6 +6,11 @@ import SwiftUI
 struct PassmateDisconnectedOverlayView: View {
     let onReconnect: () -> Void
 
+    // 오버레이가 본문 헤더의 "나가기"를 가린다. 안드로이드는 시스템 뒤로가기로 빠져나가지만 iOS 셸은
+    // 내비게이션 바를 숨겨(RouteStackLevel) 그 길이 없다 — 넘겨받으면 오버레이 위에 뒤로가기를 남긴다.
+    // 자리는 PassmateTopBar가 정한다 (규칙 §11 — 여백은 컴포넌트가 고정)
+    var onBack: (() -> Void)?
+
     var body: some View {
         VStack(spacing: 16) {
             ZStack {
@@ -54,5 +59,10 @@ struct PassmateDisconnectedOverlayView: View {
         // 뒤에 깔린 화면으로 터치가 새지 않게 전체를 히트 영역으로 잡는다
         .contentShape(Rectangle())
         .background(PassmateColors.surface.ignoresSafeArea())
+        .overlay(alignment: .topLeading) {
+            if let onBack {
+                PassmateTopBar(title: "", onBack: onBack)
+            }
+        }
     }
 }
