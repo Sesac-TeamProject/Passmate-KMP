@@ -67,7 +67,7 @@ struct RouteStackLevel<Destination: View>: View {
                 EmptyView()
             }
         }
-        .navigationBarHidden(true)
+        .passmateHidesNativeNavigationBar()
         .navigationBarBackButtonHidden(true)
         .background(nextLevelLink)
         .background(PushTransitionEndReporter { hasSettled = true })
