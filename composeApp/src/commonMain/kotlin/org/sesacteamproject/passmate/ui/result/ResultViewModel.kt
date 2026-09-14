@@ -13,6 +13,7 @@ import org.sesacteamproject.passmate.core.network.event.ServerEvent
 import org.sesacteamproject.passmate.mvi.MviViewModel
 import org.sesacteamproject.passmate.rating.domain.model.RatingDraft
 import org.sesacteamproject.passmate.rating.domain.model.RatingTag
+import org.sesacteamproject.passmate.rating.domain.policy.RatingInputPolicy
 import org.sesacteamproject.passmate.rating.domain.usecase.SubmitRatingUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.BuildReportSummaryUseCase
 import org.sesacteamproject.passmate.report.domain.usecase.GetLearningReportUseCase
@@ -192,7 +193,7 @@ class ResultViewModel(
     }
 
     private fun onChangeRatingComment(comment: String) {
-        _uiState.update { it.copy(ratingComment = comment.take(RATING_COMMENT_MAX)) }
+        _uiState.update { it.copy(ratingComment = comment.take(RatingInputPolicy.COMMENT_MAX_LENGTH)) }
     }
 
     private fun onSkipRating() {
@@ -262,8 +263,6 @@ class ResultViewModel(
     }
 
     companion object {
-        private const val RATING_COMMENT_MAX = 100
-
         private const val CONTACT_NOTICE = "문의 접수는 준비 중이에요. 잠시 후 다시 시도해 주세요"
     }
 }

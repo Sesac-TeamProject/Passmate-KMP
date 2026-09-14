@@ -39,6 +39,7 @@ import org.sesacteamproject.passmate.report.domain.model.SessionResult
 import org.sesacteamproject.passmate.user.domain.model.HostProfile
 import org.sesacteamproject.passmate.component.StarRating
 import org.sesacteamproject.passmate.rating.domain.model.RatingTag
+import org.sesacteamproject.passmate.rating.domain.policy.RatingInputPolicy
 import org.sesacteamproject.passmate.theme.PassmateColors
 
 // T080(US11) 세션 평가 시트 — Figma "UI 디자인 v6" M-06 v2(349:9492).
@@ -172,8 +173,16 @@ private fun CommentField(
     BasicTextField(
         value = fieldValue,
         onValueChange = { newValue ->
-            fieldValue = newValue
-            onChange(newValue.text)
+            val maxLength = RatingInputPolicy.COMMENT_MAX_LENGTH
+            // 앱 값은 길이 제한으로 잘려도 이전과 같으면 위 되맞춤이 돌지 않는다 — 넘친 글자가 화면에만 남지 않게 여기서도 자른다
+            val limited = if (newValue.text.length > maxLength) {
+                TextFieldValue(newValue.text.take(maxLength), TextRange(maxLength))
+            } else {
+                newValue
+            }
+
+            fieldValue = limited
+            onChange(limited.text)
         },
         textStyle = TextStyle(
             color = PassmateColors.TextPrimary,

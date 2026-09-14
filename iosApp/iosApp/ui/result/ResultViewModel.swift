@@ -258,7 +258,8 @@ final class ResultViewModel: ObservableObject {
         case let .toggleRatingTag(tag):
             onToggleRatingTag(tag)
         case let .changeRatingComment(comment):
-            uiState.ratingComment = String(comment.prefix(100))
+            let maxLength = Int(RatingInputPolicy.companion.COMMENT_MAX_LENGTH)
+            uiState.ratingComment = String(comment.prefix(maxLength))
         case .submitRating:
             onSubmitRating()
         case .skipRating:

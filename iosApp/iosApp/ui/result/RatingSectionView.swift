@@ -188,7 +188,15 @@ private struct CommentField: View {
         .cornerRadius(14)
         .onAppear { text = comment }
         .onChange(of: text) { newValue in
-            onChange(newValue)
+            let maxLength = Int(RatingInputPolicy.companion.COMMENT_MAX_LENGTH)
+
+            // 앱 값은 길이 제한으로 잘려도 이전과 같으면 아래 되맞춤이 돌지 않는다 — 넘친 글자가 화면에만 남지 않게 여기서 자른다.
+            // 자른 값으로 바뀌면 이 onChange가 한 번 더 불려 앱에 전달된다
+            if newValue.count > maxLength {
+                text = String(newValue.prefix(maxLength))
+            } else {
+                onChange(newValue)
+            }
         }
         // 밖에서 값이 달라졌을 때만 되맞춘다(길이 제한·초기화). 같은 값이면 조합을 건드리지 않는다
         .onChange(of: comment) { newValue in
