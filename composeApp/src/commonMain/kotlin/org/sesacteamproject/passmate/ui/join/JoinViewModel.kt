@@ -148,10 +148,22 @@ class JoinViewModel(
         }
     }
 
+    // 403은 code로 원인을 가른다 — 새 입장과 재입장이 같은 문구를 써야 강퇴 안내가 경로마다 달라지지 않는다.
+    // 입장 흐름에서 ACCESS_DENIED는 강퇴당한 방의 재입장 거부다 (규칙 §10)
+    private fun forbiddenMessage(code: String?): String {
+        return if (code == ServerErrorCode.HOST_CANNOT_JOIN) {
+            "내가 만든 방에는 참가자로 입장할 수 없어요"
+        } else if (code == ServerErrorCode.ACCESS_DENIED) {
+            "내보내진 방에는 다시 들어올 수 없어요"
+        } else {
+            "이 방에 입장할 권한이 없어요"
+        }
+    }
+
     // 재입장 실패는 원인별로 갈라야 한다 — 강퇴는 다시 눌러도 안 되고, 끝난 방은 결과로 가야 한다 (규칙 §10)
     private fun rejoinErrorMessage(error: AppError, fallbackMessage: String): String {
         return when (error) {
-            is AppError.PermissionDenied -> "내보내진 방에는 다시 들어올 수 없어요"
+            is AppError.PermissionDenied -> forbiddenMessage(error.serverCode)
             is AppError.Gone -> "이미 종료된 방이에요"
             is AppError.NetworkError -> "네트워크 연결을 확인해 주세요"
             else -> fallbackMessage
@@ -172,9 +184,12 @@ class JoinViewModel(
             }
     }
 
-    // 서버는 409를 닉네임 중복·기입장·입장 불가·정원 초과 네 가지로 준다.
-    // code로 갈라야 문구가 맞고, 닉네임을 바꿔도 안 들어가지는 상태가 안 생긴다 (규칙 §10)
-    private suspend fun handleJoinConflict(room: RoomInfo, code: String?) {
+    // 서버는 입장 409를 닉네임 중복·기입장·입장 불가·정원 초과 네 가지로 준다.
+    // code로 갈라야 문구가 맞고, 닉네임을 바꿔도 안 들어가지는 상태가 안 생긴다.
+    // 모르는 409(code 없음 포함)를 닉네임 중복이라고 하면 이유를 알 수 없으니 일반 실패로 둔다 (규칙 §10)
+    private suspend fun handleJoinConflict(room: RoomInfo, error: AppError.Conflict) {
+        val code = error.serverCode
+
         if (code == ServerErrorCode.ALREADY_JOINED) {
             enterAlreadyJoinedRoom(room, "이미 입장해 있는 방인데 다시 들어가지 못했어요. 잠시 후 다시 시도해 주세요")
         } else if (code == ServerErrorCode.ROOM_NOT_JOINABLE) {
@@ -183,25 +198,17 @@ class JoinViewModel(
             enterAlreadyJoinedRoom(room, "이미 시작했거나 끝난 방이라 입장할 수 없어요")
         } else if (code == ServerErrorCode.ROOM_FULL) {
             _event.emit(JoinEvent.ShowNotice("정원이 가득 찼어요"))
-        } else {
+        } else if (code == ServerErrorCode.NICKNAME_DUPLICATED) {
             _event.emit(JoinEvent.ShowNotice("이미 사용 중인 닉네임이에요. 다른 이름을 입력해 주세요"))
-        }
-    }
-
-    // 방장이 자기 방에 참가자로 들어오려 하면 403 HOST_CANNOT_JOIN이다.
-    // 일반 권한 거부와 문구가 갈려야 왜 막혔는지 알 수 있다 (규칙 §10)
-    private suspend fun handleJoinForbidden(code: String?) {
-        if (code == ServerErrorCode.HOST_CANNOT_JOIN) {
-            _event.emit(JoinEvent.ShowNotice("내가 만든 방에는 참가자로 입장할 수 없어요"))
         } else {
-            _event.emit(JoinEvent.ShowNotice("이 방에 입장할 권한이 없어요"))
+            _event.emit(JoinEvent.ShowNotice(roomErrorMessage(error)))
         }
     }
 
     private suspend fun handleJoinFailure(room: RoomInfo, error: AppError) {
         when (error) {
-            is AppError.Conflict -> handleJoinConflict(room, error.serverCode)
-            is AppError.PermissionDenied -> handleJoinForbidden(error.serverCode)
+            is AppError.Conflict -> handleJoinConflict(room, error)
+            is AppError.PermissionDenied -> _event.emit(JoinEvent.ShowNotice(forbiddenMessage(error.serverCode)))
             is AppError.LoginRequired -> {
                 _event.emit(JoinEvent.ShowNotice("유료 방은 로그인 후 입장할 수 있어요"))
                 _event.emit(JoinEvent.SignInRequiredForPaidRoom(_uiState.value.pin))

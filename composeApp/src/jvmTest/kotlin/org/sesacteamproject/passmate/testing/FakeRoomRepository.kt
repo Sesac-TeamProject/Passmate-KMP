@@ -22,6 +22,9 @@ class FakeRoomRepository(
 
     var rejoinCallCount: Int = 0
 
+    // 이어갈 게스트 기록이 있는가 — 있으면 JoinRoomUseCase가 새 입장 대신 재입장을 먼저 부른다
+    var hasGuestSession: Boolean = false
+
     var pinByRoomId: Map<Long, String> = emptyMap()
 
     var participantsResult: AppResult<List<Participant>> = AppResult.Success(emptyList())
@@ -61,7 +64,7 @@ class FakeRoomRepository(
     }
 
     override fun hasGuestSession(roomId: Long): Boolean {
-        return false
+        return hasGuestSession
     }
 
     override suspend fun rejoinRoom(room: RoomInfo): AppResult<MyParticipation> {

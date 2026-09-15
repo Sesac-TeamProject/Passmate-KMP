@@ -118,17 +118,19 @@ class JoinRoomUseCaseTest {
         assertEquals(participation, (result as AppResult.Success).value)
     }
 
+    // 재입장 폴백은 닉네임 중복에만 탄다 — 정원 초과 같은 다른 409는 그대로 돌려준다
     @Test
-    fun propagatesNicknameConflict() = runTest {
+    fun otherJoinConflictPropagatesWithoutRejoin() = runTest {
         val repository = FakeRoomRepository(
-            AppResult.Failure(AppError.Conflict(serverCode = "NICKNAME_TAKEN"))
+            AppResult.Failure(AppError.Conflict(serverCode = "ROOM_FULL"))
         )
         val useCase = JoinRoomUseCase(repository)
 
         val result = useCase.invoke(roomInfo(), "준영", null)
         val failure = assertIs<AppResult.Failure>(result)
 
-        assertEquals("NICKNAME_TAKEN", failure.error.serverCode)
+        assertEquals("ROOM_FULL", failure.error.serverCode)
+        assertEquals(listOf("join"), repository.calls)
     }
 
     // 게스트는 서버가 토큰 없이는 알아보지 못한다 — 이어갈 기록이 있으면 새 입장 대신 재입장을 먼저 부른다.

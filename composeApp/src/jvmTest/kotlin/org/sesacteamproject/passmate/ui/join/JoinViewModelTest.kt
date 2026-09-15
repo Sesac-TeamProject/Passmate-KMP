@@ -254,7 +254,7 @@ class JoinViewModelTest {
 
     @Test
     fun otherForbiddenKeepsPermissionGuidance() = runTest {
-        val roomRepository = joinFailingWith(AppError.PermissionDenied(serverCode = "ACCESS_DENIED"))
+        val roomRepository = joinFailingWith(AppError.PermissionDenied(serverCode = null))
         val viewModel = viewModel(roomRepository, isSignedIn = true)
         val events = mutableListOf<JoinEvent>()
 
@@ -266,6 +266,60 @@ class JoinViewModelTest {
         viewModel.onAction(JoinAction.ClickJoin)
 
         assertEquals(JoinEvent.ShowNotice("이 방에 입장할 권한이 없어요"), events.last())
+    }
+
+    // 강퇴는 회원이든 게스트든 같은 안내여야 한다 — 게스트는 저장된 기록으로 재입장을 먼저 불러 403을 받는다
+    @Test
+    fun kickedGuestIsToldRejoinIsImpossible() = runTest {
+        val roomRepository = FakeRoomRepository(roomInfo = freeRoom())
+        val viewModel = viewModel(roomRepository, isSignedIn = false)
+        val events = mutableListOf<JoinEvent>()
+
+        roomRepository.hasGuestSession = true
+        roomRepository.rejoinResult = AppResult.Failure(AppError.PermissionDenied(serverCode = "ACCESS_DENIED"))
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(JoinEvent.ShowNotice("내보내진 방에는 다시 들어올 수 없어요"), events.last())
+    }
+
+    // 재입장의 403도 code로 가른다 — 강퇴가 아닌 거부를 "내보내졌다"고 말하면 안 된다
+    @Test
+    fun rejoinForbiddenForOtherReasonKeepsPermissionGuidance() = runTest {
+        val roomRepository = joinFailingWith(AppError.Conflict(serverCode = "ALREADY_JOINED"))
+        val viewModel = viewModel(roomRepository, isSignedIn = true)
+        val events = mutableListOf<JoinEvent>()
+
+        roomRepository.rejoinResult = AppResult.Failure(AppError.PermissionDenied(serverCode = null))
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(JoinEvent.ShowNotice("이 방에 입장할 권한이 없어요"), events.last())
+    }
+
+    // 모르는 409를 닉네임 중복이라고 하면 이름을 바꿔도 계속 막히고 이유를 알 수 없다
+    @Test
+    fun unknownConflictIsNotReportedAsNicknameClash() = runTest {
+        val roomRepository = joinFailingWith(AppError.Conflict(serverCode = "CONFLICT"))
+        val viewModel = viewModel(roomRepository, isSignedIn = true)
+        val events = mutableListOf<JoinEvent>()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.event.collect { events.add(it) }
+        }
+        viewModel.onAction(JoinAction.ChangePin("123456"))
+        viewModel.onAction(JoinAction.ChangeNickname("테스터"))
+        viewModel.onAction(JoinAction.ClickJoin)
+
+        assertEquals(JoinEvent.ShowNotice("입장하지 못했어요. 잠시 후 다시 시도해 주세요"), events.last())
     }
 
     // 재입장으로 들어오면 입력한 이름이 아니라 처음 이름으로 들어간다 — 말없이 바뀌면 혼란스럽다

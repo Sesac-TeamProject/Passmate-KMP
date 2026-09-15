@@ -4,6 +4,9 @@ package org.sesacteamproject.passmate.core.model
 // 화면 문구 분기는 문자열을 직접 쓰지 않고 이 상수로 비교한다. Swift에서는 ServerErrorCode.shared.X로 읽는다
 object ServerErrorCode {
     // 403
+    // 일반 권한 거부 코드지만, 입장 흐름에서는 강퇴당한 방의 재입장 거부로만 온다
+    const val ACCESS_DENIED = "ACCESS_DENIED"
+
     const val GUEST_NOT_ALLOWED = "GUEST_NOT_ALLOWED"
 
     const val HOST_CANNOT_JOIN = "HOST_CANNOT_JOIN"

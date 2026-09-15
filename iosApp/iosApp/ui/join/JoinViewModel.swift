@@ -159,10 +159,22 @@ final class JoinViewModel: ObservableObject {
         }
     }
 
+    // 403은 code로 원인을 가른다 — 새 입장과 재입장이 같은 문구를 써야 강퇴 안내가 경로마다 달라지지 않는다.
+    // 입장 흐름에서 ACCESS_DENIED는 강퇴당한 방의 재입장 거부다 (규칙 §10)
+    private func forbiddenMessage(_ code: String?) -> String {
+        if code == ServerErrorCode.shared.HOST_CANNOT_JOIN {
+            return "내가 만든 방에는 참가자로 입장할 수 없어요"
+        } else if code == ServerErrorCode.shared.ACCESS_DENIED {
+            return "내보내진 방에는 다시 들어올 수 없어요"
+        } else {
+            return "이 방에 입장할 권한이 없어요"
+        }
+    }
+
     // 재입장 실패는 원인별로 갈라야 한다 — 강퇴는 다시 눌러도 안 되고, 끝난 방은 결과로 가야 한다 (규칙 §10)
     private func rejoinErrorMessage(_ error: AppError?, fallbackMessage: String) -> String {
-        if error is AppError.PermissionDenied {
-            return "내보내진 방에는 다시 들어올 수 없어요"
+        if let forbidden = error as? AppError.PermissionDenied {
+            return forbiddenMessage(forbidden.serverCode)
         } else if error is AppError.Gone {
             return "이미 종료된 방이에요"
         } else if error is AppError.NetworkError {
@@ -191,9 +203,12 @@ final class JoinViewModel: ObservableObject {
         }
     }
 
-    // 서버는 409를 닉네임 중복·기입장·입장 불가·정원 초과 네 가지로 준다.
-    // code로 갈라야 문구가 맞고, 닉네임을 바꿔도 안 들어가지는 상태가 안 생긴다 (규칙 §10)
-    private func handleJoinConflict(room: RoomInfo, code: String?) {
+    // 서버는 입장 409를 닉네임 중복·기입장·입장 불가·정원 초과 네 가지로 준다.
+    // code로 갈라야 문구가 맞고, 닉네임을 바꿔도 안 들어가지는 상태가 안 생긴다.
+    // 모르는 409(code 없음 포함)를 닉네임 중복이라고 하면 이유를 알 수 없으니 일반 실패로 둔다 (규칙 §10)
+    private func handleJoinConflict(room: RoomInfo, conflict: AppError.Conflict) {
+        let code = conflict.serverCode
+
         if code == ServerErrorCode.shared.ALREADY_JOINED {
             enterAlreadyJoinedRoom(
                 room: room,
@@ -208,26 +223,18 @@ final class JoinViewModel: ObservableObject {
             )
         } else if code == ServerErrorCode.shared.ROOM_FULL {
             event.send(.showNotice(message: "정원이 가득 찼어요"))
-        } else {
+        } else if code == ServerErrorCode.shared.NICKNAME_DUPLICATED {
             event.send(.showNotice(message: "이미 사용 중인 닉네임이에요. 다른 이름을 입력해 주세요"))
-        }
-    }
-
-    // 방장이 자기 방에 참가자로 들어오려 하면 403 HOST_CANNOT_JOIN이다.
-    // 일반 권한 거부와 문구가 갈려야 왜 막혔는지 알 수 있다 (규칙 §10)
-    private func handleJoinForbidden(code: String?) {
-        if code == ServerErrorCode.shared.HOST_CANNOT_JOIN {
-            event.send(.showNotice(message: "내가 만든 방에는 참가자로 입장할 수 없어요"))
         } else {
-            event.send(.showNotice(message: "이 방에 입장할 권한이 없어요"))
+            event.send(.showNotice(message: roomErrorMessage(conflict)))
         }
     }
 
     private func handleJoinFailure(room: RoomInfo, error: AppError?) {
         if let conflict = error as? AppError.Conflict {
-            handleJoinConflict(room: room, code: conflict.serverCode)
+            handleJoinConflict(room: room, conflict: conflict)
         } else if let forbidden = error as? AppError.PermissionDenied {
-            handleJoinForbidden(code: forbidden.serverCode)
+            event.send(.showNotice(message: forbiddenMessage(forbidden.serverCode)))
         } else if error is AppError.LoginRequired {
             event.send(.showNotice(message: "유료 방은 로그인 후 입장할 수 있어요"))
             event.send(.signInRequiredForPaidRoom(pin: uiState.pin))
