@@ -9,15 +9,18 @@ import UIKit
 // 반영되지 않는다 — 앱 첫 진입 시 바 높이(44)만큼 빈 띠가 생기고(scroll edge 외관이라 투명, 스크롤하면 바가 드러난다),
 // push 후 pop으로 루트가 다시 나타나 viewWillAppear를 타야 사라진다. push 화면은 push 전에 렌더돼 처음부터 정상이다.
 // 루트 안의 TabView는 UITabBarController라 탭마다 호스팅 컨트롤러가 하나씩 더 있고 저마다 내비 preference를 브리지하므로,
-// preference는 루트뿐 아니라 각 탭 콘텐츠에도 건다(탭 호스트가 "숨김 없음"으로 브리지해 루트의 값을 덮지 않게).
+// preference는 루트뿐 아니라 각 탭 콘텐츠에도 건다.
 //
-// 첫 표시는 UIKit이 직접 숨긴다. 2026-09-14의 첫 시도(빈 컨트롤러를 심어 willMove(toParent:)·viewWillAppear에서 한 번 숨김)는
-// iOS 15 실기기에서 듣지 않았다 — SwiftUI가 브리지 컨트롤러를 어느 부모에 언제 붙이는지에 기댄 한 번짜리 시점이라,
-// 그 시점에 조상을 못 찾거나 SwiftUI가 그 뒤에 바를 되살리면 손쓸 데가 없었다. 그래서 뷰 뒤에 빈 UIView를 심고
-//   1. 조상 UINavigationController를 컨트롤러 부모 체인이 아니라 **응답자 체인**(view → superview → 호스팅 컨트롤러 → …)으로 찾는다
-//   2. 창에 붙는 순간(didMoveToWindow, 첫 프레임 전)과 **레이아웃마다**(layoutSubviews), 그리고 한 런루프 뒤에 거듭 숨긴다
-// SwiftUI가 뒤늦게 바를 되살리면 본문이 44 줄어 이 뷰의 레이아웃이 다시 돌고, 그 레이아웃에서 다시 숨긴다 — 되살아난 채로 남을 수 없다.
-// pop으로 루트가 다시 창에 붙을 때도 didMoveToWindow가 돌아 재확인한다. (규칙 §2-1: iOS 버전 분기는 공통 컴포넌트 안에서만)
+// iOS 15는 그 위에 UIKit이 직접 숨긴다. 실기기 이력:
+//   - 09-14: 빈 컨트롤러를 심어 willMove(toParent:)·viewWillAppear에서 한 번 숨김 → 듣지 않음(SwiftUI의 컨트롤러 부모 배선에 기댄 시점).
+//   - 09-15 1차: 빈 UIView가 응답자 체인으로 컨트롤러를 찾아 창에 붙을 때 + **레이아웃마다** 숨김 → 참여한 방 탭에서 SwiftUI 쪽
+//     무언가가 바를 되살리고 우리가 레이아웃마다 되감아 **타이틀이 위아래로 떨리는 무한 핑퐁**이 났다.
+// 그래서 지금은 되감기를 레이아웃에 걸지 않는다(핑퐁 원천 차단). 대신 두 겹이다:
+//   1. NavigationBarHidingView — 창에 붙는 순간(첫 프레임 전·pop 복귀·탭 전환)과 한 런루프 뒤, 딱 두 번만 숨긴다.
+//   2. UINavigationController 확장 — 셸의 컨트롤러에 "계속 숨김" 표식을 달고, 표식이 붙은 컨트롤러에 대한
+//      setNavigationBarHidden(false)를 숨김으로 바꾼다(교환 구현). 누가 되살리려 해도 바가 나타나지 않으니 되감을 일이 없고,
+//      따라서 떨림도 없다. 표식이 없는 컨트롤러(공유 시트·사진 선택기 등 시스템 것)는 원래대로 동작한다.
+// (규칙 §2-1: iOS 버전 분기는 공통 컴포넌트 안에서만. 최소 타깃이 16으로 오르면 이 파일의 iOS 15 분기는 통째로 지운다)
 extension View {
     func passmateHidesNativeNavigationBar() -> some View {
         modifier(NativeNavigationBarHiddenModifier())
@@ -36,15 +39,14 @@ private struct NativeNavigationBarHiddenModifier: ViewModifier {
     }
 }
 
-// iOS 15: 뷰 뒤에 빈 UIView를 심고 조상 UINavigationController의 바를 숨긴다
+// iOS 15: 뷰 뒤에 빈 UIView를 심고 조상 UINavigationController에 "계속 숨김"을 건다
 private struct NativeNavigationBarHider: UIViewRepresentable {
     func makeUIView(context: Context) -> NavigationBarHidingView {
         NavigationBarHidingView()
     }
 
-    func updateUIView(_ uiView: NavigationBarHidingView, context: Context) {
-        uiView.hideNavigationBar()
-    }
+    // SwiftUI 갱신마다 되감지 않는다 — 갱신 ↔ 되살림 핑퐁의 씨앗이 된다. 숨김은 창에 붙는 시점에만 건다
+    func updateUIView(_ uiView: NavigationBarHidingView, context: Context) {}
 }
 
 private final class NavigationBarHidingView: UIView {
@@ -63,30 +65,24 @@ private final class NavigationBarHidingView: UIView {
         return nil
     }
 
-    // animated: false — 레이아웃 도중에 불리므로 애니메이션을 주면 바가 걷히는 모습이 프레임에 남는다
-    func hideNavigationBar() {
+    private func keepNavigationBarHidden() {
         let navigationController = ancestorNavigationController
 
-        if let navigationController, !navigationController.isNavigationBarHidden {
-            navigationController.setNavigationBarHidden(true, animated: false)
+        if let navigationController {
+            navigationController.passmateKeepNavigationBarHidden()
         }
     }
 
-    // 창에 붙는 순간(첫 표시·pop 복귀) — 첫 프레임 전이다. 같은 런루프에서 SwiftUI가 바를 되살릴 여지가 있어 한 번 더 예약한다
+    // 창에 붙는 순간(첫 표시·pop 복귀·탭 전환) — 첫 프레임 전이다. 같은 런루프 안에서 SwiftUI가 바를 되살릴 여지가 있어
+    // 한 런루프 뒤 한 번 더 확인한다. 그 뒤로는 되감지 않는다(되살림 자체를 아래 확장이 막는다)
     override func didMoveToWindow() {
         super.didMoveToWindow()
         if window != nil {
-            hideNavigationBar()
+            keepNavigationBarHidden()
             DispatchQueue.main.async { [weak self] in
-                self?.hideNavigationBar()
+                self?.keepNavigationBarHidden()
             }
         }
-    }
-
-    // 바가 나타나면 본문 높이가 바뀌어 이 뷰의 레이아웃이 다시 돈다 — 그때 되돌린다
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        hideNavigationBar()
     }
 
     override init(frame: CGRect) {
@@ -97,5 +93,63 @@ private final class NavigationBarHidingView: UIView {
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarHidingView는 코드로만 생성한다")
+    }
+}
+
+// iOS 15 전용 — "계속 숨김" 표식이 붙은 컨트롤러에서는 setNavigationBarHidden(false)가 숨김으로 바뀐다.
+// 교환은 프로세스에서 한 번만 일어나고, 표식은 약한 참조 집합이라 컨트롤러가 사라지면 함께 사라진다
+// (sessionGeneration으로 NavigationView가 재생성돼도 새 컨트롤러에 다시 표식만 달면 된다)
+private extension UINavigationController {
+    private static let keptHidden = NSHashTable<UINavigationController>.weakObjects()
+
+    private static let installKeepHiddenOverride: Void = {
+        UINavigationController.exchange(
+            #selector(UINavigationController.setNavigationBarHidden(_:animated:)),
+            with: #selector(UINavigationController.passmateSetNavigationBarHidden(_:animated:))
+        )
+        UINavigationController.exchange(
+            #selector(setter: UINavigationController.isNavigationBarHidden),
+            with: #selector(UINavigationController.passmateSetNavigationBarHidden(_:))
+        )
+    }()
+
+    private static func exchange(_ original: Selector, with replacement: Selector) {
+        let originalMethod = class_getInstanceMethod(UINavigationController.self, original)
+        let replacementMethod = class_getInstanceMethod(UINavigationController.self, replacement)
+
+        if let originalMethod, let replacementMethod {
+            method_exchangeImplementations(originalMethod, replacementMethod)
+        }
+    }
+
+    private var passmateKeepsNavigationBarHidden: Bool {
+        UINavigationController.keptHidden.contains(self)
+    }
+
+    // 교환 뒤에는 이 이름이 UIKit 원본 구현을 가리킨다 — 안에서 같은 이름을 부르면 원본이 실행된다
+    @objc private dynamic func passmateSetNavigationBarHidden(_ hidden: Bool, animated: Bool) {
+        if passmateKeepsNavigationBarHidden && !hidden {
+            passmateSetNavigationBarHidden(true, animated: false)
+        } else {
+            passmateSetNavigationBarHidden(hidden, animated: animated)
+        }
+    }
+
+    @objc private dynamic func passmateSetNavigationBarHidden(_ hidden: Bool) {
+        if passmateKeepsNavigationBarHidden && !hidden {
+            passmateSetNavigationBarHidden(true)
+        } else {
+            passmateSetNavigationBarHidden(hidden)
+        }
+    }
+
+    // animated: false — 레이아웃 도중에 불릴 수 있어 애니메이션을 주면 바가 걷히는 모습이 프레임에 남는다
+    func passmateKeepNavigationBarHidden() {
+        _ = UINavigationController.installKeepHiddenOverride
+
+        UINavigationController.keptHidden.add(self)
+        if !isNavigationBarHidden {
+            setNavigationBarHidden(true, animated: false)
+        }
     }
 }
