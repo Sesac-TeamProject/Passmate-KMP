@@ -3,8 +3,9 @@ import Shared
 
 // 하단 4탭 셸 — NavigationView(stack) 하나가 TabView를 감싸는 단일 [Route] 스택. push된 화면은 TabView 전체를 덮어 탭 바가 숨는다
 // (규칙 §2-1, iOS 15 호환 스펙 2026-08-31 §2). 앱 시작 기본 진입은 항상 Home(게스트 포함, 규칙 §2-1-1)
-// 시스템 내비바는 루트·push 어느 레벨에서도 쓰지 않는다 — 숨김은 passmateHidesNativeNavigationBar() 하나로만
-// (iOS 15는 루트 첫 표시에서 SwiftUI preference가 늦어 빈 띠가 생기므로 UIKit이 직접 숨긴다, NativeNavigationBarHidden 참고)
+// 시스템 내비바는 루트·push 어느 레벨에서도 쓰지 않는다 — 숨김은 passmateHidesNativeNavigationBar() 하나로만.
+// 루트 VStack과 각 탭 콘텐츠 양쪽에 붙인다 (iOS 15는 루트 첫 표시에서 SwiftUI preference가 반영되지 않아 빈 띠가 생기고,
+// TabView의 탭 호스트도 저마다 preference를 브리지한다 — UIKit이 직접 숨기는 방식은 NativeNavigationBarHidden 참고)
 struct ContentView: View {
     @StateObject private var shellViewModel = AppShellViewModel(
         isSignedInUseCase: KoinHelper.shared.isSignedInUseCase()
@@ -35,6 +36,7 @@ struct ContentView: View {
                     }
                 )
                 .passmateHidesNativeTabBar()
+                .passmateHidesNativeNavigationBar()
                 .tabItem { Text(AppTab.home.label) }
                 .tag(AppTab.home)
 
@@ -45,6 +47,7 @@ struct ContentView: View {
                     onOpenSessionControl: { roomId, pin in path.append(.sessionControl(roomId: roomId, pin: pin)) }
                 )
                 .passmateHidesNativeTabBar()
+                .passmateHidesNativeNavigationBar()
                 .tabItem { Text(AppTab.hostedRooms.label) }
                 .tag(AppTab.hostedRooms)
 
@@ -56,6 +59,7 @@ struct ContentView: View {
                     onOpenPinEntry: { shellViewModel.action(.selectTab(.home)) }
                 )
                 .passmateHidesNativeTabBar()
+                .passmateHidesNativeNavigationBar()
                 .tabItem { Text(AppTab.joinedRooms.label) }
                 .tag(AppTab.joinedRooms)
 
@@ -76,6 +80,7 @@ struct ContentView: View {
                     }
                 )
                 .passmateHidesNativeTabBar()
+                .passmateHidesNativeNavigationBar()
                 .tabItem { Text(AppTab.myInfo.label) }
                 .tag(AppTab.myInfo)
             }
@@ -112,7 +117,7 @@ struct ContentView: View {
                 onSelectTab: { shellViewModel.action(.selectTab($0)) }
             )
             }
-            // NavigationView의 루트 콘텐츠에 붙인다 — iOS 15는 첫 표시에서 여기 심은 UIKit 브리지가 첫 프레임 전에 바를 숨긴다
+            // NavigationView의 루트 콘텐츠 — iOS 15는 여기 심은 UIKit 브리지가 첫 프레임 전에 바를 숨기고 레이아웃마다 재확인한다
             .passmateHidesNativeNavigationBar()
         }
         .navigationViewStyle(.stack)
