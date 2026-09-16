@@ -1,15 +1,10 @@
 package org.sesacteamproject.passmate.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import org.sesacteamproject.passmate.component.PassmateBottomTabBar
+import org.sesacteamproject.passmate.component.PassmateNavShell
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.ui.auth.SignInScreen
 import org.sesacteamproject.passmate.ui.home.RoomListScreen
@@ -179,60 +174,54 @@ actual fun AppNavHost() {
             }
         }
     }
-    Column(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-            when (currentDestination) {
-                is JvmDestination.Home -> JoinScreen(onNavigate = onNavigate)
-                is JvmDestination.RoomList -> RoomListScreen(onNavigate = onNavigate)
-                is JvmDestination.SignIn -> SignInScreen(onNavigate = onNavigate)
-                is JvmDestination.Join -> JoinScreen(
-                    initialPin = currentDestination.pin,
-                    onNavigate = onNavigate
-                )
-                is JvmDestination.Payment -> PaymentScreen(
-                    pin = currentDestination.pin,
-                    onNavigate = onNavigate
-                )
-                is JvmDestination.CoinHistory -> CoinHistoryScreen(onNavigate = onNavigate)
-                is JvmDestination.CoinCharge -> CoinChargeScreen(onNavigate = onNavigate)
-                is JvmDestination.Earnings -> EarningsScreen(onNavigate = onNavigate)
-                is JvmDestination.DeleteAccount -> DeleteAccountScreen(onNavigate = onNavigate)
-                is JvmDestination.EditProfile -> EditProfileScreen(onNavigate = onNavigate)
-                is JvmDestination.CharacterEdit -> CharacterEditScreen(onNavigate = onNavigate)
-                is JvmDestination.SettlementAccount -> SettlementAccountScreen(onNavigate = onNavigate)
-                is JvmDestination.NotificationSettings -> NotificationSettingsScreen(onNavigate = onNavigate)
-                is JvmDestination.Waiting -> WaitingScreen(
-                    pin = currentDestination.pin,
-                    onNavigate = onNavigate
-                )
-                is JvmDestination.Play -> PlayScreen(
-                    pin = currentDestination.pin,
-                    onNavigate = onNavigate
-                )
-                is JvmDestination.Result -> ResultScreen(
-                    roomId = currentDestination.roomId,
-                    onNavigate = onNavigate
-                )
-                is JvmDestination.MyInfo -> MyInfoScreen(onNavigate = onNavigate)
-                is JvmDestination.JoinedRooms -> JoinedRoomsScreen(onNavigate = onNavigate)
-                is JvmDestination.Reputation -> ReputationScreen(onNavigate = onNavigate)
-                is JvmDestination.HostedRooms -> HostedRoomsScreen(onNavigate = onNavigate)
-                is JvmDestination.RoomReport -> RoomReportScreen(
-                    roomId = currentDestination.roomId,
-                    onNavigate = onNavigate
-                )
-                is JvmDestination.SessionControl -> SessionControlScreen(
-                    roomId = currentDestination.roomId,
-                    pin = currentDestination.pin,
-                    onNavigate = onNavigate
-                )
-            }
-        }
-        // 탭 루트 + 시안이 탭바를 유지하는 상세 화면에서 표시 (규칙 §2-1)
-        if (currentTab != null) {
-            PassmateBottomTabBar(
-                selectedTab = currentTab,
-                onSelectTab = { shellViewModel.onAction(AppShellAction.SelectTab(it)) }
+    PassmateNavShell(
+        selectedTab = currentTab,
+        onSelectTab = { shellViewModel.onAction(AppShellAction.SelectTab(it)) }
+    ) {
+        when (currentDestination) {
+            is JvmDestination.Home -> JoinScreen(onNavigate = onNavigate)
+            is JvmDestination.RoomList -> RoomListScreen(onNavigate = onNavigate)
+            is JvmDestination.SignIn -> SignInScreen(onNavigate = onNavigate)
+            is JvmDestination.Join -> JoinScreen(
+                initialPin = currentDestination.pin,
+                onNavigate = onNavigate
+            )
+            is JvmDestination.Payment -> PaymentScreen(
+                pin = currentDestination.pin,
+                onNavigate = onNavigate
+            )
+            is JvmDestination.CoinHistory -> CoinHistoryScreen(onNavigate = onNavigate)
+            is JvmDestination.CoinCharge -> CoinChargeScreen(onNavigate = onNavigate)
+            is JvmDestination.Earnings -> EarningsScreen(onNavigate = onNavigate)
+            is JvmDestination.DeleteAccount -> DeleteAccountScreen(onNavigate = onNavigate)
+            is JvmDestination.EditProfile -> EditProfileScreen(onNavigate = onNavigate)
+            is JvmDestination.CharacterEdit -> CharacterEditScreen(onNavigate = onNavigate)
+            is JvmDestination.SettlementAccount -> SettlementAccountScreen(onNavigate = onNavigate)
+            is JvmDestination.NotificationSettings -> NotificationSettingsScreen(onNavigate = onNavigate)
+            is JvmDestination.Waiting -> WaitingScreen(
+                pin = currentDestination.pin,
+                onNavigate = onNavigate
+            )
+            is JvmDestination.Play -> PlayScreen(
+                pin = currentDestination.pin,
+                onNavigate = onNavigate
+            )
+            is JvmDestination.Result -> ResultScreen(
+                roomId = currentDestination.roomId,
+                onNavigate = onNavigate
+            )
+            is JvmDestination.MyInfo -> MyInfoScreen(onNavigate = onNavigate)
+            is JvmDestination.JoinedRooms -> JoinedRoomsScreen(onNavigate = onNavigate)
+            is JvmDestination.Reputation -> ReputationScreen(onNavigate = onNavigate)
+            is JvmDestination.HostedRooms -> HostedRoomsScreen(onNavigate = onNavigate)
+            is JvmDestination.RoomReport -> RoomReportScreen(
+                roomId = currentDestination.roomId,
+                onNavigate = onNavigate
+            )
+            is JvmDestination.SessionControl -> SessionControlScreen(
+                roomId = currentDestination.roomId,
+                pin = currentDestination.pin,
+                onNavigate = onNavigate
             )
         }
     }
