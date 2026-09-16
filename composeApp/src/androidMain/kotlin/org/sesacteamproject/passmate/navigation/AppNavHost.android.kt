@@ -4,14 +4,10 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.util.Consumer
 import androidx.navigation.NavHostController
@@ -20,7 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import org.sesacteamproject.passmate.component.PassmateBottomTabBar
+import org.sesacteamproject.passmate.component.PassmateNavShell
 import org.sesacteamproject.passmate.di.koinScreenViewModel
 import org.sesacteamproject.passmate.ui.auth.SignInScreen
 import org.sesacteamproject.passmate.ui.home.RoomListScreen
@@ -216,25 +212,16 @@ actual fun AppNavHost() {
             }
         }
     }
-    Scaffold(
-        // 0을 유지한다 — 화면 배경이 상태바 뒤까지 깔려야 iOS와 같아진다.
-        // 상단 인셋은 각 화면이 배경 뒤에 statusBarsPadding으로 직접 준다
-        // (iOS도 화면마다 `.background(색.ignoresSafeArea())`로 같은 일을 한다)
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        bottomBar = {
-            // 탭 루트 4개에서만 하단 바 표시 (스펙 §1-2)
-            if (currentTab != null) {
-                PassmateBottomTabBar(
-                    selectedTab = currentTab,
-                    onSelectTab = { shellViewModel.onAction(AppShellAction.SelectTab(it)) }
-                )
-            }
-        }
-    ) { innerPadding ->
+    // 화면 배경이 상태바 뒤까지 깔려야 iOS와 같아진다 — 상단 인셋은 각 화면이 배경 뒤에
+    // statusBarsPadding으로 직접 준다 (iOS도 화면마다 `.background(색.ignoresSafeArea())`로 같은 일을 한다).
+    // 셸이 인셋을 먹지 않으므로 Scaffold(contentWindowInsets = 0)와 같은 결과다
+    PassmateNavShell(
+        selectedTab = currentTab,
+        onSelectTab = { shellViewModel.onAction(AppShellAction.SelectTab(it)) }
+    ) {
         NavHost(
             navController = navController,
-            startDestination = Route.Home.route,
-            modifier = Modifier.padding(innerPadding)
+            startDestination = Route.Home.route
         ) {
             composable(Route.Home.route) {
                 // 홈 탭 = 입장 폼 인라인 (M-01 v6) — JoinScreen 재사용
