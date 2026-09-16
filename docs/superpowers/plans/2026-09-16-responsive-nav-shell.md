@@ -253,6 +253,7 @@ private fun iconFor(tab: AppTab): PassmateIcons {
 3. 더 이상 쓰지 않는 import를 지운다:
 ```
 androidx.compose.foundation.clickable
+androidx.compose.foundation.layout.Arrangement
 androidx.compose.foundation.layout.padding
 androidx.compose.foundation.layout.size
 androidx.compose.material3.Text
@@ -260,7 +261,9 @@ androidx.compose.ui.Alignment
 androidx.compose.ui.text.font.FontWeight
 androidx.compose.ui.unit.sp
 ```
-남는 import는 `background`, `Arrangement`, `Column`, `Row`, `Spacer`, `fillMaxWidth`, `navigationBarsPadding`, `Divider`, `Composable`, `Modifier`, `dp`, `AppTab`, `PassmateColors`다. (`Arrangement`는 파일에서 더 쓰이지 않으면 함께 지운다 — 컴파일러 경고로 확인된다.)
+(`Arrangement`는 현재 81행 `verticalArrangement = Arrangement.spacedBy(4.dp)` 한 곳에서만 쓰이고 그 코드가 통째로 옮겨가므로 함께 지운다.)
+
+남는 import는 정확히 이 12개다: `background`, `Column`, `Row`, `Spacer`, `fillMaxWidth`, `navigationBarsPadding`, `Divider`, `Composable`, `Modifier`, `dp`, `AppTab`, `PassmateColors`.
 
 - [ ] **Step 3: 컴파일 확인**
 
