@@ -105,7 +105,7 @@ struct PassmateNavShell<Content: View>: View {
 | 배경 | `PassmateColors.Surface` | 하단바와 동일 |
 | 구분선 | 오른쪽 세로 1dp `PassmateColors.Border` | 하단바의 위쪽 1dp Divider를 90° 돌린 것 |
 | 항목 | 아이콘 24dp + 라벨 11sp, gap 4dp, 선택 `Primary` / 비선택 `TextTertiary`, 선택 시 Bold | `PassmateBottomTabBar.TabItem`과 동일 — 같은 코드를 공유한다 |
-| 항목 배치 | 4개를 8dp 간격으로 묶어 **세로 가운데 정렬** | Material3 `NavigationRail` 기본 정렬. 하단바의 6:5:5:5:6 비율을 세로로 그대로 쓰면 900dp 높이 창에서 항목이 화면 전체로 흩어진다 |
+| 항목 배치 | 4개를 8dp 간격으로 **위에서부터** 쌓고, 바 위 가장자리에서 10dp 띄운다 | 사용자 결정 2026-09-16(데스크톱 실행 화면 확인 후, 기존 "세로 가운데 정렬"을 뒤집음) — 데스크톱 사이드 내비는 상단부터 시작하는 것이 자연스럽다. 10dp는 하단바의 `padding(top = 10.dp)`와 같은 값이라 새 숫자가 아니다. 하단바의 6:5:5:5:6 비율을 세로로 쓰지 않는 것은 그대로 — 900dp 높이 창에서 항목이 화면 전체로 흩어진다 |
 | 인셋 | `statusBarsPadding()` + `navigationBarsPadding()` | Rail은 화면 높이를 다 쓰므로 상·하단 시스템 바를 스스로 피해야 한다 |
 
 `TabItem`은 지금 `PassmateBottomTabBar.kt`의 `private` 컴포저블이다. Rail과 공유하기 위해 **`component/PassmateTabItem.kt`로 승격**한다(규칙 §11 "화면별 중복 컴포넌트는 공통 컴포넌트로 승격한다"). 아이콘 매핑 `iconFor(tab)`도 함께 옮긴다. 하단바의 시각 결과는 바뀌지 않는다.
