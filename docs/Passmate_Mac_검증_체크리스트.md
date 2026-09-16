@@ -192,3 +192,25 @@
   - [ ] 마이·참여한 방·내가 만든 방 탭으로 전환해도 상단이 그대로(띠 재등장 없음)
   - [ ] push(SignIn·설정 상세) 화면 상단에도 빈 띠 없음 → pop 후 루트 상단 위치가 첫 진입과 동일(위로 튀지 않음)
   - [ ] 로그인/로그아웃(`sessionGeneration` 재생성) 직후에도 홈 상단에 빈 띠 없음
+
+## 14. 반응형 내비게이션 셸 (2026-09-16)
+
+> 신규 Swift 4개 — `navigation/AppShellLayout.swift`(pbxproj idx **204**) · `component/PassmateTabItemView.swift`(**205**) · `component/PassmateNavigationRail.swift`(**206**) · `component/PassmateNavShell.swift`(**207**). 그룹 ID 신규 없음.
+> 가로폭 600pt 경계로 하단 탭바 ↔ 좌측 레일(80pt)을 바꾸고, 넓은 화면에서는 본문을 600pt로 묶어 가운데 정렬한다. 레일 항목은 위에서부터 쌓는다(상단 여백 10pt). 판정은 `AppShellLayoutPolicy` 한 곳(Compose 미러). 하단바의 `private TabItemView`는 `PassmateTabItemView`로 승격돼 레일과 공유된다.
+> **주의**: `PassmateNavShell`이 `GeometryReader`를 쓴다. `GeometryReader`는 콘텐츠 크기로 줄지 않고 자식을 topLeading에 붙이므로 `NavigationView`(stack)·`TabView` 안에서 레이아웃이 흔들릴 수 있다 — iOS 15 실기기 확인이 이 항목의 핵심이다.
+
+- [ ] 컴파일: `xcodebuild … build` 오류 0 · `grep -c "PassmateBottomTabBar(" iosApp/iosApp/ContentView.swift`가 **0**(하단바는 이제 셸만 그린다)
+- [ ] **iPhone (compact, 폭 < 600)**: 홈·내가 만든 방·참여한 방·마이 네 탭 모두 **하단 탭바가 이전과 똑같이** 보인다 — 높이·간격·선택 색·상단 1pt 구분선 동일
+  - [ ] 본문 좌우에 민트색 여백이 생기지 않는다(폭이 600 미만이라 클램프가 걸리면 안 된다)
+  - [ ] 마이 → 코인 내역·계정 정보 등 M-12-x push 화면에서도 하단 탭바가 유지된다
+  - [ ] 대기실·풀이·결과·결제·명성·정산에서는 탭바가 보이지 않는다
+  - [ ] iOS 15 실기기: 첫 진입 시 상단 빈 띠 없음(§13 회귀) · 참여한 방 탭 타이틀 떨림 없음
+- [ ] **iPad 또는 iPhone 가로 (폭 ≥ 600)**: 왼쪽에 레일(폭 80)이 서고 하단 탭바는 사라진다
+  - [ ] 레일 항목이 아이콘 24 + 라벨 11 · 선택 시 primary/Bold, 비선택 textTertiary/Medium
+  - [ ] 레일 오른쪽에 1pt border 세로선
+  - [ ] 레일 항목이 **위에서부터** 8pt 간격으로 쌓이고, 첫 항목이 바 위 가장자리에서 10pt 떨어져 있다(가운데 정렬 아님)
+  - [ ] 본문이 600pt로 묶여 가운데 정렬되고 좌우가 민트색
+  - [ ] 레일에서 탭을 누르면 하단바와 동일하게 동작(게스트가 로그인 필수 탭을 누르면 SignIn)
+  - [ ] 상태바·홈 인디케이터를 레일이 침범하지 않는다(세이프에어리어)
+- [ ] **경계 전환**: iPad 멀티태스킹으로 폭을 600 위아래로 오가면 레일 ↔ 하단바가 바뀌고, 전환 중 화면이 깨지거나 스크롤 위치가 튀지 않는다
+- [ ] **회귀**: 로그인/로그아웃(`sessionGeneration` 재생성) 직후에도 레일/탭바 상태가 정상
