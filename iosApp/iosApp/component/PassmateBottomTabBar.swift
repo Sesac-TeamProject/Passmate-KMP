@@ -30,7 +30,7 @@ struct PassmateBottomTabBar: View {
             HStack(spacing: 0) {
                 gap(units: outerGapUnits)
                 ForEach(Array(AppTab.allCases.enumerated()), id: \.element) { index, tab in
-                    TabItemView(
+                    PassmateTabItemView(
                         tab: tab,
                         isSelected: tab == selectedTab,
                         onTap: { onSelectTab(tab) }
@@ -44,34 +44,5 @@ struct PassmateBottomTabBar: View {
             .padding(.bottom, 0)
         }
         .background(PassmateColors.surface)
-    }
-}
-
-private struct TabItemView: View {
-    let tab: AppTab
-
-    let isSelected: Bool
-
-    let onTap: () -> Void
-
-    private var color: Color {
-        isSelected ? PassmateColors.primary : PassmateColors.textTertiary
-    }
-
-    var body: some View {
-        Button(action: onTap) {
-            VStack(spacing: 4) {
-                PassmateIconView(icon: tab.icon, tint: color, size: 24)
-                Text(tab.label)
-                    .font(.system(size: 11, weight: isSelected ? .bold : .medium))
-                    .kerning(-0.22)
-                    .foregroundColor(color)
-            }
-            // 좌우 여백을 두면 안쪽 간격에만 24가 더해져 6:5:5:5:6이 어긋난다 — 여백은 전부 Spacer가 쥔다
-            .padding(.vertical, 4)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(tab.label)
     }
 }
