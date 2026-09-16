@@ -232,10 +232,12 @@ class WaitingViewModel(
         }
     }
 
+    // 서버가 아직 reason을 안 실어 준다(백엔드 요청 대기). "나가기"는 구독부터 끊고 퇴장을 부르므로
+    // 구독 중에 받은 내 퇴장은 남이 나를 내보낸 것이다 — reason을 기다리지 않고 닫는다
     private suspend fun onParticipantLeft(event: ServerEvent.ParticipantLeft) {
         val isMe = event.participantId == _uiState.value.myParticipantId
 
-        if (isMe && event.reason == ServerEvent.ParticipantLeft.REASON_KICKED) {
+        if (isMe) {
             _event.emit(WaitingEvent.RoomClosed("선생님이 내보냈어요"))
         } else {
             _uiState.update { state ->

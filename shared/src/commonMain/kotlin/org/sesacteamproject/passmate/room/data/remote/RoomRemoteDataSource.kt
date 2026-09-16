@@ -38,6 +38,12 @@ class RoomRemoteDataSource(
         }.body()
     }
 
+    // PIN 없이 이미 들어갔던 방으로 돌아간다. 새 참가자 행을 만들지 않고 원래 행을 되살리므로
+    // 점수·답안이 갈라지지 않는다. 진행 중(RUNNING)인 방에서도 된다
+    suspend fun rejoin(roomId: Long): JoinRoomResponse {
+        return apiClient.http.post("${apiClient.baseUrl}/rooms/$roomId/participants/me/rejoin").body()
+    }
+
     // 서버는 참가자 배열을 그대로 준다 (계약 `ParticipantResponse[]`)
     suspend fun fetchParticipants(roomId: Long): List<ParticipantDto> {
         return apiClient.http.get("${apiClient.baseUrl}/rooms/$roomId/participants").body()

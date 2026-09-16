@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.sesacteamproject.passmate.core.model.AppError
+import org.sesacteamproject.passmate.core.model.ServerErrorCode
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.core.network.SessionEventStream
@@ -92,7 +93,6 @@ class PlayViewModel(
         }
     }
 
-    // 재접속·늦은 입장 복구 — 스냅샷 적용 후 이후 이벤트만 증분 반영 (규칙 §2-1-2)
     // 연결(재연결) 직후 — M-07 오버레이를 내리고 스냅샷으로 진행 중인 문항에 복귀한다 (규칙 §2-1-2)
     private suspend fun onConnected(roomId: Long) {
         _uiState.update { it.copy(isDisconnected = false) }
@@ -109,6 +109,7 @@ class PlayViewModel(
         }
     }
 
+    // 재접속·늦은 입장 복구 — 스냅샷 적용 후 이후 이벤트만 증분 반영 (규칙 §2-1-2)
     private suspend fun loadSnapshot(roomId: Long) {
         getSessionSnapshotUseCase.invoke(roomId)
             .onSuccess { snapshot ->
@@ -273,10 +274,12 @@ class PlayViewModel(
         }
     }
 
+    // 서버가 아직 reason을 안 실어 준다(백엔드 요청 대기). "나가기"는 구독부터 끊고 퇴장을 부르므로
+    // 구독 중에 받은 내 퇴장은 남이 나를 내보낸 것이다 — reason을 기다리지 않고 닫는다
     private suspend fun onParticipantLeft(event: ServerEvent.ParticipantLeft) {
         val isMe = event.participantId == _uiState.value.myParticipantId
 
-        if (isMe && event.reason == ServerEvent.ParticipantLeft.REASON_KICKED) {
+        if (isMe) {
             _event.emit(PlayEvent.RoomClosed("선생님이 내보냈어요"))
         }
     }
@@ -362,9 +365,9 @@ class PlayViewModel(
     // code로 갈라야 문구가 맞고, 잠금은 풀리면 다시 낼 수 있으므로 hasSubmitted를 세우지 않는다 (규칙 §10)
     private suspend fun handleSubmitFailure(error: AppError) {
         val code = error.serverCode
-        val isClosed = error is AppError.Gone || (error is AppError.Conflict && code == "QUESTION_NOT_RUNNING")
+        val isClosed = error is AppError.Gone || (error is AppError.Conflict && code == ServerErrorCode.QUESTION_NOT_RUNNING)
 
-        if (error is AppError.Conflict && code == "SCREEN_LOCKED") {
+        if (error is AppError.Conflict && code == ServerErrorCode.SCREEN_LOCKED) {
             _event.emit(PlayEvent.ShowNotice("선생님이 화면을 잠갔어요"))
         } else if (isClosed) {
             _uiState.update { it.copy(hasSubmitted = true) }
@@ -436,9 +439,9 @@ class PlayViewModel(
     // 방·문항·참가자를 서버가 전부 404로 준다 — code로 갈라야 무엇이 없는지 화면이 말해 줄 수 있다 (규칙 §10)
     private fun notFoundMessage(serverCode: String?): String {
         return when (serverCode) {
-            "PARTICIPANT_NOT_FOUND" -> "이 방에 입장한 기록이 없어요. 다시 입장해 주세요"
-            "QUESTION_NOT_FOUND" -> "이 방에 없는 문항이에요"
-            "QUESTION_SET_NOT_FOUND" -> "방의 문제 세트를 찾을 수 없어요"
+            ServerErrorCode.PARTICIPANT_NOT_FOUND -> "이 방에 입장한 기록이 없어요. 다시 입장해 주세요"
+            ServerErrorCode.QUESTION_NOT_FOUND -> "이 방에 없는 문항이에요"
+            ServerErrorCode.QUESTION_SET_NOT_FOUND -> "방의 문제 세트를 찾을 수 없어요"
             else -> "방을 찾을 수 없어요"
         }
     }

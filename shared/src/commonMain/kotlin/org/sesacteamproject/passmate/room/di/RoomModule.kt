@@ -12,6 +12,7 @@ import org.sesacteamproject.passmate.room.domain.usecase.GetParticipantsUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetRoomInfoUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.GetRoomPinUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.JoinRoomUseCase
+import org.sesacteamproject.passmate.room.domain.usecase.RejoinRoomUseCase
 import org.sesacteamproject.passmate.room.domain.usecase.LeaveRoomUseCase
 
 val roomModule = module {
@@ -21,6 +22,7 @@ val roomModule = module {
     factory { GetRoomInfoUseCase(get()) }
     factory { GetRoomPinUseCase(get()) }
     factory { JoinRoomUseCase(get()) }
+    factory { RejoinRoomUseCase(get()) }
     factory { GetParticipantsUseCase(get()) }
     factory { LeaveRoomUseCase(get()) }
     factory { GetMyParticipationUseCase(get()) }

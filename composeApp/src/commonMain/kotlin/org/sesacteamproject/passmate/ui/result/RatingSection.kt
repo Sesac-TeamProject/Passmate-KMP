@@ -17,10 +17,17 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +39,7 @@ import org.sesacteamproject.passmate.report.domain.model.SessionResult
 import org.sesacteamproject.passmate.user.domain.model.HostProfile
 import org.sesacteamproject.passmate.component.StarRating
 import org.sesacteamproject.passmate.rating.domain.model.RatingTag
+import org.sesacteamproject.passmate.rating.domain.policy.RatingInputPolicy
 import org.sesacteamproject.passmate.theme.PassmateColors
 
 // T080(US11) 세션 평가 시트 — Figma "UI 디자인 v6" M-06 v2(349:9492).
@@ -151,9 +159,31 @@ private fun CommentField(
     comment: String,
     onChange: (String) -> Unit
 ) {
+    // 한글 자소분리 방지 — BasicTextField의 String 오버로드는 글자는 밖에서(uiState), 조합 구간은
+    // 내부 상태에서 가져와 합친다(foundation BasicTextField.kt). uiState는 한 프레임 늦게 오므로
+    // "옛 글자 + 새 조합 구간"이 IME로 내려가 조합이 깨진다. 조합 중인 값을 여기서 직접 들고 있는다
+    var fieldValue by remember { mutableStateOf(TextFieldValue(comment)) }
+
+    // 밖에서 값이 달라졌을 때만 되맞춘다(길이 제한·초기화). 같은 값이면 조합을 건드리지 않는다
+    LaunchedEffect(comment) {
+        if (comment != fieldValue.text) {
+            fieldValue = TextFieldValue(comment, TextRange(comment.length))
+        }
+    }
     BasicTextField(
-        value = comment,
-        onValueChange = onChange,
+        value = fieldValue,
+        onValueChange = { newValue ->
+            val maxLength = RatingInputPolicy.COMMENT_MAX_LENGTH
+            // 앱 값은 길이 제한으로 잘려도 이전과 같으면 위 되맞춤이 돌지 않는다 — 넘친 글자가 화면에만 남지 않게 여기서도 자른다
+            val limited = if (newValue.text.length > maxLength) {
+                TextFieldValue(newValue.text.take(maxLength), TextRange(maxLength))
+            } else {
+                newValue
+            }
+
+            fieldValue = limited
+            onChange(limited.text)
+        },
         textStyle = TextStyle(
             color = PassmateColors.TextPrimary,
             fontSize = 14.sp,
@@ -167,7 +197,7 @@ private fun CommentField(
                     .background(PassmateColors.FieldGray, RoundedCornerShape(14.dp))
                     .padding(horizontal = 14.dp, vertical = 12.dp)
             ) {
-                if (comment.isEmpty()) {
+                if (fieldValue.text.isEmpty()) {
                     Text(
                         text = "한 줄 후기 (선택) — 선생님에게만 보여요",
                         color = PassmateColors.TextTertiary,

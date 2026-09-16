@@ -110,10 +110,10 @@
 - 게스트 허용: `Home`(목록·방 정보), 무료 방 `Join/Waiting/Play/Result`, 무료 방 평가(별점)
 - 로그인 필수: `MyInfo`(마이페이지·누적 리포트), `Payment`(유료 방 결제·내역), 기록 연동(claim), 유료 방 입장
 - 토큰 체계:
-  - 회원: JWT access 30분 + refresh 14일. **401 응답 시 refresh 후 1회 재시도**를 ApiClient 공통 레이어에서 처리한다(백엔드는 토큰 만료를 401로 응답 — 403은 권한 거부로만 해석한다).
-  - 게스트: `join` 응답의 게스트 토큰(participationId 바인딩)을 세션 스코프로 보관하고, WebSocket CONNECT·제출·평가 API에 사용한다.
+  - 회원: JWT access 30분 + refresh 14일. **401 응답 시 refresh 후 1회 재시도**를 ApiClient 공통 레이어에서 처리한다(백엔드는 토큰 만료를 401로 응답 — 403은 권한 거부로 해석하되, `GUEST_NOT_ALLOWED`만 로그인 유도로 다룬다).
+  - 게스트: `join` 응답의 게스트 토큰(participantId·roomId 바인딩)을 **방 세션 스코프**로 보관하고, WebSocket CONNECT·제출·평가 API에 사용한다. 앱 종료로 사라지면 안 된다 — 게스트는 토큰이 유일한 신분증이라, 잃으면 재입장이 불가능해 같은 사람이 새 참가자로 또 들어간다(대기실 중복·점수 분리). 폐기 시점은 나가기·세션 종료·다른 방 입장(덮어쓰기)·서버가 401/404로 거부할 때다. 만료(1시간) 판정은 서버가 한다.
 - 서버 오류 코드 연동:
-  - `LOGIN_REQUIRED`(401, 게스트→유료 방) → 로그인 유도 + `pendingRoute` 재실행
+  - `GUEST_NOT_ALLOWED`(403, 게스트→유료 방·회원 전용 기능) → `LoginRequired`로 매핑해 로그인 유도 + `pendingRoute` 재실행
   - `PAYMENT_REQUIRED`(402) → 결제 플로우(`Payment`)로 유도
 - 서버 검증이 최종 권위다. 클라이언트 가드는 UX 목적이며, 가드를 통과했더라도 서버 4xx를 항상 처리한다.
 - 세션 변경 감지는 화면 재생성이나 임의 강제 이동으로 해결하지 않고 `observeCurrentUser()` 기반 스트림으로 처리한다. 플랫폼별 메인 ViewModel은 세션 변화를 구독해 탭/게스트 상태를 재계산한다.
@@ -132,7 +132,7 @@
 - 에러 타입은 아래와 같다:
   - 기본: `Unauthorized`, `PermissionDenied`, `ValidationFailed`, `NetworkError`, `NotFound`, `Unknown`
   - 확장: `LoginRequired`(유료 방 게스트), `PaymentRequired`(미결제), `Conflict`(닉네임 중복·중복 제출·재평가), `Gone`(종료 방·마감 문항·파기된 기록)
-- 서버 오류 응답 `{code, message}`의 `code`(예: `NICKNAME_TAKEN`, `ALREADY_RATED`, `RECORD_PURGED`)를 `AppError`에 보존해 화면 문구 분기에 사용한다.
+- 서버 오류 응답 `{code, message}`의 `code`(예: `NICKNAME_DUPLICATED`, `ALREADY_RATED`, `GUEST_RECORD_EXPIRED`)를 `AppError`에 보존해 화면 문구 분기에 사용한다.
 - 사용자 액션 에러는 사용자 문구로 변환 가능해야 한다.
 - 로그에는 내부 원인(cause)을 남기고 UI에는 안전한 메시지만 노출한다.
 - AI 분석 실패(`AI_FEEDBACK_FAILED`)는 에러 화면이 아니라 "분석 불가" 상태 표시로 처리한다 — 정오·점수 확인을 막지 않는다.

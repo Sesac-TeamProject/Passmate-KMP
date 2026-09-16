@@ -19,6 +19,7 @@ struct JoinView: View {
     @StateObject private var viewModel = JoinViewModel(
         getRoomInfoUseCase: KoinHelper.shared.getRoomInfoUseCase(),
         joinRoomUseCase: KoinHelper.shared.joinRoomUseCase(),
+        rejoinRoomUseCase: KoinHelper.shared.rejoinRoomUseCase(),
         isSignedInUseCase: KoinHelper.shared.isSignedInUseCase(),
         joinInputPolicy: KoinHelper.shared.joinInputPolicy()
     )

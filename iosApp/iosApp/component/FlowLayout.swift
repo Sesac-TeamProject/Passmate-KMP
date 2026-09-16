@@ -2,7 +2,11 @@ import SwiftUI
 
 // 칩·태그를 가로로 흐르게 놓고 폭이 넘치면 줄바꿈하는 레이아웃 — iOS 15 호환(Layout 프로토콜 미사용).
 // 자식을 열거하는 공개 API가 없어 데이터 기반으로 받는다: FlowLayout(items, id: \.self, spacing: 8) { item in chip(item) }
-// 배치는 ZStack(.topLeading) + alignmentGuide 누적 오프셋, 전체 높이는 PreferenceKey로 되읽어 고정한다 (스펙 2026-08-31 §3-1)
+//
+// 자리는 "자식 크기(가로는 줄 폭 안에서 잰다) + 줄 폭"만으로 계산한다 (스펙 2026-08-31 §3-1).
+// 예전에는 alignmentGuide 클로저가 밖의 변수를 누적하며 자리를 정하고, 놓인 결과의 maxY를 되읽어 자기 높이로 썼다.
+// SwiftUI가 가이드를 몇 번·어떤 순서로 부를지는 보장되지 않아, 키보드가 올라오며 시트가 다시 배치되자
+// 계산이 끝나지 않고 앱이 멈췄다(실기기 B-6, 0x8BADF00D). 크기는 놓인 자리와 무관하게 재고, 배치 결과는 다시 재지 않는다
 struct FlowLayout<Data: RandomAccessCollection, ID: Hashable, Content: View>: View {
     private struct Entry: Identifiable {
         let id: ID
@@ -12,77 +16,77 @@ struct FlowLayout<Data: RandomAccessCollection, ID: Hashable, Content: View>: Vi
         let element: Data.Element
     }
 
+    private struct Placement {
+        let origins: [CGPoint]
+
+        let height: CGFloat
+    }
+
     private let entries: [Entry]
 
     private let spacing: CGFloat
 
     private let content: (Data.Element) -> Content
 
-    private static var coordinateSpace: String { "PassmateFlowLayout" }
+    // 자식마다 크기 — 놓인 자리와 상관없이 잰다
+    @State private var itemSizes: [Int: CGSize] = [:]
 
-    @State private var totalHeight: CGFloat = 0
+    // 줄바꿈 기준 폭. 재기 전(0)에는 줄바꿈하지 않는다 — 한 줄로 그렸다가 폭이 오면 늘어난다
+    @State private var availableWidth: CGFloat = 0
 
-    // 자식은 alignmentGuide 음수 오프셋으로 아래 줄에 놓인다. 그 이동은 ZStack 자체 크기에는
-    // 반영되지 않으므로 ZStack 프레임을 재면 항상 "한 줄" 높이가 나온다(줄바꿈된 칩 위로 다음
-    // 뷰가 겹친다). 자식마다 실제 놓인 자리의 maxY를 재서 그중 최댓값을 전체 높이로 쓴다
-    private func boundsReader(in space: String) -> some View {
-        GeometryReader { geometry in
-            Color.clear.preference(
-                key: FlowLayoutHeightKey.self,
-                value: geometry.frame(in: .named(space)).maxY
-            )
-        }
-    }
-
-    // alignmentGuide 클로저는 레이아웃 패스마다 자식 순서대로 호출된다(.leading 다음 .top).
-    // 마지막 항목에서 누적값을 0으로 되돌려 다음 패스를 준비한다. 반환값은 음수 오프셋(leading/top 기준 이동량).
-    private func rows(in geometry: GeometryProxy) -> some View {
+    // 같은 입력이면 몇 번 불려도 같은 값을 낸다 — 레이아웃 패스의 순서·횟수에 기대지 않는다
+    private func computePlacement() -> Placement {
+        var origins: [CGPoint] = []
         var x: CGFloat = 0
         var y: CGFloat = 0
         var rowHeight: CGFloat = 0
-        let maxWidth = geometry.size.width
-        let lastIndex = entries.count - 1
+        let canWrap = availableWidth > 0
 
-        return ZStack(alignment: .topLeading) {
-            ForEach(entries) { entry in
-                content(entry.element)
-                    .alignmentGuide(.leading) { dimensions in
-                        if x + dimensions.width > maxWidth, x > 0 {
-                            x = 0
-                            y += rowHeight + spacing
-                            rowHeight = 0
-                        }
-                        let result = x
+        for entry in entries {
+            let size = itemSizes[entry.index] ?? .zero
 
-                        rowHeight = max(rowHeight, dimensions.height)
-                        if entry.index == lastIndex {
-                            x = 0
-                        } else {
-                            x += dimensions.width + spacing
-                        }
-                        return -result
-                    }
-                    .alignmentGuide(.top) { _ in
-                        let result = y
-
-                        if entry.index == lastIndex {
-                            y = 0
-                            rowHeight = 0
-                        }
-                        return -result
-                    }
-                    .background(boundsReader(in: Self.coordinateSpace))
+            if canWrap && x > 0 && x + size.width > availableWidth {
+                x = 0
+                y += rowHeight + spacing
+                rowHeight = 0
             }
+            origins.append(CGPoint(x: x, y: y))
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
         }
-        .coordinateSpace(name: Self.coordinateSpace)
+        return Placement(origins: origins, height: y + rowHeight)
+    }
+
+    private func sizeReader(index: Int) -> some View {
+        GeometryReader { geometry in
+            Color.clear.preference(key: FlowItemSizesKey.self, value: [index: geometry.size])
+        }
+    }
+
+    private var widthReader: some View {
+        GeometryReader { geometry in
+            Color.clear.preference(key: FlowWidthKey.self, value: geometry.size.width)
+        }
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            rows(in: geometry)
+        let placement = computePlacement()
+
+        ZStack(alignment: .topLeading) {
+            ForEach(entries) { entry in
+                content(entry.element)
+                    // 가로는 줄 폭 안에서 제안받는다 — 한 줄보다 긴 칩은 칩 안에서 줄바꿈하고 부모를 넓히지 않는다.
+                    // 세로는 본래 높이로 잰다 — 배치로 정한 높이가 다시 칩 크기로 돌아오지 않게
+                    .fixedSize(horizontal: false, vertical: true)
+                    .background(sizeReader(index: entry.index))
+                    // offset은 레이아웃을 바꾸지 않는다 — 옮긴 자리가 다시 크기 측정으로 돌아오지 않는다
+                    .offset(x: placement.origins[entry.index].x, y: placement.origins[entry.index].y)
+            }
         }
-        .frame(height: totalHeight)
-        .onPreferenceChange(FlowLayoutHeightKey.self) { totalHeight = $0 }
+        .frame(maxWidth: .infinity, minHeight: placement.height, maxHeight: placement.height, alignment: .topLeading)
+        .background(widthReader)
+        .onPreferenceChange(FlowItemSizesKey.self) { itemSizes = $0 }
+        .onPreferenceChange(FlowWidthKey.self) { availableWidth = $0 }
     }
 
     init(
@@ -99,10 +103,20 @@ struct FlowLayout<Data: RandomAccessCollection, ID: Hashable, Content: View>: Vi
     }
 }
 
-private struct FlowLayoutHeightKey: PreferenceKey {
+private struct FlowItemSizesKey: PreferenceKey {
+    static var defaultValue: [Int: CGSize] = [:]
+
+    // 자식들이 각자 자기 크기를 올린다 — 인덱스별로 모은다
+    static func reduce(value: inout [Int: CGSize], nextValue: () -> [Int: CGSize]) {
+        value.merge(nextValue()) { _, new in new }
+    }
+}
+
+private struct FlowWidthKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
 
-    // 자식들이 각자 자기 maxY를 올린다 — 가장 아래 자식이 전체 높이다
+    // 폭을 올리는 건 widthReader 하나지만, 같은 자리에서 칩 쪽 자식들의 기본값 0도 함께 합쳐진다.
+    // 나중 값으로 덮으면 폭이 0이 되어 줄바꿈이 꺼진다 — 최댓값을 쓴다
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = max(value, nextValue())
     }

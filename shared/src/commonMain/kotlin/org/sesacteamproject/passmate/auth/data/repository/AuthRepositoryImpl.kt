@@ -71,7 +71,7 @@ class AuthRepositoryImpl(
 
     override fun clearSession() {
         tokenStorage.clearMemberTokens()
-        tokenStorage.guestToken = null
+        tokenStorage.clearGuestSession()
     }
 
     companion object {

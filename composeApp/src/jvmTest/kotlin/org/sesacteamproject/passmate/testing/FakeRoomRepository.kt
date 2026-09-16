@@ -18,11 +18,21 @@ class FakeRoomRepository(
 
     var joinCallCount: Int = 0
 
+    var rejoinResult: AppResult<MyParticipation> = AppResult.Failure(AppError.Unknown())
+
+    var rejoinCallCount: Int = 0
+
+    // 이어갈 게스트 기록이 있는가 — 있으면 JoinRoomUseCase가 새 입장 대신 재입장을 먼저 부른다
+    var hasGuestSession: Boolean = false
+
     var pinByRoomId: Map<Long, String> = emptyMap()
 
     var participantsResult: AppResult<List<Participant>> = AppResult.Success(emptyList())
 
     var participantsCallCount: Int = 0
+
+    // 화면이 "나"를 알아보는 기준 — 퇴장 이벤트가 내 것인지 가를 때 쓴다
+    var currentParticipation: MyParticipation? = null
 
     override suspend fun getRoomPin(roomId: Long): AppResult<String> {
         val pin = pinByRoomId[roomId]
@@ -53,6 +63,15 @@ class FakeRoomRepository(
         return joinResult
     }
 
+    override fun hasGuestSession(roomId: Long): Boolean {
+        return hasGuestSession
+    }
+
+    override suspend fun rejoinRoom(room: RoomInfo): AppResult<MyParticipation> {
+        rejoinCallCount += 1
+        return rejoinResult
+    }
+
     override suspend fun getParticipants(roomId: Long): AppResult<List<Participant>> {
         participantsCallCount += 1
         return participantsResult
@@ -63,7 +82,7 @@ class FakeRoomRepository(
     }
 
     override fun myParticipation(): MyParticipation? {
-        return null
+        return currentParticipation
     }
 
     override suspend fun getHostedRooms(cursor: String?): AppResult<PagedResult<HostedRoom>> {

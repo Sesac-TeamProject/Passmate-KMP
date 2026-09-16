@@ -7,5 +7,7 @@ data class MyParticipation(
     val pin: String,
     val nickname: String,
     val avatarId: Int?,
-    val isGuest: Boolean
+    val isGuest: Boolean,
+    // 새 입장이 아니라 원래 참가자 행으로 돌아온 경우 — 화면이 안내 문구를 띄울지 판단한다
+    val isRejoined: Boolean = false
 )

@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sesacteamproject.passmate.core.model.AppError
+import org.sesacteamproject.passmate.core.model.ServerErrorCode
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
 import org.sesacteamproject.passmate.mvi.MviViewModel
@@ -73,7 +74,7 @@ class CreateRoomViewModel(
 
     // 서버 code 기반 문구 분기 (규칙 §10) — 최종 권위는 서버 검증
     private fun createFailMessage(error: AppError): String {
-        return if (error.serverCode == "HOST_LEVEL_REQUIRED") {
+        return if (error.serverCode == ServerErrorCode.HOST_LEVEL_REQUIRED) {
             "유료 방은 Lv.3(검증된 운영자)부터 열 수 있어요"
         } else if (error is AppError.ValidationFailed) {
             error.serverMessage ?: "입력값을 확인해 주세요"

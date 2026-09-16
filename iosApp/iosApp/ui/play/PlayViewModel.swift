@@ -259,11 +259,12 @@ final class PlayViewModel: ObservableObject {
         event.send(.playVoiceHint(hint: hint))
     }
 
+    // 서버가 아직 reason을 안 실어 준다(백엔드 요청 대기). "나가기"는 구독부터 끊고 퇴장을 부르므로
+    // 구독 중에 받은 내 퇴장은 남이 나를 내보낸 것이다 — reason을 기다리지 않고 닫는다
     private func onParticipantLeft(_ left: ServerEventParticipantLeft) {
         let isMe = left.participantId == uiState.myParticipantId
-        let isKicked = left.reason == ServerEventParticipantLeft.companion.REASON_KICKED
 
-        if isMe && isKicked {
+        if isMe {
             event.send(.roomClosed(message: "선생님이 내보냈어요"))
         }
     }
@@ -366,9 +367,9 @@ final class PlayViewModel: ObservableObject {
     // code로 갈라야 문구가 맞고, 잠금은 풀리면 다시 낼 수 있으므로 hasSubmitted를 세우지 않는다 (규칙 §10)
     private func handleSubmitFailure(error: AppError?) {
         let code = error?.serverCode
-        let isClosed = error is AppError.Gone || (error is AppError.Conflict && code == "QUESTION_NOT_RUNNING")
+        let isClosed = error is AppError.Gone || (error is AppError.Conflict && code == ServerErrorCode.shared.QUESTION_NOT_RUNNING)
 
-        if error is AppError.Conflict && code == "SCREEN_LOCKED" {
+        if error is AppError.Conflict && code == ServerErrorCode.shared.SCREEN_LOCKED {
             event.send(.showNotice(message: "선생님이 화면을 잠갔어요"))
         } else if isClosed {
             uiState.hasSubmitted = true
@@ -430,14 +431,13 @@ final class PlayViewModel: ObservableObject {
 
     // 방·문항·참가자를 서버가 전부 404로 준다 — code로 갈라야 무엇이 없는지 화면이 말해 줄 수 있다 (규칙 §10)
     private func notFoundMessage(_ serverCode: String?) -> String {
-        switch serverCode {
-        case "PARTICIPANT_NOT_FOUND":
+        if serverCode == ServerErrorCode.shared.PARTICIPANT_NOT_FOUND {
             return "이 방에 입장한 기록이 없어요. 다시 입장해 주세요"
-        case "QUESTION_NOT_FOUND":
+        } else if serverCode == ServerErrorCode.shared.QUESTION_NOT_FOUND {
             return "이 방에 없는 문항이에요"
-        case "QUESTION_SET_NOT_FOUND":
+        } else if serverCode == ServerErrorCode.shared.QUESTION_SET_NOT_FOUND {
             return "방의 문제 세트를 찾을 수 없어요"
-        default:
+        } else {
             return "방을 찾을 수 없어요"
         }
     }
