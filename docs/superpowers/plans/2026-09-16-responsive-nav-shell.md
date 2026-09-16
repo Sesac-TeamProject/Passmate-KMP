@@ -162,7 +162,7 @@ MSG
 
 - [ ] **Step 1: 새 파일 작성**
 
-`composeApp/src/commonMain/kotlin/org/sesacteamproject/passmate/component/PassmateTabItem.kt` 신규 — `PassmateBottomTabBar.kt`의 `private fun TabItem`과 `private fun iconFor`를 **내용 변경 없이** 옮긴 것이다:
+`composeApp/src/commonMain/kotlin/org/sesacteamproject/passmate/component/PassmateTabItem.kt` 신규 — `PassmateBottomTabBar.kt`의 `private fun TabItem`과 `private fun iconFor`를 옮긴 것이다. **레이아웃 값(여백·크기·굵기·자간·색 토큰)은 한 글자도 바꾸지 않는다.** 달라지는 것은 둘뿐이다 — 함수명(`TabItem` → `PassmateTabItem`)과 `modifier` 파라미터 추가, 그리고 아래 주석 한 줄이 공유 컴포넌트에 맞게 다시 쓰였다(원문 "여백은 전부 Spacer가 쥔다"는 하단바에서만 참이고, 레일은 `Arrangement.spacedBy`가 여백을 쥔다):
 
 ```kotlin
 package org.sesacteamproject.passmate.component
@@ -254,16 +254,17 @@ private fun iconFor(tab: AppTab): PassmateIcons {
 ```
 androidx.compose.foundation.clickable
 androidx.compose.foundation.layout.Arrangement
-androidx.compose.foundation.layout.padding
 androidx.compose.foundation.layout.size
 androidx.compose.material3.Text
 androidx.compose.ui.Alignment
 androidx.compose.ui.text.font.FontWeight
 androidx.compose.ui.unit.sp
 ```
+
+`androidx.compose.foundation.layout.padding`은 **지우지 않는다** — 탭바 Row가 `.padding(top = 10.dp, bottom = 0.dp)`로 계속 쓴다.
 (`Arrangement`는 현재 81행 `verticalArrangement = Arrangement.spacedBy(4.dp)` 한 곳에서만 쓰이고 그 코드가 통째로 옮겨가므로 함께 지운다.)
 
-남는 import는 정확히 이 12개다: `background`, `Column`, `Row`, `Spacer`, `fillMaxWidth`, `navigationBarsPadding`, `Divider`, `Composable`, `Modifier`, `dp`, `AppTab`, `PassmateColors`.
+남는 import는 정확히 이 13개다: `background`, `Column`, `Row`, `Spacer`, `fillMaxWidth`, `navigationBarsPadding`, `padding`, `Divider`, `Composable`, `Modifier`, `dp`, `AppTab`, `PassmateColors`.
 
 - [ ] **Step 3: 컴파일 확인**
 
