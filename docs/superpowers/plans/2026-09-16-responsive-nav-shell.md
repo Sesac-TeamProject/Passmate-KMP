@@ -811,7 +811,7 @@ struct PassmateTabItemView: View {
 import SwiftUI
 
 // 좌측 4탭 레일 (넓은 창) — Compose component/PassmateNavigationRail.kt 미러 (규칙 §14).
-// 하단 탭바를 그대로 세운 형태다. 표시 여부 판정은 호출부(PassmateNavShell)가 한다.
+// 하단 탭바를 그대로 세운 형태이고 항목은 위에서부터 쌓는다. 표시 여부 판정은 호출부(PassmateNavShell)가 한다.
 // 상·하단 시스템 바 회피는 SwiftUI 기본 세이프에어리어가 해준다 (Compose의 statusBarsPadding에 해당)
 struct PassmateNavigationRail: View {
     // Material3 NavigationRail 기본 폭. 오른쪽 1pt 구분선을 포함한 바깥 폭이다
@@ -819,6 +819,9 @@ struct PassmateNavigationRail: View {
 
     // 항목 사이 간격 — 하단바의 6:5:5:5:6 비율을 세로로 그대로 쓰면 높이 900 창에서 항목이 화면 전체로 흩어진다
     private static let itemGap: CGFloat = 8
+
+    // 항목 묶음을 바 위 가장자리에서 띄우는 값 — 하단바의 .padding(.top, 10)과 같은 값을 쓴다
+    private static let itemTopPadding: CGFloat = 10
 
     let selectedTab: AppTab?
 
@@ -835,7 +838,10 @@ struct PassmateNavigationRail: View {
                     )
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            // 항목은 위에서부터 쌓는다 — alignment: .top이 없으면 SwiftUI가 가운데로 놓는다
+            // (Compose Arrangement.spacedBy(ITEM_GAP) 미러, 사용자 결정 2026-09-16)
+            .padding(.top, Self.itemTopPadding)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(PassmateColors.surface)
             // 하단바의 위쪽 1pt 구분선을 90° 돌린 것
             Rectangle()
@@ -916,7 +922,7 @@ grep -n "600\|80\|8" composeApp/src/commonMain/kotlin/org/sesacteamproject/passm
      iosApp/iosApp/navigation/AppShellLayout.swift \
      iosApp/iosApp/component/PassmateNavigationRail.swift
 ```
-Expected: `railMinWidth`=600 · `contentMaxWidth`=600 · 레일 폭=80 · 항목 간격=8이 양쪽에서 같은 값으로 나온다.
+Expected: `railMinWidth`=600 · `contentMaxWidth`=600 · 레일 폭=80 · 항목 간격=8 · 상단 여백=10이 양쪽에서 같은 값으로 나온다.
 
 - [ ] **Step 7: 커밋**
 
@@ -1129,7 +1135,7 @@ Expected: 등록 **4** · 셸 호출 **2**(루트 + push 래퍼) · 하단바 �
 ## 14. 반응형 내비게이션 셸 (2026-09-16)
 
 > 신규 Swift 4개 — `navigation/AppShellLayout.swift`(pbxproj idx **204**) · `component/PassmateTabItemView.swift`(**205**) · `component/PassmateNavigationRail.swift`(**206**) · `component/PassmateNavShell.swift`(**207**). 그룹 ID 신규 없음.
-> 가로폭 600pt 경계로 하단 탭바 ↔ 좌측 레일(80pt)을 바꾸고, 넓은 화면에서는 본문을 600pt로 묶어 가운데 정렬한다. 판정은 `AppShellLayoutPolicy` 한 곳(Compose 미러). 하단바의 `private TabItemView`는 `PassmateTabItemView`로 승격돼 레일과 공유된다.
+> 가로폭 600pt 경계로 하단 탭바 ↔ 좌측 레일(80pt)을 바꾸고, 넓은 화면에서는 본문을 600pt로 묶어 가운데 정렬한다. 레일 항목은 위에서부터 쌓는다(상단 여백 10pt). 판정은 `AppShellLayoutPolicy` 한 곳(Compose 미러). 하단바의 `private TabItemView`는 `PassmateTabItemView`로 승격돼 레일과 공유된다.
 > **주의**: `PassmateNavShell`이 `GeometryReader`를 쓴다. `GeometryReader`는 콘텐츠 크기로 줄지 않고 자식을 topLeading에 붙이므로 `NavigationView`(stack)·`TabView` 안에서 레이아웃이 흔들릴 수 있다 — iOS 15 실기기 확인이 이 항목의 핵심이다.
 
 - [ ] 컴파일: `xcodebuild … build` 오류 0 · `grep -c "PassmateBottomTabBar(" iosApp/iosApp/ContentView.swift`가 **0**(하단바는 이제 셸만 그린다)
@@ -1141,7 +1147,7 @@ Expected: 등록 **4** · 셸 호출 **2**(루트 + push 래퍼) · 하단바 �
 - [ ] **iPad 또는 iPhone 가로 (폭 ≥ 600)**: 왼쪽에 레일(폭 80)이 서고 하단 탭바는 사라진다
   - [ ] 레일 항목이 아이콘 24 + 라벨 11 · 선택 시 primary/Bold, 비선택 textTertiary/Medium
   - [ ] 레일 오른쪽에 1pt border 세로선
-  - [ ] 레일 항목이 세로 가운데에 8pt 간격으로 묶여 있다
+  - [ ] 레일 항목이 **위에서부터** 8pt 간격으로 쌓이고, 첫 항목이 바 위 가장자리에서 10pt 떨어져 있다(가운데 정렬 아님)
   - [ ] 본문이 600pt로 묶여 가운데 정렬되고 좌우가 민트색
   - [ ] 레일에서 탭을 누르면 하단바와 동일하게 동작(게스트가 로그인 필수 탭을 누르면 SignIn)
   - [ ] 상태바·홈 인디케이터를 레일이 침범하지 않는다(세이프에어리어)
