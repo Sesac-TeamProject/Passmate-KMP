@@ -32,9 +32,4 @@ class AppShellLayoutTest {
     fun boundaryMatchesMaterialCompactBreakpoint() {
         assertEquals(600.dp, AppShellLayoutPolicy.RAIL_MIN_WIDTH)
     }
-
-    @Test
-    fun contentIsClampedToDesignWidth() {
-        assertEquals(600.dp, AppShellLayoutPolicy.CONTENT_MAX_WIDTH)
-    }
 }

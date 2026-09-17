@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.sesacteamproject.passmate.navigation.AppShellLayout
 import org.sesacteamproject.passmate.navigation.AppShellLayoutPolicy
@@ -50,25 +48,15 @@ fun PassmateNavShell(
     }
 }
 
-// 본문 — 넓은 창에서 시안 폭을 넘지 않게 묶고 가운데 정렬한다. 남는 좌우는 앱 배경색으로 채운다.
-// 화면들이 스스로 흰 Surface를 깔기 때문에 여백까지 흰색이면 본문이 어디까지인지 보이지 않는다
+// 본문 — 가용 폭을 그대로 채운다. 넓은 창에서 폭을 묶어 가운데 정렬했더니 PassmateTopBar의
+// 뒤로가기 버튼이 창 중앙 쪽에 떠 좌상단이 아니게 보이는 문제가 있어 클램프를 걷어냈다(2026-09-17).
+// 배경색은 화면 전환 중 빈 프레임을 덮는 안전망으로 남긴다 — 화면들이 스스로 흰 Surface를 깐다
 @Composable
 private fun ContentArea(
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
-    Box(
-        modifier = modifier.fillMaxSize().background(PassmateColors.BackgroundMint),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        // widthIn이 먼저 들어오는 제약을 깎고, 그다음 fillMaxSize가 깎인 제약을 채운다.
-        // 순서를 바꾸면 fillMaxSize가 원래 제약을 먼저 채워 클램프가 무시된다
-        Box(
-            modifier = Modifier
-                .widthIn(max = AppShellLayoutPolicy.CONTENT_MAX_WIDTH)
-                .fillMaxSize()
-        ) {
-            content()
-        }
+    Box(modifier = modifier.fillMaxSize().background(PassmateColors.BackgroundMint)) {
+        content()
     }
 }

@@ -15,9 +15,6 @@ object AppShellLayoutPolicy {
     // Material3 window size class의 compact/medium 경계
     val RAIL_MIN_WIDTH: Dp = 600.dp
 
-    // 전 화면이 모바일 폭 기준 시안이라, 넓은 창에서는 본문을 이 폭으로 묶는다
-    val CONTENT_MAX_WIDTH: Dp = 600.dp
-
     // 재는 값은 셸이 받은 **창 폭**이다. 레일을 뺀 본문 폭으로 재면 600 근처에서 배치가 튄다
     // (레일이 붙으면 본문이 600 밑으로 내려가 다시 하단바가 되고, 그러면 다시 600을 넘는다)
     fun layoutFor(width: Dp): AppShellLayout {
