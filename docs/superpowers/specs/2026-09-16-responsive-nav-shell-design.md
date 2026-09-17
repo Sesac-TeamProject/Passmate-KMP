@@ -11,7 +11,7 @@
 | 1 | 전환 기준은 **가로폭 600dp** (≥600 → Rail, <600 → BottomBar) | Material3 window size class의 compact/medium 경계. 사용자 결정 2026-09-16 — 가로/세로 비율 기준은 "500x400처럼 작지만 가로가 긴 창"에서 가뜩이나 좁은 폭을 80dp 더 먹는 문제가 있어 반려 |
 | 2 | 적용 범위는 **3플랫폼 전부**(Android · Desktop · iOS) | 사용자 결정 2026-09-16. Android 폰·iPhone은 폭이 600dp 미만이라 실질 변화 없음 |
 | 3 | Rail 모양은 **하단바를 그대로 세운 형태**(폭 80dp · 아이콘 24 + 라벨 11sp) | 사용자 결정 2026-09-16. 기존 `PassmateBottomTabBar`의 토큰·아이콘·항목 구성을 그대로 재사용해 시안과 어긋나지 않는다 |
-| 4 | 넓은 창에서 **본문 최대폭 600dp + 가운데 정렬** | 사용자 결정 2026-09-16. 전 화면이 모바일 폭 기준이라 클램프가 없으면 1600dp 창에서 PIN 입력칸·카드가 화면 끝까지 늘어난다 |
+| 4 | ~~넓은 창에서 본문 최대폭 600dp + 가운데 정렬~~ → **본문은 가용 폭을 그대로 채운다(클램프 철회)** | 사용자 결정 2026-09-16, **2026-09-17 철회**. 클램프 상태로 PC 앱을 띄워보니 `PassmateTopBar`의 뒤로가기 버튼이 좌상단이 아니라 가운데 정렬된 600dp 컬럼의 왼쪽 끝(화면 중앙 쪽)에 떠 어색했다 — 넓은 화면일수록 실제 좌상단에서 더 멀어진다. PIN 입력칸·카드가 넓은 창에서 늘어나는 문제는 남지만, 화면별로 필요하면 그 화면이 스스로 폭을 제한하는 쪽으로 넘긴다(§9 범위 밖 참고) |
 | 5 | M3 `NavigationRail`을 쓰지 않고 **커스텀 `PassmateNavigationRail`** 신설 | 기존 탭바가 이미 M3 `NavigationBar`가 아닌 피그마 v6 커스텀 구현이고, iOS에는 M3가 없다. 3플랫폼 1:1(규칙 §14)을 지키려면 커스텀이어야 한다 |
 | 6 | 배치 책임을 **공통 셸 컴포넌트 `PassmateNavShell` 하나**로 모은다 | 탭바를 그리는 코드가 지금 4군데에 흩어져 있다. 반응형을 각각 넣으면 판정이 4벌이 되어 규칙 §2-1-1의 "판정은 한 곳에 둔다"를 어긴다 |
 | 7 | Android `Scaffold`를 걷어내고 셸로 대체 | `contentWindowInsets`가 이미 `WindowInsets(0,0,0,0)`이고 snackbar·FAB를 쓰지 않아 `bottomBar` 슬롯 외에 하는 일이 없다. 셸이 같은 일을 하므로 남기면 Android만 구조가 달라진다 |
@@ -27,21 +27,20 @@ object AppShellLayoutPolicy {
     // Material3 window size class의 compact/medium 경계
     val RAIL_MIN_WIDTH = 600.dp
 
-    // 전 화면이 모바일 폭 기준 시안이라 넓은 창에서 본문을 이 폭으로 묶는다
-    val CONTENT_MAX_WIDTH = 600.dp
-
     fun layoutFor(width: Dp): AppShellLayout {
         return if (width >= RAIL_MIN_WIDTH) AppShellLayout.RAIL else AppShellLayout.BOTTOM_BAR
     }
 }
 ```
 
+`CONTENT_MAX_WIDTH`는 있었으나 2026-09-17 철회로 삭제됐다 — §0 결정 4 참고.
+
 - 경계는 **이상(≥)** 이다. 정확히 600dp면 Rail.
 - 측정 대상은 **셸이 받은 가용 폭**(창 폭)이지 본문 폭이 아니다. Rail이 80dp를 먹어 본문이 520dp가 되어도 Rail 상태가 유지된다 — 아니면 600dp 근처에서 Rail↔Bar가 무한히 튄다.
 
 ### 1-2. iOS 미러 — `iosApp/iosApp/navigation/AppShellLayout.swift` (신규)
 
-같은 이름·같은 값(`railMinWidth = 600` · `contentMaxWidth = 600` · `layoutFor(width:)`)으로 미러한다. 규칙 §14의 "Compose 화면과 iosApp 미러가 1:1인가" 항목 대상이다.
+같은 이름·같은 값(`railMinWidth = 600` · `layoutFor(width:)`)으로 미러한다. 규칙 §14의 "Compose 화면과 iosApp 미러가 1:1인가" 항목 대상이다.
 
 폭 측정은 `horizontalSizeClass`가 아니라 **실제 폭**으로 한다. size class는 iPad 분할 화면에서 경계가 600pt와 어긋나 3플랫폼 판정이 달라진다.
 
@@ -73,15 +72,13 @@ PassmateNavShell
 ```
 
 - `[...]`는 **`selectedTab != null`일 때만** 그린다. 세션 플로우(`Waiting`·`Play`·`Result`·`Payment`)·`SignIn`·`M-09` 명성·`M-T4` 정산에서 바를 숨기는 기존 규칙(규칙 §2-1-1)이 Rail에도 그대로 적용된다.
-- `ContentArea`:
+- `ContentArea` (**2026-09-17 갱신** — 최대폭 클램프 철회):
   ```
-  Box(fillMaxSize, background = PassmateColors.BackgroundMint, align = TopCenter) {
-      Box(Modifier.widthIn(max = CONTENT_MAX_WIDTH).fillMaxSize()) { content() }
-  }
+  Box(fillMaxSize, background = PassmateColors.BackgroundMint) { content() }
   ```
-  - `widthIn`이 먼저 들어오는 제약을 600dp로 깎고, 그다음 `fillMaxSize`가 깎인 제약을 채운다. 순서를 바꾸면 클램프가 무시된다.
-  - 좌우 여백 색은 `BackgroundMint`다. 화면들이 스스로 `Surface`(흰색)를 깔기 때문에, 여백까지 흰색이면 본문 컬럼이 어디까지인지 보이지 않는다.
-- 폭이 600dp 미만이면 클램프가 걸리지 않으므로 **Android 폰(≤430dp)·iPhone은 현재와 픽셀 단위로 동일**하다. 변하는 것은 Desktop · iPad · 태블릿뿐이다.
+  - 배경색은 화면 전환 중 잠깐 비는 프레임을 덮는 안전망이다 — 화면들이 스스로 `Surface`(흰색)를 fillMaxSize로 깔기 때문에 정상 동작에서는 거의 보이지 않는다.
+  - 폭 클램프가 없으므로 Rail 유무와 무관하게 **본문은 항상 가용 폭 전체**다. `PassmateTopBar`의 뒤로가기 버튼은 이제 어떤 창 폭에서도 (Rail이 있으면 그 옆) 좌상단에 붙는다.
+- 폭이 600dp 미만이면 이번에도 배치는 Column(하단바)뿐이라 **Android 폰(≤430dp)·iPhone은 현재와 픽셀 단위로 동일**하다. 변하는 것은 Desktop · iPad · 태블릿의 본문 폭뿐이다.
 
 ### 2-4. iOS 미러 (`iosApp/iosApp/component/PassmateNavShell.swift` 신규)
 
@@ -136,7 +133,7 @@ struct PassmateNavShell<Content: View>: View {
 
 1. `gradlew.bat :composeApp:compileDebugKotlinAndroid :composeApp:compileKotlinJvm` — 3타깃 중 Android·jvm 컴파일 (WSL gradle EIO 회피로 Windows `gradlew.bat` 사용)
 2. `gradlew.bat :composeApp:jvmTest --tests "*AppShellLayoutTest*"` — 경계 판정
-3. `gradlew.bat :composeApp:run` — 데스크톱 실행 후 창을 좌우로 리사이즈해 600dp 경계에서 Rail ↔ BottomBar 전환, 넓은 창에서 본문 가운데 정렬 확인
+3. `gradlew.bat :composeApp:run` — 데스크톱 실행 후 창을 좌우로 리사이즈해 600dp 경계에서 Rail ↔ BottomBar 전환, 넓은 창에서 본문이 좌우 여백 없이 가용 폭을 그대로 채우고 뒤로가기 버튼이 좌상단(Rail 옆)에 붙는지 확인
 4. iOS는 **WSL에서 Swift 컴파일이 불가능하다.** 신규 Swift 3파일을 작성하고 `iosApp.xcodeproj/project.pbxproj`에 수동 등록한 뒤(다음 빈 idx `161`·`162`·`163`, `component`·`navigation` 그룹), `docs/Passmate_Mac_검증_체크리스트.md`에 항목을 추가한다. Mac 검증 전까지 iOS는 **미검증**으로 보고한다.
 
 ## 7. 리스크
@@ -144,7 +141,7 @@ struct PassmateNavShell<Content: View>: View {
 | 리스크 | 완화 |
 |---|---|
 | iOS `GeometryReader`가 `NavigationView`(stack)·`TabView` 레이아웃을 흔든다 (iOS 15) | 셸 내부에만 두고 자식을 명시 `frame`으로 고정. Mac 실기기 확인 항목으로 체크리스트에 명시 |
-| 본문 600dp 클램프가 Desktop·iPad 전 화면에 영향 | 상수 한 줄(`CONTENT_MAX_WIDTH`)이라 조정·철회가 쉽다. 폰은 무영향 |
+| ~~본문 600dp 클램프가 Desktop·iPad 전 화면에 영향~~ | 실현됨 — 뒤로가기 버튼이 좌상단에서 떠 보이는 문제로 이어져 2026-09-17 클램프 자체를 철회했다(§0 결정 4). 개별 화면이 넓은 창에서 특정 요소(PIN 입력칸 등) 폭을 제한하고 싶으면 그 화면이 직접 처리한다 |
 | Android `Scaffold` 제거로 인셋 회귀 | 기존 `contentWindowInsets`가 이미 0이고 화면들이 각자 `statusBarsPadding()`을 준다. 하단바의 `navigationBarsPadding()`은 컴포넌트 내부에 있어 그대로 따라온다 |
 | 리포 전체에 CRLF 플립 노이즈(53파일) | 실제 수정 파일만 경로로 명시 `git add`. `git commit -- <dir>` 금지 |
 

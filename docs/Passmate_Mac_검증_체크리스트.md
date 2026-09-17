@@ -184,19 +184,27 @@
 ## 13. iOS 15 루트 내비바 빈 띠 (2026-09-14)
 
 > 신규 Swift 1개 `component/NativeNavigationBarHidden.swift` — pbxproj idx **203**(`NativeTabBarHidden` 202 다음). 그룹 ID 신규 없음.
-> 증상: iOS 15 실기기에서 앱 첫 진입 시 상단에 시스템 내비바 높이(44)만큼 빈 띠 → 다른 화면 push 후 pop하면 사라짐. 원인은 `.navigationBarHidden(true)`(SwiftUI preference)가 NavigationView **루트의 첫 표시**에 늦게 전달되는 iOS 15 동작이라, 탭바와 같은 방식(UIKit 브리지)으로 첫 프레임 전에 직접 숨긴다. 내비바 숨김은 이제 `passmateHidesNativeNavigationBar()` 하나로만 한다(루트 `ContentView` + `RouteStackLevel`).
+> 증상: iOS 15 실기기에서 앱 첫 진입 시 상단에 시스템 내비바 높이(44)만큼 빈 띠 → 다른 화면 push 후 pop하면 사라짐. 원인은 `.navigationBarHidden(true)`(SwiftUI preference)가 NavigationView **루트의 첫 표시**에 반영되지 않는 iOS 15 동작이라, UIKit 브리지로 첫 프레임 전에 직접 숨긴다. 내비바 숨김은 이제 `passmateHidesNativeNavigationBar()` 하나로만 한다.
+>
+> **2026-09-15 재수정**(7235684는 실기기에서 듣지 않았다 — 첫 진입 빈 띠 그대로, 스크롤하면 바가 드러나고, push→pop 뒤에야 사라짐): 빈 컨트롤러의 `willMove(toParent:)`·`viewWillAppear` 한 번짜리 시점 대신 빈 `UIView`가 조상 `UINavigationController`를 **응답자 체인**으로 찾아 숨긴다. 적용 위치에 **각 탭 콘텐츠 4곳**을 더했다(`TabView`=`UITabBarController`라 탭 호스트도 preference를 브리지한다). 파일 추가 없음 — pbxproj 무변경.
+> **2차**(1차의 "`layoutSubviews`마다 되감기"가 참여한 방 탭에서 SwiftUI 쪽 되살림과 핑퐁을 벌여 **타이틀이 위아래로 떨림**): 레이아웃·갱신에서는 되감지 않고 `didMoveToWindow` + 한 런루프 뒤 두 번만 숨긴다. 대신 셸 컨트롤러에 "계속 숨김" 표식을 달아 `setNavigationBarHidden(false)`를 교환 구현이 `true`로 바꾼다 — 되살림 자체가 막히니 떨릴 일이 없다.
 
-- [ ] 컴파일: `xcodebuild … build` 오류 0 · `grep -rn "navigationBarHidden" iosApp/iosApp --include='*.swift'`이 `component/NativeNavigationBarHidden.swift` 안에서만 매치
+- [ ] 컴파일: `xcodebuild … build` 오류 0 · `grep -rn "navigationBarHidden" iosApp/iosApp --include='*.swift'`이 `component/NativeNavigationBarHidden.swift` 안에서만 매치 · `grep -c "\.passmateHidesNativeNavigationBar()" iosApp/iosApp/ContentView.swift`가 **5**(루트 1 + 탭 4)
 - [ ] 시뮬(iOS 26, 회귀): 홈 첫 진입 상단 여백이 이전과 동일(제목 y=56 규격, §7-1) · 각 탭 루트 → push(SignIn·명성·코인 내역) → pop에서 시스템 내비바가 어느 화면에도 보이지 않음
 - [ ] **실기기(iOS 15)**: 앱 첫 진입(스플래시 직후) 홈 상단에 빈 띠 없음 — `패스메이트` 타이틀이 상태바 바로 아래 시안 위치
+  - [ ] 홈에서 아래로 스크롤해도 상단에 시스템 바(반투명 띠·구분선)가 드러나지 않음
   - [ ] 마이·참여한 방·내가 만든 방 탭으로 전환해도 상단이 그대로(띠 재등장 없음)
   - [ ] push(SignIn·설정 상세) 화면 상단에도 빈 띠 없음 → pop 후 루트 상단 위치가 첫 진입과 동일(위로 튀지 않음)
   - [ ] 로그인/로그아웃(`sessionGeneration` 재생성) 직후에도 홈 상단에 빈 띠 없음
+  - [ ] 첫 프레임 깜빡임 없음 — 스플래시 직후 바가 걷히는 모습이 한 프레임이라도 보이면 `didMoveToWindow` 시점에 응답자 체인이 닿지 않은 것(예약된 async만 들은 것)이니 보고할 것
+  - [ ] **참여한 방 탭**: 타이틀이 떨리지 않고 상단 위치가 홈과 같음 · 스크롤·더 보기·탭 왕복(홈↔참여한 방) 뒤에도 그대로
+  - [ ] 그래도 바가 보이면(떨림 없이 고정으로): Xcode 심볼릭 브레이크포인트 `-[UINavigationController setNavigationBarHidden:animated:]` 조건 `(BOOL)$x2 == 0`(arm64 3번째 인자=hidden)으로 호출 스택을 떠서 보고할 것 — 교환 구현을 비껴가는 호출자(비공개 API)를 찾는다
+  - [ ] 공유 시트(리포트 공유·결과 공유)·QR 카메라 시트의 상단 바는 그대로 보임(표식 없는 컨트롤러는 영향 없음)
 
 ## 14. 반응형 내비게이션 셸 (2026-09-16)
 
 > 신규 Swift 4개 — `navigation/AppShellLayout.swift`(pbxproj idx **204**) · `component/PassmateTabItemView.swift`(**205**) · `component/PassmateNavigationRail.swift`(**206**) · `component/PassmateNavShell.swift`(**207**). 그룹 ID 신규 없음.
-> 가로폭 600pt 경계로 하단 탭바 ↔ 좌측 레일(80pt)을 바꾸고, 넓은 화면에서는 본문을 600pt로 묶어 가운데 정렬한다. 레일 항목은 위에서부터 쌓는다(상단 여백 10pt). 판정은 `AppShellLayoutPolicy` 한 곳(Compose 미러). 하단바의 `private TabItemView`는 `PassmateTabItemView`로 승격돼 레일과 공유된다.
+> 가로폭 600pt 경계로 하단 탭바 ↔ 좌측 레일(80pt)을 바꾸고, 본문은 가용 폭을 그대로 채운다(최대폭 클램프는 2026-09-17 철회 — 클램프 상태에선 `PassmateTopBar` 뒤로가기 버튼이 좌상단이 아니라 화면 중앙 쪽에 떠 보였다). 레일 항목은 위에서부터 쌓는다(상단 여백 10pt). 판정은 `AppShellLayoutPolicy` 한 곳(Compose 미러). 하단바의 `private TabItemView`는 `PassmateTabItemView`로 승격돼 레일과 공유된다.
 > **주의**: `PassmateNavShell`이 `GeometryReader`를 쓴다. `GeometryReader`는 콘텐츠 크기로 줄지 않고 자식을 topLeading에 붙이므로 `NavigationView`(stack)·`TabView` 안에서 레이아웃이 흔들릴 수 있다 — iOS 15 실기기 확인이 이 항목의 핵심이다.
 
 - [ ] 컴파일: `xcodebuild … build` 오류 0 · `grep -c "PassmateBottomTabBar(" iosApp/iosApp/ContentView.swift`가 **0**(하단바는 이제 셸만 그린다)
@@ -209,7 +217,8 @@
   - [ ] 레일 항목이 아이콘 24 + 라벨 11 · 선택 시 primary/Bold, 비선택 textTertiary/Medium
   - [ ] 레일 오른쪽에 1pt border 세로선
   - [ ] 레일 항목이 **위에서부터** 8pt 간격으로 쌓이고, 첫 항목이 바 위 가장자리에서 10pt 떨어져 있다(가운데 정렬 아님)
-  - [ ] 본문이 600pt로 묶여 가운데 정렬되고 좌우가 민트색
+  - [ ] 본문이 좌우 여백 없이 가용 폭 전체를 채운다(민트색 여백이 보이면 회귀)
+  - [ ] `PassmateTopBar` 뒤로가기 버튼이 화면 좌상단(레일 바로 옆)에 붙는다 — 화면 중앙 쪽에 떠 있으면 회귀
   - [ ] 레일에서 탭을 누르면 하단바와 동일하게 동작(게스트가 로그인 필수 탭을 누르면 SignIn)
   - [ ] 상태바·홈 인디케이터를 레일이 침범하지 않는다(세이프에어리어)
 - [ ] **경계 전환**: iPad 멀티태스킹으로 폭을 600 위아래로 오가면 레일 ↔ 하단바가 바뀌고, 전환 중 화면이 깨지거나 스크롤 위치가 튀지 않는다
