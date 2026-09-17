@@ -106,7 +106,9 @@ struct RouteStackLevel<Destination: View>: View {
 - `.isDetailLink(false)` 모든 숨은 링크에 적용.
 - 숨은 링크는 `.background`에 둔다. iOS 15에서 `.background` 속 링크가 트리거되지 않는 보고가 있으므로, 실기기에서 재현되면 `ZStack { content; NavigationLink(...) { EmptyView() }.hidden() }` 형태로 전환한다(동작 규칙은 동일).
 - 한 번의 상태 변경으로 **push 2단계 이상**을 만들지 않는다(현재 코드는 전부 1단계 push). 향후 `pendingRoute`(로그인 후 원래 화면 복귀)는 **최상단 교체**(`path[path.count - 1] = target`, 같은 레벨 내용 교체)로 구현해 pop+push 동시 변경을 피한다.
-- (2026-09-14 추가) 시스템 내비바 숨김은 `.navigationBarHidden(true)`를 직접 쓰지 않고 공통 modifier `passmateHidesNativeNavigationBar()`(`component/NativeNavigationBarHidden.swift`)로 한다. iOS 15는 NavigationView **루트의 첫 표시**에서 preference 전달이 늦어 내비바 높이만큼 빈 띠가 생기고 push→pop 뒤에야 사라지므로, 탭바(`NativeTabBarHidden`)와 같은 UIKit 브리지로 첫 프레임 전에 직접 숨긴다. 적용 위치는 루트 콘텐츠(`ContentView`의 `VStack`)와 `RouteStackLevel` 두 곳.
+- (2026-09-14 추가, 2026-09-15 재수정) 시스템 내비바 숨김은 `.navigationBarHidden(true)`를 직접 쓰지 않고 공통 modifier `passmateHidesNativeNavigationBar()`(`component/NativeNavigationBarHidden.swift`)로 한다. iOS 15는 NavigationView **루트의 첫 표시**에서 preference가 반영되지 않아 내비바 높이만큼 빈 띠가 생기고(투명한 scroll edge 외관 — 스크롤하면 바가 드러난다) push→pop 뒤에야 사라진다. 적용 위치는 루트 콘텐츠(`ContentView`의 `VStack`)·**각 탭 콘텐츠 4곳**·`RouteStackLevel`. 탭 콘텐츠에도 거는 이유: `TabView`는 `UITabBarController`라 탭마다 호스팅 컨트롤러가 하나씩 더 있고 저마다 내비 preference를 브리지한다.
+  - 첫 표시는 UIKit이 직접 숨긴다. 첫 시도(09-14: 빈 컨트롤러를 심어 `willMove(toParent:)`·`viewWillAppear`에서 한 번 숨김)는 실기기에서 듣지 않았다 — SwiftUI의 컨트롤러 부모 배선 시점에 기댄 한 번짜리 시점이었다. 09-15 1차는 빈 `UIView`가 **응답자 체인**으로 조상 `UINavigationController`를 찾아 `didMoveToWindow` + **`layoutSubviews`마다** 숨겼는데, 참여한 방 탭에서 SwiftUI 쪽 무언가가 바를 되살리고 우리가 레이아웃마다 되감아 **타이틀이 위아래로 떨리는 무한 핑퐁**이 났다.
+  - 09-15 2차(현행): 레이아웃·SwiftUI 갱신에서는 되감지 않는다(핑퐁 원천 차단). `didMoveToWindow`(첫 프레임 전·pop 복귀·탭 전환)와 한 런루프 뒤 **두 번만** 숨기고, 대신 셸의 `UINavigationController`에 "계속 숨김" 표식(약한 참조 집합)을 달아 `setNavigationBarHidden(_:animated:)`·`isNavigationBarHidden` setter 교환 구현이 표식 붙은 컨트롤러의 `false`를 `true`로 바꾼다. 누가 되살리려 해도 바가 나타나지 않으므로 되감을 일도, 떨림도 없다. 표식 없는 컨트롤러(공유 시트 등 시스템 것)는 원래대로다. 교환은 iOS 15 브리지가 처음 컨트롤러를 찾을 때 프로세스당 한 번만 설치되며 iOS 16+에서는 실행되지 않는다.
 
 ## 3. `FlowLayout` · `WeakTopicsRow`
 

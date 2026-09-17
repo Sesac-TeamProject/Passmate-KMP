@@ -21,9 +21,12 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            // 탭바는 겹치지 않고 자리를 차지한다 — ZStack으로 덮으면 탭 루트 콘텐츠의
-            // 마지막 줄·버튼이 탭바 밑으로 들어간다(M-01 로그인 안내·M-13 + 버튼·M-12 하단)
-            VStack(spacing: 0) {
+            // 탭바·레일은 겹치지 않고 자리를 차지한다 — ZStack으로 덮으면 탭 루트 콘텐츠의
+            // 마지막 줄·버튼이 밑으로 들어간다(M-01 로그인 안내·M-13 + 버튼·M-12 하단)
+            PassmateNavShell(
+                selectedTab: selectedTab,
+                onSelectTab: { shellViewModel.action(.selectTab($0)) }
+            ) {
             TabView(selection: tabSelection) {
                 // 홈 탭 = 입장 폼 인라인 (M-01 v6) — JoinView 재사용
                 JoinView(
@@ -90,16 +93,15 @@ struct ContentView: View {
                         // 시안이 탭바를 유지하는 화면(M-12-x·M-14)에서는 push 위에도 탭바를 그린다.
                         // push가 TabView 전체를 덮는 구조라 화면마다 직접 얹어야 한다 (규칙 §2-1)
                         if let owner = route.tabBarOwner {
-                            VStack(spacing: 0) {
+                            PassmateNavShell(
+                                selectedTab: owner,
+                                onSelectTab: { tab in
+                                    self.path = []
+                                    shellViewModel.action(.selectTab(tab))
+                                }
+                            ) {
                                 destinationView(for: route, path: path)
                                     .frame(maxHeight: .infinity)
-                                PassmateBottomTabBar(
-                                    selectedTab: owner,
-                                    onSelectTab: { tab in
-                                        self.path = []
-                                        shellViewModel.action(.selectTab(tab))
-                                    }
-                                )
                             }
                         } else {
                             destinationView(for: route, path: path)
@@ -111,11 +113,6 @@ struct ContentView: View {
                 .isDetailLink(false)
             )
             .frame(maxHeight: .infinity)
-            // 시안 v6 nav/4탭 — 기본 탭 바 대신 Compose와 같은 커스텀 바를 그린다 (규칙 §14)
-            PassmateBottomTabBar(
-                selectedTab: selectedTab,
-                onSelectTab: { shellViewModel.action(.selectTab($0)) }
-            )
             }
             // NavigationView의 루트 콘텐츠 — iOS 15는 여기 심은 UIKit 브리지가 첫 프레임 전에 바를 숨기고 레이아웃마다 재확인한다
             .passmateHidesNativeNavigationBar()
