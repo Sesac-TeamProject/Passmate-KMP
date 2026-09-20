@@ -126,7 +126,7 @@ private fun AmountBody(
         // 베타 잠금(M-12-4β) — 결제 안내 문구 자리에 배너가 들어가고, 충전 버튼은 꺼진다
         if (uiState.isBetaPaymentLocked) {
             PassmateBetaNotice(
-                body = "정식 출시 전까지 코인 충전을 이용할 수 없습니다."
+                body = CoinChargeBetaLockText.NOTICE_BODY
             )
         } else {
             Text(
@@ -352,6 +352,13 @@ private fun RetryState(onRetry: () -> Unit) {
 
 private fun formatNumber(value: Int): String {
     return value.toString().reversed().chunked(3).joinToString(",").reversed()
+}
+
+// 베타 잠금 문구 (시안 M-12-4β) — iOS CoinChargeView.swift의 CoinChargeBetaLockText와 1:1.
+// 제목·치수·타이포는 공통 컴포넌트 PassmateBetaNotice가 갖는다
+private object CoinChargeBetaLockText {
+
+    const val NOTICE_BODY = "정식 출시 전까지 코인 충전을 이용할 수 없습니다."
 }
 
 // --- Preview ---

@@ -190,7 +190,7 @@ private struct PaymentContentView: View {
                 // 베타 잠금(M-11β) — 결제 버튼 바로 위에 배너, 버튼은 꺼진다
                 if uiState.isBetaPaymentLocked {
                     PassmateBetaNoticeView(
-                        message: "정식 출시 전까지 유료 방을 이용할 수 없습니다."
+                        message: PaymentBetaLockText.noticeBody
                     )
                 }
                 payButton
@@ -485,6 +485,12 @@ private struct CoinShortageSheetView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(PassmateColors.surface.ignoresSafeArea())
     }
+}
+
+// 베타 잠금 문구 (시안 M-11β) — Compose PaymentScreen.kt의 PaymentBetaLockText 미러.
+// 제목·치수·타이포는 공통 컴포넌트 PassmateBetaNoticeView가 갖는다
+private enum PaymentBetaLockText {
+    static let noticeBody = "정식 출시 전까지 유료 방을 이용할 수 없습니다."
 }
 
 // MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)

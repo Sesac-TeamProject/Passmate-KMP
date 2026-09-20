@@ -152,7 +152,7 @@ private fun CreateRoomContentView(
         // 베타 잠금(M-13aβ) — PIN 안내 문구 자리에 배너가 들어간다. 만들기 버튼은 그대로 켜 둔다
         if (uiState.isBetaPaymentLocked) {
             PassmateBetaNotice(
-                body = "유료 방은 아직 준비 중입니다.\n현재는 무료 방만 만들 수 있습니다."
+                body = CreateRoomBetaLockText.NOTICE_BODY
             )
         } else {
             Text(
@@ -288,7 +288,7 @@ private fun PaidToggle(
     isPaidLocked: Boolean,
     onSelect: (Boolean) -> Unit
 ) {
-    val paidLabel = if (isPaidLocked) "유료 · 준비 중" else "유료 (Lv.3부터)"
+    val paidLabel = if (isPaidLocked) CreateRoomBetaLockText.PAID_TAB_LABEL else "유료 (Lv.3부터)"
 
     Row(
         modifier = Modifier
@@ -383,6 +383,16 @@ private fun SubmitButton(
 
 private fun setLabel(set: QuestionSetSummary): String {
     return "${set.title} (${set.questionCount}문항)"
+}
+
+// 베타 잠금 문구 (시안 M-13aβ) — iOS CreateRoomSheetView.swift의 CreateRoomBetaLockText와 1:1.
+// 제목·치수·타이포는 공통 컴포넌트 PassmateBetaNotice가 갖는다
+private object CreateRoomBetaLockText {
+
+    const val NOTICE_BODY = "유료 방은 아직 준비 중입니다.\n현재는 무료 방만 만들 수 있습니다."
+
+    // 잠긴 유료 탭의 라벨 — 평소 라벨 "유료 (Lv.3부터)" 자리에 들어간다
+    const val PAID_TAB_LABEL = "유료 · 준비 중"
 }
 
 // --- Preview ---

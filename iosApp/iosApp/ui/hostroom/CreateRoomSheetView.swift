@@ -98,7 +98,7 @@ private struct CreateRoomContentView: View {
                 // 베타 잠금(M-13aβ) — PIN 안내 문구 자리에 배너가 들어간다. 만들기 버튼은 그대로 켜 둔다
                 if uiState.isBetaPaymentLocked {
                     PassmateBetaNoticeView(
-                        message: "유료 방은 아직 준비 중입니다.\n현재는 무료 방만 만들 수 있습니다."
+                        message: CreateRoomBetaLockText.noticeBody
                     )
                 } else {
                     Text("PIN은 방을 만들면 자동 발급 · 프로젝터 화면은 웹에서")
@@ -189,7 +189,7 @@ private struct CreateRoomContentView: View {
         HStack(spacing: 4) {
             paidOption(label: "무료", isSelected: !uiState.isPaid, isPaidValue: false)
             paidOption(
-                label: uiState.isBetaPaymentLocked ? "유료 · 준비 중" : "유료 (Lv.3부터)",
+                label: uiState.isBetaPaymentLocked ? CreateRoomBetaLockText.paidTabLabel : "유료 (Lv.3부터)",
                 isSelected: uiState.isPaid,
                 isPaidValue: true,
                 isEnabled: !uiState.isBetaPaymentLocked
@@ -254,6 +254,15 @@ private struct CreateRoomSheetHeightKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = max(value, nextValue())
     }
+}
+
+// 베타 잠금 문구 (시안 M-13aβ) — Compose CreateRoomSheet.kt의 CreateRoomBetaLockText 미러.
+// 제목·치수·타이포는 공통 컴포넌트 PassmateBetaNoticeView가 갖는다
+private enum CreateRoomBetaLockText {
+    static let noticeBody = "유료 방은 아직 준비 중입니다.\n현재는 무료 방만 만들 수 있습니다."
+
+    // 잠긴 유료 탭의 라벨 — 평소 라벨 "유료 (Lv.3부터)" 자리에 들어간다
+    static let paidTabLabel = "유료 · 준비 중"
 }
 
 // MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
