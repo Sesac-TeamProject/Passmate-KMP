@@ -20,7 +20,24 @@ struct HostedRoomsView: View {
 
     @State private var isCreateSheetVisible = false
 
-    @State private var createSheetDetent: PassmateSheetDetent = .medium
+    // 새 방 만들기 시트는 내용 높이로 연다 (M-13a — Compose PassmateBottomSheet 미러). 측정 전(0)에는 반높이로 열린다
+    @State private var createSheetContentHeight: CGFloat = 0
+
+    // 유료 탭은 입력칸에 키보드까지 올라온다 — 시트를 끝까지 올린다
+    @State private var isCreateSheetExpanded = false
+
+    private var createSheetDetent: Binding<PassmateSheetDetent> {
+        Binding(
+            get: { isCreateSheetExpanded ? .large : .contentHeight(createSheetContentHeight) },
+            set: { detent in
+                if case .large = detent {
+                    isCreateSheetExpanded = true
+                } else {
+                    isCreateSheetExpanded = false
+                }
+            }
+        )
+    }
 
     @State private var noticeMessage: String?
 
@@ -51,7 +68,7 @@ struct HostedRoomsView: View {
                 noticeMessage = message
             }
         }
-        .sheet(isPresented: $isCreateSheetVisible, onDismiss: { createSheetDetent = .medium }) {
+        .sheet(isPresented: $isCreateSheetVisible, onDismiss: { isCreateSheetExpanded = false }) {
             CreateRoomSheetView(
                 onCreated: { pin in
                     isCreateSheetVisible = false
@@ -61,10 +78,10 @@ struct HostedRoomsView: View {
                     viewModel.action(.notice(message: message))
                 },
                 onClose: { isCreateSheetVisible = false },
-                // 유료 탭은 입력칸이 늘어 반높이로는 다 안 보인다 — 시트를 끝까지 올린다
-                onPaidChanged: { isPaid in createSheetDetent = isPaid ? .large : .medium }
+                onPaidChanged: { isPaid in isCreateSheetExpanded = isPaid },
+                onContentHeightChanged: { height in createSheetContentHeight = height }
             )
-            .passmateDetents([.medium, .large], selection: $createSheetDetent)
+            .passmateDetents([.contentHeight(createSheetContentHeight), .large], selection: createSheetDetent)
         }
         .overlay(alignment: .bottom) {
             if let noticeMessage {
