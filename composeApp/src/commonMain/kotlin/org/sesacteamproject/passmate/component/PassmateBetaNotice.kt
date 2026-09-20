@@ -20,11 +20,13 @@ import org.sesacteamproject.passmate.theme.PassmateColors
 // 베타 안내 배너 — 시안 "13 · 베타 운영"의 banner/베타 안내(1111:9662). BETA 칩 + 제목 한 줄 + 설명.
 // 잠긴 버튼 **바로 위**에 둔다: 왜 안 눌리는지를 버튼보다 먼저 읽어야 한다.
 // 여러 줄 설명은 body에 개행(\n)으로 준다. iOS PassmateBetaNoticeView와 1:1 미러
+//
+// 제목은 시안에서 고정 레이어다(바뀌는 자리는 body뿐) — 호출부가 매번 적지 않게 컴포넌트가 기본값으로 갖는다
 @Composable
 fun PassmateBetaNotice(
-    title: String,
     body: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    title: String = DEFAULT_TITLE
 ) {
     Column(
         modifier = modifier
@@ -66,3 +68,6 @@ fun PassmateBetaNotice(
         )
     }
 }
+
+// iOS PassmateBetaNoticeView의 defaultTitle과 1:1
+private const val DEFAULT_TITLE = "현재는 베타 버전입니다."

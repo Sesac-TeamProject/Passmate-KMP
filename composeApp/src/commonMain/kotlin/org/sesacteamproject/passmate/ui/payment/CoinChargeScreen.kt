@@ -126,7 +126,6 @@ private fun AmountBody(
         // 베타 잠금(M-12-4β) — 결제 안내 문구 자리에 배너가 들어가고, 충전 버튼은 꺼진다
         if (uiState.isBetaPaymentLocked) {
             PassmateBetaNotice(
-                title = "현재는 베타 버전입니다.",
                 body = "정식 출시 전까지 코인 충전을 이용할 수 없습니다."
             )
         } else {

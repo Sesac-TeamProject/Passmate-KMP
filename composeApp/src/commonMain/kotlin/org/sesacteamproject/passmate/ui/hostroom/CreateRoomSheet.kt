@@ -152,7 +152,6 @@ private fun CreateRoomContentView(
         // 베타 잠금(M-13aβ) — PIN 안내 문구 자리에 배너가 들어간다. 만들기 버튼은 그대로 켜 둔다
         if (uiState.isBetaPaymentLocked) {
             PassmateBetaNotice(
-                title = "현재는 베타 버전입니다.",
                 body = "유료 방은 아직 준비 중입니다.\n현재는 무료 방만 만들 수 있습니다."
             )
         } else {

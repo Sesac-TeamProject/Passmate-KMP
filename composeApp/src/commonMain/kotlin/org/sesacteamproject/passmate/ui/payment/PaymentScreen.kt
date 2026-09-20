@@ -251,7 +251,6 @@ private fun LoadedPayment(
             // 베타 잠금(M-11β) — 결제 버튼 바로 위에 배너, 버튼은 꺼진다
             if (uiState.isBetaPaymentLocked) {
                 PassmateBetaNotice(
-                    title = "현재는 베타 버전입니다.",
                     body = "정식 출시 전까지 유료 방을 이용할 수 없습니다."
                 )
             }
