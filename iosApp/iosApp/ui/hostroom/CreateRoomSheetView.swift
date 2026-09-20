@@ -88,11 +88,19 @@ private struct CreateRoomContentView: View {
                     .background(PassmateColors.fieldGray)
                     .cornerRadius(14)
                 }
-                Text("PIN은 방을 만들면 자동 발급 · 프로젝터 화면은 웹에서")
-                    .font(.system(size: 12))
-                    .kerning(-0.24)
-                    .foregroundColor(PassmateColors.textTertiary)
-                    .frame(maxWidth: .infinity)
+                // 베타 잠금(M-13aβ) — PIN 안내 문구 자리에 배너가 들어간다. 만들기 버튼은 그대로 켜 둔다
+                if uiState.isBetaPaymentLocked {
+                    PassmateBetaNoticeView(
+                        title: "현재는 베타 버전입니다.",
+                        message: "유료 방은 아직 준비 중입니다.\n현재는 무료 방만 만들 수 있습니다."
+                    )
+                } else {
+                    Text("PIN은 방을 만들면 자동 발급 · 프로젝터 화면은 웹에서")
+                        .font(.system(size: 12))
+                        .kerning(-0.24)
+                        .foregroundColor(PassmateColors.textTertiary)
+                        .frame(maxWidth: .infinity)
+                }
                 submitButton
             }
             .padding(.horizontal, 20)
@@ -168,24 +176,39 @@ private struct CreateRoomContentView: View {
     private var paidToggle: some View {
         HStack(spacing: 4) {
             paidOption(label: "무료", isSelected: !uiState.isPaid, isPaidValue: false)
-            paidOption(label: "유료 (Lv.3부터)", isSelected: uiState.isPaid, isPaidValue: true)
+            paidOption(
+                label: uiState.isBetaPaymentLocked ? "유료 · 준비 중" : "유료 (Lv.3부터)",
+                isSelected: uiState.isPaid,
+                isPaidValue: true,
+                isEnabled: !uiState.isBetaPaymentLocked
+            )
         }
         .padding(4)
         .background(PassmateColors.fieldGray)
         .cornerRadius(14)
     }
 
-    private func paidOption(label: String, isSelected: Bool, isPaidValue: Bool) -> some View {
-        Button(action: { onAction(.selectPaid(isPaid: isPaidValue)) }) {
+    private func paidOption(label: String, isSelected: Bool, isPaidValue: Bool, isEnabled: Bool = true) -> some View {
+        let textColor: Color
+
+        if !isEnabled {
+            textColor = PassmateColors.textTertiary
+        } else if isSelected {
+            textColor = PassmateColors.primaryDeep
+        } else {
+            textColor = PassmateColors.textSecondary
+        }
+        return Button(action: { onAction(.selectPaid(isPaid: isPaidValue)) }) {
             Text(label)
                 .font(.system(size: 14, weight: .medium))
                 .kerning(-0.28)
-                .foregroundColor(isSelected ? PassmateColors.primaryDeep : PassmateColors.textSecondary)
+                .foregroundColor(textColor)
                 .frame(maxWidth: .infinity)
                 .frame(height: 44)
                 .background(isSelected ? PassmateColors.surface : PassmateColors.fieldGray)
                 .cornerRadius(12)
         }
+        .disabled(!isEnabled)
     }
 
     private var submitButton: some View {
@@ -211,4 +234,20 @@ private struct CreateRoomContentView: View {
     private func setLabel(_ set: QuestionSetSummary) -> String {
         "\(set.title) (\(set.questionCount)문항)"
     }
+}
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("M-13aβ 베타 잠금") {
+    CreateRoomContentView(
+        uiState: CreateRoomUiState(
+            isLoadingSets: false,
+            sets: [QuestionSetSummary(setId: 7, title: "Spring 기초 세트", isConfirmed: true, questionCount: 8)],
+            title: "8월 4주차 Spring 스터디",
+            selectedSetId: 7,
+            isBetaPaymentLocked: true
+        ),
+        onAction: { _ in },
+        onClose: {}
+    )
 }

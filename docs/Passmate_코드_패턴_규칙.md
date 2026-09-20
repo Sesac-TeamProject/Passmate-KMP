@@ -116,6 +116,7 @@
   - `GUEST_NOT_ALLOWED`(403, 게스트→유료 방·회원 전용 기능) → `LoginRequired`로 매핑해 로그인 유도 + `pendingRoute` 재실행
   - `PAYMENT_REQUIRED`(402) → 결제 플로우(`Payment`)로 유도
 - 서버 검증이 최종 권위다. 클라이언트 가드는 UX 목적이며, 가드를 통과했더라도 서버 4xx를 항상 처리한다.
+- **베타 결제 잠금(2026-09-20 결정, 시안 "13 · 베타 운영")**: BM 확정 전까지 결제를 통째로 막는다. 스위치는 `shared`의 `BetaConfig.BETA_PAYMENT_LOCKED` **하나**이고 코인 충전(M-12-4)·유료 방 입장 결제(M-11)·유료 방 개설(M-13a)이 같이 잠긴다 — 결제만 막고 개설을 열어 두면 아무도 못 들어가는 방이 생긴다. 웹 `src/config/beta.ts`와 같은 이름이며 정식 출시 때 둘을 같이 `false`로 내린다. VM은 이 값을 생성자 기본값으로 받아 `uiState.isBetaPaymentLocked`로 내보내고(화면은 배너 `PassmateBetaNotice` + 버튼 비활성만 그린다), 잠긴 액션은 VM에서 한 번 더 막아 요청 자체가 나가지 않게 한다. 테스트는 운영 스위치에 기대지 않도록 잠금 여부를 명시해 VM을 만든다. AI 생성 한도는 여기 두지 않는다 — 서버가 센다(`GET /users/me/ai-quota`).
 - 세션 변경 감지는 화면 재생성이나 임의 강제 이동으로 해결하지 않고 `observeCurrentUser()` 기반 스트림으로 처리한다. 플랫폼별 메인 ViewModel은 세션 변화를 구독해 탭/게스트 상태를 재계산한다.
 
 ## 9. 비동기/상태 처리 규칙

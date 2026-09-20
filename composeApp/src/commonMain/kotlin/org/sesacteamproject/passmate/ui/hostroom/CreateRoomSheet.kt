@@ -37,9 +37,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBetaNotice
 import org.sesacteamproject.passmate.di.koinScreenViewModel
+import org.sesacteamproject.passmate.preview.PassmatePreview
 import org.sesacteamproject.passmate.question.domain.model.QuestionSetSummary
 import org.sesacteamproject.passmate.theme.PassmateColors
+import org.sesacteamproject.passmate.theme.PassmateTheme
 
 // Figma "UI 디자인 v6" M-13 새 방 만들기 시트(406:5893) — 방 이름·문제 세트·방 유형 → PIN 발급.
 // 시트 표시 여부는 호스팅 화면(HostedRoomsScreen)이 소유한다 (규칙 §11-1)
@@ -127,6 +130,7 @@ private fun CreateRoomContentView(
         FieldLabel(text = "방 유형")
         PaidToggle(
             isPaid = uiState.isPaid,
+            isPaidLocked = uiState.isBetaPaymentLocked,
             onSelect = { onAction(CreateRoomAction.SelectPaid(it)) }
         )
         if (uiState.isPaid) {
@@ -145,14 +149,22 @@ private fun CreateRoomContentView(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        Text(
-            text = "PIN은 방을 만들면 자동 발급 · 프로젝터 화면은 웹에서",
-            color = PassmateColors.TextTertiary,
-            fontSize = 12.sp,
-            letterSpacing = (-0.24).sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
+        // 베타 잠금(M-13aβ) — PIN 안내 문구 자리에 배너가 들어간다. 만들기 버튼은 그대로 켜 둔다
+        if (uiState.isBetaPaymentLocked) {
+            PassmateBetaNotice(
+                title = "현재는 베타 버전입니다.",
+                body = "유료 방은 아직 준비 중입니다.\n현재는 무료 방만 만들 수 있습니다."
+            )
+        } else {
+            Text(
+                text = "PIN은 방을 만들면 자동 발급 · 프로젝터 화면은 웹에서",
+                color = PassmateColors.TextTertiary,
+                fontSize = 12.sp,
+                letterSpacing = (-0.24).sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         SubmitButton(
             enabled = uiState.canSubmit,
             isSubmitting = uiState.isSubmitting,
@@ -274,8 +286,11 @@ private fun SetSelector(
 @Composable
 private fun PaidToggle(
     isPaid: Boolean,
+    isPaidLocked: Boolean,
     onSelect: (Boolean) -> Unit
 ) {
+    val paidLabel = if (isPaidLocked) "유료 · 준비 중" else "유료 (Lv.3부터)"
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -290,8 +305,9 @@ private fun PaidToggle(
             modifier = Modifier.weight(1f)
         )
         PaidOption(
-            label = "유료 (Lv.3부터)",
+            label = paidLabel,
             isSelected = isPaid,
+            isEnabled = !isPaidLocked,
             onClick = { onSelect(true) },
             modifier = Modifier.weight(1f)
         )
@@ -303,16 +319,23 @@ private fun PaidOption(
     label: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true
 ) {
     val background = if (isSelected) PassmateColors.Surface else PassmateColors.FieldGray
-    val textColor = if (isSelected) PassmateColors.PrimaryDeep else PassmateColors.TextSecondary
+    val textColor = if (!isEnabled) {
+        PassmateColors.TextTertiary
+    } else if (isSelected) {
+        PassmateColors.PrimaryDeep
+    } else {
+        PassmateColors.TextSecondary
+    }
 
     Box(
         modifier = modifier
             .height(44.dp)
             .background(background, RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick),
+            .clickable(enabled = isEnabled, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -361,4 +384,27 @@ private fun SubmitButton(
 
 private fun setLabel(set: QuestionSetSummary): String {
     return "${set.title} (${set.questionCount}문항)"
+}
+
+// --- Preview ---
+
+// M-13aβ 베타 잠금 — 유료 탭은 "유료 · 준비 중"으로 꺼지고, PIN 안내 자리에 배너가 들어간다
+@PassmatePreview
+@Composable
+private fun CreateRoomContentViewBetaLockedPreview() {
+    PassmateTheme {
+        CreateRoomContentView(
+            uiState = CreateRoomUiState(
+                isLoadingSets = false,
+                sets = listOf(
+                    QuestionSetSummary(setId = 7L, title = "Spring 기초 세트", isConfirmed = true, questionCount = 8)
+                ),
+                title = "8월 4주차 Spring 스터디",
+                selectedSetId = 7L,
+                isBetaPaymentLocked = true
+            ),
+            onAction = {},
+            onClose = {}
+        )
+    }
 }

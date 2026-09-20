@@ -103,11 +103,20 @@ private struct CoinChargeContentView: View {
                 balanceCard
                 sectionTitle("충전 금액").padding(.top, 24)
                 amountGrid.padding(.top, 10)
-                Text("1 C = ₩1 · 결제 수단은 포트원(PortOne) 결제창에서 선택해요 · 충전 후 7일 내 미사용 시 환불 가능")
-                    .font(.system(size: 12))
-                    .kerning(-0.24)
-                    .foregroundColor(PassmateColors.textTertiary)
+                // 베타 잠금(M-12-4β) — 결제 안내 문구 자리에 배너가 들어가고, 충전 버튼은 꺼진다
+                if uiState.isBetaPaymentLocked {
+                    PassmateBetaNoticeView(
+                        title: "현재는 베타 버전입니다.",
+                        message: "정식 출시 전까지 코인 충전을 이용할 수 없습니다."
+                    )
                     .padding(.top, 16)
+                } else {
+                    Text("1 C = ₩1 · 결제 수단은 포트원(PortOne) 결제창에서 선택해요 · 충전 후 7일 내 미사용 시 환불 가능")
+                        .font(.system(size: 12))
+                        .kerning(-0.24)
+                        .foregroundColor(PassmateColors.textTertiary)
+                        .padding(.top, 16)
+                }
                 if let errorMessage = uiState.errorMessage {
                     Text(errorMessage)
                         .font(.system(size: 13))
@@ -192,7 +201,9 @@ private struct CoinChargeContentView: View {
     }
 
     private var chargeButton: some View {
-        Button {
+        let isEnabled = !uiState.isProcessing && !uiState.isBetaPaymentLocked
+
+        return Button {
             onAction(.clickCharge)
         } label: {
             Group {
@@ -206,10 +217,10 @@ private struct CoinChargeContentView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
-            .background(uiState.isProcessing ? PassmateColors.border : PassmateColors.primary)
+            .background(isEnabled ? PassmateColors.primary : PassmateColors.border)
             .cornerRadius(16)
         }
-        .disabled(uiState.isProcessing)
+        .disabled(!isEnabled)
     }
 
     // MARK: - M-12-6 충전 완료
@@ -310,6 +321,20 @@ private struct CoinChargeContentView: View {
             balance: 1200,
             presets: [5_000, 10_000, 30_000, 50_000],
             selectedAmount: 10_000
+        ),
+        onAction: { _ in },
+        onBack: {}
+    )
+}
+
+#Preview("M-12-4β 베타 잠금") {
+    CoinChargeContentView(
+        uiState: CoinChargeUiState(
+            isLoading: false,
+            balance: 1200,
+            presets: [5_000, 10_000, 30_000, 50_000],
+            selectedAmount: 10_000,
+            isBetaPaymentLocked: true
         ),
         onAction: { _ in },
         onBack: {}

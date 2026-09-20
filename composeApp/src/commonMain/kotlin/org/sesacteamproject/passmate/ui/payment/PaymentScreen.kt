@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sesacteamproject.passmate.component.PaidRoomChip
 import org.sesacteamproject.passmate.component.PassmateBackButton
+import org.sesacteamproject.passmate.component.PassmateBetaNotice
 import org.sesacteamproject.passmate.component.PassmateBottomSheet
 import org.sesacteamproject.passmate.component.PassmateCard
 import org.sesacteamproject.passmate.component.PassmateIcon
@@ -235,7 +236,8 @@ private fun LoadedPayment(
                 selectedAvatarId = uiState.avatarId,
                 onSelect = { onAction(PaymentAction.SelectAvatar(it)) }
             )
-            if (!uiState.hasEnough) {
+            // 베타 잠금 중에는 충전을 못 하니 부족분 안내를 띄우지 않는다 — 배너가 대신 설명한다
+            if (!uiState.hasEnough && !uiState.isBetaPaymentLocked) {
                 ShortfallField(balance = uiState.balance, shortfall = uiState.shortfall)
             }
             uiState.errorMessage?.let {
@@ -244,6 +246,13 @@ private fun LoadedPayment(
                     color = PassmateColors.WrongPinkText,
                     fontSize = 13.sp,
                     letterSpacing = (-0.26).sp
+                )
+            }
+            // 베타 잠금(M-11β) — 결제 버튼 바로 위에 배너, 버튼은 꺼진다
+            if (uiState.isBetaPaymentLocked) {
+                PassmateBetaNotice(
+                    title = "현재는 베타 버전입니다.",
+                    body = "정식 출시 전까지 유료 방을 이용할 수 없습니다."
                 )
             }
             PayButton(uiState = uiState, onClick = { onAction(PaymentAction.ClickPay) })
@@ -474,12 +483,13 @@ private fun PayButton(
     uiState: PaymentUiState,
     onClick: () -> Unit
 ) {
-    val label = if (uiState.hasEnough) {
+    // 베타 잠금 중에는 충전 경로가 없으니 라벨을 시안(M-11β)대로 "결제하고 입장"으로 고정한다
+    val label = if (uiState.hasEnough || uiState.isBetaPaymentLocked) {
         "${formatNumber(uiState.entryFee)} C 결제하고 입장"
     } else {
         "${formatNumber(uiState.shortfall)} C 충전하고 입장"
     }
-    val enabled = !uiState.isProcessing
+    val enabled = !uiState.isProcessing && !uiState.isBetaPaymentLocked
     val background = if (enabled) PassmateColors.Primary else PassmateColors.Border
 
     Box(
@@ -686,6 +696,27 @@ private fun PaymentContentScreenShortfallPreview() {
                 shortfall = 300,
                 nickname = "민지",
                 avatarId = 3
+            ),
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+// M-11β 베타 잠금 — 결제 버튼 위 배너, 버튼 비활성. 코인이 모자라도 부족분 안내는 뜨지 않는다
+@PassmatePreview
+@Composable
+private fun PaymentContentScreenBetaLockedPreview() {
+    PassmateTheme {
+        PaymentContentScreen(
+            uiState = PaymentUiState(
+                isLoading = false,
+                room = previewPaidRoom,
+                balance = 200,
+                shortfall = 300,
+                nickname = "민지",
+                avatarId = 3,
+                isBetaPaymentLocked = true
             ),
             onAction = {},
             onBack = {}

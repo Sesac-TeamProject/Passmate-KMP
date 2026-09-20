@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sesacteamproject.passmate.component.PortOneRequest
 import org.sesacteamproject.passmate.component.PortOneResult
+import org.sesacteamproject.passmate.core.config.BetaConfig
 import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
@@ -22,8 +23,11 @@ class CoinChargeViewModel(
     private val getMyCoinsUseCase: GetMyCoinsUseCase,
     private val requestChargeUseCase: RequestChargeUseCase,
     private val confirmChargeUseCase: ConfirmChargeUseCase,
-    private val coinPolicy: CoinPolicy
-) : MviViewModel<CoinChargeUiState, CoinChargeAction, CoinChargeEvent>(CoinChargeUiState()) {
+    private val coinPolicy: CoinPolicy,
+    private val isBetaPaymentLocked: Boolean = BetaConfig.BETA_PAYMENT_LOCKED
+) : MviViewModel<CoinChargeUiState, CoinChargeAction, CoinChargeEvent>(
+    CoinChargeUiState(isBetaPaymentLocked = isBetaPaymentLocked)
+) {
 
     private var pendingChargeId: String? = null
 
@@ -47,7 +51,8 @@ class CoinChargeViewModel(
     private fun onClickCharge() {
         val state = _uiState.value
 
-        if (state.isProcessing || state.isLoading) {
+        // 베타 잠금 — 버튼은 화면이 꺼 두지만, 액션이 들어와도 충전 요청은 나가지 않는다 (M-12-4β)
+        if (isBetaPaymentLocked || state.isProcessing || state.isLoading) {
             return
         }
         _uiState.update { it.copy(isProcessing = true, errorMessage = null) }

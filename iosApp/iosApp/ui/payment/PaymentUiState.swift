@@ -25,6 +25,9 @@ struct PaymentUiState {
 
     var errorMessage: String? = nil
 
+    // 베타 잠금 (M-11β) — 배너를 띄우고 결제 버튼을 끈다. 값은 VM이 BetaConfig에서 채운다
+    var isBetaPaymentLocked: Bool = false
+
     var entryFee: Int {
         Int(room?.entryFee?.int32Value ?? 0)
     }
