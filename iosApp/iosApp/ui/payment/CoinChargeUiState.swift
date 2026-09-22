@@ -24,6 +24,9 @@ struct CoinChargeUiState {
 
     var errorMessage: String? = nil
 
+    // 베타 잠금 (M-12-4β) — 배너를 띄우고 충전 버튼을 끈다. 값은 VM이 BetaConfig에서 채운다
+    var isBetaPaymentLocked: Bool = false
+
     var isPortOneVisible: Bool {
         checkout != nil
     }

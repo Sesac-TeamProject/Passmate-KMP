@@ -22,6 +22,8 @@ final class PaymentViewModel: ObservableObject {
 
     private let joinInputPolicy: JoinInputPolicy
 
+    private let isBetaPaymentLocked: Bool
+
     @Published private(set) var uiState = PaymentUiState()
 
     let event = PassthroughSubject<PaymentEvent, Never>()
@@ -82,7 +84,8 @@ final class PaymentViewModel: ObservableObject {
     }
 
     private func onClickPay() {
-        guard let room = uiState.room, !uiState.isProcessing else {
+        // 베타 잠금 — 참가비 차감도 코인 부족 시트도 열지 않는다 (M-11β)
+        guard !isBetaPaymentLocked, let room = uiState.room, !uiState.isProcessing else {
             return
         }
         if !joinInputPolicy.isValidNickname(nickname: uiState.nickname) {
@@ -99,7 +102,8 @@ final class PaymentViewModel: ObservableObject {
     }
 
     private func onConfirmCharge() {
-        if uiState.isProcessing {
+        // 베타 잠금 — 시트가 뜨지 않으니 올 일이 없지만, 들어와도 충전 요청은 나가지 않는다
+        if isBetaPaymentLocked || uiState.isProcessing {
             return
         } else {
             uiState.isCoinShortageSheetVisible = false
@@ -278,7 +282,8 @@ final class PaymentViewModel: ObservableObject {
         payEntryFeeUseCase: PayEntryFeeUseCase,
         joinRoomUseCase: JoinRoomUseCase,
         coinPolicy: CoinPolicy,
-        joinInputPolicy: JoinInputPolicy
+        joinInputPolicy: JoinInputPolicy,
+        isBetaPaymentLocked: Bool = BetaConfig.shared.BETA_PAYMENT_LOCKED
     ) {
         self.getRoomInfoUseCase = getRoomInfoUseCase
         self.getMyCoinsUseCase = getMyCoinsUseCase
@@ -288,5 +293,7 @@ final class PaymentViewModel: ObservableObject {
         self.joinRoomUseCase = joinRoomUseCase
         self.coinPolicy = coinPolicy
         self.joinInputPolicy = joinInputPolicy
+        self.isBetaPaymentLocked = isBetaPaymentLocked
+        self.uiState.isBetaPaymentLocked = isBetaPaymentLocked
     }
 }

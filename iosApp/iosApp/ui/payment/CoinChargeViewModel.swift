@@ -14,6 +14,8 @@ final class CoinChargeViewModel: ObservableObject {
 
     private let coinPolicy: CoinPolicy
 
+    private let isBetaPaymentLocked: Bool
+
     @Published private(set) var uiState = CoinChargeUiState()
 
     let event = PassthroughSubject<CoinChargeEvent, Never>()
@@ -39,7 +41,8 @@ final class CoinChargeViewModel: ObservableObject {
     }
 
     private func onClickCharge() {
-        if uiState.isProcessing || uiState.isLoading {
+        // 베타 잠금 — 버튼은 화면이 꺼 두지만, 액션이 들어와도 충전 요청은 나가지 않는다 (M-12-4β)
+        if isBetaPaymentLocked || uiState.isProcessing || uiState.isLoading {
             return
         }
         uiState.isProcessing = true
@@ -147,11 +150,14 @@ final class CoinChargeViewModel: ObservableObject {
         getMyCoinsUseCase: GetMyCoinsUseCase,
         requestChargeUseCase: RequestChargeUseCase,
         confirmChargeUseCase: ConfirmChargeUseCase,
-        coinPolicy: CoinPolicy
+        coinPolicy: CoinPolicy,
+        isBetaPaymentLocked: Bool = BetaConfig.shared.BETA_PAYMENT_LOCKED
     ) {
         self.getMyCoinsUseCase = getMyCoinsUseCase
         self.requestChargeUseCase = requestChargeUseCase
         self.confirmChargeUseCase = confirmChargeUseCase
         self.coinPolicy = coinPolicy
+        self.isBetaPaymentLocked = isBetaPaymentLocked
+        self.uiState.isBetaPaymentLocked = isBetaPaymentLocked
     }
 }

@@ -17,7 +17,9 @@ data class PaymentUiState(
     // 코인이 모자랄 때 뜨는 M-11 시트. 표시 여부 판단은 VM, 시트 생명주기는 화면이 갖는다 (규칙 §11-1)
     val isCoinShortageSheetVisible: Boolean = false,
     val checkout: PortOneRequest? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    // 베타 잠금 (M-11β) — 배너를 띄우고 결제 버튼을 끈다. 값은 VM이 BetaConfig에서 채운다
+    val isBetaPaymentLocked: Boolean = false
 ) {
     val entryFee: Int
         get() = room?.entryFee ?: 0

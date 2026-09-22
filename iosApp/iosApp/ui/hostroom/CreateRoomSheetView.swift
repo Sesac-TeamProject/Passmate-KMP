@@ -13,6 +13,10 @@ struct CreateRoomSheetView: View {
     // 유료 탭은 입력칸이 늘어난다 — 상위가 시트 높이를 올리도록 알린다 (M-13a)
     var onPaidChanged: (Bool) -> Void = { _ in }
 
+    // 본문 높이 — 상위가 시트를 내용 높이로 연다. 반높이 고정이면 베타 배너(M-13aβ)만큼 길어진 폼에서
+    // 만들기 버튼이 시트 밖으로 밀린다 (Compose PassmateBottomSheet는 원래 내용 높이로 열린다)
+    var onContentHeightChanged: (CGFloat) -> Void = { _ in }
+
     @StateObject private var viewModel = CreateRoomViewModel(
         getMyQuestionSetsUseCase: KoinHelper.shared.getMyQuestionSetsUseCase(),
         createRoomUseCase: KoinHelper.shared.createRoomUseCase()
@@ -29,6 +33,9 @@ struct CreateRoomSheetView: View {
         }
         .onChange(of: viewModel.uiState.isPaid) { isPaid in
             onPaidChanged(isPaid)
+        }
+        .onPreferenceChange(CreateRoomSheetHeightKey.self) { height in
+            onContentHeightChanged(height)
         }
         .onReceive(viewModel.event) { event in
             switch event {
@@ -88,16 +95,29 @@ private struct CreateRoomContentView: View {
                     .background(PassmateColors.fieldGray)
                     .cornerRadius(14)
                 }
-                Text("PIN은 방을 만들면 자동 발급 · 프로젝터 화면은 웹에서")
-                    .font(.system(size: 12))
-                    .kerning(-0.24)
-                    .foregroundColor(PassmateColors.textTertiary)
-                    .frame(maxWidth: .infinity)
+                // 베타 잠금(M-13aβ) — PIN 안내 문구 자리에 배너가 들어간다. 만들기 버튼은 그대로 켜 둔다
+                if uiState.isBetaPaymentLocked {
+                    PassmateBetaNoticeView(
+                        message: CreateRoomBetaLockText.noticeBody
+                    )
+                } else {
+                    Text("PIN은 방을 만들면 자동 발급 · 프로젝터 화면은 웹에서")
+                        .font(.system(size: 12))
+                        .kerning(-0.24)
+                        .foregroundColor(PassmateColors.textTertiary)
+                        .frame(maxWidth: .infinity)
+                }
                 submitButton
             }
             .padding(.horizontal, 20)
             .padding(.top, 24)
             .padding(.bottom, 28)
+            // 스크롤뷰가 아니라 안쪽 본문을 잰다 — 스크롤뷰의 크기는 제안받은 시트 높이라 내용 높이가 아니다
+            .background(
+                GeometryReader { geometry in
+                    Color.clear.preference(key: CreateRoomSheetHeightKey.self, value: geometry.size.height)
+                }
+            )
         }
         .background(PassmateColors.surface.ignoresSafeArea())
     }
@@ -168,24 +188,39 @@ private struct CreateRoomContentView: View {
     private var paidToggle: some View {
         HStack(spacing: 4) {
             paidOption(label: "무료", isSelected: !uiState.isPaid, isPaidValue: false)
-            paidOption(label: "유료 (Lv.3부터)", isSelected: uiState.isPaid, isPaidValue: true)
+            paidOption(
+                label: uiState.isBetaPaymentLocked ? CreateRoomBetaLockText.paidTabLabel : "유료 (Lv.3부터)",
+                isSelected: uiState.isPaid,
+                isPaidValue: true,
+                isEnabled: !uiState.isBetaPaymentLocked
+            )
         }
         .padding(4)
         .background(PassmateColors.fieldGray)
         .cornerRadius(14)
     }
 
-    private func paidOption(label: String, isSelected: Bool, isPaidValue: Bool) -> some View {
-        Button(action: { onAction(.selectPaid(isPaid: isPaidValue)) }) {
+    private func paidOption(label: String, isSelected: Bool, isPaidValue: Bool, isEnabled: Bool = true) -> some View {
+        let textColor: Color
+
+        if !isEnabled {
+            textColor = PassmateColors.textTertiary
+        } else if isSelected {
+            textColor = PassmateColors.primaryDeep
+        } else {
+            textColor = PassmateColors.textSecondary
+        }
+        return Button(action: { onAction(.selectPaid(isPaid: isPaidValue)) }) {
             Text(label)
                 .font(.system(size: 14, weight: .medium))
                 .kerning(-0.28)
-                .foregroundColor(isSelected ? PassmateColors.primaryDeep : PassmateColors.textSecondary)
+                .foregroundColor(textColor)
                 .frame(maxWidth: .infinity)
                 .frame(height: 44)
                 .background(isSelected ? PassmateColors.surface : PassmateColors.fieldGray)
                 .cornerRadius(12)
         }
+        .disabled(!isEnabled)
     }
 
     private var submitButton: some View {
@@ -211,4 +246,37 @@ private struct CreateRoomContentView: View {
     private func setLabel(_ set: QuestionSetSummary) -> String {
         "\(set.title) (\(set.questionCount)문항)"
     }
+}
+
+private struct CreateRoomSheetHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+// 베타 잠금 문구 (시안 M-13aβ) — Compose CreateRoomSheet.kt의 CreateRoomBetaLockText 미러.
+// 제목·치수·타이포는 공통 컴포넌트 PassmateBetaNoticeView가 갖는다
+private enum CreateRoomBetaLockText {
+    static let noticeBody = "유료 방은 아직 준비 중입니다.\n현재는 무료 방만 만들 수 있습니다."
+
+    // 잠긴 유료 탭의 라벨 — 평소 라벨 "유료 (Lv.3부터)" 자리에 들어간다
+    static let paidTabLabel = "유료 · 준비 중"
+}
+
+// MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
+
+#Preview("M-13aβ 베타 잠금") {
+    CreateRoomContentView(
+        uiState: CreateRoomUiState(
+            isLoadingSets: false,
+            sets: [QuestionSetSummary(setId: 7, title: "Spring 기초 세트", isConfirmed: true, questionCount: 8)],
+            title: "8월 4주차 Spring 스터디",
+            selectedSetId: 7,
+            isBetaPaymentLocked: true
+        ),
+        onAction: { _ in },
+        onClose: {}
+    )
 }

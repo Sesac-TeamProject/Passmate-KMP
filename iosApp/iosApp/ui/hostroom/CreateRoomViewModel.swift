@@ -8,11 +8,20 @@ final class CreateRoomViewModel: ObservableObject {
 
     private let createRoomUseCase: CreateRoomUseCase
 
+    private let isBetaPaymentLocked: Bool
+
     @Published private(set) var uiState = CreateRoomUiState()
 
     let event = PassthroughSubject<CreateRoomEvent, Never>()
 
     private var hasEntered = false
+
+    // 베타 잠금 — 유료는 고를 수 없다. 탭은 화면이 꺼 두지만, 액션이 들어와도 무료로 남는다 (M-13aβ)
+    private func onSelectPaid(isPaid: Bool) {
+        let resolvedIsPaid = isPaid && !isBetaPaymentLocked
+
+        uiState.isPaid = resolvedIsPaid
+    }
 
     private func onEnter() {
         if hasEntered {
@@ -99,7 +108,7 @@ final class CreateRoomViewModel: ObservableObject {
         case let .selectSet(setId):
             uiState.selectedSetId = setId
         case let .selectPaid(isPaid):
-            uiState.isPaid = isPaid
+            onSelectPaid(isPaid: isPaid)
         case let .changeEntryFee(text):
             uiState.entryFeeText = String(text.filter { $0.isNumber }.prefix(7))
         case .submit:
@@ -109,9 +118,12 @@ final class CreateRoomViewModel: ObservableObject {
 
     init(
         getMyQuestionSetsUseCase: GetMyQuestionSetsUseCase,
-        createRoomUseCase: CreateRoomUseCase
+        createRoomUseCase: CreateRoomUseCase,
+        isBetaPaymentLocked: Bool = BetaConfig.shared.BETA_PAYMENT_LOCKED
     ) {
         self.getMyQuestionSetsUseCase = getMyQuestionSetsUseCase
         self.createRoomUseCase = createRoomUseCase
+        self.isBetaPaymentLocked = isBetaPaymentLocked
+        self.uiState.isBetaPaymentLocked = isBetaPaymentLocked
     }
 }

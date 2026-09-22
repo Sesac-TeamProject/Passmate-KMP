@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sesacteamproject.passmate.component.PassmateBetaNotice
 import org.sesacteamproject.passmate.component.PassmateTopBar
 import org.sesacteamproject.passmate.component.PortOnePaymentView
 import org.sesacteamproject.passmate.di.koinScreenViewModel
@@ -122,12 +123,19 @@ private fun AmountBody(
             onSelect = { onAction(CoinChargeAction.SelectAmount(it)) }
         )
         Spacer(Modifier.height(16.dp))
-        Text(
-            text = "1 C = ₩1 · 결제 수단은 포트원(PortOne) 결제창에서 선택해요 · 충전 후 7일 내 미사용 시 환불 가능",
-            color = PassmateColors.TextTertiary,
-            fontSize = 12.sp,
-            letterSpacing = (-0.24).sp
-        )
+        // 베타 잠금(M-12-4β) — 결제 안내 문구 자리에 배너가 들어가고, 충전 버튼은 꺼진다
+        if (uiState.isBetaPaymentLocked) {
+            PassmateBetaNotice(
+                body = CoinChargeBetaLockText.NOTICE_BODY
+            )
+        } else {
+            Text(
+                text = "1 C = ₩1 · 결제 수단은 포트원(PortOne) 결제창에서 선택해요 · 충전 후 7일 내 미사용 시 환불 가능",
+                color = PassmateColors.TextTertiary,
+                fontSize = 12.sp,
+                letterSpacing = (-0.24).sp
+            )
+        }
         uiState.errorMessage?.let {
             Spacer(Modifier.height(12.dp))
             Text(it, color = PassmateColors.WrongPinkText, fontSize = 13.sp)
@@ -229,7 +237,7 @@ private fun ChargeButton(
     uiState: CoinChargeUiState,
     onClick: () -> Unit
 ) {
-    val enabled = !uiState.isProcessing
+    val enabled = !uiState.isProcessing && !uiState.isBetaPaymentLocked
     val bg = if (enabled) PassmateColors.Primary else PassmateColors.Border
 
     Box(
@@ -346,6 +354,13 @@ private fun formatNumber(value: Int): String {
     return value.toString().reversed().chunked(3).joinToString(",").reversed()
 }
 
+// 베타 잠금 문구 (시안 M-12-4β) — iOS CoinChargeView.swift의 CoinChargeBetaLockText와 1:1.
+// 제목·치수·타이포는 공통 컴포넌트 PassmateBetaNotice가 갖는다
+private object CoinChargeBetaLockText {
+
+    const val NOTICE_BODY = "정식 출시 전까지 코인 충전을 이용할 수 없습니다."
+}
+
 // --- Preview ---
 
 // M-12-4 금액 선택
@@ -359,6 +374,25 @@ private fun CoinChargeContentScreenPreview() {
                 balance = 1200,
                 presets = listOf(5_000, 10_000, 30_000, 50_000),
                 selectedAmount = 10_000
+            ),
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+// M-12-4β 베타 잠금 — 안내 문구 자리에 배너, 충전 버튼 비활성
+@PassmatePreview
+@Composable
+private fun CoinChargeContentScreenBetaLockedPreview() {
+    PassmateTheme {
+        CoinChargeContentScreen(
+            uiState = CoinChargeUiState(
+                isLoading = false,
+                balance = 1200,
+                presets = listOf(5_000, 10_000, 30_000, 50_000),
+                selectedAmount = 10_000,
+                isBetaPaymentLocked = true
             ),
             onAction = {},
             onBack = {}

@@ -15,7 +15,9 @@ data class CoinChargeUiState(
     val isCompleted: Boolean = false,
     // 완료 화면 표기용 — 방금 충전한 금액(원 = C)
     val chargedAmount: Int = 0,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    // 베타 잠금 (M-12-4β) — 배너를 띄우고 충전 버튼을 끈다. 값은 VM이 BetaConfig에서 채운다
+    val isBetaPaymentLocked: Boolean = false
 ) {
     val isPortOneVisible: Boolean
         get() = checkout != null

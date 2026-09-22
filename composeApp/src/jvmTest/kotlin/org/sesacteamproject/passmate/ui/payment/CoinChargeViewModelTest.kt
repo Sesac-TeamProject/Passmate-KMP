@@ -4,6 +4,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -37,12 +38,18 @@ class CoinChargeViewModelTest {
         payMethod = "EASY_PAY"
     )
 
-    private fun viewModel(repository: FakePaymentRepository): CoinChargeViewModel {
+    // 충전 흐름 테스트는 잠금이 풀린 상태가 전제다 — 운영 스위치(BetaConfig)에 기대지 않게 기본값을 false로 고정한다.
+    // 베타 잠금 테스트만 true를 명시한다
+    private fun viewModel(
+        repository: FakePaymentRepository,
+        isBetaPaymentLocked: Boolean = false
+    ): CoinChargeViewModel {
         return CoinChargeViewModel(
             getMyCoinsUseCase = GetMyCoinsUseCase(repository),
             requestChargeUseCase = RequestChargeUseCase(repository),
             confirmChargeUseCase = ConfirmChargeUseCase(repository),
-            coinPolicy = CoinPolicy()
+            coinPolicy = CoinPolicy(),
+            isBetaPaymentLocked = isBetaPaymentLocked
         )
     }
 
@@ -157,6 +164,34 @@ class CoinChargeViewModelTest {
         assertEquals(false, state.isProcessing)
         assertNull(state.errorMessage)
         assertNull(state.checkout)
+    }
+
+    // 베타 잠금 (Figma "13 · 베타 운영" M-12-4β) — 결제가 잠기면 충전 요청이 아예 나가지 않는다.
+    // 버튼만 끄는 것으로는 부족하다: 화면 밖 경로로 액션이 들어와도 서버에 닿으면 안 된다
+    @Test
+    fun lockedChargeSendsNoRequest() = runTest {
+        val repository = FakePaymentRepository(
+            coinsResult = AppResult.Success(CoinBalance(1200, PaymentMethod.KAKAO_PAY, null)),
+            chargeResult = AppResult.Success(checkout)
+        )
+        val viewModel = viewModel(repository, isBetaPaymentLocked = true)
+
+        viewModel.onAction(CoinChargeAction.Enter)
+        viewModel.onAction(CoinChargeAction.ClickCharge)
+
+        assertNull(repository.chargedAmount)
+        assertFalse(viewModel.uiState.value.isProcessing)
+        assertNull(viewModel.uiState.value.checkout)
+    }
+
+    // 화면은 이 값 하나로 배너를 띄우고 버튼을 끈다
+    @Test
+    fun lockedStateIsExposedToScreen() = runTest {
+        val locked = viewModel(FakePaymentRepository(), isBetaPaymentLocked = true)
+        val unlocked = viewModel(FakePaymentRepository(), isBetaPaymentLocked = false)
+
+        assertTrue(locked.uiState.value.isBetaPaymentLocked)
+        assertFalse(unlocked.uiState.value.isBetaPaymentLocked)
     }
 
     @BeforeTest

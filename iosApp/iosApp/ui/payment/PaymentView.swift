@@ -177,7 +177,8 @@ private struct PaymentContentView: View {
                 entryFeeSection
                 nicknameField
                 avatarField
-                if !uiState.hasEnough {
+                // 베타 잠금 중에는 충전을 못 하니 부족분 안내를 띄우지 않는다 — 배너가 대신 설명한다
+                if !uiState.hasEnough && !uiState.isBetaPaymentLocked {
                     shortfallField
                 }
                 if let error = uiState.errorMessage {
@@ -185,6 +186,12 @@ private struct PaymentContentView: View {
                         .font(.system(size: 13))
                         .kerning(-0.26)
                         .foregroundColor(PassmateColors.wrongPinkText)
+                }
+                // 베타 잠금(M-11β) — 결제 버튼 바로 위에 배너, 버튼은 꺼진다
+                if uiState.isBetaPaymentLocked {
+                    PassmateBetaNoticeView(
+                        message: PaymentBetaLockText.noticeBody
+                    )
                 }
                 payButton
             }
@@ -283,9 +290,11 @@ private struct PaymentContentView: View {
     }
 
     private var payButton: some View {
-        let label = uiState.hasEnough
+        // 베타 잠금 중에는 충전 경로가 없으니 라벨을 시안(M-11β)대로 "결제하고 입장"으로 고정한다
+        let label = uiState.hasEnough || uiState.isBetaPaymentLocked
             ? "\(formatNumber(uiState.entryFee)) C 결제하고 입장"
             : "\(formatNumber(uiState.shortfall)) C 충전하고 입장"
+        let isEnabled = !uiState.isProcessing && !uiState.isBetaPaymentLocked
 
         return Button(action: { onAction(.clickPay) }) {
             ZStack {
@@ -300,10 +309,10 @@ private struct PaymentContentView: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 54)
-            .background(uiState.isProcessing ? PassmateColors.border : PassmateColors.primary)
+            .background(isEnabled ? PassmateColors.primary : PassmateColors.border)
             .cornerRadius(16)
         }
-        .disabled(uiState.isProcessing)
+        .disabled(!isEnabled)
     }
 
     private var avatarRows: [[Int]] {
@@ -478,6 +487,12 @@ private struct CoinShortageSheetView: View {
     }
 }
 
+// 베타 잠금 문구 (시안 M-11β) — Compose PaymentScreen.kt의 PaymentBetaLockText 미러.
+// 제목·치수·타이포는 공통 컴포넌트 PassmateBetaNoticeView가 갖는다
+private enum PaymentBetaLockText {
+    static let noticeBody = "정식 출시 전까지 유료 방을 이용할 수 없습니다."
+}
+
 // MARK: - 프리뷰 (Figma 시안 비교용, 백엔드 불필요)
 
 private let previewPaidRoom = RoomInfo(
@@ -506,6 +521,22 @@ private let previewPaidRoom = RoomInfo(
             shortfall: 300,
             nickname: "민지",
             avatarId: 3
+        ),
+        onAction: { _ in },
+        onBack: {}
+    )
+}
+
+#Preview("M-11β 베타 잠금") {
+    PaymentContentView(
+        uiState: PaymentUiState(
+            isLoading: false,
+            room: previewPaidRoom,
+            balance: 200,
+            shortfall: 300,
+            nickname: "민지",
+            avatarId: 3,
+            isBetaPaymentLocked: true
         ),
         onAction: { _ in },
         onBack: {}

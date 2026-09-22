@@ -3,6 +3,7 @@ package org.sesacteamproject.passmate.ui.hostroom
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.sesacteamproject.passmate.core.config.BetaConfig
 import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.ServerErrorCode
 import org.sesacteamproject.passmate.core.model.onFailure
@@ -13,8 +14,11 @@ import org.sesacteamproject.passmate.room.domain.usecase.CreateRoomUseCase
 
 class CreateRoomViewModel(
     private val getMyQuestionSetsUseCase: GetMyQuestionSetsUseCase,
-    private val createRoomUseCase: CreateRoomUseCase
-) : MviViewModel<CreateRoomUiState, CreateRoomAction, CreateRoomEvent>(CreateRoomUiState()) {
+    private val createRoomUseCase: CreateRoomUseCase,
+    private val isBetaPaymentLocked: Boolean = BetaConfig.BETA_PAYMENT_LOCKED
+) : MviViewModel<CreateRoomUiState, CreateRoomAction, CreateRoomEvent>(
+    CreateRoomUiState(isBetaPaymentLocked = isBetaPaymentLocked)
+) {
 
     private var hasEntered = false
 
@@ -45,6 +49,13 @@ class CreateRoomViewModel(
                     _uiState.update { it.copy(isLoadingSets = false, setsLoadFailed = true) }
                 }
         }
+    }
+
+    // 베타 잠금 — 유료는 고를 수 없다. 탭은 화면이 꺼 두지만, 액션이 들어와도 무료로 남는다 (M-13aβ)
+    private fun onSelectPaid(isPaid: Boolean) {
+        val resolvedIsPaid = isPaid && !isBetaPaymentLocked
+
+        _uiState.update { it.copy(isPaid = resolvedIsPaid) }
     }
 
     private fun onSubmit() {
@@ -91,7 +102,7 @@ class CreateRoomViewModel(
             is CreateRoomAction.RetrySets -> loadSets()
             is CreateRoomAction.ChangeTitle -> _uiState.update { it.copy(title = action.title) }
             is CreateRoomAction.SelectSet -> _uiState.update { it.copy(selectedSetId = action.setId) }
-            is CreateRoomAction.SelectPaid -> _uiState.update { it.copy(isPaid = action.isPaid) }
+            is CreateRoomAction.SelectPaid -> onSelectPaid(action.isPaid)
             is CreateRoomAction.ChangeEntryFee -> _uiState.update {
                 it.copy(entryFeeText = action.text.filter { ch -> ch.isDigit() }.take(7))
             }

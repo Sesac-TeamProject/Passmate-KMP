@@ -42,6 +42,8 @@ class FakePaymentRepository(
 
     var confirmedPaymentId: String? = null
 
+    var payEntryCalls: Int = 0
+
     override suspend fun getMyCoins(): AppResult<CoinBalance> {
         coinsCalls += 1
         coinsGate?.await()
@@ -64,6 +66,7 @@ class FakePaymentRepository(
     }
 
     override suspend fun payEntryFee(roomId: Long, nickname: String, avatarId: Int?): AppResult<EntryPayment> {
+        payEntryCalls += 1
         return AppResult.Failure(AppError.Unknown())
     }
 

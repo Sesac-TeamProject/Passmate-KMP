@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sesacteamproject.passmate.component.PortOneRequest
 import org.sesacteamproject.passmate.component.PortOneResult
+import org.sesacteamproject.passmate.core.config.BetaConfig
 import org.sesacteamproject.passmate.core.model.AppError
 import org.sesacteamproject.passmate.core.model.onFailure
 import org.sesacteamproject.passmate.core.model.onSuccess
@@ -31,8 +32,11 @@ class PaymentViewModel(
     private val payEntryFeeUseCase: PayEntryFeeUseCase,
     private val joinRoomUseCase: JoinRoomUseCase,
     private val coinPolicy: CoinPolicy,
-    private val joinInputPolicy: JoinInputPolicy
-) : MviViewModel<PaymentUiState, PaymentAction, PaymentEvent>(PaymentUiState()) {
+    private val joinInputPolicy: JoinInputPolicy,
+    private val isBetaPaymentLocked: Boolean = BetaConfig.BETA_PAYMENT_LOCKED
+) : MviViewModel<PaymentUiState, PaymentAction, PaymentEvent>(
+    PaymentUiState(isBetaPaymentLocked = isBetaPaymentLocked)
+) {
 
     private var pin: String = ""
 
@@ -84,7 +88,8 @@ class PaymentViewModel(
     private fun onClickPay() {
         val state = _uiState.value
 
-        if (state.isProcessing || state.room == null) {
+        // 베타 잠금 — 참가비 차감도 코인 부족 시트도 열지 않는다 (M-11β)
+        if (isBetaPaymentLocked || state.isProcessing || state.room == null) {
             return
         }
         if (!joinInputPolicy.isValidNickname(state.nickname)) {
@@ -101,7 +106,8 @@ class PaymentViewModel(
     private fun onConfirmCharge() {
         val state = _uiState.value
 
-        if (state.isProcessing) {
+        // 베타 잠금 — 시트가 뜨지 않으니 올 일이 없지만, 들어와도 충전 요청은 나가지 않는다
+        if (isBetaPaymentLocked || state.isProcessing) {
             return
         } else {
             _uiState.update { it.copy(isCoinShortageSheetVisible = false, isProcessing = true, errorMessage = null) }

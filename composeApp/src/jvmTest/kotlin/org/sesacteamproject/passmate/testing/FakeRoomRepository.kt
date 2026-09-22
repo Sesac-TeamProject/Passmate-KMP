@@ -34,6 +34,11 @@ class FakeRoomRepository(
     // 화면이 "나"를 알아보는 기준 — 퇴장 이벤트가 내 것인지 가를 때 쓴다
     var currentParticipation: MyParticipation? = null
 
+    var createResult: AppResult<CreatedRoom> = AppResult.Failure(AppError.Unknown())
+
+    // 마지막 방 생성 요청의 유료 여부 — 요청이 없었으면 null
+    var createdIsPaid: Boolean? = null
+
     override suspend fun getRoomPin(roomId: Long): AppResult<String> {
         val pin = pinByRoomId[roomId]
 
@@ -95,6 +100,7 @@ class FakeRoomRepository(
         isPaid: Boolean,
         entryFee: Int?
     ): AppResult<CreatedRoom> {
-        return AppResult.Failure(AppError.Unknown())
+        createdIsPaid = isPaid
+        return createResult
     }
 }
