@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A1010000400AABBCCDDEEFF0400 /* GoogleSignInClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000400AABBCCDDEEFF0400 /* GoogleSignInClient.swift */; };
+		A1010000404AABBCCDDEEFF0404 /* AppleSignInClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011000404AABBCCDDEEFF0404 /* AppleSignInClient.swift */; };
 		A1010000403AABBCCDDEEFF0403 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A1014000402AABBCCDDEEFF0402 /* GoogleSignIn */; };
 		A1010001AABBCCDDEEFF0001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011001AABBCCDDEEFF0001 /* ContentView.swift */; };
 		A1010002AABBCCDDEEFF0002 /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1011002AABBCCDDEEFF0002 /* iOSApp.swift */; };
@@ -176,6 +177,8 @@
 
 /* Begin PBXFileReference section */
 		A1011000400AABBCCDDEEFF0400 /* GoogleSignInClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInClient.swift; sourceTree = "<group>"; };
+		A1011000404AABBCCDDEEFF0404 /* AppleSignInClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInClient.swift; sourceTree = "<group>"; };
+		A1011000405AABBCCDDEEFF0405 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		A1011000AABBCCDDEEFF0000 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		A1011001AABBCCDDEEFF0001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1011002AABBCCDDEEFF0002 /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
@@ -367,6 +370,7 @@
 				A1012021AABBCCDDEEFF0021 /* component */,
 				A1011004AABBCCDDEEFF0004 /* Assets.xcassets */,
 				A1011006AABBCCDDEEFF0006 /* Info.plist */,
+				A1011000405AABBCCDDEEFF0405 /* iosApp.entitlements */,
 				A1012000AABBCCDDEEFF0000 /* Preview Content */,
 			);
 			path = iosApp;
@@ -443,6 +447,7 @@
 				A1011030AABBCCDDEEFF0030 /* SignInAction.swift */,
 				A1011031AABBCCDDEEFF0031 /* SignInEvent.swift */,
 				A1011000400AABBCCDDEEFF0400 /* GoogleSignInClient.swift */,
+				A1011000404AABBCCDDEEFF0404 /* AppleSignInClient.swift */,
 			);
 			path = auth;
 			sourceTree = "<group>";
@@ -773,6 +778,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1010000400AABBCCDDEEFF0400 /* GoogleSignInClient.swift in Sources */,
+				A1010000404AABBCCDDEEFF0404 /* AppleSignInClient.swift in Sources */,
 				A1010001AABBCCDDEEFF0001 /* ContentView.swift in Sources */,
 				A1010002AABBCCDDEEFF0002 /* iOSApp.swift in Sources */,
 				A1010027AABBCCDDEEFF0027 /* SignInView.swift in Sources */,
@@ -1067,6 +1073,7 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
@@ -1104,6 +1111,7 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";

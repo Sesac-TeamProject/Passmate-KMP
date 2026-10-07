@@ -5,6 +5,8 @@ import Shared
 final class SignInViewModel: ObservableObject {
     private let signInWithGoogleUseCase: SignInWithGoogleUseCase
 
+    private let signInWithAppleUseCase: SignInWithAppleUseCase
+
     private let completeGuestClaimUseCase: CompleteGuestClaimUseCase
 
     private let devSignInUseCase: DevSignInUseCase
@@ -31,15 +33,29 @@ final class SignInViewModel: ObservableObject {
         event.send(.showNotice(message: "구글 로그인을 마치지 못했어요. 다시 시도해 주세요"))
     }
 
+    // Apple 로그인은 iOS에서만 연다 (Android·Desktop의 Compose VM은 "준비 중" 안내를 유지한다)
     private func onClickAppleSignIn() {
-        event.send(.showNotice(message: "Apple 로그인은 준비 중이에요"))
+        if !uiState.isSigningIn {
+            uiState.isSigningIn = true
+            event.send(.requestAppleSignIn)
+        }
+    }
+
+    // 시트를 닫은 것뿐이면 실패가 아니다 — 진행 표시만 걷는다
+    private func onCancelAppleSignIn() {
+        uiState.isSigningIn = false
+    }
+
+    private func onFailAppleSignIn() {
+        uiState.isSigningIn = false
+        event.send(.showNotice(message: "Apple 로그인을 마치지 못했어요. 다시 시도해 주세요"))
     }
 
     private func onClickGuestEnter() {
         event.send(.guestEnterRequested)
     }
 
-    // 성공/실패 판정과 후처리는 두 로그인 경로가 공유한다 (Kotlin 미러의 finishSignIn과 1:1)
+    // 성공/실패 판정과 후처리는 모든 로그인 경로가 공유한다 (Kotlin 미러의 finishSignIn과 1:1)
     private func handleSignInResult(result: Any?, error: Error?, failureMessage: String) {
         DispatchQueue.main.async {
             self.uiState.isSigningIn = false
@@ -69,6 +85,17 @@ final class SignInViewModel: ObservableObject {
     private func onReceiveGoogleIdToken(idToken: String) {
         uiState.isSigningIn = true
         signInWithGoogleUseCase.invoke(idToken: idToken) { [weak self] result, error in
+            self?.handleSignInResult(
+                result: result,
+                error: error,
+                failureMessage: "로그인에 실패했어요. 다시 시도해 주세요"
+            )
+        }
+    }
+
+    private func onReceiveAppleIdToken(idToken: String, name: String?) {
+        uiState.isSigningIn = true
+        signInWithAppleUseCase.invoke(idToken: idToken, name: name) { [weak self] result, error in
             self?.handleSignInResult(
                 result: result,
                 error: error,
@@ -109,16 +136,24 @@ final class SignInViewModel: ObservableObject {
             onCancelGoogleSignIn()
         case .failGoogleSignIn:
             onFailGoogleSignIn()
+        case let .receiveAppleIdToken(idToken, name):
+            onReceiveAppleIdToken(idToken: idToken, name: name)
+        case .cancelAppleSignIn:
+            onCancelAppleSignIn()
+        case .failAppleSignIn:
+            onFailAppleSignIn()
         }
     }
 
     init(
         signInWithGoogleUseCase: SignInWithGoogleUseCase,
+        signInWithAppleUseCase: SignInWithAppleUseCase,
         completeGuestClaimUseCase: CompleteGuestClaimUseCase,
         devSignInUseCase: DevSignInUseCase,
         isDevSignInAvailableUseCase: IsDevSignInAvailableUseCase
     ) {
         self.signInWithGoogleUseCase = signInWithGoogleUseCase
+        self.signInWithAppleUseCase = signInWithAppleUseCase
         self.completeGuestClaimUseCase = completeGuestClaimUseCase
         self.devSignInUseCase = devSignInUseCase
         self.uiState = SignInUiState(

@@ -67,4 +67,17 @@ class SocialLoginTest {
 
         assertEquals("""{"idToken":"google-id-token"}""", body)
     }
+
+    // Apple은 첫 인증 때만 이름을 준다 — 받았을 때만 name을 싣는다
+    @Test
+    fun sendsAppleNameOnlyWhenPresent() {
+        val first = json.encodeToString(
+            SocialLoginRequest.serializer(),
+            SocialLoginRequest(idToken = "apple-id-token", name = "홍희표")
+        )
+        val later = json.encodeToString(SocialLoginRequest.serializer(), SocialLoginRequest(idToken = "apple-id-token"))
+
+        assertEquals("""{"idToken":"apple-id-token","name":"홍희표"}""", first)
+        assertEquals("""{"idToken":"apple-id-token"}""", later)
+    }
 }
