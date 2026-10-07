@@ -9,6 +9,7 @@ struct SignInView: View {
 
     @StateObject private var viewModel = SignInViewModel(
         signInWithGoogleUseCase: KoinHelper.shared.signInWithGoogleUseCase(),
+        signInWithAppleUseCase: KoinHelper.shared.signInWithAppleUseCase(),
         completeGuestClaimUseCase: KoinHelper.shared.completeGuestClaimUseCase(),
         devSignInUseCase: KoinHelper.shared.devSignInUseCase(),
         isDevSignInAvailableUseCase: KoinHelper.shared.isDevSignInAvailableUseCase()
@@ -29,6 +30,21 @@ struct SignInView: View {
         }
     }
 
+    private func requestAppleSignIn() {
+        AppleSignInClient.requestIdToken { outcome in
+            switch outcome {
+            case let .idToken(idToken, authorizationCode, name):
+                viewModel.action(
+                    .receiveAppleIdToken(idToken: idToken, authorizationCode: authorizationCode, name: name)
+                )
+            case .cancelled:
+                viewModel.action(.cancelAppleSignIn)
+            case .failed:
+                viewModel.action(.failAppleSignIn)
+            }
+        }
+    }
+
     var body: some View {
         SignInContentView(
             uiState: viewModel.uiState,
@@ -38,6 +54,8 @@ struct SignInView: View {
             switch event {
             case .requestGoogleSignIn:
                 requestGoogleSignIn()
+            case .requestAppleSignIn:
+                requestAppleSignIn()
             case .signInCompleted:
                 onSignedIn()
             case .guestEnterRequested:

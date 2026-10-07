@@ -223,3 +223,20 @@
   - [ ] 상태바·홈 인디케이터를 레일이 침범하지 않는다(세이프에어리어)
 - [ ] **경계 전환**: iPad 멀티태스킹으로 폭을 600 위아래로 오가면 레일 ↔ 하단바가 바뀌고, 전환 중 화면이 깨지거나 스크롤 위치가 튀지 않는다
 - [ ] **회귀**: 로그인/로그아웃(`sessionGeneration` 재생성) 직후에도 레일/탭바 상태가 정상
+
+## 15. Apple 로그인 (feature/apple-login, 2026-10-07)
+
+> 신규 Swift 1개 — `ui/auth/AppleSignInClient.swift`(pbxproj idx **0404**) + `iosApp/iosApp.entitlements`(**0405**, `com.apple.developer.applesignin`=Default, 타깃 Debug·Release `CODE_SIGN_ENTITLEMENTS`). 그룹 ID 신규 없음. 다음 idx = **0406**.
+> 서버는 `POST /auth/login/apple {idToken, name?}`(백엔드 `feature/apple-login`) — 토큰 aud가 번들 ID와 같아야 한다. 기본 허용값은 `org.sesacteamproject.passmate.Passmate`(Config.xcconfig `TEAM_ID` 비움 기준). Local.xcconfig로 `TEAM_ID`를 붙여 번들 ID가 달라지면 백엔드 `APPLE_CLIENT_IDS`에 그 값을 쉼표로 추가해야 로그인된다.
+
+- [ ] Xcode → Signing & Capabilities에 **Sign in with Apple**이 보이고 서명 오류가 없다 (자동 서명이 App ID에 기능을 켠다 — 무료 개인 팀은 이 기능을 못 써서 서명이 실패한다)
+- [ ] 컴파일 오류 0 — 특히 `SignInWithAppleUseCase.invoke(idToken:name:completionHandler:)` 인터롭 시그니처, `KoinHelper.shared.signInWithAppleUseCase()`
+- [ ] 로그인 화면 "Apple로 계속하기" → Apple 시트가 뜬다 ("준비 중이에요" 토스트가 뜨면 회귀)
+  - [ ] 시트 닫기(취소) → 토스트 없이 버튼이 다시 활성화된다
+  - [ ] 첫 인증: 이름·이메일 공유 화면 → 완료 시 홈으로 이동, 마이에서 닉네임 = Apple 이름(한국어 기기면 성+이름)
+  - [ ] "이메일 가리기" 선택 시 닉네임 = "패스메이트 회원" (privaterelay 주소 아이디를 닉네임으로 쓰지 않음)
+  - [ ] 로그아웃 후 재로그인: 이름 공유 화면 없이 바로 같은 계정(isNewUser=false, 닉네임 유지)
+  - [ ] 다시 처음부터 시험하려면: 설정 → Apple ID → 암호 및 보안 → Apple로 로그인 → 패스메이트 → "Apple ID 사용 중단"
+- [ ] 게스트 가입 유도(결과 화면) → Apple 로그인 → 게스트 기록 claim 동작(구글과 같은 `finishSignIn` 경로)
+- [ ] **탈퇴 시 Apple 연결 해제** `[백엔드: APPLE_KEY_ID·APPLE_PRIVATE_KEY 설정 필요]` — Apple로 로그인(서버 로그에 "refresh token 보관 실패"가 없어야 함) → 마이 → 회원 탈퇴 → 서버 로그 "탈퇴 회원의 Apple 연결을 해제했다" → 설정 → Apple ID → Apple로 로그인 목록에서 패스메이트가 사라진다 → 다시 Apple 로그인하면 이름·이메일 공유 화면부터 다시 뜬다(새 가입)
+- [ ] 백엔드 미배포 상태에서 누르면 "로그인에 실패했어요" 토스트(서버 400 UNSUPPORTED_PROVIDER) — 앱이 죽지 않는다

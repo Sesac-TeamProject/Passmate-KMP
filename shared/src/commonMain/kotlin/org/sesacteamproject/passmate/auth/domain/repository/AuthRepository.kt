@@ -7,6 +7,10 @@ interface AuthRepository {
     // 네이티브 SDK가 받아 온 Google ID 토큰으로 로그인한다 (POST /auth/login/google)
     suspend fun signInWithGoogle(idToken: String): AppResult<Unit>
 
+    // iOS 네이티브 Apple 로그인의 identity token으로 로그인한다 (POST /auth/login/apple).
+    // authorizationCode는 탈퇴 시 Apple 연결 해제용(서버가 교환해 보관), name은 첫 인증 때만 온다
+    suspend fun signInWithApple(idToken: String, authorizationCode: String?, name: String?): AppResult<Unit>
+
     // 로컬 개발 서버(dev-login이 있는 서버)에 붙어 있는지 — 운영 URL이면 false
     fun isDevSignInAvailable(): Boolean
 

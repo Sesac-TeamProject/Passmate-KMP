@@ -27,6 +27,14 @@ class AuthRemoteDataSource(
         }.body()
     }
 
+    // Apple 로그인 (POST /auth/login/apple) — 서버가 identity token을 Apple 공개키로 검증한다
+    suspend fun loginWithApple(request: SocialLoginRequest): LoginResponse {
+        return apiClient.http.post("${apiClient.baseUrl}/auth/login/apple") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
     // 로컬 개발 서버 전용 로그인 (POST /auth/dev-login) — 운영에는 배포되지 않는 API다
     suspend fun devLogin(request: DevLoginRequest): LoginResponse {
         return apiClient.http.post("${apiClient.baseUrl}/auth/dev-login") {

@@ -4,6 +4,7 @@ import org.koin.dsl.module
 import org.sesacteamproject.passmate.auth.data.remote.AuthRemoteDataSource
 import org.sesacteamproject.passmate.auth.data.repository.AuthRepositoryImpl
 import org.sesacteamproject.passmate.auth.domain.repository.AuthRepository
+import org.sesacteamproject.passmate.auth.domain.usecase.SignInWithAppleUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.SignInWithGoogleUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.DevSignInUseCase
 import org.sesacteamproject.passmate.auth.domain.usecase.IsDevSignInAvailableUseCase
@@ -14,6 +15,7 @@ val authModule = module {
     single { AuthRemoteDataSource(get()) }
     single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
     factory { SignInWithGoogleUseCase(get()) }
+    factory { SignInWithAppleUseCase(get()) }
     factory { DevSignInUseCase(get()) }
     factory { IsDevSignInAvailableUseCase(get()) }
     factory { IsSignedInUseCase(get()) }
