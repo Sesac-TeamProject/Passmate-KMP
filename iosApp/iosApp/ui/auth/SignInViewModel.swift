@@ -93,9 +93,13 @@ final class SignInViewModel: ObservableObject {
         }
     }
 
-    private func onReceiveAppleIdToken(idToken: String, name: String?) {
+    private func onReceiveAppleIdToken(idToken: String, authorizationCode: String?, name: String?) {
         uiState.isSigningIn = true
-        signInWithAppleUseCase.invoke(idToken: idToken, name: name) { [weak self] result, error in
+        signInWithAppleUseCase.invoke(
+            idToken: idToken,
+            authorizationCode: authorizationCode,
+            name: name
+        ) { [weak self] result, error in
             self?.handleSignInResult(
                 result: result,
                 error: error,
@@ -136,8 +140,8 @@ final class SignInViewModel: ObservableObject {
             onCancelGoogleSignIn()
         case .failGoogleSignIn:
             onFailGoogleSignIn()
-        case let .receiveAppleIdToken(idToken, name):
-            onReceiveAppleIdToken(idToken: idToken, name: name)
+        case let .receiveAppleIdToken(idToken, authorizationCode, name):
+            onReceiveAppleIdToken(idToken: idToken, authorizationCode: authorizationCode, name: name)
         case .cancelAppleSignIn:
             onCancelAppleSignIn()
         case .failAppleSignIn:

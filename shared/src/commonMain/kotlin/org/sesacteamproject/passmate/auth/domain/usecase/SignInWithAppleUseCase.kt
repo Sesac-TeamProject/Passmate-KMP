@@ -6,7 +6,7 @@ import org.sesacteamproject.passmate.core.model.AppResult
 class SignInWithAppleUseCase(
     private val authRepository: AuthRepository
 ) {
-    suspend operator fun invoke(idToken: String, name: String?): AppResult<Unit> {
-        return authRepository.signInWithApple(idToken, name)
+    suspend operator fun invoke(idToken: String, authorizationCode: String?, name: String?): AppResult<Unit> {
+        return authRepository.signInWithApple(idToken, authorizationCode, name)
     }
 }

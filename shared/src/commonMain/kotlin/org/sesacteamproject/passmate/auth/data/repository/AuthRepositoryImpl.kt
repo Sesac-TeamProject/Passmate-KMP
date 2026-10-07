@@ -33,8 +33,16 @@ class AuthRepositoryImpl(
         return result.flatMapToSession()
     }
 
-    override suspend fun signInWithApple(idToken: String, name: String?): AppResult<Unit> {
-        val request = SocialLoginRequest(idToken, name?.takeIf { it.isNotBlank() })
+    override suspend fun signInWithApple(
+        idToken: String,
+        authorizationCode: String?,
+        name: String?
+    ): AppResult<Unit> {
+        val request = SocialLoginRequest(
+            idToken = idToken,
+            authorizationCode = authorizationCode?.takeIf { it.isNotBlank() },
+            name = name?.takeIf { it.isNotBlank() }
+        )
         val result = apiCall { remoteDataSource.loginWithApple(request) }
 
         return result.flatMapToSession()

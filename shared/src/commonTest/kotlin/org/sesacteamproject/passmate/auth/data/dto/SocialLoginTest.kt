@@ -68,16 +68,19 @@ class SocialLoginTest {
         assertEquals("""{"idToken":"google-id-token"}""", body)
     }
 
-    // Apple은 첫 인증 때만 이름을 준다 — 받았을 때만 name을 싣는다
+    // Apple은 인가 코드를 함께 싣고(탈퇴 시 연결 해제용), 이름은 첫 인증 때만 준다 — 받았을 때만 name을 싣는다
     @Test
-    fun sendsAppleNameOnlyWhenPresent() {
+    fun sendsAppleCodeAndNameOnlyWhenPresent() {
         val first = json.encodeToString(
             SocialLoginRequest.serializer(),
-            SocialLoginRequest(idToken = "apple-id-token", name = "홍희표")
+            SocialLoginRequest(idToken = "apple-id-token", authorizationCode = "apple-code", name = "홍희표")
         )
-        val later = json.encodeToString(SocialLoginRequest.serializer(), SocialLoginRequest(idToken = "apple-id-token"))
+        val later = json.encodeToString(
+            SocialLoginRequest.serializer(),
+            SocialLoginRequest(idToken = "apple-id-token", authorizationCode = "apple-code")
+        )
 
-        assertEquals("""{"idToken":"apple-id-token","name":"홍희표"}""", first)
-        assertEquals("""{"idToken":"apple-id-token"}""", later)
+        assertEquals("""{"idToken":"apple-id-token","authorizationCode":"apple-code","name":"홍희표"}""", first)
+        assertEquals("""{"idToken":"apple-id-token","authorizationCode":"apple-code"}""", later)
     }
 }

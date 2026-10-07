@@ -238,4 +238,5 @@
   - [ ] 로그아웃 후 재로그인: 이름 공유 화면 없이 바로 같은 계정(isNewUser=false, 닉네임 유지)
   - [ ] 다시 처음부터 시험하려면: 설정 → Apple ID → 암호 및 보안 → Apple로 로그인 → 패스메이트 → "Apple ID 사용 중단"
 - [ ] 게스트 가입 유도(결과 화면) → Apple 로그인 → 게스트 기록 claim 동작(구글과 같은 `finishSignIn` 경로)
+- [ ] **탈퇴 시 Apple 연결 해제** `[백엔드: APPLE_KEY_ID·APPLE_PRIVATE_KEY 설정 필요]` — Apple로 로그인(서버 로그에 "refresh token 보관 실패"가 없어야 함) → 마이 → 회원 탈퇴 → 서버 로그 "탈퇴 회원의 Apple 연결을 해제했다" → 설정 → Apple ID → Apple로 로그인 목록에서 패스메이트가 사라진다 → 다시 Apple 로그인하면 이름·이메일 공유 화면부터 다시 뜬다(새 가입)
 - [ ] 백엔드 미배포 상태에서 누르면 "로그인에 실패했어요" 토스트(서버 400 UNSUPPORTED_PROVIDER) — 앱이 죽지 않는다

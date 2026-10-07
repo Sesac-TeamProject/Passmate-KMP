@@ -33,8 +33,10 @@ struct SignInView: View {
     private func requestAppleSignIn() {
         AppleSignInClient.requestIdToken { outcome in
             switch outcome {
-            case let .idToken(idToken, name):
-                viewModel.action(.receiveAppleIdToken(idToken: idToken, name: name))
+            case let .idToken(idToken, authorizationCode, name):
+                viewModel.action(
+                    .receiveAppleIdToken(idToken: idToken, authorizationCode: authorizationCode, name: name)
+                )
             case .cancelled:
                 viewModel.action(.cancelAppleSignIn)
             case .failed:

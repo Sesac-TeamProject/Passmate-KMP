@@ -3,9 +3,10 @@ import Foundation
 import UIKit
 
 // 애플 로그인 결과 — GoogleSignInOutcome과 같은 3갈래다.
+// authorizationCode는 서버가 refresh token으로 바꿔 두었다가 탈퇴 때 Apple 연결을 끊는 데 쓴다(5분 안에 1회용).
 // name은 Apple이 첫 인증 때만 주는 이름이다. 두 번째 로그인부터는 nil이다
 enum AppleSignInOutcome {
-    case idToken(String, name: String?)
+    case idToken(String, authorizationCode: String?, name: String?)
     case cancelled
     case failed
 }
@@ -73,9 +74,11 @@ extension AppleSignInClient: ASAuthorizationControllerDelegate {
     ) {
         let credential = authorization.credential as? ASAuthorizationAppleIDCredential
         let idToken = credential?.identityToken.flatMap { String(data: $0, encoding: .utf8) }
+        let authorizationCode = credential?.authorizationCode.flatMap { String(data: $0, encoding: .utf8) }
+        let name = AppleSignInClient.displayName(credential?.fullName)
 
         if let idToken {
-            finish(.idToken(idToken, name: AppleSignInClient.displayName(credential?.fullName)))
+            finish(.idToken(idToken, authorizationCode: authorizationCode, name: name))
         } else {
             print("Passmate/AppleSignIn: identity token이 비어 있다")
             finish(.failed)
