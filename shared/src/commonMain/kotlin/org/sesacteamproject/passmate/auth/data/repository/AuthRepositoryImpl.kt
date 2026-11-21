@@ -18,7 +18,7 @@ class AuthRepositoryImpl(
     private val remoteDataSource: AuthRemoteDataSource
 ) : AuthRepository {
 
-    // 로그인 응답의 토큰 쌍을 세션 저장 경로로 넘긴다 — 구글·개발용 로그인이 공유한다
+    // 로그인 응답의 토큰 쌍을 세션 저장 경로로 넘긴다 — 구글·애플·개발용 로그인이 공유한다
     private suspend fun AppResult<LoginResponse>.flatMapToSession(): AppResult<Unit> {
         return when (this) {
             is AppResult.Success -> completeSignIn(value.accessToken, value.refreshToken)
@@ -33,7 +33,22 @@ class AuthRepositoryImpl(
         return result.flatMapToSession()
     }
 
-    // 로그인 응답의 토큰 쌍을 세션에 저장한다 — 구글·개발용 로그인이 공유하는 마지막 단계다
+    override suspend fun signInWithApple(
+        idToken: String,
+        authorizationCode: String?,
+        name: String?
+    ): AppResult<Unit> {
+        val request = SocialLoginRequest(
+            idToken = idToken,
+            authorizationCode = authorizationCode?.takeIf { it.isNotBlank() },
+            name = name?.takeIf { it.isNotBlank() }
+        )
+        val result = apiCall { remoteDataSource.loginWithApple(request) }
+
+        return result.flatMapToSession()
+    }
+
+    // 로그인 응답의 토큰 쌍을 세션에 저장한다 — 구글·애플·개발용 로그인이 공유하는 마지막 단계다
     private suspend fun completeSignIn(accessToken: String, refreshToken: String): AppResult<Unit> {
         return if (accessToken.isBlank() || refreshToken.isBlank()) {
             AppResult.Failure(AppError.ValidationFailed(serverMessage = "로그인 콜백 토큰이 비어 있습니다"))

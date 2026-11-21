@@ -35,6 +35,14 @@ class FakeAuthRepository(
         }
     }
 
+    override suspend fun signInWithApple(
+        idToken: String,
+        authorizationCode: String?,
+        name: String?
+    ): AppResult<Unit> {
+        return completeSignIn()
+    }
+
     private fun completeSignIn(): AppResult<Unit> {
         isSignedIn = true
         return AppResult.Success(Unit)
